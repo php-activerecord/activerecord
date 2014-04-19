@@ -1,4 +1,4 @@
-activerecord
+PHP ActiveRecord
 ============
 
-PHP ActiveRecord Project
+This is an open source implementation of ActiveRecord in PHP.
