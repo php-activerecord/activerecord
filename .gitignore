@@ -1,0 +1,11 @@
+.project
+.buildpath
+.settings
+*.log
+*.db
+*.swp
+vendor/*
+composer.lock
+phpunit.xml
+.php_cs.cache
+.php_cs
