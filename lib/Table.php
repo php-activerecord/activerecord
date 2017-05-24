@@ -146,9 +146,9 @@ class Table
                 } else {
                     throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");
                 }
+            } else {
+                $ret .= $value;
             }
-
-            $ret .= $value;
 
             $space = ' ';
         }

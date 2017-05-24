@@ -94,6 +94,7 @@ class DatabaseLoader
         if (!file_exists($file)) {
             throw new Exception("File not found: $file");
         }
+
         return file_get_contents($file);
     }
 
