@@ -225,8 +225,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
     /**
      * Creates a new instance of specified {@link Model} with the attributes pre-loaded.
      *
-     * @param Model $model      The model which holds this association
-     * @param array $attributes Hash containing attributes to initialize the model with
+     * @param Model $model            The model which holds this association
+     * @param array $attributes       Hash containing attributes to initialize the model with
+     * @param bool  $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
      *
      * @return Model
      */
@@ -240,8 +241,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
     /**
      * Creates a new instance of {@link Model} and invokes save.
      *
-     * @param Model $model      The model which holds this association
-     * @param array $attributes Hash containing attributes to initialize the model with
+     * @param Model $model            The model which holds this association
+     * @param array $attributes       Hash containing attributes to initialize the model with
+     * @param bool  $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
      *
      * @return Model
      */

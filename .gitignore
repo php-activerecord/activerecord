@@ -5,7 +5,9 @@
 *.db
 *.swp
 vendor/*
+output/*
 composer.lock
 phpunit.xml
 .php_cs.cache
 .php_cs
+docs/*

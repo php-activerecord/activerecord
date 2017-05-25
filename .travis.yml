@@ -1,11 +1,10 @@
-language: php
 cache:
     directories:
-      - $HOME/.composer/cache
-      - $HOME/.phpcsfixer
+        - $HOME/.composer/cache/files
 
 before_install:
   - if [[ "$TRAVIS_PHP_VERSION" = "hhvm" || "$TRAVIS_PHP_VERSION" = "nightly" ]]; then sed -i '/^.*friendsofphp\/php-cs-fixer.*$/d' composer.json; fi
+  - if [[ "$TRAVIS_PHP_VERSION" != 7.0 ]]; then sed -i '/^.*sami\/sami.*$/d' composer.json; fi
 
 install:
   - travis_retry composer install --prefer-dist --no-interaction
@@ -14,6 +13,7 @@ before_script:
   - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE phpar_test;'
   - psql -c 'CREATE DATABASE phpar_test;' -U postgres
+  - sudo apt-get install graphviz
 
 services:
   - memcache
@@ -37,6 +37,15 @@ matrix:
 
 script:
   - IFS=$'\n'; COMMIT_SCA_FILES=($(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")); unset IFS
-  - if [[ "$WITH_PHPCSFIXER" == "true" ]]; then mkdir -p $HOME/.phpcsfixer && vendor/bin/php-cs-fixer fix --cache-file "$HOME/.phpcsfixer/.php_cs.cache" --dry-run --diff --verbose "${COMMIT_SCA_FILES[@]}"; fi
+  - if [[ "$WITH_PHPCSFIXER" == "true" ]]; then vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection -- "${COMMIT_SCA_FILES[@]}"; fi
   - ./vendor/bin/phpunit
+  - if [[ "$WITH_SAMI" == "true" ]]; then ./vendor/bin/sami.php update sami-config.php; fi
 
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: ./docs
+  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+  on:
+    branch: generate-docs
+    condition: $TRAVIS_PHP_VERSION = 7.0
