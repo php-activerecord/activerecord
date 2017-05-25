@@ -153,8 +153,6 @@ class Table
             $space = ' ';
         }
 
-        $arr = array();
-
         return $ret;
     }
 
