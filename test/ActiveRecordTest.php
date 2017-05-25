@@ -348,6 +348,7 @@ class ActiveRecordTest extends DatabaseTest
         $original = Author::count();
         $ret = Author::transaction(function () {
             Author::create(['name' => 'blah']);
+
             return true;
         });
         $this->assert_equals($original+1, Author::count());

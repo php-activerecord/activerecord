@@ -21,6 +21,7 @@ class ModelCallbackTest extends DatabaseTest
         foreach ($callbacks as $name) {
             $this->callback->register($name, function ($model) use (&$fired, $name, $return) {
                 $fired[] = $name;
+
                 return $return;
             });
         }
