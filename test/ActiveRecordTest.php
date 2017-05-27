@@ -298,6 +298,9 @@ class ActiveRecordTest extends DatabaseTest
         $book = new Book();
         $this->assert_true(isset($book->name));
         $this->assert_false(isset($book->sharks));
+
+        $author = Author::find(1);
+        $this->assert_true(isset($author->awesome_person));
     }
 
     public function test_readonly_only_halt_on_write_method()
