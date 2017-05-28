@@ -30,7 +30,6 @@ matrix:
       - PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test WITH_PHPCSFIXER=true
     - php: 7.1
     - php: 'nightly'
-    - php: hhvm
   allow_failures:
     - php: 'nightly'
 
