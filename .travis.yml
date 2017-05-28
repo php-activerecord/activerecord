@@ -1,4 +1,14 @@
-install: composer install --prefer-source
+language: php
+cache:
+    directories:
+      - $HOME/.composer/cache
+      - $HOME/.phpcsfixer
+
+before_install:
+  - if [[ "$TRAVIS_PHP_VERSION" = "hhvm" || "$TRAVIS_PHP_VERSION" = "nightly" ]]; then sed -i '/^.*friendsofphp\/php-cs-fixer.*$/d' composer.json; fi
+
+install:
+  - travis_retry composer install --prefer-dist --no-interaction
 
 before_script:
   - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
@@ -10,19 +20,22 @@ services:
 
 env: PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
 
-language: php
-php:
-  - 5.4
-  - 5.5
-  - 5.6
-  - 7.0
-  - 7.1
-
 matrix:
-  allow_failures:
   fast_finish: true
+  include:
+    - php: 5.3
+    - php: 5.4
+    - php: 5.5
+    - php: 5.6
+    - php: 7.0
+      env: WITH_PHPCSFIXER=true
+    - php: 7.1
+    - php: 'nightly'
+    - php: hhvm
+  allow_failures:
+    - php: 'nightly'
 
 script:
   - IFS=$'\n'; COMMIT_SCA_FILES=($(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")); unset IFS
-  - ./vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection -- "${COMMIT_SCA_FILES[@]}"
+  - if [[ "$WITH_PHPCSFIXER" == "true" ]]; then mkdir -p $HOME/.phpcsfixer && vendor/bin/php-cs-fixer fix --cache-file "$HOME/.phpcsfixer/.php_cs.cache" --dry-run --diff --verbose "${COMMIT_SCA_FILES[@]}"; fi
   - ./vendor/bin/phpunit
