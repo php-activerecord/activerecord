@@ -1,6 +1,7 @@
 cache:
     directories:
         - $HOME/.composer/cache/files
+        - $HOME/.phpcsfixer
 
 before_install:
   - if [[ "$TRAVIS_PHP_VERSION" = "hhvm" || "$TRAVIS_PHP_VERSION" = "nightly" ]]; then sed -i '/^.*friendsofphp\/php-cs-fixer.*$/d' composer.json; fi
@@ -13,7 +14,6 @@ before_script:
   - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE phpar_test;'
   - psql -c 'CREATE DATABASE phpar_test;' -U postgres
-  - sudo apt-get install graphviz
 
 services:
   - memcache
