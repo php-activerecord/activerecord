@@ -225,8 +225,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
     /**
      * Creates a new instance of specified {@link Model} with the attributes pre-loaded.
      *
-     * @param Model $model      The model which holds this association
-     * @param array $attributes Hash containing attributes to initialize the model with
+     * @param Model $model            The model which holds this association
+     * @param array $attributes       Hash containing attributes to initialize the model with
+     * @param bool  $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
      *
      * @return Model
      */
@@ -240,8 +241,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
     /**
      * Creates a new instance of {@link Model} and invokes save.
      *
-     * @param Model $model      The model which holds this association
-     * @param array $attributes Hash containing attributes to initialize the model with
+     * @param Model $model            The model which holds this association
+     * @param array $attributes       Hash containing attributes to initialize the model with
+     * @param bool  $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
      *
      * @return Model
      */
@@ -396,7 +398,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 /**
  * One-to-many relationship.
  *
- * <code>
+ * ```php
  * # Table: people
  * # Primary key: id
  * # Foreign key: school_id
@@ -409,11 +411,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
  *     array('people')
  *   );
  * });
- * </code>
+ * ```
  *
  * Example using options:
  *
- * <code>
+ * ```php
  * class Payment extends ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('person'),
@@ -429,7 +431,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
  *           'conditions' => 'payments.amount < 200')
  *     );
  * }
- * </code>
+ * ```
  *
  * @package ActiveRecord
  *

@@ -1,0 +1,17 @@
+.navbar-api-link {
+    font-weight: bold;
+}
+
+.navbar-header a {
+    display: inline-block;
+}
+
+.navbar-header a:after {
+    content: '|';
+    color: rgba(0,0,0,0.6);
+    padding-left: 12px;
+}
+
+.navbar-header a:last-child:after {
+    content: '';
+}

@@ -167,20 +167,20 @@ abstract class Connection
      * Use this for any adapters that can take connection info in the form below
      * to set the adapters connection info.
      *
-     * <code>
+     * ```
      * protocol://username:password@host[:port]/dbname
      * protocol://urlencoded%20username:urlencoded%20password@host[:port]/dbname?decode=true
      * protocol://username:password@unix(/some/file/path)/dbname
-     * </code>
+     * ```
      *
      * Sqlite has a special syntax, as it does not need a database name or user authentication:
      *
-     * <code>
+     * ```
      * sqlite://file.db
      * sqlite://../relative/path/to/file.db
      * sqlite://unix(/absolute/path/to/file.db)
      * sqlite://windows(c%2A/absolute/path/to/file.db)
-     * </code>
+     * ```
      *
      * @param string $connection_url A connection URL
      *

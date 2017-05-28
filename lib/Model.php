@@ -1,5 +1,7 @@
 <?php
 /**
+ * The base class for your models.
+ *
  * @package ActiveRecord
  */
 
@@ -7,10 +9,9 @@ namespace ActiveRecord;
 
 /**
  * The base class for your models.
- *
  * Defining an ActiveRecord model for a table called people and orders:
  *
- * <code>
+ * ```sql
  * CREATE TABLE people(
  *   id int primary key auto_increment,
  *   parent_id int,
@@ -24,9 +25,9 @@ namespace ActiveRecord;
  *   cost decimal(10,2),
  *   total decimal(10,2)
  * );
- * </code>
+ * ```
  *
- * <code>
+ * ```php
  * class Person extends ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
@@ -59,7 +60,7 @@ namespace ActiveRecord;
  *     $this->total = $this->cost * 0.045;
  *   }
  * }
- * </code>
+ * ```
  *
  * For a more in-depth look at defining models, relationships, callbacks and many other things
  * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
@@ -462,6 +463,9 @@ class Model
         throw new UndefinedPropertyException(get_called_class(), $name);
     }
 
+    /**
+     * Magic method; this gets called by PHP itself when your model is unserialized.
+     */
     public function __wakeup()
     {
         // make sure the models Table instance gets initialized when waking up
@@ -956,6 +960,11 @@ class Model
         return true;
     }
 
+    /**
+     * If individual caching is enabled, this method will re-cache the current state of this model instance.
+     *
+     * @protected
+     */
     protected function update_cache()
     {
         $table = static::table();
@@ -964,6 +973,13 @@ class Model
         }
     }
 
+    /**
+     * Generates a unique key for caching.
+     *
+     * @protected
+     *
+     * @return string
+     */
     protected function cache_key()
     {
         $table = static::table();
@@ -1002,8 +1018,8 @@ class Model
      * <li><b>order:</b> A SQL fragment for ordering such as: 'name asc', 'id desc, name asc' (MySQL & Sqlite only)</li>
      * </ul>
      *
-     * @params array $options
-     * return integer Number of rows affected
+     * @param array $options
+     *                       return integer Number of rows affected
      */
     public static function delete_all($options=[])
     {
@@ -1059,8 +1075,8 @@ class Model
      * <li><b>order:</b> A SQL fragment for ordering such as: 'name asc', 'id desc, name asc' (MySQL & Sqlite only)</li>
      * </ul>
      *
-     * @params array $options
-     * return integer Number of rows affected
+     * @param array $options
+     *                       return integer Number of rows affected
      */
     public static function update_all($options=[])
     {
@@ -1117,6 +1133,9 @@ class Model
         return true;
     }
 
+    /**
+     * Removes this individual from cache.
+     */
     public function remove_from_cache()
     {
         $table = static::table();
@@ -1381,6 +1400,11 @@ class Model
         return $this;
     }
 
+    /**
+     * Magic Method. Called when cloning a model.
+     *
+     * @return Model}
+     */
     public function __clone()
     {
         $this->__relationships = [];
@@ -1765,7 +1789,7 @@ class Model
         }
         $results = count($list);
 
-        if ($results != ($expected = count($values))) {
+        if ($results != ($expected = count((array) $values))) {
             $class = get_called_class();
             if (is_array($values)) {
                 $values = join(',', $values);

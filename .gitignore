@@ -1,11 +1,14 @@
 .project
+.idea
 .buildpath
 .settings
 *.log
 *.db
 *.swp
 vendor/*
+output/*
 composer.lock
 phpunit.xml
 .php_cs.cache
 .php_cs
+build/*

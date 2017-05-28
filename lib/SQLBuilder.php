@@ -239,7 +239,7 @@ class SQLBuilder
         }
 
         $parts = preg_split('/(_and_|_or_)/i', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
-        $num_values = count($values);
+        $num_values = count((array) $values);
         $conditions = [''];
 
         for ($i=0, $j=0, $n=count($parts); $i<$n; $i+=2, ++$j) {
@@ -270,8 +270,8 @@ class SQLBuilder
     /**
      * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
      *
-     * @param string $name A string containing attribute names connected with _and_ or _or_
-     * @param $args Array of values for each attribute in $name
+     * @param string $name   A string containing attribute names connected with _and_ or _or_
+     * @param array  $values Array of values for each attribute in $name
      * @param $map A hash of "mapped_column_name" => "real_column_name"
      *
      * @return array A hash of array(name => value, ...)

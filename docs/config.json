@@ -1,0 +1,10 @@
+{
+	"title": "php-activerecord",
+	"html": {
+		"repo": "php-activerecord/activerecord",
+		"links": {
+			"GitHub": "https://github.com/php-activerecord/activerecord",
+			"API documentation": "../api/v1.0/index.html"
+		}
+	}
+}
