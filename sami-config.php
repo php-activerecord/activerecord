@@ -10,6 +10,7 @@ $versions = GitVersionCollection::create('lib')
 ;
 
 return new Sami('lib', [
+    'theme' => 'docs/theme',
     'versions' => $versions,
     'build_dir' => 'docs/build/%version%',
     'cache_dir' => 'docs/cache/%version%'
