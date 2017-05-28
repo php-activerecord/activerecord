@@ -38,3 +38,4 @@ script:
   - IFS=$'\n'; COMMIT_SCA_FILES=($(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")); unset IFS
   - if [[ "$WITH_PHPCSFIXER" == "true" ]]; then mkdir -p $HOME/.phpcsfixer && vendor/bin/php-cs-fixer fix --cache-file "$HOME/.phpcsfixer/.php_cs.cache" --dry-run --diff --verbose "${COMMIT_SCA_FILES[@]}"; fi
   - ./vendor/bin/phpunit
+
