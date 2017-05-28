@@ -9,8 +9,10 @@ $versions = GitVersionCollection::create('lib')
     ->add('generate-docs', 'docs branch')
 ;
 
+echo "DIR **** " . __DIR__;
+
 return new Sami('lib', [
-    'theme' => 'docs/theme/php-ar',
+    'theme' => __DIR__.'./docs/theme/php-ar',
     'versions' => $versions,
     'build_dir' => 'docs/build/%version%',
     'cache_dir' => 'docs/cache/%version%'
