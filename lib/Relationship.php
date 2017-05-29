@@ -398,7 +398,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 /**
  * One-to-many relationship.
  *
- * <code>
+ * ```php
  * # Table: people
  * # Primary key: id
  * # Foreign key: school_id
@@ -411,11 +411,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
  *     array('people')
  *   );
  * });
- * </code>
+ * ```
  *
  * Example using options:
  *
- * <code>
+ * ```php
  * class Payment extends ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('person'),
@@ -431,7 +431,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
  *           'conditions' => 'payments.amount < 200')
  *     );
  * }
- * </code>
+ * ```
  *
  * @package ActiveRecord
  *

@@ -11,5 +11,4 @@ composer.lock
 phpunit.xml
 .php_cs.cache
 .php_cs
-docs/build/*
-docs/cache/*
+build/*
