@@ -45,7 +45,7 @@ script:
 deploy:
   provider: pages
   skip_cleanup: true
-  local_dir: ./docs
+  local_dir: ./build
   github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
   on:
     branch: generate-docs
