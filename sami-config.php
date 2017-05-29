@@ -13,7 +13,7 @@ echo "DIR **** " . __DIR__;
 
 return new Sami('lib', [
     'theme' => 'php-ar',
-    'versions' => $versions,
+//    'versions' => $versions,
     'build_dir' => 'docs/build/%version%',
     'cache_dir' => 'docs/cache/%version%',
     'template_dirs' => [
