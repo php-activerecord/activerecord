@@ -5,7 +5,8 @@ use Sami\Version\GitVersionCollection;
 use Symfony\Component\Finder\Finder;
 
 $versions = GitVersionCollection::create('lib')
-    ->add('generate-docs', 'docs branch')
+    ->add('1.0', '1,0 release')
+    ->add('master', 'master branch')
 ;
 return new Sami('lib', [
     'theme' => 'default',
