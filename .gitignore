@@ -11,4 +11,3 @@ composer.lock
 phpunit.xml
 .php_cs.cache
 .php_cs
-build/*
