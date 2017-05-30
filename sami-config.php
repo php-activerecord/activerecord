@@ -11,6 +11,7 @@ $versions = GitVersionCollection::create('lib')
 ;
 
 return new Sami('lib', [
+    'title' => 'php-activerecord API',
     'theme' => 'php-ar',
     'versions' => $versions,
     'build_dir' => 'build/api/%version%',
