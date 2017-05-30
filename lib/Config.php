@@ -10,14 +10,14 @@ use Closure;
 /**
  * Manages configuration options for ActiveRecord.
  *
- * <code>
+ * ```
  * ActiveRecord::initialize(function($cfg) {
  *   $cfg->set_model_home('models');
  *   $cfg->set_connections(array(
  *     'development' => 'mysql://user:pass@development.com/awesome_development',
  *     'production' => 'mysql://user:pass@production.com/awesome_production'));
  * });
- * </code>
+ * ```
  *
  * @package ActiveRecord
  */
@@ -26,20 +26,20 @@ class Config extends Singleton
     /**
      * Name of the connection to use by default.
      *
-     * <code>
+     * ```
      * ActiveRecord\Config::initialize(function($cfg) {
      *   $cfg->set_model_directory('/your/app/models');
      *   $cfg->set_connections(array(
      *     'development' => 'mysql://user:pass@development.com/awesome_development',
      *     'production' => 'mysql://user:pass@production.com/awesome_production'));
      * });
-     * </code>
+     * ```
      *
      * This is a singleton class so you can retrieve the {@link Singleton} instance by doing:
      *
-     * <code>
+     * ```
      * $config = ActiveRecord\Config::instance();
-     * </code>
+     * ```
      *
      * @var string
      */
@@ -95,22 +95,22 @@ class Config extends Singleton
      *
      * This method is just syntatic sugar.
      *
-     * <code>
+     * ```
      * ActiveRecord\Config::initialize(function($cfg) {
      *   $cfg->set_model_directory('/path/to/your/model_directory');
      *   $cfg->set_connections(array(
      *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
      * });
-     * </code>
+     * ```
      *
      * You can also initialize by grabbing the singleton object:
      *
-     * <code>
+     * ```
      * $cfg = ActiveRecord\Config::instance();
      * $cfg->set_model_directory('/path/to/your/model_directory');
      * $cfg->set_connections(array('development' =>
      *   'mysql://username:password@localhost/database_name'));
-     * </code>
+     * ```
      *
      * @param Closure $initializer A closure
      */
@@ -122,10 +122,10 @@ class Config extends Singleton
     /**
      * Sets the list of database connection strings.
      *
-     * <code>
+     * ```
      * $config->set_connections(array(
      *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
-     * </code>
+     * ```
      *
      * @param array  $connections        Array of connections
      * @param string $default_connection Optionally specify the default_connection
@@ -323,10 +323,10 @@ class Config extends Singleton
      *
      * Example:
      *
-     * <code>
+     * ```
      * $config->set_cache("memcached://localhost");
      * $config->set_cache("memcached://localhost",array("expire" => 60));
-     * </code>
+     * ```
      *
      * @param string $url     url to your cache server
      * @param array  $options Array of options

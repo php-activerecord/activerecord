@@ -12,7 +12,7 @@ namespace ActiveRecord;
  *
  * Example of formatting and changing the default format:
  *
- * <code>
+ * ```
  * $now = new ActiveRecord\DateTime('2010-01-02 03:04:05');
  * ActiveRecord\DateTime::$DEFAULT_FORMAT = 'short';
  *
@@ -22,14 +22,14 @@ namespace ActiveRecord;
  *
  * # __toString() uses the default formatter
  * echo (string)$now;           # 02 Jan 03:04
- * </code>
+ * ```
  *
  * You can also add your own pre-defined friendly formatters:
  *
- * <code>
+ * ```
  * ActiveRecord\DateTime::$FORMATS['awesome_format'] = 'H:i:s m/d/Y';
  * echo $now->format('awesome_format')  # 03:04:05 01/02/2010
- * </code>
+ * ```
  *
  * @package ActiveRecord
  *
@@ -75,11 +75,11 @@ class DateTime extends \DateTime implements DateTimeInterface
     /**
      * Formats the DateTime to the specified format.
      *
-     * <code>
+     * ```
      * $datetime->format();         # uses the format defined in DateTime::$DEFAULT_FORMAT
      * $datetime->format('short');  # d M H:i
      * $datetime->format('Y-m-d');  # Y-m-d
-     * </code>
+     * ```
      *
      * @see FORMATS
      * @see get_format

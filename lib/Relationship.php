@@ -629,7 +629,7 @@ class HasMany extends AbstractRelationship
 /**
  * One-to-one relationship.
  *
- * <code>
+ * ```
  * # Table name: states
  * # Primary key: id
  * class State extends ActiveRecord\Model {}
@@ -639,7 +639,7 @@ class HasMany extends AbstractRelationship
  * class Person extends ActiveRecord\Model {
  *   static $has_one = array(array('state'));
  * }
- * </code>
+ * ```
  *
  * @package ActiveRecord
  *
@@ -677,7 +677,7 @@ class HasAndBelongsToMany extends AbstractRelationship
 /**
  * Belongs to relationship.
  *
- * <code>
+ * ```
  * class School extends ActiveRecord\Model {}
  *
  * class Person extends ActiveRecord\Model {
@@ -685,11 +685,11 @@ class HasAndBelongsToMany extends AbstractRelationship
  *     array('school')
  *   );
  * }
- * </code>
+ * ```
  *
  * Example using options:
  *
- * <code>
+ * ```
  * class School extends ActiveRecord\Model {}
  *
  * class Person extends ActiveRecord\Model {
@@ -697,7 +697,7 @@ class HasAndBelongsToMany extends AbstractRelationship
  *     array('school', 'primary_key' => 'school_id')
  *   );
  * }
- * </code>
+ * ```
  *
  * @package ActiveRecord
  *

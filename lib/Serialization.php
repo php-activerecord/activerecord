@@ -24,7 +24,7 @@ use XmlWriter;
  *
  * Example usage:
  *
- * <code>
+ * ```
  * # include the attributes id and name
  * # run $model->encoded_description() and include its return value
  * # include the comments association
@@ -37,7 +37,7 @@ use XmlWriter;
  *
  * # except the password field from being included
  * $model->to_xml(array('except' => 'password')));
- * </code>
+ * ```
  *
  * @package ActiveRecord
  *
@@ -63,7 +63,7 @@ abstract class Serialization
      * Setting this to true will produce the following attributes array when
      * the include option was used:
      *
-     * <code>
+     * ```
      * $user = array('id' => 1, 'name' => 'Tito',
      *   'permissions' => array(
      *     'permission' => array(
@@ -72,18 +72,18 @@ abstract class Serialization
      *     )
      *   )
      * );
-     * </code>
+     * ```
      *
      * Setting to false will produce this:
      *
-     * <code>
+     * ```
      * $user = array('id' => 1, 'name' => 'Tito',
      *   'permissions' => array(
      *     array('id' => 100, 'name' => 'admin'),
      *     array('id' => 101, 'name' => 'normal')
      *   )
      * );
-     * </code>
+     * ```
      *
      * @var bool
      */

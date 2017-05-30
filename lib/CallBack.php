@@ -34,7 +34,7 @@ use Closure;
  *
  * This class isn't meant to be used directly. Callbacks are defined on your model like the example below:
  *
- * <code>
+ * ```
  * class Person extends ActiveRecord\Model {
  *   static $before_save = array('make_name_uppercase');
  *   static $after_save = array('do_happy_dance');
@@ -47,7 +47,7 @@ use Closure;
  *     happy_dance();
  *   }
  * }
- * </code>
+ * ```
  *
  * Available options for callbacks:
  *

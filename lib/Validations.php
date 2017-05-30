@@ -20,7 +20,7 @@ use IteratorAggregate;
  * This class isn't meant to be directly used. Instead you define
  * validators thru static variables in your {@link Model}. Example:
  *
- * <code>
+ * ```
  * class Person extends ActiveRecord\Model {
  *   static $validates_length_of = array(
  *     array('name', 'within' => array(30,100),
@@ -34,7 +34,7 @@ use IteratorAggregate;
  *
  * if (!$person->is_valid())
  *   print_r($person->errors);
- * </code>
+ * ```
  *
  * @package ActiveRecord
  *
@@ -157,14 +157,14 @@ class Validations
     /**
      * Validates a field is not null and not blank.
      *
-     * <code>
+     * ```
      * class Person extends ActiveRecord\Model {
      *   static $validates_presence_of = array(
      *     array('first_name'),
      *     array('last_name')
      *   );
      * }
-     * </code>
+     * ```
      *
      * Available options:
      *
@@ -189,13 +189,13 @@ class Validations
     /**
      * Validates that a value is included the specified array.
      *
-     * <code>
+     * ```
      * class Car extends ActiveRecord\Model {
      *   static $validates_inclusion_of = array(
      *     array('fuel_type', 'in' => array('hyrdogen', 'petroleum', 'electric')),
      *   );
      * }
-     * </code>
+     * ```
      *
      * Available options:
      *
@@ -286,13 +286,13 @@ class Validations
     /**
      * Validates that a value is numeric.
      *
-     * <code>
+     * ```
      * class Person extends ActiveRecord\Model {
      *   static $validates_numericality_of = array(
      *     array('salary', 'greater_than' => 19.99, 'less_than' => 99.99)
      *   );
      * }
-     * </code>
+     * ```
      *
      * Available options:
      *
@@ -390,13 +390,13 @@ class Validations
     /**
      * Validates that a value is matches a regex.
      *
-     * <code>
+     * ```
      * class Person extends ActiveRecord\Model {
      *   static $validates_format_of = array(
      *     array('email', 'with' => '/^.*?@.*$/')
      *   );
      * }
-     * </code>
+     * ```
      *
      * Available options:
      *
@@ -436,13 +436,13 @@ class Validations
     /**
      * Validates the length of a value.
      *
-     * <code>
+     * ```
      * class Person extends ActiveRecord\Model {
      *   static $validates_length_of = array(
      *     array('name', 'within' => array(1,50))
      *   );
      * }
-     * </code>
+     * ```
      *
      * Available options:
      *
@@ -537,14 +537,14 @@ class Validations
     /**
      * Validates the uniqueness of a value.
      *
-     * <code>
+     * ```
      * class Person extends ActiveRecord\Model {
      *   static $validates_uniqueness_of = array(
      *     array('name'),
      *     array(array('blah','bleh'), 'message' => 'blech')
      *   );
      * }
-     * </code>
+     * ```
      *
      * Available options:
      *
@@ -766,14 +766,14 @@ class Errors implements IteratorAggregate
     /**
      * Returns the internal errors object.
      *
-     * <code>
+     * ```
      * $model->errors->get_raw_errors();
      *
      * # array(
      * #  "name" => array("can't be blank"),
      * #  "state" => array("is the wrong length (should be 2 chars)",
      * # )
-     * </code>
+     * ```
      */
     public function get_raw_errors()
     {
@@ -783,14 +783,14 @@ class Errors implements IteratorAggregate
     /**
      * Returns all the error messages as an array.
      *
-     * <code>
+     * ```
      * $model->errors->full_messages();
      *
      * # array(
      * #  "Name can't be blank",
      * #  "State is the wrong length (should be 2 chars)"
      * # )
-     * </code>
+     * ```
      *
      * @return array
      */
@@ -808,14 +808,14 @@ class Errors implements IteratorAggregate
     /**
      * Returns all the error messages as an array, including error key.
      *
-     * <code>
+     * ```
      * $model->errors->errors();
      *
      * # array(
      * #  "name" => array("Name can't be blank"),
      * #  "state" => array("State is the wrong length (should be 2 chars)")
      * # )
-     * </code>
+     * ```
      *
      * @param callable $closure closure to fetch the errors in some other format (optional)
      *                          This closure has the signature function($attribute, $message)
@@ -850,11 +850,11 @@ class Errors implements IteratorAggregate
      * Convert all error messages to a String.
      * This function is called implicitely if the object is casted to a string:
      *
-     * <code>
+     * ```
      * echo $error;
      *
      * # "Name can't be blank\nState is the wrong length (should be 2 chars)"
-     * </code>
+     * ```
      *
      * @return string
      */
@@ -906,10 +906,10 @@ class Errors implements IteratorAggregate
      *
      * This will allow you to iterate over the {@link Errors} object using foreach.
      *
-     * <code>
+     * ```
      * foreach ($model->errors as $msg)
      *   echo "$msg\n";
-     * </code>
+     * ```
      *
      * @return ArrayIterator
      */

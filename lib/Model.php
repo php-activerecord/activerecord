@@ -171,7 +171,7 @@ class Model
     /**
      * Allows you to create aliases for attributes.
      *
-     * <code>
+     * ```
      * class Person extends ActiveRecord\Model {
      *   static $alias_attribute = array(
      *     'alias_first_name' => 'first_name',
@@ -181,7 +181,7 @@ class Model
      * $person = Person::first();
      * $person->alias_first_name = 'Tito';
      * echo $person->alias_first_name;
-     * </code>
+     * ```
      *
      * @var array
      */
@@ -192,7 +192,7 @@ class Model
      *
      * This is the opposite of {@link attr_protected $attr_protected}.
      *
-     * <code>
+     * ```
      * class Person extends ActiveRecord\Model {
      *   static $attr_accessible = array('first_name','last_name');
      * }
@@ -203,7 +203,7 @@ class Model
      *   'id' => 11111));
      *
      * echo $person->id; # => null
-     * </code>
+     * ```
      *
      * @var array
      */
@@ -224,22 +224,22 @@ class Model
     /**
      * Delegates calls to a relationship.
      *
-     * <code>
+     * ```
      * class Person extends ActiveRecord\Model {
      *   static $belongs_to = array(array('venue'),array('host'));
      *   static $delegate = array(
      *     array('name', 'state', 'to' => 'venue'),
      *     array('name', 'to' => 'host', 'prefix' => 'woot'));
      * }
-     * </code>
+     * ```
      *
      * Can then do:
      *
-     * <code>
+     * ```
      * $person->state     # same as calling $person->venue->state
      * $person->name      # same as calling $person->venue->name
      * $person->woot_name # same as calling $person->host->name
-     * </code>
+     * ```
      *
      * @var array
      */
@@ -252,9 +252,9 @@ class Model
      * then @var $attributes will be mapped according to the schema's defaults. Otherwise, the given
      * $attributes will be mapped via set_attributes_via_mass_assignment.
      *
-     * <code>
+     * ```
      * new Person(array('first_name' => 'Tito', 'last_name' => 'the Grief'));
-     * </code>
+     * ```
      *
      * @param array $attributes             Hash containing names and values to mass assign to the model
      * @param bool  $guard_attributes       Set to true to guard protected/non-accessible attributes
@@ -293,7 +293,7 @@ class Model
      * You can also define customer getter methods for the model.
      *
      * EXAMPLE:
-     * <code>
+     * ```
      * class User extends ActiveRecord\Model {
      *
      *   # define custom getter methods. Note you must
@@ -305,7 +305,7 @@ class Model
      *
      * $user = new User();
      * echo $user->middle_name;  # will call $user->get_middle_name()
-     * </code>
+     * ```
      *
      * If you define a custom getter with the same name as an attribute then you
      * will need to use read_attribute() to get the attribute's value.
@@ -314,7 +314,7 @@ class Model
      * For example, assume 'name' is a field on the table and we're defining a
      * custom getter for 'name':
      *
-     * <code>
+     * ```
      * class User extends ActiveRecord\Model {
      *
      *   # INCORRECT way to do it
@@ -330,7 +330,7 @@ class Model
      * $user = new User();
      * $user->name = 'bob';
      * echo $user->name; # => BOB
-     * </code>
+     * ```
      *
      *
      * @see read_attribute()
@@ -390,7 +390,7 @@ class Model
      * You can also define customer setter methods for the model.
      *
      * EXAMPLE:
-     * <code>
+     * ```
      * class User extends ActiveRecord\Model {
      *
      *   # define custom setter methods. Note you must
@@ -402,7 +402,7 @@ class Model
      *
      * $user = new User();
      * $user->password = 'plaintext';  # will call $user->set_password('plaintext')
-     * </code>
+     * ```
      *
      * If you define a custom setter with the same name as an attribute then you
      * will need to use assign_attribute() to assign the value to the attribute.
@@ -411,7 +411,7 @@ class Model
      * For example, assume 'name' is a field on the table and we're defining a
      * custom setter for 'name':
      *
-     * <code>
+     * ```
      * class User extends ActiveRecord\Model {
      *
      *   # INCORRECT way to do it
@@ -427,7 +427,7 @@ class Model
      * $user = new User();
      * $user->name = 'bob';
      * echo $user->name; # => BOB
-     * </code>
+     * ```
      *
      * @param string $name  Name of attribute, relationship or other to set
      * @param mixed  $value The value
@@ -672,7 +672,7 @@ class Model
      *
      * Will return an array looking like:
      *
-     * <code>
+     * ```
      * array(
      *   'name' => array(
      *     array('validator' => 'validates_presence_of'),
@@ -681,7 +681,7 @@ class Model
      *     array('validator' => 'validates_length_of', 'minimum' => 6))
      *   )
      * );
-     * </code>
+     * ```
      *
      * @return array an array containing validator data for this model
      */
@@ -994,21 +994,21 @@ class Model
      *
      * Delete all using a hash:
      *
-     * <code>
+     * ```
      * YourModel::delete_all(array('conditions' => array('name' => 'Tito')));
-     * </code>
+     * ```
      *
      * Delete all using an array:
      *
-     * <code>
+     * ```
      * YourModel::delete_all(array('conditions' => array('name = ?', 'Tito')));
-     * </code>
+     * ```
      *
      * Delete all using a string:
      *
-     * <code>
+     * ```
      * YourModel::delete_all(array('conditions' => 'name = "Tito"'));
-     * </code>
+     * ```
      *
      * An options array takes the following parameters:
      *
@@ -1056,15 +1056,15 @@ class Model
      *
      * Update all using a hash:
      *
-     * <code>
+     * ```
      * YourModel::update_all(array('set' => array('name' => "Bob")));
-     * </code>
+     * ```
      *
      * Update all using a string:
      *
-     * <code>
+     * ```
      * YourModel::update_all(array('set' => 'name = "Bob"'));
-     * </code>
+     * ```
      *
      * An options array takes the following parameters:
      *
@@ -1436,7 +1436,7 @@ class Model
      * Dynamic finders are just an easy way to do queries quickly without having to
      * specify an options array with conditions in it.
      *
-     * <code>
+     * ```
      * SomeModel::find_by_first_name('Tito');
      * SomeModel::find_by_first_name_and_last_name('Tito','the Grief');
      * SomeModel::find_by_first_name_or_last_name('Tito','the Grief');
@@ -1444,24 +1444,24 @@ class Model
      * SomeModel::count_by_name('Bob')
      * SomeModel::count_by_name_or_state('Bob','VA')
      * SomeModel::count_by_name_and_state('Bob','VA')
-     * </code>
+     * ```
      *
      * You can also create the model if the find call returned no results:
      *
-     * <code>
+     * ```
      * Person::find_or_create_by_name('Tito');
      *
      * # would be the equivalent of
      * if (!Person::find_by_name('Tito'))
      *   Person::create(array('Tito'));
-     * </code>
+     * ```
      *
      * Some other examples of find_or_create_by:
      *
-     * <code>
+     * ```
      * Person::find_or_create_by_name_and_id('Tito',1);
      * Person::find_or_create_by_name_and_id(array('name' => 'Tito', 'id' => 1));
-     * </code>
+     * ```
      *
      * @param string $method Name of method
      * @param mixed  $args   Method args
@@ -1558,9 +1558,9 @@ class Model
     /**
      * Get a count of qualifying records.
      *
-     * <code>
+     * ```
      * YourModel::count(array('conditions' => 'amount > 3.14159265'));
-     * </code>
+     * ```
      *
      * @see find
      *
@@ -1590,11 +1590,11 @@ class Model
     /**
      * Determine if a record exists.
      *
-     * <code>
+     * ```
      * SomeModel::exists(123);
      * SomeModel::exists(array('conditions' => array('id=? and name=?', 123, 'Tito')));
      * SomeModel::exists(array('id' => 123, 'name' => 'Tito'));
-     * </code>
+     * ```
      *
      * @see find
      *
@@ -1634,7 +1634,7 @@ class Model
      *
      * Finding by the primary key:
      *
-     * <code>
+     * ```
      * # queries for the model with id=123
      * YourModel::find(123);
      *
@@ -1643,24 +1643,24 @@ class Model
      *
      * # finding by pk accepts an options array
      * YourModel::find(123,array('order' => 'name desc'));
-     * </code>
+     * ```
      *
      * Finding by using a conditions array:
      *
-     * <code>
+     * ```
      * YourModel::find('first', array('conditions' => array('name=?','Tito'),
      *   'order' => 'name asc'))
      * YourModel::find('all', array('conditions' => 'amount > 3.14159265'));
      * YourModel::find('all', array('conditions' => array('id in(?)', array(1,2,3))));
-     * </code>
+     * ```
      *
      * Finding by using a hash:
      *
-     * <code>
+     * ```
      * YourModel::find(array('name' => 'Tito', 'id' => 1));
      * YourModel::find('first',array('name' => 'Tito', 'id' => 1));
      * YourModel::find('all',array('name' => 'Tito', 'id' => 1));
-     * </code>
+     * ```
      *
      * An options array can take the following parameters:
      *
@@ -1808,10 +1808,10 @@ class Model
     /**
      * Find using a raw SELECT query.
      *
-     * <code>
+     * ```
      * YourModel::find_by_sql("SELECT * FROM people WHERE name=?",array('Tito'));
      * YourModel::find_by_sql("SELECT * FROM people WHERE name='Tito'");
-     * </code>
+     * ```
      *
      * @param string $sql    The raw SELECT query
      * @param array  $values An array of values for any parameters that needs to be bound
@@ -1948,7 +1948,7 @@ class Model
      * (defaults are , and double quotes)
      *
      * Ex:
-     * <code>
+     * ```
      * ActiveRecord\CsvSerializer::$delimiter=';';
      * ActiveRecord\CsvSerializer::$enclosure='';
      * YourModel::find('first')->to_csv(array('only'=>array('name','level')));
@@ -1956,7 +1956,7 @@ class Model
      *
      * YourModel::find('first')->to_csv(array('only_header'=>true,'only'=>array('name','level')));
      * returns: name,level
-     * </code>
+     * ```
      *
      * @see Serialization
      *
@@ -2026,18 +2026,18 @@ class Model
     /**
      * Executes a block of code inside a database transaction.
      *
-     * <code>
+     * ```
      * YourModel::transaction(function()
      * {
      *   YourModel::create(array("name" => "blah"));
      * });
-     * </code>
+     * ```
      *
      * If an exception is thrown inside the closure the transaction will
      * automatically be rolled back. You can also return false from your
      * closure to cause a rollback:
      *
-     * <code>
+     * ```
      * YourModel::transaction(function()
      * {
      *   YourModel::create(array("name" => "blah"));
@@ -2049,7 +2049,7 @@ class Model
      *   YourModel::create(array("name" => "blah"));
      *   return false; # rollback!
      * });
-     * </code>
+     * ```
      *
      * @param callable $closure The closure to execute. To cause a rollback have your closure return false or throw an exception.
      *
