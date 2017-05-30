@@ -236,9 +236,9 @@ class Model
      * Can then do:
      *
      * ```
-     * $person->state     # same as calling $person->venue->state
-     * $person->name      # same as calling $person->venue->name
-     * $person->woot_name # same as calling $person->host->name
+     * $person->state     // same as calling $person->venue->state
+     * $person->name      // same as calling $person->venue->name
+     * $person->woot_name // same as calling $person->host->name
      * ```
      *
      * @var array
