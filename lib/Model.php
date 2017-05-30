@@ -296,8 +296,8 @@ class Model
      * ```
      * class User extends ActiveRecord\Model {
      *
-     *   # define custom getter methods. Note you must
-     *   # prepend get_ to your method name:
+     *   // define custom getter methods. Note you must
+     *   // prepend get_ to your method name:
      *   function get_middle_initial() {
      *     return $this->middle_name{0};
      *   }
