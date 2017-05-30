@@ -1,9 +1,7 @@
 <?php
 
-use Sami\RemoteRepository\GitHubRemoteRepository;
 use Sami\Sami;
 use Sami\Version\GitVersionCollection;
-use Symfony\Component\Finder\Finder;
 
 $versions = GitVersionCollection::create('lib')
     ->addFromTags('v1.0')
