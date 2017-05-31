@@ -8,7 +8,7 @@ php-activerecord is an implementation of Active Record, a design pattern with th
  }
  ```
  
- You are then ready access rows from your database's authors table and make edits:
+ You are then ready to access rows from your database's authors table and make edits:
  ```
  $person = Person::find(3); // find author with id of 3
  echo $person->first_name; // "Bruce"

@@ -414,10 +414,10 @@ class Model
      * ```
      * class User extends ActiveRecord\Model {
      *
-     *   # INCORRECT way to do it
-     *   # function set_name($name) {
-     *   #   $this->name = strtoupper($name);
-     *   # }
+     *   // INCORRECT way to do it
+     *   // function set_name($name) {
+     *   //   $this->name = strtoupper($name);
+     *   // }
      *
      *   function set_name($name) {
      *     $this->assign_attribute('name',strtoupper($name));
