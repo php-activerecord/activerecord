@@ -1,6 +1,7 @@
 <?php
 
 use Sami\Sami;
+
 //use Sami\Version\GitVersionCollection;
 
 //$versions = GitVersionCollection::create('lib')
