@@ -1,0 +1,7 @@
+{
+  "name": "php-activerecord.io",
+  "private": false,
+  "devDependencies": {
+    "flatdoc": "^0.9.0"
+  }
+}

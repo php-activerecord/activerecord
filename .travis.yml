@@ -10,9 +10,6 @@ before_install:
   # sami requires at least PHP 7.0. Since we only run it for PHP 7, we'll remove it from composer.json for non-7 builds
   - if [[ "$TRAVIS_PHP_VERSION" != 7.0 ]]; then sed -i '/^.*sami\/sami.*$/d' composer.json; fi
 
-  # daux requires at least PHP 5.6. Since we only run it for PHP 7, we'll remove it from composer.json for non-7 builds
-  - if [[ "$TRAVIS_PHP_VERSION" != 7.0 ]]; then sed -i '/^.*justinwalsh\/daux.io.*$/d' composer.json; fi
-
 install:
   - travis_retry composer install --prefer-dist --no-interaction
 
@@ -45,13 +42,12 @@ script:
   - IFS=$'\n'; COMMIT_SCA_FILES=($(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")); unset IFS
   - if [[ "$WITH_PHPCSFIXER" == "true" ]]; then vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection -- "${COMMIT_SCA_FILES[@]}"; fi
   - ./vendor/bin/phpunit
-  - if [[ "$WITH_DOCS" == "true" ]]; then ./vendor/bin/daux generate --source=docs --destination ./build/docs; fi
   - if [[ "$WITH_DOCS" == "true" ]]; then echo "*** pwd:"; pwd; ls -la;  ./vendor/bin/sami.php update sami-config.php; fi
 
 deploy:
   provider: pages
   skip_cleanup: true
-  local_dir: ./build/docs
+  local_dir: ./docs
   github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
   on:
     branch: master

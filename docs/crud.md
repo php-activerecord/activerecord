@@ -1,3 +1,5 @@
+# Basic CRUD
+
 ### Retrieve ###
 These are your basic methods to find and retrieve records from your database.
 See the *Finders* section for more details.

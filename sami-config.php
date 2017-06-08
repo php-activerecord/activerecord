@@ -25,8 +25,8 @@ use Sami\Sami;
 return new Sami('lib', [
     'title' => 'php-activerecord API',
     'theme' => 'php-ar',
-    'build_dir' => 'build/docs/api',
-    'cache_dir' => 'build/docs/api/cache',
+    'build_dir' => 'docs/api',
+    'cache_dir' => 'docs/api/cache',
     'template_dirs' => [
         'docs/sami/themes'
     ]
