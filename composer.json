@@ -9,7 +9,7 @@
         "php": ">=5.4.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.* || 5.*", 
+        "phpunit/phpunit": "4.* || 5.*",
         "pear/pear_exception": "1.0",
         "friendsofphp/php-cs-fixer": "^2.1",
         "sami/sami": "^4.0",
@@ -20,7 +20,6 @@
     },
 	"scripts": {
 		"style-check" : "php vendor/bin/php-cs-fixer fix --dry-run --verbose --diff",
-		"style-fix" : "php vendor/bin/php-cs-fixer fix --verbose",
-		"gen-api-docs": "php vendor/sami/sami/sami.php update sami-config.php"
+		"style-fix" : "php vendor/bin/php-cs-fixer fix --verbose"
 	}
 }
