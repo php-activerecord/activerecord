@@ -1610,7 +1610,7 @@ class Model
      *
      * @see find
      *
-     * @return Model The first matched record or null if not found
+     * @return Model|null The first matched record or null if not found
      */
     public static function first(/* ... */)
     {
@@ -1622,7 +1622,7 @@ class Model
      *
      * @see find
      *
-     * @return Model The last matched record or null if not found
+     * @return Model|null The last matched record or null if not found
      */
     public static function last(/* ... */)
     {
@@ -2017,6 +2017,7 @@ class Model
      * @param bool   $must_exist  set to true to raise an exception if the callback does not exist
      *
      * @return bool True if invoked or null if not
+     * @throws ActiveRecordException
      */
     private function invoke_callback($method_name, $must_exist=true)
     {
