@@ -2019,7 +2019,7 @@ class Model
      * @return bool True if invoked or null if not
      * @throws ActiveRecordException
      */
-	private function invoke_callback($method_name, $must_exist=true)
+    private function invoke_callback($method_name, $must_exist=true)
     {
         return static::table()->callback->invoke($this, $method_name, $must_exist);
     }
