@@ -1728,7 +1728,7 @@ class Model
                 $args = $args[0];
             }
 
-            if(is_array($args) && array_values($args)==$args) {
+            if(is_array($args) && array_values($args)==$args && count($args)) {
                 $single = false;
             }
         }
