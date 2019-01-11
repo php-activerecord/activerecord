@@ -1683,7 +1683,6 @@ class Model
      * 	Returns an array of records if:
      * 		- doing a "all"
      * 		- passing in an array of ids.
-     *		- "conditions" are passed in.
      * 		- an associative array is passed in
      *
      * Returns NULL if:
@@ -1701,9 +1700,6 @@ class Model
         $args = func_get_args();
         $options = static::extract_and_validate_options($args);
 
-        if(isset($options['conditions']) && (!count($args) || $args['0'] != "all")) {
-            array_unshift($args, "all");
-        }
         $num_args = count($args);
         $single = true;
 
