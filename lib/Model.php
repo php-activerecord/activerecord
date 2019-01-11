@@ -1610,7 +1610,7 @@ class Model
      *
      * @see find
      *
-     * @return Model|null The first matched record or null if not found
+     * @return static|null The first matched record or null if not found
      */
     public static function first(/* ... */)
     {
@@ -1679,7 +1679,7 @@ class Model
      *
      * @throws {@link RecordNotFound} if no options are passed or finding by pk and no records matched
      *
-     * @return mixed An array of records found if doing a find_all otherwise a
+     * @return static|static[]|null An array of records found if doing a find_all otherwise a
      *               single Model object or null if it wasn't found. NULL is only return when
      *               doing a first/last find. If doing an all find and no records matched this
      *               will return an empty array.
@@ -1770,10 +1770,11 @@ class Model
      *
      * @throws {@link RecordNotFound} if a record could not be found
      *
-     * @return Model
+     * @return static|static[]
      */
     public static function find_by_pk($values, $options)
     {
+    	$single = !is_array($values);
         if ($values===null) {
             throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
         }
@@ -1802,7 +1803,7 @@ class Model
             throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
         }
 
-        return $expected == 1 ? $list[0] : $list;
+        return $single ? $list[0] : $list;
     }
 
     /**
@@ -1816,7 +1817,7 @@ class Model
      * @param string $sql    The raw SELECT query
      * @param array  $values An array of values for any parameters that needs to be bound
      *
-     * @return array An array of models
+     * @return static[] An array of models
      */
     public static function find_by_sql($sql, $values=null)
     {
