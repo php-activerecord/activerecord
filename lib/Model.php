@@ -1720,9 +1720,14 @@ class Model
             $args = array_slice($args, 1);
             $num_args--;
         }
+
         //find by pk
         elseif (1 === count($args) && 1 == $num_args) {
             $args = $args[0];
+
+            if(is_array($args) && array_values($args)==$args) {
+                $single = false;
+            }
         }
 
         // anything left in $args is a find by pk
@@ -1730,9 +1735,9 @@ class Model
             $list = static::find_by_pk($args, $options, true);
         }
         else {
-			$options['mapped_names'] = static::$alias_attribute;
-			$list = static::table()->find($options);
-		}
+            $options['mapped_names'] = static::$alias_attribute;
+            $list = static::table()->find($options);
+        }
 
         return $single ? (!empty($list) ? $list[0] : null) : $list;
     }
