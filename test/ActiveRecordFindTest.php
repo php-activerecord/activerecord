@@ -171,7 +171,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
     public function test_find_with_conditions()
     {
-        $author = Author::find(['conditions' => ['author_id=? and name=?', 1, 'Tito']]);
+        $author = Author::find("first", ['conditions' => ['author_id=? and name=?', 1, 'Tito']]);
         $this->assert_equals(1, $author->author_id);
     }
 
