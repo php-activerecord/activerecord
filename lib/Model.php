@@ -1679,10 +1679,17 @@ class Model
      *
      * @throws {@link RecordNotFound} if no options are passed or finding by pk and no records matched
      *
-     * @return static|static[]|null An array of records found if doing a find_all otherwise a
-     *               single Model object or null if it wasn't found. NULL is only return when
-     *               doing a first/last find. If doing an all find and no records matched this
-     *               will return an empty array.
+     * @return static|static[]|null
+     * 	Returns an array of records if:
+     * 		- doing a "all"
+     * 		- passing in an array of ids.
+     *		- "conditions" are passed in.
+     * 		- an associative array is passed in
+     *
+     * Returns NULL if:
+     * 		- doing a "first" or "last" query, and none are found
+     *
+     * Otherwise returns a single Model object.
      */
     public static function find(/* $type, $options */)
     {
@@ -1693,6 +1700,10 @@ class Model
         }
         $args = func_get_args();
         $options = static::extract_and_validate_options($args);
+
+        if(isset($options['conditions']) && (!count($args) || $args['0'] != "all")) {
+            array_unshift($args, "all");
+        }
         $num_args = count($args);
         $single = true;
 
@@ -1728,7 +1739,7 @@ class Model
                 $args = $args[0];
             }
 
-            if(is_array($args) && array_values($args)==$args && count($args)) {
+            if(is_array($args) && array_values($args)==$args) {
                 $single = false;
             }
         }
