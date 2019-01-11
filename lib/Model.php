@@ -1727,11 +1727,12 @@ class Model
 
         // anything left in $args is a find by pk
         if ($num_args > 0 && !isset($options['conditions'])) {
-            return static::find_by_pk($args, $options);
+            $list = static::find_by_pk($args, $options, true);
         }
-
-        $options['mapped_names'] = static::$alias_attribute;
-        $list = static::table()->find($options);
+        else {
+			$options['mapped_names'] = static::$alias_attribute;
+			$list = static::table()->find($options);
+		}
 
         return $single ? (!empty($list) ? $list[0] : null) : $list;
     }
@@ -1772,9 +1773,9 @@ class Model
      *
      * @return static|static[]
      */
-    public static function find_by_pk($values, $options)
+    public static function find_by_pk($values, $options, $forceArray = false)
     {
-        $single = !is_array($values);
+        $single = !is_array($values) && !$forceArray;
         if ($values===null) {
             throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
         }
