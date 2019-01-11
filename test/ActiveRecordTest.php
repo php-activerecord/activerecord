@@ -110,8 +110,8 @@ class ActiveRecordTest extends DatabaseTest
 
     public function test_get_values_for()
     {
-        $book = Book::find_by_name('Ancient Art of Main Tanking');
-        $ret = $book->get_values_for(['book_id', 'author_id']);
+        $books = Book::find_by_name('Ancient Art of Main Tanking');
+        $ret = $books[0]->get_values_for(['book_id', 'author_id']);
         $this->assert_equals(['book_id', 'author_id'], array_keys($ret));
         $this->assert_equals([1, 1], array_values($ret));
     }
