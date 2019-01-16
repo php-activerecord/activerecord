@@ -209,9 +209,9 @@ class SQLBuilder
         for ($i=0, $n=count($parts); $i<$n; ++$i) {
             $v = strtolower($parts[$i]);
 
-            if (strpos($v, ' asc') !== false) {
+            if (false !== strpos($v, ' asc')) {
                 $parts[$i] = preg_replace('/asc/i', 'DESC', $parts[$i]);
-            } elseif (strpos($v, ' desc') !== false) {
+            } elseif (false !== strpos($v, ' desc')) {
                 $parts[$i] = preg_replace('/desc/i', 'ASC', $parts[$i]);
             } else {
                 $parts[$i] .= ' DESC';
@@ -316,7 +316,7 @@ class SQLBuilder
         require_once 'Expressions.php';
         $num_args = count($args);
 
-        if ($num_args == 1 && is_hash($args[0])) {
+        if (1 == $num_args && is_hash($args[0])) {
             $hash = is_null($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
             $e = new Expressions($this->connection, $hash);
             $this->where = $e->to_s();

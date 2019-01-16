@@ -7,7 +7,7 @@ class VenueAfterCreate extends ActiveRecord\Model
 
     public function change_name_after_create_if_name_is_change_me()
     {
-        if ($this->name == 'change me') {
+        if ('change me' == $this->name) {
             $this->name = 'changed!';
             $this->save();
         }

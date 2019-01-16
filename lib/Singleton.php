@@ -41,7 +41,7 @@ abstract class Singleton
     /**
      * Singleton objects should not be cloned.
      */
-    final private function __clone()
+    private function __clone()
     {
     }
 

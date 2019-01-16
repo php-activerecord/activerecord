@@ -485,7 +485,7 @@ class Validations
             if ($this->is_null_with_option($var, $options) || $this->is_blank_with_option($var, $options)) {
                 continue;
             }
-            if ($range_options[0] == 'within' || $range_options[0] == 'in') {
+            if ('within' == $range_options[0] || 'in' == $range_options[0]) {
                 $range = $options[$range_options[0]];
 
                 if (!(Utils::is_a('range', $range))) {
@@ -504,7 +504,7 @@ class Validations
                 if (is_float($option)) {
                     throw new  ValidationsArgumentError("$range_option value cannot use a float for length.");
                 }
-                if (!($range_option == 'maximum' && is_null($this->model->$attribute))) {
+                if (!('maximum' == $range_option && is_null($this->model->$attribute))) {
                     $messageOptions = ['is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long'];
 
                     if (isset($options['message'])) {
@@ -581,7 +581,7 @@ class Validations
             $sql = '';
             $conditions = [''];
             $pk_quoted = $connection->quote_name($pk[0]);
-            if ($pk_value === null) {
+            if (null === $pk_value) {
                 $sql = "{$pk_quoted} IS NOT NULL";
             } else {
                 $sql = "{$pk_quoted} != ?";
@@ -732,7 +732,7 @@ class Errors implements IteratorAggregate
             $msg = self::$DEFAULT_ERROR_MESSAGES['blank'];
         }
 
-        if (($value = $this->model->$attribute) === '' || $value === null) {
+        if ('' === ($value = $this->model->$attribute) || null === $value) {
             $this->add($attribute, $msg);
         }
     }
@@ -760,7 +760,7 @@ class Errors implements IteratorAggregate
     {
         $errors = $this->$attribute;
 
-        return $errors && count($errors) == 1 ? $errors[0] : $errors;
+        return $errors && 1 == count($errors) ? $errors[0] : $errors;
     }
 
     /**

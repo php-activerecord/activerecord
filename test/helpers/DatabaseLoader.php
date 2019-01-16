@@ -13,7 +13,7 @@ class DatabaseLoader
             static::$instances[$db->protocol] = 0;
         }
 
-        if (static::$instances[$db->protocol]++ == 0) {
+        if (0 == static::$instances[$db->protocol]++) {
             // drop and re-create the tables one time only
             $this->drop_tables();
             $this->exec_sql_script($db->protocol);
@@ -23,7 +23,7 @@ class DatabaseLoader
     public function reset_table_data()
     {
         foreach ($this->get_fixture_tables() as $table) {
-            if ($this->db->protocol == 'oci' && $table == 'rm-bldg') {
+            if ('oci' == $this->db->protocol && 'rm-bldg' == $table) {
                 continue;
             }
 
@@ -44,10 +44,10 @@ class DatabaseLoader
         $tables = $this->db->tables();
 
         foreach ($this->get_fixture_tables() as $table) {
-            if ($this->db->protocol == 'oci') {
+            if ('oci' == $this->db->protocol) {
                 $table = strtoupper($table);
 
-                if ($table == 'RM-BLDG') {
+                if ('RM-BLDG' == $table) {
                     continue;
                 }
             }
@@ -56,7 +56,7 @@ class DatabaseLoader
                 $this->db->query('DROP TABLE ' . $this->quote_name($table));
             }
 
-            if ($this->db->protocol == 'oci') {
+            if ('oci' == $this->db->protocol) {
                 try {
                     $this->db->query("DROP SEQUENCE {$table}_seq");
                 } catch (ActiveRecord\DatabaseException $e) {
@@ -69,7 +69,7 @@ class DatabaseLoader
     public function exec_sql_script($file)
     {
         foreach (explode(';', $this->get_sql($file)) as $sql) {
-            if (trim($sql) != '') {
+            if ('' != trim($sql)) {
                 $this->db->query($sql);
             }
         }
@@ -122,7 +122,7 @@ class DatabaseLoader
 
     public function quote_name($name)
     {
-        if ($this->db->protocol == 'oci') {
+        if ('oci' == $this->db->protocol) {
             $name = strtoupper($name);
         }
 

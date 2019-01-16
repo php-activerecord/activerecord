@@ -80,10 +80,10 @@ SQL;
         $c->pk                = ($column['pk'] ? true : false);
         $c->auto_increment    = false;
 
-        if (substr($column['type'], 0, 9) == 'timestamp') {
+        if ('timestamp' == substr($column['type'], 0, 9)) {
             $c->raw_type = 'datetime';
             $c->length = 19;
-        } elseif ($column['type'] == 'date') {
+        } elseif ('date' == $column['type']) {
             $c->raw_type = 'date';
             $c->length = 10;
         } else {
@@ -102,7 +102,7 @@ SQL;
         if ($column['default']) {
             preg_match("/^nextval\('(.*)'\)$/", $column['default'], $matches);
 
-            if (count($matches) == 2) {
+            if (2 == count($matches)) {
                 $c->sequence = $matches[1];
             } else {
                 $c->default = $c->cast($column['default'], $this);

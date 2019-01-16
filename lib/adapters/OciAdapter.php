@@ -98,14 +98,14 @@ class OciAdapter extends Connection
         $column['column_name'] = strtolower($column['column_name']);
         $column['data_type'] = strtolower(preg_replace('/\(.*?\)/', '', $column['data_type']));
 
-        if ($column['data_default'] !== null) {
+        if (null !== $column['data_default']) {
             $column['data_default'] = trim($column['data_default'], "' ");
         }
 
-        if ($column['data_type'] == 'number') {
+        if ('number' == $column['data_type']) {
             if ($column['data_scale'] > 0) {
                 $column['data_type'] = 'decimal';
-            } elseif ($column['data_scale'] == 0) {
+            } elseif (0 == $column['data_scale']) {
                 $column['data_type'] = 'int';
             }
         }
@@ -113,11 +113,11 @@ class OciAdapter extends Connection
         $c = new Column();
         $c->inflected_name    = Inflector::instance()->variablize($column['column_name']);
         $c->name            = $column['column_name'];
-        $c->nullable        = $column['nullable'] == 'Y' ? true : false;
-        $c->pk                = $column['pk'] == 'P' ? true : false;
+        $c->nullable        = 'Y' == $column['nullable'] ? true : false;
+        $c->pk                = 'P' == $column['pk'] ? true : false;
         $c->length            = $column['data_length'];
 
-        if ($column['data_type'] == 'timestamp') {
+        if ('timestamp' == $column['data_type']) {
             $c->raw_type = 'datetime';
         } else {
             $c->raw_type = $column['data_type'];

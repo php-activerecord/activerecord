@@ -37,17 +37,17 @@ class MysqlAdapter extends Connection
         $c = new Column();
         $c->inflected_name    = Inflector::instance()->variablize($column['field']);
         $c->name            = $column['field'];
-        $c->nullable        = ($column['null'] === 'YES' ? true : false);
-        $c->pk                = ($column['key'] === 'PRI' ? true : false);
-        $c->auto_increment    = ($column['extra'] === 'auto_increment' ? true : false);
+        $c->nullable        = ('YES' === $column['null'] ? true : false);
+        $c->pk                = ('PRI' === $column['key'] ? true : false);
+        $c->auto_increment    = ('auto_increment' === $column['extra'] ? true : false);
 
-        if ($column['type'] == 'timestamp' || $column['type'] == 'datetime') {
+        if ('timestamp' == $column['type'] || 'datetime' == $column['type']) {
             $c->raw_type = 'datetime';
             $c->length = 19;
-        } elseif ($column['type'] == 'date') {
+        } elseif ('date' == $column['type']) {
             $c->raw_type = 'date';
             $c->length = 10;
-        } elseif ($column['type'] == 'time') {
+        } elseif ('time' == $column['type']) {
             $c->raw_type = 'time';
             $c->length = 8;
         } else {

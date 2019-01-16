@@ -35,7 +35,7 @@ abstract class Inflector
         $camelized = '';
 
         for ($i=0, $n=strlen($s); $i<$n; ++$i) {
-            if ($s[$i] == '_' && $i+1 < $n) {
+            if ('_' == $s[$i] && $i+1 < $n) {
                 $camelized .= strtoupper($s[++$i]);
             } else {
                 $camelized .= $s[$i];

@@ -169,7 +169,7 @@ class RelationshipTest extends DatabaseTest
             $event->venue->name;
             $this->fail('expected Exception ActiveRecord\UndefinedPropertyException');
         } catch (ActiveRecord\UndefinedPropertyException $e) {
-            $this->assert_true(strpos($e->getMessage(), 'name') !== false);
+            $this->assert_true(false !== strpos($e->getMessage(), 'name'));
         }
     }
 
@@ -273,7 +273,7 @@ class RelationshipTest extends DatabaseTest
             $venue->events[0]->description;
             $this->fail('expected Exception ActiveRecord\UndefinedPropertyException');
         } catch (ActiveRecord\UndefinedPropertyException $e) {
-            $this->assert_true(strpos($e->getMessage(), 'description') !== false);
+            $this->assert_true(false !== strpos($e->getMessage(), 'description'));
         }
     }
 
@@ -381,7 +381,7 @@ class RelationshipTest extends DatabaseTest
         Venue::$has_many[1] = ['hosts', 'through' => 'events', 'conditions' => ['events.title != ?', 'Love Overboard']];
 
         $venue = $this->get_relationship();
-        $this->assert_true(count($venue->hosts) === 1);
+        $this->assert_true(1 === count($venue->hosts));
         $this->assert_sql_has('events.title !=', ActiveRecord\Table::load('Host')->last_sql);
     }
 
@@ -422,7 +422,7 @@ class RelationshipTest extends DatabaseTest
             $this->assert_equals($book->secondary_author_id, $author->parent_author_id);
         }
 
-        $this->assert_true(strpos(ActiveRecord\Table::load('Book')->last_sql, 'secondary_author_id') !== false);
+        $this->assert_true(false !== strpos(ActiveRecord\Table::load('Book')->last_sql, 'secondary_author_id'));
         Author::$has_many = $old;
     }
 
@@ -447,7 +447,7 @@ class RelationshipTest extends DatabaseTest
             $employee->position->active;
             $this->fail('expected Exception ActiveRecord\UndefinedPropertyException');
         } catch (ActiveRecord\UndefinedPropertyException $e) {
-            $this->assert_true(strpos($e->getMessage(), 'active') !== false);
+            $this->assert_true(false !== strpos($e->getMessage(), 'active'));
         }
     }
 
@@ -509,7 +509,7 @@ class RelationshipTest extends DatabaseTest
 
         $book = Book::find(1);
         $this->assert_equals($book->secondary_author_id, $book->explicit_author->parent_author_id);
-        $this->assert_true(strpos(ActiveRecord\Table::load('Author')->last_sql, 'parent_author_id') !== false);
+        $this->assert_true(false !== strpos(ActiveRecord\Table::load('Author')->last_sql, 'parent_author_id'));
     }
 
     public function test_dont_attempt_to_load_if_all_foreign_keys_are_null()

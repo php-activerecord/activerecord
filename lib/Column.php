@@ -171,7 +171,7 @@ class Column
      */
     public function cast($value, $connection)
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
@@ -212,7 +212,7 @@ class Column
      */
     public function map_raw_type()
     {
-        if ($this->raw_type == 'integer') {
+        if ('integer' == $this->raw_type) {
             $this->raw_type = 'int';
         }
 

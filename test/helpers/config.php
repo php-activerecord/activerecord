@@ -30,7 +30,7 @@ $GLOBALS['slow_tests'] = false;
 // whether or not to show warnings when Log or Memcache is missing
 $GLOBALS['show_warnings'] = true;
 
-if (getenv('LOG') !== 'false') {
+if ('false' !== getenv('LOG')) {
     DatabaseTest::$log = true;
 }
 
@@ -45,9 +45,9 @@ ActiveRecord\Config::initialize(function ($cfg) {
     $cfg->set_default_connection('mysql');
 
     for ($i=0; $i<count($GLOBALS['argv']); ++$i) {
-        if ($GLOBALS['argv'][$i] == '--adapter') {
+        if ('--adapter' == $GLOBALS['argv'][$i]) {
             $cfg->set_default_connection($GLOBALS['argv'][$i+1]);
-        } elseif ($GLOBALS['argv'][$i] == '--slow-tests') {
+        } elseif ('--slow-tests' == $GLOBALS['argv'][$i]) {
             $GLOBALS['slow_tests'] = true;
         }
     }
