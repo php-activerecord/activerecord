@@ -110,7 +110,7 @@ function get_namespaces($class_name)
 
 function has_namespace($class_name)
 {
-    if (strpos($class_name, '\\') !== false) {
+    if (false !== strpos($class_name, '\\')) {
         return true;
     }
 
@@ -119,7 +119,7 @@ function has_namespace($class_name)
 
 function has_absolute_namespace($class_name)
 {
-    if (strpos($class_name, '\\') === 0) {
+    if (0 === strpos($class_name, '\\')) {
         return true;
     }
 
@@ -368,7 +368,7 @@ class Utils
 
     public static function pluralize_if($count, $string)
     {
-        if ($count == 1) {
+        if (1 == $count) {
             return $string;
         }
 

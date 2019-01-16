@@ -30,7 +30,7 @@ class ActiveRecordFindTest extends DatabaseTest
             Author::find(1, 999999999);
             $this->fail();
         } catch (ActiveRecord\RecordNotFound $e) {
-            $this->assert_true(strpos($e->getMessage(), 'found 1, but was looking for 2') !== false);
+            $this->assert_true(false !== strpos($e->getMessage(), 'found 1, but was looking for 2'));
         }
     }
 
@@ -38,7 +38,7 @@ class ActiveRecordFindTest extends DatabaseTest
     {
         $author = Author::find(3, ['order' => 'name']);
         $this->assert_equals(3, $author->id);
-        $this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name') !== false);
+        $this->assert_true(false !== strpos(Author::table()->last_sql, 'ORDER BY name'));
     }
 
     public function test_find_by_pk_array()
@@ -53,7 +53,7 @@ class ActiveRecordFindTest extends DatabaseTest
     {
         $authors = Author::find(1, '2', ['order' => 'name']);
         $this->assert_equals(2, count($authors));
-        $this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name') !== false);
+        $this->assert_true(false !== strpos(Author::table()->last_sql, 'ORDER BY name'));
     }
 
     /**
@@ -171,7 +171,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
     public function test_find_with_conditions()
     {
-        $author = Author::find(['conditions' => ['author_id=? and name=?', 1, 'Tito']]);
+        $author = Author::find('first', ['conditions' => ['author_id=? and name=?', 1, 'Tito']]);
         $this->assert_equals(1, $author->author_id);
     }
 
@@ -203,7 +203,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
         foreach ($res as $author) {
             $this->assert_true($author instanceof ActiveRecord\Model);
-            $i++;
+            ++$i;
         }
         $this->assert_true($i > 0);
     }
@@ -214,7 +214,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
         foreach (Author::all() as $author) {
             $this->assert_true($author instanceof ActiveRecord\Model);
-            $i++;
+            ++$i;
         }
         $this->assert_true($i > 0);
     }

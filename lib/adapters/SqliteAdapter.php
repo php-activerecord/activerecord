@@ -69,16 +69,16 @@ class SqliteAdapter extends Connection
 
         $c->map_raw_type();
 
-        if ($c->type == Column::DATETIME) {
+        if (Column::DATETIME == $c->type) {
             $c->length = 19;
-        } elseif ($c->type == Column::DATE) {
+        } elseif (Column::DATE == $c->type) {
             $c->length = 10;
         }
 
         // From SQLite3 docs: The value is a signed integer, stored in 1, 2, 3, 4, 6,
         // or 8 bytes depending on the magnitude of the value.
         // so is it ok to assume it's possible an int can always go up to 8 bytes?
-        if ($c->type == Column::INTEGER && !$c->length) {
+        if (Column::INTEGER == $c->type && !$c->length) {
             $c->length = 8;
         }
 

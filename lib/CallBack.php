@@ -180,7 +180,7 @@ class CallBack
         $first = substr($name, 0, 6);
 
         // starts with /(after|before)_(create|update)/
-        if (($first == 'after_' || $first == 'before') && (($second = substr($name, 7, 5)) == 'creat' || $second == 'updat' || $second == 'reate' || $second == 'pdate')) {
+        if (('after_' == $first || 'before' == $first) && ('creat' == ($second = substr($name, 7, 5)) || 'updat' == $second || 'reate' == $second || 'pdate' == $second)) {
             $temporal_save = str_replace(['create', 'update'], 'save', $name);
 
             if (!isset($this->registry[$temporal_save])) {
@@ -194,7 +194,7 @@ class CallBack
             foreach ($registry as $method) {
                 $ret = ($method instanceof Closure ? $method($model) : $model->$method());
 
-                if (false === $ret && $first === 'before') {
+                if (false === $ret && 'before' === $first) {
                     return false;
                 }
             }
@@ -240,8 +240,8 @@ class CallBack
                         'Please change the visibility of ' . $this->klass->getName() . '->' . $closure_or_method_name . '()');
                 }
 
-                    // i'm a dirty ruby programmer
-                    throw new ActiveRecordException("Unknown method for callback: $name" .
+                // i'm a dirty ruby programmer
+                throw new ActiveRecordException("Unknown method for callback: $name" .
                         (is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ''));
             }
         }

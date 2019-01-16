@@ -129,14 +129,14 @@ class Table
         foreach ($joins as $value) {
             $ret .= $space;
 
-            if (stripos($value, 'JOIN ') === false) {
+            if (false === stripos($value, 'JOIN ')) {
                 if (array_key_exists($value, $this->relationships)) {
                     $rel = $this->get_relationship($value);
 
                     // if there is more than 1 join for a given table we need to alias the table names
                     if (array_key_exists($rel->class_name, $existing_tables)) {
                         $alias = $value;
-                        $existing_tables[$rel->class_name]++;
+                        ++$existing_tables[$rel->class_name];
                     } else {
                         $existing_tables[$rel->class_name] = true;
                         $alias = null;
@@ -443,7 +443,7 @@ class Table
         $date_class = Config::instance()->get_date_class();
         foreach ($hash as $name => &$value) {
             if ($value instanceof $date_class || $value instanceof \DateTime) {
-                if (isset($this->columns[$name]) && $this->columns[$name]->type == Column::DATE) {
+                if (isset($this->columns[$name]) && Column::DATE == $this->columns[$name]->type) {
                     $hash[$name] = $this->conn->date_to_string($value);
                 } else {
                     $hash[$name] = $this->conn->datetime_to_string($value);

@@ -33,7 +33,7 @@ class Expressions
             list($expressions, $values) = $this->build_sql_from_hash($expressions, $glue);
         }
 
-        if ($expressions != '') {
+        if ('' != $expressions) {
             if (!$values) {
                 $values = array_slice(func_get_args(), 2);
             }
@@ -104,14 +104,14 @@ class Expressions
         for ($i=0, $n=strlen($this->expressions), $j=0; $i<$n; ++$i) {
             $ch = $this->expressions[$i];
 
-            if ($ch == self::ParameterMarker) {
-                if ($quotes % 2 == 0) {
+            if (self::ParameterMarker == $ch) {
+                if (0 == $quotes % 2) {
                     if ($j > $num_values-1) {
                         throw new ExpressionsException("No bound parameter for index $j");
                     }
                     $ch = $this->substitute($values, $substitute, $i, $j++);
                 }
-            } elseif ($ch == '\'' && $i > 0 && $this->expressions[$i-1] != '\\') {
+            } elseif ('\'' == $ch && $i > 0 && '\\' != $this->expressions[$i-1]) {
                 ++$quotes;
             }
 
@@ -151,7 +151,7 @@ class Expressions
         if (is_array($value)) {
             $value_count = count($value);
 
-            if ($value_count === 0) {
+            if (0 === $value_count) {
                 if ($substitute) {
                     return 'NULL';
                 }

@@ -450,7 +450,7 @@ class Model
             return $this->assign_attribute($name, $value);
         }
 
-        if ($name == 'id') {
+        if ('id' == $name) {
             return $this->assign_attribute($this->get_primary_key(true), $value);
         }
 
@@ -555,7 +555,7 @@ class Model
             return $this->__relationships[$name];
         }
 
-        if ($name == 'id') {
+        if ('id' == $name) {
             $pk = $this->get_primary_key(true);
             if (isset($this->attributes[$pk])) {
                 return $this->attributes[$pk];
@@ -735,7 +735,7 @@ class Model
      */
     private function is_delegated($name, &$delegate)
     {
-        if ($delegate['prefix'] != '') {
+        if ('' != $delegate['prefix']) {
             $name = substr($name, strlen($delegate['prefix'])+1);
         }
 
@@ -829,7 +829,7 @@ class Model
      * @param bool  $validate         True if the validators should be run
      * @param bool  $guard_attributes Set to true to guard protected/non-accessible attributes
      *
-     * @return Model
+     * @return static
      */
     public static function create($attributes, $validate=true, $guard_attributes=true)
     {
@@ -908,12 +908,11 @@ class Model
         // if we've got an autoincrementing/sequenced pk set it
         // don't need this check until the day comes that we decide to support composite pks
         // if (count($pk) == 1)
-        {
-            $column = $table->get_column_by_inflected_name($pk);
 
-            if ($column->auto_increment || $use_sequence) {
-                $this->attributes[$pk] = $column->cast(static::connection()->insert_id($table->sequence), static::connection());
-            }
+        $column = $table->get_column_by_inflected_name($pk);
+
+        if ($column->auto_increment || $use_sequence) {
+            $this->attributes[$pk] = $column->cast(static::connection()->insert_id($table->sequence), static::connection());
         }
 
         $this->__new_record = false;
@@ -1340,7 +1339,7 @@ class Model
                 }
             } else {
                 // ignore OciAdapter's limit() stuff
-                if ($name == 'ar_rnum__') {
+                if ('ar_rnum__' == $name) {
                     continue;
                 }
 
@@ -1394,7 +1393,7 @@ class Model
         $this->__relationships = [];
         $pk = array_values($this->get_values_for($this->get_primary_key()));
 
-        $this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
+        $this->set_attributes_via_mass_assignment($this->find($pk[0])->attributes, false);
         $this->reset_dirty();
 
         return $this;
@@ -1477,18 +1476,18 @@ class Model
         $options = static::extract_and_validate_options($args);
         $create = false;
 
-        if (substr($method, 0, 17) == 'find_or_create_by') {
+        if ('find_or_create_by' == substr($method, 0, 17)) {
             $attributes = substr($method, 17);
 
             // can't take any finders with OR in it when doing a find_or_create_by
-            if (strpos($attributes, '_or_') !== false) {
+            if (false !== strpos($attributes, '_or_')) {
                 throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
             }
             $create = true;
             $method = 'find_by' . substr($method, 17);
         }
 
-        if (substr($method, 0, 7) === 'find_by') {
+        if ('find_by' === substr($method, 0, 7)) {
             $attributes = substr($method, 8);
             $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
 
@@ -1497,11 +1496,11 @@ class Model
             }
 
             return $ret;
-        } elseif (substr($method, 0, 11) === 'find_all_by') {
+        } elseif ('find_all_by' === substr($method, 0, 11)) {
             $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
 
             return static::find('all', $options);
-        } elseif (substr($method, 0, 8) === 'count_by') {
+        } elseif ('count_by' === substr($method, 0, 8)) {
             $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 9), $args, static::$alias_attribute);
 
             return static::count($options);
@@ -1548,7 +1547,7 @@ class Model
      *
      * @see find
      *
-     * @return array array of records found
+     * @return static[]
      */
     public static function all(/* ... */)
     {
@@ -1610,7 +1609,7 @@ class Model
      *
      * @see find
      *
-     * @return Model|null The first matched record or null if not found
+     * @return static|null The first matched record or null if not found
      */
     public static function first(/* ... */)
     {
@@ -1679,10 +1678,21 @@ class Model
      *
      * @throws {@link RecordNotFound} if no options are passed or finding by pk and no records matched
      *
-     * @return mixed An array of records found if doing a find_all otherwise a
-     *               single Model object or null if it wasn't found. NULL is only return when
-     *               doing a first/last find. If doing an all find and no records matched this
-     *               will return an empty array.
+     * @return static|static[]|null
+     *
+     * The rules for what gets returned are complex, but predictable:
+     *
+     * /-------------------------------------------------------------------------------------------
+     * 	First Argument								Return Type			Example
+     * --------------------------------------------------------------------------------------------
+     *	int|string									static				User::find(3);
+     * 	array<string, int|string>					static				User::find(["name"=>"Philip"]);
+     * 	"first"										static|null			User::find("first", ["name"=>"Waldo"]);
+     * 	"last"										static|null			User::find("last", ["name"=>"William"]);
+     *  "all"										static[]			User::find("all", ["name" => "Stephen"]
+     *  ...int|string								static[]			User::find(1, 3, 5, 8);
+     *  array<int,int|string>						static[]			User::find([1,3,5,8]);
+     * 	array<"conditions", array<string,string>>	static[]			User::find(["conditions"=> ["name" => "Kurt"]]);
      */
     public static function find(/* $type, $options */)
     {
@@ -1693,10 +1703,11 @@ class Model
         }
         $args = func_get_args();
         $options = static::extract_and_validate_options($args);
+
         $num_args = count($args);
         $single = true;
 
-        if ($num_args > 0 && ($args[0] === 'all' || $args[0] === 'first' || $args[0] === 'last')) {
+        if ($num_args > 0 && ('all' === $args[0] || 'first' === $args[0] || 'last' === $args[0])) {
             switch ($args[0]) {
                 case 'all':
                     $single = false;
@@ -1711,6 +1722,7 @@ class Model
 
                 // fall thru
 
+                // no break
                 case 'first':
                     $options['limit'] = 1;
                     $options['offset'] = 0;
@@ -1718,20 +1730,27 @@ class Model
             }
 
             $args = array_slice($args, 1);
-            $num_args--;
+            --$num_args;
         }
+
         //find by pk
-        elseif (1 === count($args) && 1 == $num_args) {
-            $args = $args[0];
+        else {
+            if (1 === count($args) && 1 == $num_args) {
+                $args = $args[0];
+            }
+
+            if (is_array($args) && array_values($args)==$args) {
+                $single = false;
+            }
         }
 
         // anything left in $args is a find by pk
         if ($num_args > 0 && !isset($options['conditions'])) {
-            return static::find_by_pk($args, $options);
+            $list = static::find_by_pk($args, $options, true);
+        } else {
+            $options['mapped_names'] = static::$alias_attribute;
+            $list = static::table()->find($options);
         }
-
-        $options['mapped_names'] = static::$alias_attribute;
-        $list = static::table()->find($options);
 
         return $single ? (!empty($list) ? $list[0] : null) : $list;
     }
@@ -1770,11 +1789,12 @@ class Model
      *
      * @throws {@link RecordNotFound} if a record could not be found
      *
-     * @return Model
+     * @return static|static[]
      */
-    public static function find_by_pk($values, $options)
+    public static function find_by_pk($values, $options, $forceArray = false)
     {
-        if ($values===null) {
+        $single = !is_array($values) && !$forceArray;
+        if (null===$values) {
             throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
         }
 
@@ -1795,14 +1815,14 @@ class Model
                 $values = join(',', $values);
             }
 
-            if ($expected == 1) {
+            if (1 == $expected) {
                 throw new RecordNotFound("Couldn't find $class with ID=$values");
             }
 
             throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
         }
 
-        return $expected == 1 ? $list[0] : $list;
+        return $single ? $list[0] : $list;
     }
 
     /**
@@ -1816,7 +1836,7 @@ class Model
      * @param string $sql    The raw SELECT query
      * @param array  $values An array of values for any parameters that needs to be bound
      *
-     * @return array An array of models
+     * @return static[] An array of models
      */
     public static function find_by_sql($sql, $values=null)
     {
@@ -2016,8 +2036,9 @@ class Model
      * @param string $method_name name of the call back to run
      * @param bool   $must_exist  set to true to raise an exception if the callback does not exist
      *
-     * @return bool True if invoked or null if not
      * @throws ActiveRecordException
+     *
+     * @return bool True if invoked or null if not
      */
     private function invoke_callback($method_name, $must_exist=true)
     {
@@ -2063,7 +2084,7 @@ class Model
         try {
             $connection->transaction();
 
-            if ($closure() === false) {
+            if (false === $closure()) {
                 $connection->rollback();
 
                 return false;

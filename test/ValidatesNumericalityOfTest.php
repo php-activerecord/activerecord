@@ -32,7 +32,7 @@ class ValidatesNumericalityOfTest extends DatabaseTest
         $book = new BookNumericality();
         $book->numeric_test = $value;
 
-        if ($boolean == 'valid') {
+        if ('valid' == $boolean) {
             $this->assert_true($book->save());
             $this->assert_false($book->errors->is_invalid('numeric_test'));
         } else {

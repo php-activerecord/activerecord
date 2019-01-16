@@ -112,7 +112,7 @@ abstract class Connection
     {
         $config = Config::instance();
 
-        if (strpos($connection_string_or_connection_name, '://') === false) {
+        if (false === strpos($connection_string_or_connection_name, '://')) {
             $connection_string = $connection_string_or_connection_name ?
                 $config->get_connection($connection_string_or_connection_name) :
                 $config->get_default_connection_string();
@@ -200,9 +200,9 @@ abstract class Connection
         $info->user = isset($url['user']) ? $url['user'] : null;
         $info->pass = isset($url['pass']) ? $url['pass'] : null;
 
-        $allow_blank_db = ($info->protocol == 'sqlite');
+        $allow_blank_db = ('sqlite' == $info->protocol);
 
-        if ($info->host == 'unix(') {
+        if ('unix(' == $info->host) {
             $socket_database = $info->host . '/' . $info->db;
 
             if ($allow_blank_db) {
@@ -215,7 +215,7 @@ abstract class Connection
                 $info->host = $matches[1][0];
                 $info->db = $matches[2][0];
             }
-        } elseif (substr($info->host, 0, 8) == 'windows(') {
+        } elseif ('windows(' == substr($info->host, 0, 8)) {
             $info->host = urldecode(substr($info->host, 8) . '/' . substr($info->db, 0, -1));
             $info->db = null;
         }
@@ -228,7 +228,7 @@ abstract class Connection
             $info->port = $url['port'];
         }
 
-        if (strpos($connection_url, 'decode=true') !== false) {
+        if (false !== strpos($connection_url, 'decode=true')) {
             if ($info->user) {
                 $info->user = urldecode($info->user);
             }
@@ -242,7 +242,7 @@ abstract class Connection
             foreach (explode('/&/', $url['query']) as $pair) {
                 list($name, $value) = explode('=', $pair);
 
-                if ($name == 'charset') {
+                if ('charset' == $name) {
                     $info->charset = $value;
                 }
             }
@@ -262,7 +262,7 @@ abstract class Connection
     {
         try {
             // unix sockets start with a /
-            if ($info->host[0] != '/') {
+            if ('/' != $info->host[0]) {
                 $host = "host=$info->host";
 
                 if (isset($info->port)) {

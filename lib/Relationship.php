@@ -84,7 +84,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
         $relationship = strtolower(denamespace(get_called_class()));
 
-        if ($relationship === 'hasmany' || $relationship === 'hasandbelongstomany') {
+        if ('hasmany' === $relationship || 'hasandbelongstomany' === $relationship) {
             $this->poly_relationship = true;
         }
 
@@ -722,7 +722,7 @@ class BelongsTo extends AbstractRelationship
 
     public function __get($name)
     {
-        if ($name === 'primary_key' && !isset($this->primary_key)) {
+        if ('primary_key' === $name && !isset($this->primary_key)) {
             $this->primary_key = [Table::load($this->class_name)->pk[0]];
         }
 

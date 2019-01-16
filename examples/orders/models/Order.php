@@ -25,9 +25,9 @@ class Order extends ActiveRecord\Model
 
     public function apply_tax()
     {
-        if ($this->person->state == 'VA') {
+        if ('VA' == $this->person->state) {
             $tax = 0.045;
-        } elseif ($this->person->state == 'CA') {
+        } elseif ('CA' == $this->person->state) {
             $tax = 0.10;
         } else {
             $tax = 0.02;

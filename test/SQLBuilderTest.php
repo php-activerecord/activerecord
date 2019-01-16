@@ -27,7 +27,7 @@ class SQLBuilderTest extends DatabaseTest
         $this->assert_sql_has($expected_sql, array_shift($cond));
 
         if ($values) {
-            $this->assert_equals(array_values(array_filter($values, function ($s) { return $s !== null; })), array_values($cond));
+            $this->assert_equals(array_values(array_filter($values, function ($s) { return null !== $s; })), array_values($cond));
         } else {
             $this->assert_equals([], $cond);
         }

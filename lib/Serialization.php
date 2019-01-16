@@ -171,7 +171,7 @@ abstract class Serialization
                 try {
                     $assoc = $this->model->$association;
 
-                    if ($assoc === null) {
+                    if (null === $assoc) {
                         $this->attributes[$association] = null;
                     } elseif (!is_array($assoc)) {
                         $serialized = new $serializer_class($assoc, $options);
@@ -305,7 +305,7 @@ class XmlSerializer extends Serialization
         $this->writer->endDocument();
         $xml = $this->writer->outputMemory(true);
 
-        if (@$this->options['skip_instruct'] == true) {
+        if (true == @$this->options['skip_instruct']) {
             $xml = preg_replace('/<\?xml version.*?\?>/', '', $xml);
         }
 
@@ -315,7 +315,7 @@ class XmlSerializer extends Serialization
     private function write($data, $tag=null)
     {
         foreach ($data as $attr => $value) {
-            if ($tag != null) {
+            if (null != $tag) {
                 $attr = $tag;
             }
 
@@ -348,7 +348,7 @@ class CsvSerializer extends Serialization
 
     public function to_s()
     {
-        if (@$this->options['only_header'] == true) {
+        if (true == @$this->options['only_header']) {
             return $this->header();
         }
 

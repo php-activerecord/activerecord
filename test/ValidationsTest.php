@@ -13,7 +13,7 @@ class BookValidations extends ActiveRecord\Model
     // fired for every validation - but only used for custom validation test
     public function validate()
     {
-        if ($this->name == 'test_custom_validation') {
+        if ('test_custom_validation' == $this->name) {
             $this->errors->add('name', self::$custom_validator_error_msg);
         }
     }
@@ -163,7 +163,7 @@ class ValidationsTest extends DatabaseTest
     {
         $book = new BookValidations();
         $book->is_valid();
-        $this->assert_true(strpos(serialize($book->errors), 'model";N;') !== false);
+        $this->assert_true(false !== strpos(serialize($book->errors), 'model";N;'));
     }
 
     public function test_validations_takes_strings()

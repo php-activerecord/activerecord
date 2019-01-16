@@ -67,7 +67,7 @@ class ActiveRecordWriteTest extends DatabaseTest
     {
         $author = new Author(['name' => 'Blah Blah']);
         $author->save();
-        $this->assert_true(strpos($author->connection()->last_query, $author->connection()->quote_name('updated_at')) !== false);
+        $this->assert_true(false !== strpos($author->connection()->last_query, $author->connection()->quote_name('updated_at')));
     }
 
     public function test_save_auto_increment_id()
@@ -131,7 +131,7 @@ class ActiveRecordWriteTest extends DatabaseTest
         $book = Book::find(1);
         $book->name = 'new name';
         $book->save();
-        $this->assert_true(strpos($book->connection()->last_query, $book->connection()->quote_name('name')) !== false);
+        $this->assert_true(false !== strpos($book->connection()->last_query, $book->connection()->quote_name('name')));
     }
 
     public function test_update_attributes()
@@ -214,8 +214,8 @@ class ActiveRecordWriteTest extends DatabaseTest
     public function test_dirty_attributes_cleared_after_saving()
     {
         $book = $this->make_new_book_and();
-        $this->assert_true(strpos($book->table()->last_sql, 'name') !== false);
-        $this->assert_true(strpos($book->table()->last_sql, 'special') !== false);
+        $this->assert_true(false !== strpos($book->table()->last_sql, 'name'));
+        $this->assert_true(false !== strpos($book->table()->last_sql, 'special'));
         $this->assert_equals(null, $book->dirty_attributes());
     }
 
@@ -390,7 +390,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 
         $num_affected = Author::delete_all(['conditions' => ['parent_author_id = ?', 2], 'limit' => 1, 'order' => 'name asc']);
         $this->assert_equals(1, $num_affected);
-        $this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1') !== false);
+        $this->assert_true(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
     }
 
     public function test_update_all_with_set_as_string()
@@ -435,7 +435,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'limit' => 1, 'order' => 'name asc']);
         $this->assert_equals(1, $num_affected);
-        $this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1') !== false);
+        $this->assert_true(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
     }
 
     public function test_update_native_datetime()

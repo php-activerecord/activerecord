@@ -9,7 +9,7 @@ class AdapterTest extends DatabaseTest
     public function set_up($connection_name=null)
     {
         if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
-            ActiveRecord\Config::instance()->get_connection($connection_name) == 'skip') {
+            'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
             $this->mark_test_skipped($connection_name . ' drivers are not present');
         }
 
@@ -98,7 +98,7 @@ class AdapterTest extends DatabaseTest
         }
         $connection_string = "{$connection_string}@{$url['host']}:$port{$url['path']}";
 
-        if ($this->conn->protocol != 'sqlite') {
+        if ('sqlite' != $this->conn->protocol) {
             ActiveRecord\Connection::instance($connection_string);
         }
     }
@@ -270,7 +270,7 @@ class AdapterTest extends DatabaseTest
         $names = ['author_id', 'parent_author_id', 'name', 'updated_at', 'created_at', 'some_Date', 'some_time', 'some_text', 'encrypted_password', 'mixedCaseField'];
 
         if ($this->conn instanceof ActiveRecord\OciAdapter) {
-            $names = array_filter(array_map('strtolower', $names), function ($s) { return $s !== 'some_time'; });
+            $names = array_filter(array_map('strtolower', $names), function ($s) { return 'some_time' !== $s; });
         }
 
         foreach ($names as $field) {

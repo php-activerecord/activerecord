@@ -27,7 +27,7 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
         $this->column->type = $type;
         $value = $this->column->cast($original_value, $this->conn);
 
-        if ($original_value != null && ($type == Column::DATETIME || $type == Column::DATE)) {
+        if (null != $original_value && (Column::DATETIME == $type || Column::DATE == $type)) {
             $this->assert_true($value instanceof DateTime);
         } else {
             $this->assert_same($casted_value, $value);
