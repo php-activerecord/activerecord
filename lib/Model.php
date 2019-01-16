@@ -829,7 +829,7 @@ class Model
      * @param bool  $validate         True if the validators should be run
      * @param bool  $guard_attributes Set to true to guard protected/non-accessible attributes
      *
-     * @return Model
+     * @return static
      */
     public static function create($attributes, $validate=true, $guard_attributes=true)
     {
@@ -1548,7 +1548,7 @@ class Model
      *
      * @see find
      *
-     * @return array array of records found
+     * @return static[]
      */
     public static function all(/* ... */)
     {
@@ -1680,15 +1680,21 @@ class Model
      * @throws {@link RecordNotFound} if no options are passed or finding by pk and no records matched
      *
      * @return static|static[]|null
-     * 	Returns an array of records if:
-     * 		- doing a "all"
-     * 		- passing in an array of ids.
-     * 		- an associative array is passed in
+	 *
+	 * The rules for what gets returned are complex, but predictable:
+	 *
+	 * /-------------------------------------------------------------------------------------------
+	 * 	First Argument								Return Type			Example
+	 * --------------------------------------------------------------------------------------------
+	 *	int|string									static				User::find(3);
+	 * 	array<string, int|string>					static				User::find(["name"=>"Philip"]);
+	 * 	"first"										static|null			User::find("first", ["name"=>"Waldo"]);
+	 * 	"last"										static|null			User::find("last", ["name"=>"William"]);
+	 *  "all"										static[]			User::find("all", ["name" => "Stephen"]
+	 *  ...int|string								static[]			User::find(1, 3, 5, 8);
+	 *  array<int,int|string>						static[]			User::find([1,3,5,8]);
+	 * 	array<"conditions", array<string,string>>	static[]			User::find(["conditions"=> ["name" => "Kurt"]]);
      *
-     * Returns NULL if:
-     * 		- doing a "first" or "last" query, and none are found
-     *
-     * Otherwise returns a single Model object.
      */
     public static function find(/* $type, $options */)
     {
