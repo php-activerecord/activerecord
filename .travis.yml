@@ -19,7 +19,7 @@ before_script:
   - psql -c 'CREATE DATABASE phpar_test;' -U postgres
 
 services:
-  - memcache
+  - memcached
 
 env:
   - PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
