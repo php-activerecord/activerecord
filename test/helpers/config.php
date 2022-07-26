@@ -17,7 +17,9 @@
  **/
 require_once 'vendor/autoload.php';
 
+require_once 'vendor/phpunit/phpunit/src/Framework/TestCase.php';
 require_once 'SnakeCase_PHPUnit_Framework_TestCase.php';
+
 
 require_once 'DatabaseTest.php';
 require_once 'AdapterTest.php';

@@ -12,3 +12,4 @@ phpunit.xml
 .php_cs.cache
 .php_cs
 docs/api
+.phpunit.result.cache

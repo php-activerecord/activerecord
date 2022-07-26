@@ -190,7 +190,7 @@ class Utils
         return is_array(end($options)) ? end($options) : [];
     }
 
-    public static function add_condition(&$conditions=[], $condition, $conjuction='AND')
+    public static function add_condition(&$conditions, $condition, $conjuction='AND')
     {
         if (is_array($condition)) {
             if (empty($conditions)) {

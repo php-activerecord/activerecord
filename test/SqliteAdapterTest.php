@@ -9,14 +9,14 @@ class SqliteAdapterTest extends AdapterTest
         parent::set_up('sqlite');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
         @unlink(self::InvalidDb);
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
 
