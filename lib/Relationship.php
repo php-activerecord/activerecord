@@ -749,8 +749,8 @@ class BelongsTo extends AbstractRelationship
         return $class::first($options);
     }
 
-    public function load_eagerly($models=[], $attributes, $includes, Table $table)
+    public function load_eagerly($models, $attributes, $includes, Table $table)
     {
-        $this->query_and_attach_related_models_eagerly($table, $models, $attributes, $includes, $this->primary_key, $this->foreign_key);
+        $this->query_and_attach_related_models_eagerly($table, $models ?? [], $attributes, $includes, $this->primary_key, $this->foreign_key);
     }
 }
