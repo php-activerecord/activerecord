@@ -1809,7 +1809,7 @@ class Model
         }
         $results = count($list);
 
-        if ($results != ($expected = count((array) $values))) {
+        if ($results != ($expected = @count((array) $values))) {
             $class = get_called_class();
             if (is_array($values)) {
                 $values = join(',', $values);
