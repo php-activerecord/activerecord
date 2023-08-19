@@ -12,8 +12,6 @@ The code has been refreshed with a number of improvements:
     ```sh
     composer style-check
     ```
-* We've moved the minimum required version of PHP up to 5.4, which means our style checker is now enforcing short array syntax.
-
 * API and Usage documentation is now automatically generated and deployed to github pages. You'll find the usage documentation in `/docs` if you want to make any changes.  
 
 
@@ -40,7 +38,7 @@ Of course, there are some differences which will be obvious to the user if they 
 
 ## Minimum Requirements ##
 
-- PHP 5.4+
+- PHP 8.1+
 - PDO driver for your respective database
 
 ## Supported Databases ##
