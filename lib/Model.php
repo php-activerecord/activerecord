@@ -372,7 +372,7 @@ class Model
         }
 
         // check for getters
-        if (method_exists($this, "get_${attribute_name}")) {
+        if (method_exists($this, "get_{$attribute_name}")) {
             return true;
         }
 
