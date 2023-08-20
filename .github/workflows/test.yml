@@ -1,0 +1,66 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  phpunit:
+    name: PHPUnit
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - 8.1
+          - 8.2
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: pcov
+          ini-values: zend.assertions=1, assert.exception=1
+          php-version: ${{ matrix.php-version }}
+          tools: cs2pr
+
+      - name: Install dependencies with Composer
+        uses: ramsey/composer-install@v2
+
+      - name: Run PHPUnit
+        run: |
+          export $ENV
+          vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Upload coverage file
+        uses: actions/upload-artifact@v3
+        with:
+          name: phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage
+          path: coverage.xml
+  upload_coverage:
+    name: Upload coverage to Codecov
+    runs-on: ubuntu-20.04
+    needs:
+      - phpunit
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Download coverage files
+        uses: actions/download-artifact@v3
+        with:
+          path: reports
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: reports
