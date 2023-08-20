@@ -1625,7 +1625,7 @@ class Model
      */
     public static function last(/* ... */)
     {
-        return call_user_func_array('static::find', array_merge(['last'], func_get_args()));
+        return call_user_func_array(static::class.'::find', array_merge(['last'], func_get_args()));
     }
 
     /**
