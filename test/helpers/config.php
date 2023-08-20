@@ -18,8 +18,11 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 require_once __DIR__ . '/../../vendor/phpunit/phpunit/src/Framework/TestCase.php';
-require_once 'DatabaseTestCase.php';
-require_once 'AdapterTestCase.php';
+require_once 'SnakeCase_PHPUnit_Framework_TestCase.php';
+
+
+require_once 'DatabaseTest.php';
+require_once 'AdapterTest.php';
 
 require_once __DIR__ . '/../../ActiveRecord.php';
 
