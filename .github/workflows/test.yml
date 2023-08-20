@@ -1,6 +1,5 @@
 name: Test
-permissions:
-  contents: write
+
 on:
   pull_request:
   push:
@@ -11,35 +10,6 @@ jobs:
   phpunit:
     name: PHPUnit
     runs-on: ubuntu-20.04
-    services:
-      memcached:
-        image: memcached:1.6
-        ports:
-          - 11211:11211
-        options: --name memcached-container
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test
-          MYSQL_USER: test
-          MYSQL_PASSWORD: test
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_DB: test
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     strategy:
       fail-fast: false
@@ -58,43 +28,39 @@ jobs:
           coverage: pcov
           ini-values: zend.assertions=1, assert.exception=1
           php-version: ${{ matrix.php-version }}
-          extensions: memcached
           tools: cs2pr
-
-      - name: Check drivers
-        run: php drivers.php
 
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
 
-      - name: Create and set permissions on SQLite Database
-        run: |
-          touch test.db
-          echo $USER:$USER
-          sudo chown $USER:$USER test.db
-          chmod 777 test.db
-
-          # Verify SQLite installation and permissions
-      - name: Verify SQLite setup
-        run: |
-          sqlite3 --version
-          ls -la test.db
-          sqlite3 test.db "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name TEXT);"
-          ls -la test.db
-
-      - name: Verify MySQL
-        run: |
-          echo "MySQL Connection String: mysql://test:test@localhost:3306/test"
-
-      - name: Verify PostgreSQL
-        run: |
-          echo "PostgreSQL Connection String: postgres://test:test@localhost:5432/test"
-
       - name: Run PHPUnit
         run: |
-          vendor/bin/phpunit -c phpunit.xml.dist
+          export $ENV
+          vendor/bin/phpunit --coverage-clover=coverage.xml
 
-      - name: Upload coverage reports to Codecov
+      - name: Upload coverage file
+        uses: actions/upload-artifact@v3
+        with:
+          name: phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage
+          path: coverage.xml
+  upload_coverage:
+    name: Upload coverage to Codecov
+    runs-on: ubuntu-20.04
+    needs:
+      - phpunit
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Download coverage files
+        uses: actions/download-artifact@v3
+        with:
+          path: reports
+
+      - name: Upload to Codecov
         uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          directory: reports
