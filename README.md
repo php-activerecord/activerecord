@@ -6,6 +6,7 @@
 
 This is a badly-needed relaunch of the project originally created by Kien La and Jacques Fuentes. Both authors and the current maintainers have lost interest in PHP, moved onto other languages, and no longer review pull requests or issues. Some of us still depend on the project and want to see it move forward, so we've moved it here under new ownership. 
 
+
 The code has been refreshed with a number of improvements:
 
 * A PSR-2 style checker has been added to the travis build, and a fixer has been run on the codebase. You can check your code locally with the command:
@@ -20,6 +21,13 @@ Note that the original website, <http://www.phpactiverecord.org/>, has also fall
  
 http://php-activerecord.github.io/activerecord/docs/Introduction.html 
  
+## Installation
+
+Via composer:
+
+```sh
+composer require php-patterns/activerecord
+```
 
 ## Introduction ##
 A brief summarization of what ActiveRecord is:
