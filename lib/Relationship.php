@@ -708,6 +708,8 @@ class BelongsTo extends AbstractRelationship
 {
     public function __construct($options=[])
     {
+        private $primary_key;
+
         parent::__construct($options);
 
         if (!$this->class_name) {
