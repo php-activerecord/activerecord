@@ -43,6 +43,7 @@ use IteratorAggregate;
  */
 class Validations
 {
+    private $klass;
     private $model;
     private $options = [];
     private $validators = [];
