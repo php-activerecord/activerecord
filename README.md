@@ -19,7 +19,7 @@ The code has been refreshed with a number of improvements:
 Note that the original website, <http://www.phpactiverecord.org/>, has also fallen into neglect and disrepair, and is not 
  advised as a primary reference. A new documentation site has been launched here: 
  
-http://php-activerecord.github.io/activerecord/docs/Introduction.html 
+http://php-activerecord.github.io/activerecord/
  
 ## Installation
 
