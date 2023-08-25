@@ -337,7 +337,7 @@ abstract class Connection
         if ($this->logging) {
             $this->logger->info($sql);
             if ($values) {
-                $this->logger->info($values);
+                $this->logger->info(var_export($values, true));
             }
         }
 

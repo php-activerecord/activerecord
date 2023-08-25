@@ -8,7 +8,7 @@ services:
       MYSQL_USER: test
       MYSQL_PASSWORD: test
     ports:
-      - "3306:3306"
+      - "3320:3320"
 
   postgres:
     image: postgres:latest
@@ -19,10 +19,11 @@ services:
     ports:
       - "5432:5432"
 
-  memcached:
-    image: memcached:latest
-    ports:
-      - "11211:11211"
+  oci:
+    image: container-registry.oracle.com/database/free
     environment:
-      - MEMCACHED_MEMORY_LIMIT=64
-      - MEMCACHED_MAX_CONNECTIONS=1024
+      ORACLE_PWD: test
+      ORACLE_PDB: dev
+    ports:
+      - "8080:8080"
+      - "1521:1521"
