@@ -5,6 +5,7 @@ require_once __DIR__ . '/DatabaseLoader.php';
 class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
     protected $conn;
+    protected $original_date_class;
     public static $log = false;
     public static $db;
 
