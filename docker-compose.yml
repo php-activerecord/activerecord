@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    ports:
+      - "3320:3320"
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5432:5432"
+
+  oci:
+    image: container-registry.oracle.com/database/free
+    environment:
+      ORACLE_PWD: test
+      ORACLE_PDB: dev
+    ports:
+      - "8080:8080"
+      - "1521:1521"
