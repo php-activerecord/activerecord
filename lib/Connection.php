@@ -49,7 +49,7 @@ abstract class Connection
      */
     private $logging = false;
     /**
-     * Contains a Logger object that must impelement a log() method.
+     * Contains a Logger object that must implement a log() method.
      *
      * @var object
      */
@@ -272,7 +272,8 @@ abstract class Connection
                 $host = "unix_socket=$info->host";
             }
 
-            $this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+            $dsn = "$info->protocol:$host;dbname=$info->db";
+            $this->connection = new PDO($dsn, $info->user, $info->pass, static::$PDO_OPTIONS);
         } catch (PDOException $e) {
             throw new DatabaseException($e);
         }
@@ -333,9 +334,9 @@ abstract class Connection
     public function query($sql, &$values=[])
     {
         if ($this->logging) {
-            $this->logger->log($sql);
+            $this->logger->info($sql);
             if ($values) {
-                $this->logger->log($values);
+                $this->logger->info($values);
             }
         }
 

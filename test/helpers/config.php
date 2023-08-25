@@ -39,8 +39,8 @@ if ('false' !== getenv('LOG')) {
 ActiveRecord\Config::initialize(function ($cfg) {
     $cfg->set_model_directory(realpath(__DIR__ . '/../models'));
     $cfg->set_connections([
-        'mysql'  => getenv('PHPAR_MYSQL') ?: 'mysql://test:test@127.0.0.1/test',
-        'pgsql'  => getenv('PHPAR_PGSQL') ?: 'pgsql://test:test@127.0.0.1/test',
+        'mysql'  => getenv('PHPAR_MYSQL') ?: 'mysql://test:test@127.0.0.1:3320/test',
+        'pgsql'  => getenv('PHPAR_PGSQL') ?: 'pgsql://test:test@127.0.0.1:5432/test',
         'oci'    => getenv('PHPAR_OCI') ?: 'oci://test:test@127.0.0.1/dev',
         'sqlite' => getenv('PHPAR_SQLITE') ?: 'sqlite://test.db']);
 
@@ -54,11 +54,15 @@ ActiveRecord\Config::initialize(function ($cfg) {
         }
     }
 
-    if (class_exists('Log_file')) { // PEAR Log installed
-        $logger = new Log_file(dirname(__FILE__) . '/../log/query.log', 'ident', ['mode' => 0664, 'timeFormat' =>  '%Y-%m-%d %H:%M:%S']);
+    if (class_exists('Monolog\Logger')) { // Monolog installed
+        $log = new Monolog\Logger("arlog");
+        $log->pushHandler(new \Monolog\Handler\StreamHandler(
+            dirname(__FILE__) . '/../log/query.log',
+            \Monolog\Level::Warning)
+        );
 
         $cfg->set_logging(true);
-        $cfg->set_logger($logger);
+        $cfg->set_logger($log);
     } else {
         if ($GLOBALS['show_warnings'] && !isset($GLOBALS['show_warnings_done'])) {
             echo "(Logging SQL queries disabled, PEAR::Log not found.)\n";

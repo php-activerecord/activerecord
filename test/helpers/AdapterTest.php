@@ -8,6 +8,7 @@ class AdapterTest extends DatabaseTest
 
     public function set_up($connection_name=null)
     {
+        $d = PDO::getAvailableDrivers();
         if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
             'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
             $this->mark_test_skipped($connection_name . ' drivers are not present');
