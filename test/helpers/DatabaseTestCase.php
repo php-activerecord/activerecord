@@ -8,8 +8,7 @@ require_once __DIR__ . '/DatabaseLoader.php';
 
 abstract class DatabaseTestCase extends TestCase
 {
-    protected string $connection_name;
-    protected \ActiveRecord\Connection $connection;
+    protected $conn;
     protected $original_date_class;
     public static $log = false;
     public static $db;
