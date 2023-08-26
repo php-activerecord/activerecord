@@ -101,7 +101,7 @@ class SerializationTest extends DatabaseTestCase
     {
         $now = new DateTime();
         $a = $this->_a(['only' => 'created_at'], new Author(['created_at' => $now]));
-        $this->assertEquals($now->format(\ActiveRecord\Serialize\Serialization::$DATETIME_FORMAT), $a['created_at']);
+        $this->assertEquals($now->format(ActiveRecord\Serialization::$DATETIME_FORMAT), $a['created_at']);
     }
 
     public function test_to_json()
@@ -113,9 +113,8 @@ class SerializationTest extends DatabaseTestCase
 
     public function test_to_json_include_root()
     {
-        $this->assertNotNull(json_decode(Book::find(1)->to_json([
-            'include_root'=>true
-        ]))->{'test\models\book'});
+        ActiveRecord\JsonSerializer::$include_root = true;
+        $this->assertNotNull(json_decode(Book::find(1)->to_json())->book);
     }
 
     public function test_to_xml_include()
@@ -142,8 +141,8 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_array_include_root()
     {
         $book = Book::find(1);
-        $array = $book->to_array(['include_root' => true]);
-        $book_attributes = ['test\models\book' => $book->attributes()];
+        $array = $book->to_array();
+        $book_attributes = ['book' => $book->attributes()];
         $this->assertEquals($book_attributes, $array);
     }
 

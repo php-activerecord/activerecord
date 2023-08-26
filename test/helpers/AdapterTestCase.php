@@ -20,7 +20,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_i_has_a_default_port_unless_im_sqlite()
     {
-        if ($this->connection instanceof SqliteAdapter) {
+        if ($this->connection instanceof ActiveRecord\SqliteAdapter) {
             $this->expectNotToPerformAssertions();
             return;
         }

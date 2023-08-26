@@ -75,7 +75,7 @@ class RelationshipTest extends DatabaseTestCase
 
     protected function assert_default_belongs_to($event, $association_name='venue')
     {
-        $this->assertTrue($event->$association_name instanceof Venue);
+        $this->assert_true($event->$association_name instanceof Venue);
         $this->assertEquals(5, $event->id);
         $this->assertEquals('West Chester', $event->$association_name->city);
         $this->assertEquals(6, $event->$association_name->id);
@@ -153,7 +153,7 @@ class RelationshipTest extends DatabaseTestCase
     public function test_belongs_to_returns_null_when_foreign_key_is_null()
     {
         $event = Event::create(['title' => 'venueless event', 'host_id'=>1]);
-        $this->assertNull($event->venue);
+        $this->assert_null($event->venue);
     }
 
     public function test_belongs_to_with_explicit_class_name()
