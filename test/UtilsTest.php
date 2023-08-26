@@ -1,8 +1,9 @@
 <?php
 
 use ActiveRecord as AR;
+use PHPUnit\Framework\TestCase;
 
-class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
+class UtilsTest extends TestCase
 {
     public function setUp(): void
     {

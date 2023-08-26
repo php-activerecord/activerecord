@@ -26,7 +26,8 @@ class SerializationTest extends DatabaseTest
 
     public function test_only()
     {
-        $this->assert_has_keys('name', 'special', $this->_a(['only' => ['name', 'special']]));
+        $this->assertArrayHasKey('special', $this->_a(['only' => ['name', 'special']]));
+        $this->assertArrayHasKey('name', $this->_a(['only' => ['name', 'special']]));
     }
 
     public function test_only_not_array()
@@ -36,8 +37,10 @@ class SerializationTest extends DatabaseTest
 
     public function test_only_should_only_apply_to_attributes()
     {
-        $this->assert_has_keys('name', 'author', $this->_a(['only' => 'name', 'include' => 'author']));
-        $this->assert_has_keys('book_id', 'upper_name', $this->_a(['only' => 'book_id', 'methods' => 'upper_name']));
+        $this->assertArrayHasKey('author', $this->_a(['only' => 'name', 'include' => 'author']));
+        $this->assertArrayHasKey('name', $this->_a(['only' => 'name', 'include' => 'author']));
+        $this->assertArrayHasKey('book_id', $this->_a(['only' => 'book_id', 'methods' => 'upper_name']));
+        $this->assertArrayHasKey('upper_name', $this->_a(['only' => 'book_id', 'methods' => 'upper_name']));
     }
 
     public function test_only_overrides_except()
@@ -47,12 +50,13 @@ class SerializationTest extends DatabaseTest
 
     public function test_except()
     {
-        $this->assert_doesnt_has_keys('name', 'special', $this->_a(['except' => ['name', 'special']]));
+        $this->assertArrayNotHasKey('name', $this->_a(['except' => ['name', 'special']]));
+        $this->assertArrayNotHasKey('special', $this->_a(['except' => ['name', 'special']]));
     }
 
     public function test_except_takes_a_string()
     {
-        $this->assert_doesnt_has_keys('name', $this->_a(['except' => 'name']));
+        $this->assertArrayNotHasKey('name', $this->_a(['except' => 'name']));
     }
 
     public function test_methods()

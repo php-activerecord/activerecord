@@ -3,8 +3,9 @@
 use ActiveRecord\Column;
 use ActiveRecord\DatabaseException;
 use ActiveRecord\DateTime;
+use PHPUnit\Framework\TestCase;
 
-class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
+class ColumnTest extends TestCase
 {
     public function setUp($connection_name = null): void
     {

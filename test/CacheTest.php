@@ -1,8 +1,9 @@
 <?php
 
 use ActiveRecord\Cache;
+use PHPUnit\Framework\TestCase;
 
-class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
+class CacheTest extends TestCase
 {
     public function setUp($connection_name=null): void
     {

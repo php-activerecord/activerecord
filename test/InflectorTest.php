@@ -1,8 +1,10 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once __DIR__ . '/../lib/Inflector.php';
 
-class InflectorTest extends SnakeCase_PHPUnit_Framework_TestCase
+class InflectorTest extends TestCase
 {
     public function setUp(): void
     {

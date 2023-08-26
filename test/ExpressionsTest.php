@@ -5,8 +5,9 @@ require_once __DIR__ . '/../lib/Expressions.php';
 use ActiveRecord\ConnectionManager;
 use ActiveRecord\DatabaseException;
 use ActiveRecord\Expressions;
+use PHPUnit\Framework\TestCase;
 
-class ExpressionsTest extends SnakeCase_PHPUnit_Framework_TestCase
+class ExpressionsTest extends TestCase
 {
     public function test_values()
     {

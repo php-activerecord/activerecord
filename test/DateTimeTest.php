@@ -2,8 +2,9 @@
 
 use ActiveRecord\DatabaseException;
 use ActiveRecord\DateTime as DateTime;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
+class DateTimeTest extends TestCase
 {
     public function setUp(): void
     {
@@ -62,7 +63,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
         $b = new DateTime();
         $b->setISODate(2001, 1);
 
-        $this->assert_datetime_equals($a, $b);
+        $this->assertEquals($a->format(DateTime::ATOM), $b->format(DateTime::ATOM));
     }
 
     public function test_set_time()
@@ -73,7 +74,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
         $b = new DateTime();
         $b->setTime(1, 1);
 
-        $this->assert_datetime_equals($a, $b);
+        $this->assertEquals($a->format(DateTime::ATOM), $b->format(DateTime::ATOM));
     }
 
     public function test_get_format_with_friendly()

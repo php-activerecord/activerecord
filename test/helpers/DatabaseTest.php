@@ -1,8 +1,10 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once __DIR__ . '/DatabaseLoader.php';
 
-class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
+abstract class DatabaseTest extends TestCase
 {
     protected \ActiveRecord\Connection $connection;
     protected $original_date_class;

@@ -532,8 +532,8 @@ class ActiveRecordTest extends DatabaseTest
     {
         $author = new Author();
         $author->created_at = $now = new \DateTime();
-        $this->assert_is_a('ActiveRecord\\DateTime', $author->created_at);
-        $this->assert_datetime_equals($now, $author->created_at);
+        $this->assertInstanceOf('ActiveRecord\\DateTime', $author->created_at);
+        $this->assertEquals($now->format(DateTime::ATOM), $author->created_at->format(DateTime::ATOM));
     }
 
     public function test_assigning_php_datetime_gets_converted_to_date_class_with_custom_date_class()
@@ -541,14 +541,14 @@ class ActiveRecordTest extends DatabaseTest
         ActiveRecord\Config::instance()->set_date_class('\\DateTime'); // use PHP built-in DateTime
         $author = new Author();
         $author->created_at = $now = new \DateTime();
-        $this->assert_is_a('DateTime', $author->created_at);
-        $this->assert_datetime_equals($now, $author->created_at);
+        $this->assertInstanceOf('DateTime', $author->created_at);
+        $this->assertEquals($now->format(DateTime::ATOM), $author->created_at->format(DateTime::ATOM));
     }
 
     public function test_assigning_from_mass_assignment_php_datetime_gets_converted_to_ar_datetime()
     {
         $author = new Author(['created_at' => new \DateTime()]);
-        $this->assert_is_a('ActiveRecord\\DateTime', $author->created_at);
+        $this->assertInstanceOf('ActiveRecord\\DateTime', $author->created_at);
     }
 
     public function test_get_real_attribute_name()

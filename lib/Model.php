@@ -734,12 +734,14 @@ class Model
      */
     private function is_delegated($name, &$delegate)
     {
-        if ('' != $delegate['prefix']) {
-            $name = substr($name, strlen($delegate['prefix'])+1);
-        }
+        if (is_array($delegate)) {
+            if ('' != $delegate['prefix']) {
+                $name = substr($name, strlen($delegate['prefix'])+1);
+            }
 
-        if (is_array($delegate) && in_array($name, $delegate['delegate'])) {
-            return $name;
+            if(in_array($name, $delegate['delegate'])) {
+                return $name;
+            }
         }
 
         return null;
