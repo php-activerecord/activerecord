@@ -1,7 +1,6 @@
 <?php
 
 use ActiveRecord\Cache;
-use ActiveRecord\Exception\CacheException;
 use PHPUnit\Framework\TestCase;
 
 class CacheTest extends TestCase

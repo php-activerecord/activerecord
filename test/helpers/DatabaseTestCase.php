@@ -1,12 +1,10 @@
 <?php
 
-use ActiveRecord\Exception\DatabaseException;
-use ActiveRecord\Exception\UndefinedPropertyException;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/DatabaseLoader.php';
 
-abstract class DatabaseTestCase extends TestCase
+abstract class DatabaseTest extends TestCase
 {
     protected \ActiveRecord\Connection $connection;
     protected $original_date_class;
