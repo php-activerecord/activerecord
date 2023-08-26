@@ -31,7 +31,7 @@ class SerializationTest extends DatabaseTest
 
     public function test_only_not_array()
     {
-        $this->assert_has_keys('name', $this->_a(['only' => 'name']));
+        $this->assertArrayHasKey('name', $this->_a(['only' => 'name']));
     }
 
     public function test_only_should_only_apply_to_attributes()
@@ -42,7 +42,7 @@ class SerializationTest extends DatabaseTest
 
     public function test_only_overrides_except()
     {
-        $this->assert_has_keys('name', $this->_a(['only' => 'name', 'except' => 'name']));
+        $this->assertArrayHasKey('name', $this->_a(['only' => 'name', 'except' => 'name']));
     }
 
     public function test_except()
@@ -78,7 +78,7 @@ class SerializationTest extends DatabaseTest
     public function test_include()
     {
         $a = $this->_a(['include' => ['author']]);
-        $this->assert_has_keys('parent_author_id', $a['author']);
+        $this->assertArrayHasKey('parent_author_id', $a['author']);
     }
 
     public function test_include_nested_with_nested_options()
@@ -87,29 +87,29 @@ class SerializationTest extends DatabaseTest
             ['include' => ['events' => ['except' => 'title', 'include' => ['host' => ['only' => 'id']]]]],
             Host::find(4));
 
-        $this->assert_equals(3, count($a['events']));
-        $this->assert_doesnt_has_keys('title', $a['events'][0]);
-        $this->assert_equals(['id' => 4], $a['events'][0]['host']);
+        $this->assertEquals(3, count($a['events']));
+        $this->assertArrayNotHasKey('title', $a['events'][0]);
+        $this->assertEquals(['id' => 4], $a['events'][0]['host']);
     }
 
     public function test_datetime_values_get_converted_to_strings()
     {
         $now = new DateTime();
         $a = $this->_a(['only' => 'created_at'], new Author(['created_at' => $now]));
-        $this->assert_equals($now->format(ActiveRecord\Serialization::$DATETIME_FORMAT), $a['created_at']);
+        $this->assertEquals($now->format(ActiveRecord\Serialization::$DATETIME_FORMAT), $a['created_at']);
     }
 
     public function test_to_json()
     {
         $book = Book::find(1);
         $json = $book->to_json();
-        $this->assert_equals($book->attributes(), (array) json_decode($json));
+        $this->assertEquals($book->attributes(), (array) json_decode($json));
     }
 
     public function test_to_json_include_root()
     {
         ActiveRecord\JsonSerializer::$include_root = true;
-        $this->assert_not_null(json_decode(Book::find(1)->to_json())->book);
+        $this->assertNotNull(json_decode(Book::find(1)->to_json())->book);
     }
 
     public function test_to_xml_include()
@@ -117,20 +117,20 @@ class SerializationTest extends DatabaseTest
         $xml = Host::find(4)->to_xml(['include' => 'events']);
         $decoded = get_object_vars(new SimpleXMLElement($xml));
 
-        $this->assert_equals(3, count($decoded['events']->event));
+        $this->assertEquals(3, count($decoded['events']->event));
     }
 
     public function test_to_xml()
     {
         $book = Book::find(1);
-        $this->assert_equals($book->attributes(), get_object_vars(new SimpleXMLElement($book->to_xml())));
+        $this->assertEquals($book->attributes(), get_object_vars(new SimpleXMLElement($book->to_xml())));
     }
 
     public function test_to_array()
     {
         $book = Book::find(1);
         $array = $book->to_array();
-        $this->assert_equals($book->attributes(), $array);
+        $this->assertEquals($book->attributes(), $array);
     }
 
     public function test_to_array_include_root()
@@ -139,7 +139,7 @@ class SerializationTest extends DatabaseTest
         $book = Book::find(1);
         $array = $book->to_array();
         $book_attributes = ['book' => $book->attributes()];
-        $this->assert_equals($book_attributes, $array);
+        $this->assertEquals($book_attributes, $array);
     }
 
     public function test_to_array_except()
@@ -148,14 +148,14 @@ class SerializationTest extends DatabaseTest
         $array = $book->to_array(['except' => ['special']]);
         $book_attributes = $book->attributes();
         unset($book_attributes['special']);
-        $this->assert_equals($book_attributes, $array);
+        $this->assertEquals($book_attributes, $array);
     }
 
     public function test_works_with_datetime()
     {
         Author::find(1)->update_attribute('created_at', new DateTime());
-        $this->assert_reg_exp('/<updated_at>[0-9]{4}-[0-9]{2}-[0-9]{2}/', Author::find(1)->to_xml());
-        $this->assert_reg_exp('/"updated_at":"[0-9]{4}-[0-9]{2}-[0-9]{2}/', Author::find(1)->to_json());
+        $this->assertMatchesRegularExpression('/<updated_at>[0-9]{4}-[0-9]{2}-[0-9]{2}/', Author::find(1)->to_xml());
+        $this->assertMatchesRegularExpression('/"updated_at":"[0-9]{4}-[0-9]{2}-[0-9]{2}/', Author::find(1)->to_json());
     }
 
     public function test_to_xml_skip_instruct()
@@ -166,7 +166,7 @@ class SerializationTest extends DatabaseTest
 
     public function test_only_method()
     {
-        $this->assert_contains('<sharks>lasers</sharks>', Author::first()->to_xml(['only_method' => 'return_something']));
+        $this->assertStringContainsString('<sharks>lasers</sharks>', Author::first()->to_xml(['only_method' => 'return_something']));
     }
 
     public function test_to_csv()

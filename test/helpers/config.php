@@ -39,7 +39,7 @@ if ('false' !== getenv('LOG')) {
 ActiveRecord\Config::initialize(function ($cfg) {
     $cfg->set_model_directory(realpath(__DIR__ . '/../models'));
     $cfg->set_connections([
-        'mysql'  => getenv('PHPAR_MYSQL') ?: 'mysql://test:test@127.0.0.1:3320/test',
+        'mysql'  => getenv('PHPAR_MYSQL') ?: 'mysql://test:test@127.0.0.1:3306/test',
         'pgsql'  => getenv('PHPAR_PGSQL') ?: 'pgsql://test:test@127.0.0.1:5432/test',
         'sqlite' => getenv('PHPAR_SQLITE') ?: 'sqlite://test.db']);
 

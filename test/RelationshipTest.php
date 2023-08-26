@@ -27,7 +27,7 @@ class RelationshipTest extends DatabaseTest
         Host::$has_many = [['events', 'order' => 'id asc']];
 
         foreach ($this->relationship_names as $name) {
-            if (preg_match("/$name/", $this->getName(), $match)) {
+            if (preg_match("/$name/", $this->name(), $match)) {
                 $this->relationship_name = $match[0];
             }
         }
@@ -59,23 +59,23 @@ class RelationshipTest extends DatabaseTest
     protected function assert_default_belongs_to($event, $association_name='venue')
     {
         $this->assert_true($event->$association_name instanceof Venue);
-        $this->assert_equals(5, $event->id);
-        $this->assert_equals('West Chester', $event->$association_name->city);
-        $this->assert_equals(6, $event->$association_name->id);
+        $this->assertEquals(5, $event->id);
+        $this->assertEquals('West Chester', $event->$association_name->city);
+        $this->assertEquals(6, $event->$association_name->id);
     }
 
     protected function assert_default_has_many($venue, $association_name='events')
     {
-        $this->assert_equals(2, $venue->id);
-        $this->assert_true(count($venue->$association_name) > 1);
-        $this->assert_equals('Yeah Yeah Yeahs', $venue->{$association_name}[0]->title);
+        $this->assertEquals(2, $venue->id);
+        $this->assertTrue(count($venue->$association_name) > 1);
+        $this->assertEquals('Yeah Yeah Yeahs', $venue->{$association_name}[0]->title);
     }
 
     protected function assert_default_has_one($employee, $association_name='position')
     {
-        $this->assert_true($employee->$association_name instanceof Position);
-        $this->assert_equals('physicist', $employee->$association_name->title);
-        $this->assert_not_null($employee->id, $employee->$association_name->title);
+        $this->assertTrue($employee->$association_name instanceof Position);
+        $this->assertEquals('physicist', $employee->$association_name->title);
+        $this->assertNotNull($employee->id, $employee->$association_name->title);
     }
 
     public function test_has_many_basic()
@@ -135,7 +135,7 @@ class RelationshipTest extends DatabaseTest
 
     public function test_belongs_to_returns_null_when_foreign_key_is_null()
     {
-        $event = Event::create(['title' => 'venueless event']);
+        $event = Event::create(['title' => 'venueless event', 'host_id'=>1]);
         $this->assert_null($event->venue);
     }
 
@@ -572,15 +572,15 @@ class RelationshipTest extends DatabaseTest
         $assocs = ['books', 'awesome_people'];
 
         foreach ($assocs as $assoc) {
-            $this->assert_internal_type('array', $authors[0]->$assoc);
+            $this->assertIsArray($authors[0]->$assoc);
 
             foreach ($authors[0]->$assoc as $a) {
-                $this->assert_equals($authors[0]->author_id, $a->author_id);
+                $this->assertEquals($authors[0]->author_id, $a->author_id);
             }
         }
 
         foreach ($assocs as $assoc) {
-            $this->assert_internal_type('array', $authors[1]->$assoc);
+            $this->assertIsArray($authors[1]->$assoc);
         }
 
         $this->assert_sql_has('WHERE author_id IN(?,?)', ActiveRecord\Table::load('Author')->last_sql);
@@ -592,14 +592,14 @@ class RelationshipTest extends DatabaseTest
     {
         $venues = Venue::find([1, 2], ['include' => ['events' => ['host']]]);
 
-        $this->assert_equals(2, count($venues));
+        $this->assertEquals(2, count($venues));
 
         foreach ($venues as $v) {
-            $this->assert_true(count($v->events) > 0);
+            $this->assertTrue(count($v->events) > 0);
 
             foreach ($v->events as $e) {
-                $this->assert_equals($e->host_id, $e->host->id);
-                $this->assert_equals($v->id, $e->venue_id);
+                $this->assertEquals($e->host_id, $e->host->id);
+                $this->assertEquals($v->id, $e->venue_id);
             }
         }
 
@@ -613,7 +613,7 @@ class RelationshipTest extends DatabaseTest
         $events = Event::find([1, 2, 3, 5, 7], ['include' => 'venue']);
 
         foreach ($events as $event) {
-            $this->assert_equals($event->venue_id, $event->venue->id);
+            $this->assertEquals($event->venue_id, $event->venue->id);
         }
 
         $this->assert_sql_has('WHERE id IN(?,?,?,?,?)', ActiveRecord\Table::load('Venue')->last_sql);
@@ -624,8 +624,8 @@ class RelationshipTest extends DatabaseTest
         $events = Event::find([1, 2, 3, 5, 7], ['include' => ['venue', 'host']]);
 
         foreach ($events as $event) {
-            $this->assert_equals($event->venue_id, $event->venue->id);
-            $this->assert_equals($event->host_id, $event->host->id);
+            $this->assertEquals($event->venue_id, $event->venue->id);
+            $this->assertEquals($event->host_id, $event->host->id);
         }
 
         $this->assert_sql_has('WHERE id IN(?,?,?,?,?)', ActiveRecord\Table::load('Event')->last_sql);
@@ -642,8 +642,8 @@ class RelationshipTest extends DatabaseTest
         $assocs = ['author', 'awesome_people'];
 
         foreach ($books as $book) {
-            $this->assert_equals($book->author_id, $book->author->author_id);
-            $this->assert_equals($book->author->author_id, $book->author->awesome_people[0]->author_id);
+            $this->assertEquals($book->author_id, $book->author->author_id);
+            $this->assertEquals($book->author->author_id, $book->author->awesome_people[0]->author_id);
         }
 
         $this->assert_sql_has('WHERE book_id IN(?,?)', ActiveRecord\Table::load('Book')->last_sql);
@@ -673,9 +673,9 @@ class RelationshipTest extends DatabaseTest
         $venue = $events[0]->venue;
         $venue->name = 'new name';
 
-        $this->assert_equals($venue->id, $events[1]->venue->id);
-        $this->assert_not_equals($venue->name, $events[1]->venue->name);
-        $this->assert_not_equals(spl_object_hash($venue), spl_object_hash($events[1]->venue));
+        $this->assertEquals($venue->id, $events[1]->venue->id);
+        $this->assertNotEquals($venue->name, $events[1]->venue->name);
+        $this->assertNotEquals(spl_object_hash($venue), spl_object_hash($events[1]->venue));
     }
 
     public function test_eager_loading_clones_nested_related_objects()
@@ -686,9 +686,9 @@ class RelationshipTest extends DatabaseTest
         $changed_host = $venues[3]->events[0]->host;
         $changed_host->name = 'changed';
 
-        $this->assert_equals($changed_host->id, $unchanged_host->id);
-        $this->assert_not_equals($changed_host->name, $unchanged_host->name);
-        $this->assert_not_equals(spl_object_hash($changed_host), spl_object_hash($unchanged_host));
+        $this->assertEquals($changed_host->id, $unchanged_host->id);
+        $this->assertNotEquals($changed_host->name, $unchanged_host->name);
+        $this->assertNotEquals(spl_object_hash($changed_host), spl_object_hash($unchanged_host));
     }
 
     public function test_gh_23_relationships_with_joins_to_same_table_should_alias_table_name()

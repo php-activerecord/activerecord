@@ -37,7 +37,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
         array_shift($args);
 
         call_user_func_array([$datetime, $method], $args);
-        $this->assert_has_keys('some_date', $model->dirty_attributes());
+        $this->assertArrayHasKey('some_date', $model->dirty_attributes());
     }
 
     public function test_should_flag_the_attribute_dirty()

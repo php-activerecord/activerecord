@@ -507,7 +507,7 @@ class ActiveRecordTest extends DatabaseTest
     {
         $author = new Author();
         $author->flag_dirty('some_date');
-        $this->assert_has_keys('some_date', $author->dirty_attributes());
+        $this->assertArrayHasKey('some_date', $author->dirty_attributes());
         $this->assert_true($author->attribute_is_dirty('some_date'));
         $author->save();
         $this->assert_false($author->attribute_is_dirty('some_date'));

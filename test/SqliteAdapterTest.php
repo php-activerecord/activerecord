@@ -76,5 +76,6 @@ class SqliteAdapterTest extends AdapterTest
     // not supported
     public function test_connect_with_port()
     {
+        $this->expectNotToPerformAssertions();
     }
 }
