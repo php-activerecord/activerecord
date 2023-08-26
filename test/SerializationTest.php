@@ -12,6 +12,8 @@ class SerializationTest extends DatabaseTestCase
     public function tearDown(): void
     {
         parent::tearDown();
+        ActiveRecord\ArraySerializer::$include_root = false;
+        ActiveRecord\JsonSerializer::$include_root = false;
     }
 
     public function _a($options=[], $model=null)
