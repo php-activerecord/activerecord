@@ -4,7 +4,7 @@ use ActiveRecord\Cache;
 
 class ActiveRecordCacheTest extends DatabaseTest
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
         if (!extension_loaded('memcache')) {
             $this->markTestSkipped('The memcache extension is not available');
@@ -12,7 +12,7 @@ class ActiveRecordCacheTest extends DatabaseTest
             return;
         }
 
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
         ActiveRecord\Config::instance()->set_cache('memcache://localhost');
     }
 

@@ -6,7 +6,7 @@ use ActiveRecord\DateTime;
 
 class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
-    public function set_up()
+    public function setUp($connection_name = null): void
     {
         $this->column = new Column();
         try {
@@ -132,7 +132,7 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 
     public function test_native_date_time_attribute_copies_exact_tz()
     {
-        $dt = new \DateTime(null, new \DateTimeZone('America/New_York'));
+        $dt = new \DateTime('', new \DateTimeZone('America/New_York'));
 
         $column = new Column();
         $column->type = Column::DATETIME;

@@ -1,11 +1,12 @@
 <?php
 
 use ActiveRecord\Connection;
+use PHPUnit\Framework\TestCase;
 
 // Only use this to test static methods in Connection that are not specific
 // to any database adapter.
 
-class ConnectionTest extends SnakeCase_PHPUnit_Framework_TestCase
+class ConnectionTest extends TestCase
 {
     public function test_connection_info_from_should_throw_exception_when_no_host()
     {

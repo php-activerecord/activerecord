@@ -4,7 +4,7 @@ use ActiveRecord as AR;
 
 class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
-    public function set_up()
+    public function setUp(): void
     {
         $this->object_array = [null, null];
         $this->object_array[0] = new stdClass();

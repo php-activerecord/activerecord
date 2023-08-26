@@ -19,9 +19,9 @@ class ValidatesNumericalityOfTest extends DatabaseTest
     public static $INTEGERS = [0, 10, -10];
     public static $JUNK = ['not a number', '42 not a number', '00-1', '--3', '+-3', '+3-1', '-+019.0', '12.12.13.12', "123\nnot a number"];
 
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
         BookNumericality::$validates_numericality_of = [
             ['numeric_test']
         ];

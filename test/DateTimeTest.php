@@ -5,7 +5,7 @@ use ActiveRecord\DateTime as DateTime;
 
 class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
-    public function set_up()
+    public function setUp(): void
     {
         $this->date = new DateTime();
         $this->original_format = DateTime::$DEFAULT_FORMAT;

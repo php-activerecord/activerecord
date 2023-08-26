@@ -4,12 +4,12 @@ use PhpUnit\Framework\TestCase;
 
 class SnakeCase_PHPUnit_Framework_TestCase extends TestCase
 {
-    public function setUp(): void
-    {
-        if (method_exists($this, 'set_up')) {
-            call_user_func_array([$this, 'set_up'], func_get_args());
-        }
-    }
+//    public function setUp(): void
+//    {
+//        if (method_exists($this, 'set_up')) {
+//            call_user_func_array([$this, 'set_up'], func_get_args());
+//        }
+//    }
 
     public function tearDown(): void
     {

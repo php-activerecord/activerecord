@@ -14,9 +14,9 @@ class BookSize extends ActiveRecord\Model
 
 class ValidatesLengthOfTest extends DatabaseTest
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
         BookLength::$validates_length_of[0] = ['name', 'allow_blank' => false, 'allow_null' => false];
     }
 
@@ -84,7 +84,7 @@ class ValidatesLengthOfTest extends DatabaseTest
         $book->save();
         $this->assertTrue($book->errors->is_invalid('name'));
 
-        $this->set_up();
+        $this->setUp();
         BookLength::$validates_length_of[0]['in'] = [1, 3];
         $book = new BookLength();
         $book->name = 'four';
@@ -168,7 +168,7 @@ class ValidatesLengthOfTest extends DatabaseTest
             $this->assertEquals('maximum value cannot use a float for length.', $e->getMessage());
         }
 
-        $this->set_up();
+        $this->setUp();
         BookLength::$validates_length_of[0]['is'] = 1.8;
         $book = new BookLength();
         $book->name = '123';
@@ -211,7 +211,7 @@ class ValidatesLengthOfTest extends DatabaseTest
             $this->assertEquals('within must be an array composing a range of numbers with key [0] being less than key [1]', $e->getMessage());
         }
 
-        $this->set_up();
+        $this->setUp();
         BookLength::$validates_length_of[0]['in'] = 'string';
         $book = new BookLength();
         $book->name = '123';

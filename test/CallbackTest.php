@@ -2,9 +2,9 @@
 
 class CallBackTest extends DatabaseTest
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
 
         // ensure VenueCB model has been loaded
         VenueCB::find(1);

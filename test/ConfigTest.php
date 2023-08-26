@@ -2,6 +2,7 @@
 
 use ActiveRecord\Config;
 use ActiveRecord\ConfigException;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 class TestLogger implements LoggerInterface
@@ -140,9 +141,9 @@ class TestDateTime
     }
 }
 
-class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
-    public function set_up()
+    public function setUp(): void
     {
         $this->config = new Config();
         $this->connections = ['development' => 'mysql://blah/development', 'test' => 'mysql://blah/test'];

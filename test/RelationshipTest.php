@@ -16,9 +16,9 @@ class RelationshipTest extends DatabaseTest
     protected $relationship_name;
     protected $relationship_names = ['has_many', 'belongs_to', 'has_one'];
 
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
 
         Event::$belongs_to = [['venue'], ['host']];
         Venue::$has_many = [['events', 'order' => 'id asc'], ['hosts', 'through' => 'events', 'order' => 'hosts.id asc']];

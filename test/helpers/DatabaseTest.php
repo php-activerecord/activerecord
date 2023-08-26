@@ -9,7 +9,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
     public static $log = false;
     public static $db;
 
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
         ActiveRecord\Table::clear_cache();
 

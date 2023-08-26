@@ -27,9 +27,9 @@ class ValuestoreValidations extends ActiveRecord\Model
 
 class ValidationsTest extends DatabaseTest
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
 
         BookValidations::$validates_presence_of[0] = 'name';
         BookValidations::$validates_uniqueness_of[0] = 'name';

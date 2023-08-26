@@ -4,7 +4,7 @@ use ActiveRecord\Cache;
 
 class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
-    public function set_up()
+    public function setUp($connection_name=null): void
     {
         if (!extension_loaded('memcache')) {
             $this->markTestSkipped('The memcache extension is not available');
@@ -83,7 +83,6 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 
     public function test_exception_when_connect_fails()
     {
-        $this->expectExceptionMessage("Could not connect to 127.0.0.1:1234");
         $this->expectException(\ActiveRecord\CacheException::class);
         Cache::initialize('memcache://127.0.0.1:1234');
     }

@@ -4,9 +4,9 @@ require_once __DIR__ . '/../lib/adapters/SqliteAdapter.php';
 
 class SqliteAdapterTest extends AdapterTest
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up('sqlite');
+        parent::setUp('sqlite');
     }
 
     public function tearDown(): void
