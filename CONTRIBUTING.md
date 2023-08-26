@@ -36,7 +36,29 @@ tests, pass the `--verbose` flag to PHPUnit:
 vendor/bin/phpunit --verbose
 ```
 
-Some common steps for fixing skipped tests are to:
+For Docker users, a docker-compose.yml has been provided in the project root that will provide:
+- mysql
+- postgres
+- memcached
+
+Simply run:
+```shell
+docker-composer up -d
+```
+
+Then, the necessary services will be available and the tests should pass (although you may need to install PHP memcache extensions in a separate step, see below ).
+
+#### Installing memcache on Windows
+If you're a Windows user, finding the correct memcache dll can be a bit tricky, as the PECL repo seems to be in disrepair. You can find them here:
+
+https://github.com/nono303/PHP-memcache-dll/tree/master
+
+Download the .dll that matches your version of PHP, and add this line to your php.ini:
+extension=memcache
+
+
+#### Alternate setup
+If Docker is not available to you, or you would simply not use it, you will have to do your best to install the various services on your own.
 
 * Install `memcached` and the PHP memcached extension (e.g., `brew install php56-memcache memcached` on macOS)
 * Install the PDO drivers for PostgreSQL (e.g., `brew install php56-pdo-pgsql` on macOS)

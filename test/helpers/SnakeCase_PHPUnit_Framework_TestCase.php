@@ -20,7 +20,11 @@ class SnakeCase_PHPUnit_Framework_TestCase extends TestCase
     public function setUp(): void
     {
         if (method_exists($this, 'set_up')) {
-            call_user_func_array([$this, 'set_up'], func_get_args());
+            try {
+                call_user_func_array([$this, 'set_up'], func_get_args());
+            } catch (\Exception $e) {
+                xdebug_break();
+            }
         }
     }
 

@@ -49,6 +49,7 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 
     public function test_get_does_not_execute_closure_on_cache_hit()
     {
+        $this->expectNotToPerformAssertions();
         $this->cache_get();
         Cache::get('1337', function () { throw new Exception('I better not execute!'); });
     }
@@ -82,7 +83,7 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 
     public function test_exception_when_connect_fails()
     {
-        $this->expectExceptionMessage("Connection refused");
+        $this->expectExceptionMessage("Could not connect to 127.0.0.1:1234");
         $this->expectException(\ActiveRecord\CacheException::class);
         Cache::initialize('memcache://127.0.0.1:1234');
     }

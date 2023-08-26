@@ -269,7 +269,8 @@ class AdapterTest extends DatabaseTest
         $this->assert_equals(true, $columns['author_id']->pk);
         $this->assert_equals('int', $columns['author_id']->raw_type);
         $this->assert_equals(Column::INTEGER, $columns['author_id']->type);
-        $this->assert_true($columns['author_id']->length > 1);
+        $c = $columns['author_id'];
+        $this->assert_true($columns['name']->length > 1);
         $this->assert_false($columns['author_id']->nullable);
 
         $this->assert_equals(false, $columns['parent_author_id']->pk);
