@@ -16,7 +16,7 @@ class ActiveRecordCacheTest extends DatabaseTest
         ActiveRecord\Config::instance()->set_cache('memcache://localhost');
     }
 
-    public function tear_down()
+    public function tearDown(): void
     {
         Cache::flush();
         Cache::initialize(null);

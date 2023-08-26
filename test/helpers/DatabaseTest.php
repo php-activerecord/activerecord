@@ -45,7 +45,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
         }
     }
 
-    public function tear_down()
+    public function tearDown(): void
     {
         ActiveRecord\Config::instance()->set_date_class($this->original_date_class);
         if ($this->original_default_connection) {

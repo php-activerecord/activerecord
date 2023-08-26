@@ -24,7 +24,7 @@ class CacheModelTest extends DatabaseTest
         return $method;
     }
 
-    public function tear_down()
+    public function tearDown(): void
     {
         Cache::flush();
         Cache::initialize(null);

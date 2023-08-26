@@ -6,9 +6,9 @@ use ActiveRecord\DateTime;
 
 class SerializationTest extends DatabaseTest
 {
-    public function tear_down()
+    public function tearDown(): void
     {
-        parent::tear_down();
+        parent::tearDown();
         ActiveRecord\ArraySerializer::$include_root = false;
         ActiveRecord\JsonSerializer::$include_root = false;
     }

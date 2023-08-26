@@ -4,20 +4,6 @@ use PhpUnit\Framework\TestCase;
 
 class SnakeCase_PHPUnit_Framework_TestCase extends TestCase
 {
-//    public function setUp(): void
-//    {
-//        if (method_exists($this, 'set_up')) {
-//            call_user_func_array([$this, 'set_up'], func_get_args());
-//        }
-//    }
-
-    public function tearDown(): void
-    {
-        if (method_exists($this, 'tear_down')) {
-            call_user_func_array([$this, 'tear_down'], func_get_args());
-        }
-    }
-
     private function setup_assert_keys($args)
     {
         $last = count($args)-1;

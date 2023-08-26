@@ -15,7 +15,7 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
         Cache::initialize('memcache://localhost');
     }
 
-    public function tear_down()
+    public function tearDown(): void
     {
         Cache::flush();
     }
