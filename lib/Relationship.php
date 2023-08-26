@@ -709,8 +709,6 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
-    private $primary_key;
-
     public function __construct($options=[])
     {
 
