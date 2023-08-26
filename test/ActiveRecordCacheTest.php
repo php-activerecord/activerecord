@@ -15,7 +15,7 @@ class ActiveRecordCacheTest extends DatabaseTestCase
         }
 
         parent::setUp($connection_name);
-        Config::instance()->set_cache('memcache://localhost');
+        ActiveRecord\Config::instance()->set_cache('memcache://localhost');
     }
 
     public function tearDown(): void

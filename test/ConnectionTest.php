@@ -1,7 +1,6 @@
 <?php
 
 use ActiveRecord\Connection;
-use ActiveRecord\Exception\DatabaseException;
 use PHPUnit\Framework\TestCase;
 
 // Only use this to test static methods in Connection that are not specific

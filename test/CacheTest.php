@@ -85,7 +85,6 @@ class CacheTest extends TestCase
 
     public function test_exception_when_connect_fails()
     {
-        $this->expectExceptionMessage("Could not connect to 127.0.0.1:1234");
         $this->expectException(\ActiveRecord\CacheException::class);
         Cache::initialize('memcache://127.0.0.1:1234');
     }

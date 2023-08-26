@@ -2,6 +2,7 @@
 
 use ActiveRecord\Config;
 use ActiveRecord\ConfigException;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 class TestLogger implements LoggerInterface

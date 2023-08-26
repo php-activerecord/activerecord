@@ -13,7 +13,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function setUp($connection_name=null): void
     {
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
         $this->sql = new SQLBuilder($this->connection, $this->table_name);
         $this->table = Table::load($this->class_name);
     }
