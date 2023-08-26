@@ -4,19 +4,6 @@ use PhpUnit\Framework\TestCase;
 
 class SnakeCase_PHPUnit_Framework_TestCase extends TestCase
 {
-    public function __call($meth, $args)
-    {
-        $camel_cased_method = ActiveRecord\Inflector::instance()->camelize($meth);
-
-        if (method_exists($this, $camel_cased_method)) {
-            return call_user_func_array([$this, $camel_cased_method], $args);
-        }
-
-        $class_name = get_called_class();
-        $trace = debug_backtrace();
-        die("PHP Fatal Error:  Call to undefined method $class_name::$meth() in {$trace[1]['file']} on line {$trace[1]['line']}" . PHP_EOL);
-    }
-
     public function setUp(): void
     {
         if (method_exists($this, 'set_up')) {
@@ -44,10 +31,10 @@ class SnakeCase_PHPUnit_Framework_TestCase extends TestCase
     {
         list($keys, $array) = $this->setup_assert_keys(func_get_args());
 
-        $this->assert_not_null($array, 'Array was null');
+        $this->assertNotNull($array, 'Array was null');
 
         foreach ($keys as $name) {
-            $this->assert_array_has_key($name, $array);
+            $this->assertArrayHasKey($name, $array);
         }
     }
 
@@ -56,17 +43,17 @@ class SnakeCase_PHPUnit_Framework_TestCase extends TestCase
         list($keys, $array) = $this->setup_assert_keys(func_get_args());
 
         foreach ($keys as $name) {
-            $this->assert_array_not_has_key($name, $array);
+            $this->assertArrayNotHasKey($name, $array);
         }
     }
 
     public function assert_is_a($expected_class, $object)
     {
-        $this->assert_equals($expected_class, get_class($object));
+        $this->assertEquals($expected_class, get_class($object));
     }
 
     public function assert_datetime_equals($expected, $actual)
     {
-        $this->assert_equals($expected->format(DateTime::ISO8601), $actual->format(DateTime::ISO8601));
+        $this->assertEquals($expected->format(DateTime::ISO8601), $actual->format(DateTime::ISO8601));
     }
 }

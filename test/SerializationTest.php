@@ -58,13 +58,13 @@ class SerializationTest extends DatabaseTest
     public function test_methods()
     {
         $a = $this->_a(['methods' => ['upper_name']]);
-        $this->assert_equals('ANCIENT ART OF MAIN TANKING', $a['upper_name']);
+        $this->assertEquals('ANCIENT ART OF MAIN TANKING', $a['upper_name']);
     }
 
     public function test_methods_takes_a_string()
     {
         $a = $this->_a(['methods' => 'upper_name']);
-        $this->assert_equals('ANCIENT ART OF MAIN TANKING', $a['upper_name']);
+        $this->assertEquals('ANCIENT ART OF MAIN TANKING', $a['upper_name']);
     }
 
     // methods added last should we shuld have value of the method in our json
@@ -72,7 +72,7 @@ class SerializationTest extends DatabaseTest
     public function test_methods_method_same_as_attribute()
     {
         $a = $this->_a(['methods' => 'name']);
-        $this->assert_equals('ancient art of main tanking', $a['name']);
+        $this->assertEquals('ancient art of main tanking', $a['name']);
     }
 
     public function test_include()
@@ -160,8 +160,8 @@ class SerializationTest extends DatabaseTest
 
     public function test_to_xml_skip_instruct()
     {
-        $this->assert_same(false, strpos(Book::find(1)->to_xml(['skip_instruct' => true]), '<?xml version'));
-        $this->assert_same(0, strpos(Book::find(1)->to_xml(['skip_instruct' => false]), '<?xml version'));
+        $this->assertSame(false, strpos(Book::find(1)->to_xml(['skip_instruct' => true]), '<?xml version'));
+        $this->assertSame(0, strpos(Book::find(1)->to_xml(['skip_instruct' => false]), '<?xml version'));
     }
 
     public function test_only_method()
@@ -172,13 +172,13 @@ class SerializationTest extends DatabaseTest
     public function test_to_csv()
     {
         $book = Book::find(1);
-        $this->assert_equals('1,1,2,"Ancient Art of Main Tanking",0,0', $book->to_csv());
+        $this->assertEquals('1,1,2,"Ancient Art of Main Tanking",0,0', $book->to_csv());
     }
 
     public function test_to_csv_only_header()
     {
         $book = Book::find(1);
-        $this->assert_equals('book_id,author_id,secondary_author_id,name,numeric_test,special',
+        $this->assertEquals('book_id,author_id,secondary_author_id,name,numeric_test,special',
                          $book->to_csv(['only_header'=>true])
                          );
     }
@@ -186,7 +186,7 @@ class SerializationTest extends DatabaseTest
     public function test_to_csv_only_method()
     {
         $book = Book::find(1);
-        $this->assert_equals('2,"Ancient Art of Main Tanking"',
+        $this->assertEquals('2,"Ancient Art of Main Tanking"',
                          $book->to_csv(['only'=>['name', 'secondary_author_id']])
                          );
     }
@@ -194,7 +194,7 @@ class SerializationTest extends DatabaseTest
     public function test_to_csv_only_method_on_header()
     {
         $book = Book::find(1);
-        $this->assert_equals('secondary_author_id,name',
+        $this->assertEquals('secondary_author_id,name',
                          $book->to_csv(['only'=>['secondary_author_id', 'name'],
                                              'only_header'=>true])
                          );
@@ -204,7 +204,7 @@ class SerializationTest extends DatabaseTest
     {
         $book = Book::find(1);
         ActiveRecord\CsvSerializer::$delimiter=';';
-        $this->assert_equals('1;1;2;"Ancient Art of Main Tanking";0;0', $book->to_csv());
+        $this->assertEquals('1;1;2;"Ancient Art of Main Tanking";0;0', $book->to_csv());
     }
 
     public function test_to_csv_with_custom_enclosure()
@@ -212,6 +212,6 @@ class SerializationTest extends DatabaseTest
         $book = Book::find(1);
         ActiveRecord\CsvSerializer::$delimiter=',';
         ActiveRecord\CsvSerializer::$enclosure="'";
-        $this->assert_equals("1,1,2,'Ancient Art of Main Tanking',0,0", $book->to_csv());
+        $this->assertEquals("1,1,2,'Ancient Art of Main Tanking',0,0", $book->to_csv());
     }
 }
