@@ -86,7 +86,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function test_sequence_was_set()
     {
         if ($this->connection->supports_sequences()) {
-            $this->assert_equals($this->connection->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
+            $this->assertEquals($this->connection->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
         } else {
             $this->assertNull(Author::table()->sequence);
         }
@@ -95,7 +95,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function test_sequence_was_explicitly_set()
     {
         if ($this->connection->supports_sequences()) {
-            $this->assert_equals(AuthorExplicitSequence::$sequence, AuthorExplicitSequence::table()->sequence);
+            $this->assertEquals(AuthorExplicitSequence::$sequence, AuthorExplicitSequence::table()->sequence);
         } else {
             $this->assertNull(Author::table()->sequence);
         }

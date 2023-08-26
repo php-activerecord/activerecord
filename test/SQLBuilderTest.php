@@ -95,7 +95,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function test_limit()
     {
         $this->sql->limit(10)->offset(1);
-        $this->assert_equals($this->connection->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
+        $this->assertEquals($this->connection->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
     }
 
     public function test_select()

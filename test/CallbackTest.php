@@ -160,7 +160,7 @@ class CallBackTest extends DatabaseTestCase
     public function test_invoke_runs_all_callbacks()
     {
         if (method_exists($this, 'createMock')) {
-            $mock = $this->createMock(VenueCB::class, ['after_destroy_one', 'after_destroy_two']);
+            $mock = $this->createMock('VenueCB', ['after_destroy_one', 'after_destroy_two']);
         } else {
             $mock = $this->get_mock(VenueCB::class, ['after_destroy_one', 'after_destroy_two']);
         }
@@ -188,7 +188,7 @@ class CallBackTest extends DatabaseTestCase
     public function test_invoke_unregistered_callback()
     {
         $this->expectException(\ActiveRecord\ActiveRecordException::class);
-        $mock = $this->get_mock_builder('VenueCB', ['columns']);
+        $mock = $this->getMockBuilder('VenueCB', ['columns']);
         $this->callback->invoke($mock, 'before_validation_on_create');
     }
 
@@ -234,7 +234,7 @@ class CallBackTest extends DatabaseTestCase
 
         $this->assertTrue($i_should_have_ran);
         $this->assertFalse($i_ran);
-        $this->assertTrue(false === strpos(ActiveRecord\Table::load(VenueCB::class)->last_sql, 'INSERT'));
+        $this->assertTrue(false === strpos(ActiveRecord\Table::load('VenueCB')->last_sql, 'INSERT'));
     }
 
     public function test_before_save_returned_false_halts_execution()
@@ -256,7 +256,7 @@ class CallBackTest extends DatabaseTestCase
         $this->assertTrue($i_should_have_ran);
         $this->assertFalse($i_ran);
         $this->assertFalse($ret);
-        $this->assertTrue(false === strpos(ActiveRecord\Table::load(VenueCB::class)->last_sql, 'UPDATE'));
+        $this->assertTrue(false === strpos(ActiveRecord\Table::load('VenueCB')->last_sql, 'UPDATE'));
     }
 
     public function test_before_destroy_returned_false_halts_execution()
@@ -274,7 +274,7 @@ class CallBackTest extends DatabaseTestCase
 
         $this->assertFalse($i_ran);
         $this->assertFalse($ret);
-        $this->assertTrue(false === strpos(ActiveRecord\Table::load(VenueCB::class)->last_sql, 'DELETE'));
+        $this->assertTrue(false === strpos(ActiveRecord\Table::load('VenueCB')->last_sql, 'DELETE'));
     }
 
     public function test_before_validation_returned_false_halts_execution()
@@ -288,6 +288,6 @@ class CallBackTest extends DatabaseTestCase
         $ret = $v->save();
 
         $this->assertFalse($ret);
-        $this->assertTrue(false === strpos(ActiveRecord\Table::load(VenueCB::class)->last_sql, 'UPDATE'));
+        $this->assertTrue(false === strpos(ActiveRecord\Table::load('VenueCB')->last_sql, 'UPDATE'));
     }
 }

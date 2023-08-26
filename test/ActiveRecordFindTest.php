@@ -33,7 +33,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
         try {
             Author::find(1, 999999999);
             $this->fail();
-        } catch (RecordNotFound $e) {
+        } catch (ActiveRecord\RecordNotFound $e) {
             $this->assertTrue(false !== strpos($e->getMessage(), 'found 1, but was looking for 2'));
         }
     }
@@ -104,13 +104,13 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function test_find_all_hash()
     {
-        $books = \test\models\Book::find('all', ['conditions' => ['author_id' => 1]]);
+        $books = Book::find('all', ['conditions' => ['author_id' => 1]]);
         $this->assertTrue(count($books) > 0);
     }
 
     public function test_find_all_hash_with_order()
     {
-        $books = \test\models\Book::find('all', ['conditions' => ['author_id' => 1], 'order' => 'name DESC']);
+        $books = Book::find('all', ['conditions' => ['author_id' => 1], 'order' => 'name DESC']);
         $this->assertTrue(count($books) > 0);
     }
 
@@ -340,13 +340,13 @@ class ActiveRecordFindTest extends DatabaseTestCase
     {
         $venues = Venue::all(['select' => 'state', 'group' => 'state']);
         $this->assertTrue(count($venues) > 0);
-        $this->assert_sql_has('GROUP BY state', ActiveRecord\Table::load(Venue::class)->last_sql);
+        $this->assert_sql_has('GROUP BY state', ActiveRecord\Table::load('Venue')->last_sql);
     }
 
     public function test_group_with_order_and_limit_and_having()
     {
         $venues = Venue::all(['select' => 'state', 'group' => 'state', 'having' => 'length(state) = 2', 'order' => 'state', 'limit' => 2]);
-        $this->assert_true(count($venues) > 0);
+        $this->assertTrue(count($venues) > 0);
         $this->assert_sql_has($this->connection->limit('SELECT state FROM venues GROUP BY state HAVING length(state) = 2 ORDER BY state', null, 2), Venue::table()->last_sql);
     }
 

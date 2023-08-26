@@ -144,7 +144,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
     {
         if ($this->connection->supports_sequences()) {
             $author_columns = $this->connection->columns('authors');
-            $this->assert_equals('authors_author_id_seq', $author_columns['author_id']->sequence);
+            $this->assertEquals('authors_author_id_seq', $author_columns['author_id']->sequence);
         } else {
             $this->expectNotToPerformAssertions();
         }
@@ -266,12 +266,12 @@ abstract class AdapterTestCase extends DatabaseTestCase
             $this->assertTrue(array_key_exists($field, $columns));
         }
 
-        $this->assert_equals(true, $columns['author_id']->pk);
-        $this->assert_equals('int', $columns['author_id']->raw_type);
-        $this->assert_equals(Column::INTEGER, $columns['author_id']->type);
+        $this->assertEquals(true, $columns['author_id']->pk);
+        $this->assertEquals('int', $columns['author_id']->raw_type);
+        $this->assertEquals(Column::INTEGER, $columns['author_id']->type);
         $c = $columns['author_id'];
-        $this->assert_true($columns['name']->length > 1);
-        $this->assert_false($columns['author_id']->nullable);
+        $this->assertTrue($columns['name']->length > 1);
+        $this->assertFalse($columns['author_id']->nullable);
 
         $this->assertEquals(false, $columns['parent_author_id']->pk);
         $this->assertTrue($columns['parent_author_id']->nullable);
@@ -395,7 +395,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
     public function test_datetime_to_string()
     {
         $datetime = '2009-01-01 01:01:01';
-        $this->assert_equals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
+        $this->assertEquals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
     }
 
     public function test_date_to_string()

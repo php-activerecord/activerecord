@@ -31,7 +31,7 @@ class ActiveRecordTest extends DatabaseTestCase
     public function test_options_hash_with_unknown_keys()
     {
         $this->expectException(\ActiveRecord\ActiveRecordException::class);
-        $this->assert_false(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
+        $this->assertFalse(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
     }
 
     public function test_options_is_hash()
@@ -187,12 +187,12 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_auto_load_with_namespaced_model()
     {
-        $this->assertTrue(class_exists(\test\models\namespacetest\Book::class));
+        $this->assertTrue(class_exists('NamespaceTest\Book'));
     }
 
     public function test_namespace_gets_stripped_from_table_name()
     {
-        $model = new \test\models\namespacetest\Book();
+        $model = new NamespaceTest\Book();
         $this->assertEquals('books', $model->table()->table);
     }
 
@@ -334,7 +334,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_cast_when_loading()
     {
-        $book = \test\models\Book::find(1);
+        $book = Book::find(1);
         $this->assertSame(1, $book->book_id);
         $this->assertSame('Ancient Art of Main Tanking', $book->name);
     }
@@ -519,7 +519,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $author = new Author();
         $author->flag_dirty('some_date');
         $this->assertArrayHasKey('some_date', $author->dirty_attributes());
-        $this->assert_true($author->attribute_is_dirty('some_date'));
+        $this->assertTrue($author->attribute_is_dirty('some_date'));
         $author->save();
         $this->assertFalse($author->attribute_is_dirty('some_date'));
     }

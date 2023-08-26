@@ -75,7 +75,7 @@ class RelationshipTest extends DatabaseTestCase
 
     protected function assert_default_belongs_to($event, $association_name='venue')
     {
-        $this->assert_true($event->$association_name instanceof Venue);
+        $this->assertTrue($event->$association_name instanceof Venue);
         $this->assertEquals(5, $event->id);
         $this->assertEquals('West Chester', $event->$association_name->city);
         $this->assertEquals(6, $event->$association_name->id);
@@ -153,7 +153,7 @@ class RelationshipTest extends DatabaseTestCase
     public function test_belongs_to_returns_null_when_foreign_key_is_null()
     {
         $event = Event::create(['title' => 'venueless event', 'host_id'=>1]);
-        $this->assert_null($event->venue);
+        $this->assertNull($event->venue);
     }
 
     public function test_belongs_to_with_explicit_class_name()
@@ -183,7 +183,7 @@ class RelationshipTest extends DatabaseTestCase
         try {
             $event->venue->name;
             $this->fail('expected Exception ActiveRecord\UndefinedPropertyException');
-        } catch (UndefinedPropertyException $e) {
+        } catch (ActiveRecord\UndefinedPropertyException $e) {
             $this->assertTrue(false !== strpos($e->getMessage(), 'name'));
         }
     }
@@ -287,7 +287,7 @@ class RelationshipTest extends DatabaseTestCase
         try {
             $venue->events[0]->description;
             $this->fail('expected Exception ActiveRecord\UndefinedPropertyException');
-        } catch (UndefinedPropertyException $e) {
+        } catch (ActiveRecord\UndefinedPropertyException $e) {
             $this->assertTrue(false !== strpos($e->getMessage(), 'description'));
         }
     }
@@ -395,7 +395,7 @@ class RelationshipTest extends DatabaseTestCase
 
         $venue = $this->get_relationship();
         $this->assertTrue(1 === count($venue->hosts));
-        $this->assert_sql_has('events.title !=', ActiveRecord\Table::load(Host::class)->last_sql);
+        $this->assert_sql_has('events.title !=', ActiveRecord\Table::load('Host')->last_sql);
     }
 
     public function test_has_many_through_using_source()
@@ -433,7 +433,7 @@ class RelationshipTest extends DatabaseTestCase
             $this->assertEquals($book->secondary_author_id, $author->parent_author_id);
         }
 
-        $this->assertTrue(false !== strpos(ActiveRecord\Table::load(Book::class)->last_sql, 'secondary_author_id'));
+        $this->assertTrue(false !== strpos(ActiveRecord\Table::load('Book')->last_sql, 'secondary_author_id'));
         Author::$has_many = $old;
     }
 
@@ -457,7 +457,7 @@ class RelationshipTest extends DatabaseTestCase
         try {
             $employee->position->active;
             $this->fail('expected Exception ActiveRecord\UndefinedPropertyException');
-        } catch (UndefinedPropertyException $e) {
+        } catch (ActiveRecord\UndefinedPropertyException $e) {
             $this->assertTrue(false !== strpos($e->getMessage(), 'active'));
         }
     }
@@ -520,7 +520,7 @@ class RelationshipTest extends DatabaseTestCase
 
         $book = Book::find(1);
         $this->assertEquals($book->secondary_author_id, $book->explicit_author->parent_author_id);
-        $this->assertTrue(false !== strpos(ActiveRecord\Table::load(Author::class)->last_sql, 'parent_author_id'));
+        $this->assertTrue(false !== strpos(ActiveRecord\Table::load('Author')->last_sql, 'parent_author_id'));
     }
 
     public function test_dont_attempt_to_load_if_all_foreign_keys_are_null()
@@ -553,7 +553,7 @@ class RelationshipTest extends DatabaseTestCase
         Venue::$has_many = [['events', 'class_name' => 'Event', 'order' => 'id asc', 'conditions' => ['length(title) = ?', 14]]];
         $venues = Venue::find([2, 6], ['include' => 'events']);
 
-        $this->assert_sql_has('WHERE length(title) = ? AND venue_id IN(?,?) ORDER BY id asc', ActiveRecord\Table::load(Event::class)->last_sql);
+        $this->assert_sql_has('WHERE length(title) = ? AND venue_id IN(?,?) ORDER BY id asc', ActiveRecord\Table::load('Event')->last_sql);
         $this->assertEquals(1, count($venues[0]->events));
     }
 

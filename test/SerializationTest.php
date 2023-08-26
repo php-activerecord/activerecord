@@ -210,15 +210,15 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_csv_with_custom_delimiter()
     {
         $book = Book::find(1);
-        CsvSerializer::$delimiter=';';
+        ActiveRecord\CsvSerializer::$delimiter=';';
         $this->assertEquals('1;1;2;"Ancient Art of Main Tanking";0;0', $book->to_csv());
     }
 
     public function test_to_csv_with_custom_enclosure()
     {
         $book = Book::find(1);
-        CsvSerializer::$delimiter=',';
-        CsvSerializer::$enclosure="'";
+        ActiveRecord\CsvSerializer::$delimiter=',';
+        ActiveRecord\CsvSerializer::$enclosure="'";
         $this->assertEquals("1,1,2,'Ancient Art of Main Tanking',0,0", $book->to_csv());
     }
 }

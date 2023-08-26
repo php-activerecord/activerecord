@@ -166,7 +166,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = '123';
         try {
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('maximum value cannot use a float for length.', $e->getMessage());
         }
 
@@ -176,7 +176,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = '123';
         try {
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('is value cannot use a float for length.', $e->getMessage());
 
             return;
@@ -193,7 +193,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = '123';
         try {
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('minimum value cannot use a signed integer.', $e->getMessage());
 
             return;
@@ -209,7 +209,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = '123';
         try {
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('within must be an array composing a range of numbers with key [0] being less than key [1]', $e->getMessage());
         }
 
@@ -219,7 +219,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = '123';
         try {
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('in must be an array composing a range of numbers with key [0] being less than key [1]', $e->getMessage());
 
             return;
@@ -236,7 +236,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = '123';
         try {
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('is value cannot use a signed integer.', $e->getMessage());
 
             return;
@@ -251,7 +251,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
             $book = new BookLength();
             $book->name = null;
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('Range unspecified.  Specify the [within], [maximum], or [is] option.', $e->getMessage());
 
             return;
@@ -269,7 +269,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
             $book = new BookLength();
             $book->name = null;
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('Too many range options specified.  Choose only one.', $e->getMessage());
 
             return;
@@ -287,7 +287,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
             $book = new BookLength();
             $book->name = null;
             $book->save();
-        } catch (ValidationsArgumentError $e) {
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
             $this->assertEquals('Too many range options specified.  Choose only one.', $e->getMessage());
 
             return;

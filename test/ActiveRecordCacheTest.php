@@ -31,7 +31,7 @@ class ActiveRecordCacheTest extends DatabaseTestCase
 
     public function test_explicit_default_expire()
     {
-        Config::instance()->set_cache('memcache://localhost', ['expire' => 1]);
+        ActiveRecord\Config::instance()->set_cache('memcache://localhost', ['expire' => 1]);
         $this->assertEquals(1, Cache::$options['expire']);
     }
 
