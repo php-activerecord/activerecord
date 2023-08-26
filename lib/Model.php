@@ -558,6 +558,8 @@ class Model
         // this may be first access to the relationship so check Table
         if (($relationship = $table->get_relationship($name))) {
             $this->__relationships[$name] = $relationship->load($this);
+            $this->__relationships[$name] ??= new \stdClass();
+
             return $this->__relationships[$name];
         }
 
