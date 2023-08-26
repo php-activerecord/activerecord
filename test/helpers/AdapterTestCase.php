@@ -266,12 +266,12 @@ abstract class AdapterTestCase extends DatabaseTestCase
             $this->assertTrue(array_key_exists($field, $columns));
         }
 
-        $this->assertEquals(true, $columns['author_id']->pk);
-        $this->assertEquals('int', $columns['author_id']->raw_type);
-        $this->assertEquals(Column::INTEGER, $columns['author_id']->type);
+        $this->assert_equals(true, $columns['author_id']->pk);
+        $this->assert_equals('int', $columns['author_id']->raw_type);
+        $this->assert_equals(Column::INTEGER, $columns['author_id']->type);
         $c = $columns['author_id'];
-        $this->assertTrue($columns['name']->length > 1);
-        $this->assertFalse($columns['author_id']->nullable);
+        $this->assert_true($columns['name']->length > 1);
+        $this->assert_false($columns['author_id']->nullable);
 
         $this->assertEquals(false, $columns['parent_author_id']->pk);
         $this->assertTrue($columns['parent_author_id']->nullable);
