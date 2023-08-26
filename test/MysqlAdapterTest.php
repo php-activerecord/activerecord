@@ -13,7 +13,7 @@ class MysqlAdapterTest extends AdapterTest
 
     public function test_enum()
     {
-        $author_columns = $this->conn->columns('authors');
+        $author_columns = $this->connection->columns('authors');
         $this->assert_equals('enum', $author_columns['some_enum']->raw_type);
         $this->assert_equals(Column::STRING, $author_columns['some_enum']->type);
         $this->assert_same(null, $author_columns['some_enum']->length);
@@ -30,8 +30,8 @@ class MysqlAdapterTest extends AdapterTest
     {
         $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
-        $this->conn->query_and_fetch($this->conn->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
+        $this->connection->query_and_fetch($this->connection->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
 
-        $this->assert_true(false !== strpos($this->conn->last_query, 'LIMIT 1'));
+        $this->assert_true(false !== strpos($this->connection->last_query, 'LIMIT 1'));
     }
 }

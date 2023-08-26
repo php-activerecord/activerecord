@@ -17,11 +17,9 @@ class ActiveRecordTest extends DatabaseTest
         $this->assert_false(Author::is_options_hash([1, 2, 3]));
     }
 
-    /**
-     * @expectedException \ActiveRecord\ActiveRecordException
-     */
     public function test_options_hash_with_unknown_keys()
     {
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         $this->assert_false(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
     }
 
@@ -63,11 +61,9 @@ class ActiveRecordTest extends DatabaseTest
         $this->assert_equals([], Author::extract_and_validate_options($args));
     }
 
-    /**
-     * @expectedException \ActiveRecord\UndefinedPropertyException
-     */
     public function test_invalid_attribute()
     {
+        $this->expectException(\ActiveRecord\UndefinedPropertyException::class);
         $author = Author::find('first', ['conditions' => 'author_id=1']);
         $author->some_invalid_field_name;
     }
@@ -118,7 +114,7 @@ class ActiveRecordTest extends DatabaseTest
 
     public function test_hyphenated_column_names_to_underscore()
     {
-        if ($this->conn instanceof ActiveRecord\OciAdapter) {
+        if ($this->connection instanceof ActiveRecord\OciAdapter) {
             return;
         }
 
@@ -128,7 +124,7 @@ class ActiveRecordTest extends DatabaseTest
 
     public function test_column_names_with_spaces()
     {
-        if ($this->conn instanceof ActiveRecord\OciAdapter) {
+        if ($this->connection instanceof ActiveRecord\OciAdapter) {
             return;
         }
 
@@ -490,11 +486,9 @@ class ActiveRecordTest extends DatabaseTest
         $this->assert_equals('authors', Author::table_name());
     }
 
-    /**
-     * @expectedException \ActiveRecord\ActiveRecordException
-     */
     public function test_undefined_instance_method()
     {
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         Author::first()->find_by_name('sdf');
     }
 

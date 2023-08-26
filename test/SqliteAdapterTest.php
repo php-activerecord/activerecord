@@ -37,40 +37,40 @@ class SqliteAdapterTest extends AdapterTest
     {
         $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
-        $this->conn->query_and_fetch($this->conn->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
+        $this->connection->query_and_fetch($this->connection->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
 
-        $this->assert_true(false !== strpos($this->conn->last_query, 'LIMIT 1'));
+        $this->assert_true(false !== strpos($this->connection->last_query, 'LIMIT 1'));
     }
 
     public function test_gh183_sqliteadapter_autoincrement()
     {
         // defined in lowercase: id integer not null primary key
-        $columns = $this->conn->columns('awesome_people');
+        $columns = $this->connection->columns('awesome_people');
         $this->assert_true($columns['id']->auto_increment);
 
         // defined in uppercase: `amenity_id` INTEGER NOT NULL PRIMARY KEY
-        $columns = $this->conn->columns('amenities');
+        $columns = $this->connection->columns('amenities');
         $this->assert_true($columns['amenity_id']->auto_increment);
 
         // defined using int: `rm-id` INT NOT NULL
-        $columns = $this->conn->columns('`rm-bldg`');
+        $columns = $this->connection->columns('`rm-bldg`');
         $this->assert_false($columns['rm-id']->auto_increment);
 
         // defined using int: id INT NOT NULL PRIMARY KEY
-        $columns = $this->conn->columns('hosts');
+        $columns = $this->connection->columns('hosts');
         $this->assert_true($columns['id']->auto_increment);
     }
 
     public function test_datetime_to_string()
     {
         $datetime = '2009-01-01 01:01:01';
-        $this->assert_equals($datetime, $this->conn->datetime_to_string(date_create($datetime)));
+        $this->assert_equals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
     }
 
     public function test_date_to_string()
     {
         $datetime = '2009-01-01';
-        $this->assert_equals($datetime, $this->conn->date_to_string(date_create($datetime)));
+        $this->assert_equals($datetime, $this->connection->date_to_string(date_create($datetime)));
     }
 
     // not supported

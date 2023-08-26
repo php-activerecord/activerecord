@@ -12,7 +12,7 @@ class SQLBuilderTest extends DatabaseTest
     public function set_up($connection_name=null)
     {
         parent::set_up($connection_name);
-        $this->sql = new SQLBuilder($this->conn, $this->table_name);
+        $this->sql = new SQLBuilder($this->connection, $this->table_name);
         $this->table = Table::load($this->class_name);
     }
 
@@ -33,11 +33,9 @@ class SQLBuilderTest extends DatabaseTest
         }
     }
 
-    /**
-     * @expectedException \ActiveRecord\ActiveRecordException
-     */
     public function test_no_connection()
     {
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         new SQLBuilder(null, 'authors');
     }
 
@@ -95,7 +93,7 @@ class SQLBuilderTest extends DatabaseTest
     public function test_limit()
     {
         $this->sql->limit(10)->offset(1);
-        $this->assert_equals($this->conn->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
+        $this->assert_equals($this->connection->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
     }
 
     public function test_select()
@@ -130,14 +128,12 @@ class SQLBuilderTest extends DatabaseTest
         $this->sql->order('name');
         $this->sql->group('name');
         $this->sql->where(['id' => 1]);
-        $this->assert_sql_has($this->conn->limit("SELECT * FROM authors WHERE id=? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
+        $this->assert_sql_has($this->connection->limit("SELECT * FROM authors WHERE id=? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
     }
 
-    /**
-     * @expectedException \ActiveRecord\ActiveRecordException
-     */
     public function test_insert_requires_hash()
     {
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         $this->sql->insert([1]);
     }
 
@@ -162,7 +158,7 @@ class SQLBuilderTest extends DatabaseTest
 
     public function test_update_with_limit_and_order()
     {
-        if (!$this->conn->accepts_limit_and_order_for_update_and_delete()) {
+        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
             $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE operation');
         }
 
@@ -204,7 +200,7 @@ class SQLBuilderTest extends DatabaseTest
 
     public function test_delete_with_limit_and_order()
     {
-        if (!$this->conn->accepts_limit_and_order_for_update_and_delete()) {
+        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
             $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
         }
 

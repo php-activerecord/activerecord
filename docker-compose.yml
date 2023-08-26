@@ -8,7 +8,7 @@ services:
       MYSQL_USER: test
       MYSQL_PASSWORD: test
     ports:
-      - "3320:3320"
+      - "3320:3306"
 
   postgres:
     image: postgres:latest
@@ -18,12 +18,3 @@ services:
       POSTGRES_PASSWORD: test
     ports:
       - "5432:5432"
-
-  oci:
-    image: container-registry.oracle.com/database/free
-    environment:
-      ORACLE_PWD: test
-      ORACLE_PDB: dev
-    ports:
-      - "8080:8080"
-      - "1521:1521"

@@ -52,12 +52,10 @@ class ActiveRecordWriteTest extends DatabaseTest
         $this->assert_not_null(Author::find($author->id));
     }
 
-    /**
-     * @expectedException \ActiveRecord\DatabaseException
-     */
     public function test_insert_with_no_sequence_defined()
     {
-        if (!$this->conn->supports_sequences()) {
+        $this->expectException(\ActiveRecord\DatabaseException::class);
+        if (!$this->connection->supports_sequences()) {
             throw new ActiveRecord\DatabaseException('');
         }
         AuthorWithoutSequence::create(['name' => 'Bob!']);
@@ -79,8 +77,8 @@ class ActiveRecordWriteTest extends DatabaseTest
 
     public function test_sequence_was_set()
     {
-        if ($this->conn->supports_sequences()) {
-            $this->assert_equals($this->conn->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
+        if ($this->connection->supports_sequences()) {
+            $this->assert_equals($this->connection->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
         } else {
             $this->assert_null(Author::table()->sequence);
         }
@@ -88,7 +86,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 
     public function test_sequence_was_explicitly_set()
     {
-        if ($this->conn->supports_sequences()) {
+        if ($this->connection->supports_sequences()) {
             $this->assert_equals(AuthorExplicitSequence::$sequence, AuthorExplicitSequence::table()->sequence);
         } else {
             $this->assert_null(Author::table()->sequence);
@@ -145,11 +143,9 @@ class ActiveRecordWriteTest extends DatabaseTest
         $this->assert_same($new_name, $book->name, Book::find(1)->name);
     }
 
-    /**
-     * @expectedException \ActiveRecord\UndefinedPropertyException
-     */
     public function test_update_attributes_undefined_property()
     {
+        $this->expectException(\ActiveRecord\UndefinedPropertyException::class);
         $book = Book::find(1);
         $book->update_attributes(['name' => 'new name', 'invalid_attribute' => true, 'another_invalid_attribute' => 'blah']);
     }
@@ -164,11 +160,9 @@ class ActiveRecordWriteTest extends DatabaseTest
         $this->assert_same($new_name, $book->name, Book::find(1)->name);
     }
 
-    /**
-     * @expectedException \ActiveRecord\UndefinedPropertyException
-     */
     public function test_update_attribute_undefined_property()
     {
+        $this->expectException(\ActiveRecord\UndefinedPropertyException::class);
         $book = Book::find(1);
         $book->update_attribute('invalid_attribute', true);
     }
@@ -184,7 +178,7 @@ class ActiveRecordWriteTest extends DatabaseTest
     public function test_save_blank_value()
     {
         // oracle doesn't do blanks. probably an option to enable?
-        if ($this->conn instanceof ActiveRecord\OciAdapter) {
+        if ($this->connection instanceof ActiveRecord\OciAdapter) {
             return;
         }
 
@@ -295,22 +289,18 @@ class ActiveRecordWriteTest extends DatabaseTest
         $this->assert_not_null($author->created_at);
     }
 
-    /**
-     * @expectedException \ActiveRecord\ActiveRecordException
-     */
     public function test_update_with_no_primary_key_defined()
     {
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         Author::table()->pk = [];
         $author = Author::first();
         $author->name = 'blahhhhhhhhhh';
         $author->save();
     }
 
-    /**
-     * @expectedException \ActiveRecord\ActiveRecordException
-     */
     public function test_delete_with_no_primary_key_defined()
     {
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         Author::table()->pk = [];
         $author = author::first();
         $author->delete();
@@ -322,11 +312,9 @@ class ActiveRecordWriteTest extends DatabaseTest
         $this->assert_equals(9999, $author->author_id);
     }
 
-    /**
-     * @expectedException \ActiveRecord\ReadOnlyException
-     */
     public function test_readonly()
     {
+        $this->expectException(\ActiveRecord\ReadOnlyException::class);
         $author = Author::first(['readonly' => true]);
         $author->save();
     }
@@ -384,7 +372,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 
     public function test_delete_all_with_limit_and_order()
     {
-        if (!$this->conn->accepts_limit_and_order_for_update_and_delete()) {
+        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
             $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 
@@ -429,7 +417,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 
     public function test_update_all_with_limit_and_order()
     {
-        if (!$this->conn->accepts_limit_and_order_for_update_and_delete()) {
+        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
             $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 

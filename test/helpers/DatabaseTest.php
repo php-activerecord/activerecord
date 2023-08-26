@@ -4,7 +4,7 @@ require_once __DIR__ . '/DatabaseLoader.php';
 
 class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
-    protected $conn;
+    protected \ActiveRecord\Connection $connection;
     protected $original_date_class;
     public static $log = false;
     public static $db;
@@ -30,14 +30,14 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 
         $this->connection_name = $connection_name;
         try {
-            $this->conn = ActiveRecord\ConnectionManager::get_connection($connection_name);
+            $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
         } catch (ActiveRecord\DatabaseException $e) {
             $this->mark_test_skipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
 
         $GLOBALS['ACTIVERECORD_LOG'] = false;
 
-        $loader = new DatabaseLoader($this->conn);
+        $loader = new DatabaseLoader($this->connection);
         $loader->reset_table_data();
 
         if (self::$log) {
@@ -63,7 +63,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
             $message = $e->getMessage();
         }
 
-        $this->assertContains($contains, $message);
+        $this->assertStringContainsString($contains, $message);
     }
 
     /**
@@ -77,7 +77,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
         $needle = str_replace(['"', '`'], '', $needle);
         $haystack = str_replace(['"', '`'], '', $haystack);
 
-        return $this->assertContains($needle, $haystack);
+        return $this->assertStringContainsString($needle, $haystack);
     }
 
     public function assert_sql_doesnt_has($needle, $haystack)
@@ -85,6 +85,6 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
         $needle = str_replace(['"', '`'], '', $needle);
         $haystack = str_replace(['"', '`'], '', $haystack);
 
-        return $this->assertNotContains($needle, $haystack);
+        return $this->assertStringNotContainsString($needle, $haystack);
     }
 }
