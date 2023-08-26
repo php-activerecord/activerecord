@@ -41,7 +41,6 @@ ActiveRecord\Config::initialize(function ($cfg) {
     $cfg->set_connections([
         'mysql'  => getenv('PHPAR_MYSQL') ?: 'mysql://test:test@127.0.0.1:3320/test',
         'pgsql'  => getenv('PHPAR_PGSQL') ?: 'pgsql://test:test@127.0.0.1:5432/test',
-        'oci'    => getenv('PHPAR_OCI') ?: 'oci://test:test@127.0.0.1/dev',
         'sqlite' => getenv('PHPAR_SQLITE') ?: 'sqlite://test.db']);
 
     $cfg->set_default_connection('mysql');

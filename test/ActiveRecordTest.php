@@ -30,8 +30,8 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_options_hash_with_unknown_keys()
     {
-        $this->expectException(ActiveRecordException::class);
-        $this->assertFalse(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->assert_false(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
     }
 
     public function test_options_is_hash()
@@ -74,7 +74,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_invalid_attribute()
     {
-        $this->expectException(UndefinedPropertyException::class);
+        $this->expectException(\ActiveRecord\UndefinedPropertyException::class);
         $author = Author::find('first', ['conditions' => 'author_id=1']);
         $author->some_invalid_field_name;
     }
@@ -125,12 +125,20 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_hyphenated_column_names_to_underscore()
     {
+        if ($this->connection instanceof ActiveRecord\OciAdapter) {
+            return;
+        }
+
         $keys = array_keys(RmBldg::first()->attributes());
         $this->assertTrue(in_array('rm_name', $keys));
     }
 
     public function test_column_names_with_spaces()
     {
+        if ($this->connection instanceof ActiveRecord\OciAdapter) {
+            return;
+        }
+
         $keys = array_keys(RmBldg::first()->attributes());
         $this->assertTrue(in_array('space_out', $keys));
     }
@@ -491,7 +499,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_undefined_instance_method()
     {
-        $this->expectException(ActiveRecordException::class);
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         Author::first()->find_by_name('sdf');
     }
 

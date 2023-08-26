@@ -85,7 +85,8 @@ class CacheTest extends TestCase
 
     public function test_exception_when_connect_fails()
     {
-        $this->expectException(CacheException::class);
+        $this->expectExceptionMessage("Connection refused");
+        $this->expectException(\ActiveRecord\CacheException::class);
         Cache::initialize('memcache://127.0.0.1:1234');
     }
 }

@@ -11,7 +11,7 @@ class ConnectionTest extends TestCase
 {
     public function test_connection_info_from_should_throw_exception_when_no_host()
     {
-        $this->expectException(DatabaseException::class);
+        $this->expectException(\ActiveRecord\DatabaseException::class);
         ActiveRecord\Connection::parse_connection_url('mysql://user:pass@');
     }
 
@@ -34,7 +34,7 @@ class ConnectionTest extends TestCase
 
     public function test_gh_103_sqlite_connection_string_absolute()
     {
-        $this->expectException(DatabaseException::class);
+        $this->expectException(\ActiveRecord\DatabaseException::class);
         ActiveRecord\Connection::parse_connection_url('sqlite:///some/path/to/file.db');
     }
 

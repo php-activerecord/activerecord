@@ -121,8 +121,8 @@ class RelationshipTest extends DatabaseTestCase
 
     public function test_joins_on_model_via_undeclared_association()
     {
-        $this->expectException(RelationshipException::class);
-        JoinBook::first(['joins' => ['undeclared']]);
+        $this->expectException(\ActiveRecord\RelationshipException::class);
+        $x = JoinBook::first(['joins' => ['undeclared']]);
     }
 
     public function test_joins_only_loads_given_model_attributes()
@@ -369,7 +369,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function test_has_many_through_no_association()
     {
-        $this->expectException(HasManyThroughAssociationException::class);
+        $this->expectException(\ActiveRecord\HasManyThroughAssociationException::class);
         Event::$belongs_to = [['host']];
         Venue::$has_many[1] = ['hosts', 'through' => 'blahhhhhhh'];
 
@@ -544,7 +544,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function test_throw_error_if_relationship_is_not_a_model()
     {
-        $this->expectException(RelationshipException::class);
+        $this->expectException(\ActiveRecord\RelationshipException::class);
         AuthorWithNonModelRelationship::first()->books;
     }
 
@@ -736,7 +736,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function test_dont_attempt_eager_load_when_record_does_not_exist()
     {
-        $this->expectException(RecordNotFound::class);
+        $this->expectException(\ActiveRecord\RecordNotFound::class);
         Author::find(999999, ['include' => ['books']]);
     }
 }

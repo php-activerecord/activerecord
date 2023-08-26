@@ -12,9 +12,9 @@ class MysqlAdapterTest extends AdapterTestCase
     public function test_enum()
     {
         $author_columns = $this->connection->columns('authors');
-        $this->assertEquals('enum', $author_columns['some_enum']->raw_type);
-        $this->assertEquals(Column::STRING, $author_columns['some_enum']->type);
-        $this->assertSame(null, $author_columns['some_enum']->length);
+        $this->assert_equals('enum', $author_columns['some_enum']->raw_type);
+        $this->assert_equals(Column::STRING, $author_columns['some_enum']->type);
+        $this->assert_same(null, $author_columns['some_enum']->length);
     }
 
     public function test_set_charset()
@@ -30,6 +30,6 @@ class MysqlAdapterTest extends AdapterTestCase
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
         $this->connection->query_and_fetch($this->connection->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
 
-        $this->assertTrue(false !== strpos($this->connection->last_query, 'LIMIT 1'));
+        $this->assert_true(false !== strpos($this->connection->last_query, 'LIMIT 1'));
     }
 }

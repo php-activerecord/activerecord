@@ -8,7 +8,7 @@ require_once __DIR__ . '/DatabaseLoader.php';
 
 abstract class DatabaseTestCase extends TestCase
 {
-    protected $conn;
+    protected \ActiveRecord\Connection $connection;
     protected $original_date_class;
     public static $log = false;
     public static $db;
@@ -31,9 +31,8 @@ abstract class DatabaseTestCase extends TestCase
 
         try {
             $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
-            $this->connection_name = $connection_name;
-        } catch (DatabaseException $e) {
-            $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
+        } catch (ActiveRecord\DatabaseException $e) {
+            $this->mark_test_skipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
 
         $GLOBALS['ACTIVERECORD_LOG'] = false;

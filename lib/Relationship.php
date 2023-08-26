@@ -709,8 +709,11 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
+    private $primary_key;
+
     public function __construct($options=[])
     {
+
         parent::__construct($options);
 
         if (!$this->class_name) {

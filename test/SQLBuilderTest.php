@@ -13,7 +13,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function setUp($connection_name=null): void
     {
-        parent::setUp($connection_name);
+        parent::set_up($connection_name);
         $this->sql = new SQLBuilder($this->connection, $this->table_name);
         $this->table = Table::load($this->class_name);
     }
@@ -37,7 +37,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function test_no_connection()
     {
-        $this->expectException(ActiveRecordException::class);
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         new SQLBuilder(null, 'authors');
     }
 
@@ -95,7 +95,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function test_limit()
     {
         $this->sql->limit(10)->offset(1);
-        $this->assertEquals($this->connection->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
+        $this->assert_equals($this->connection->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
     }
 
     public function test_select()
@@ -135,7 +135,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function test_insert_requires_hash()
     {
-        $this->expectException(ActiveRecordException::class);
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         $this->sql->insert([1]);
     }
 
@@ -161,7 +161,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function test_update_with_limit_and_order()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
-            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE operation');
+            $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE operation');
         }
 
         $this->sql->update(['id' => 1])->order('name asc')->limit(1);
@@ -203,7 +203,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function test_delete_with_limit_and_order()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
-            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
+            $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
         }
 
         $this->sql->delete(['id' => 1])->order('name asc')->limit(1);

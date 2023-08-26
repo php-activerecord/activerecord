@@ -298,7 +298,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
 
     public function test_with_option_as_non_numeric()
     {
-        $this->expectException(ValidationsArgumentError::class);
+        $this->expectException(\ActiveRecord\ValidationsArgumentError::class);
         BookLength::$validates_length_of[0]['with'] = ['test'];
 
         $book = new BookLength();
@@ -308,7 +308,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
 
     public function test_with_option_as_non_numeric_non_array()
     {
-        $this->expectException(ValidationsArgumentError::class);
+        $this->expectException(\ActiveRecord\ValidationsArgumentError::class);
         BookLength::$validates_length_of[0]['with'] = 'test';
 
         $book = new BookLength();

@@ -64,13 +64,13 @@ class CallBackTest extends DatabaseTestCase
 
     public function test_register_invalid_callback()
     {
-        $this->expectException(ActiveRecordException::class);
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         $this->callback->register('invalid_callback');
     }
 
     public function test_register_callback_with_undefined_method()
     {
-        $this->expectException(ActiveRecordException::class);
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         $this->callback->register('after_construct', 'do_not_define_me');
     }
 
@@ -125,7 +125,7 @@ class CallBackTest extends DatabaseTestCase
 
     public function test_register_via_static_with_invalid_definition()
     {
-        $this->expectException(ActiveRecordException::class);
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
         $class_name = 'Venues_' . md5(uniqid());
         eval("class $class_name extends ActiveRecord\\Model { static \$table_name = 'venues'; static \$after_save = 'method_that_does_not_exist'; };");
         new $class_name();
@@ -187,8 +187,8 @@ class CallBackTest extends DatabaseTestCase
 
     public function test_invoke_unregistered_callback()
     {
-        $this->expectException(ActiveRecordException::class);
-        $mock = $this->getMockBuilder('VenueCB', ['columns']);
+        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $mock = $this->get_mock_builder('VenueCB', ['columns']);
         $this->callback->invoke($mock, 'before_validation_on_create');
     }
 
