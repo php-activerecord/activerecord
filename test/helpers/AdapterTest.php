@@ -8,7 +8,6 @@ class AdapterTest extends DatabaseTest
 
     public function set_up($connection_name=null)
     {
-        $d = PDO::getAvailableDrivers();
         if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
             'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
             $this->mark_test_skipped($connection_name . ' drivers are not present');
@@ -77,6 +76,7 @@ class AdapterTest extends DatabaseTest
 
     public function test_connect_with_port()
     {
+        $this->expectNotToPerformAssertions();
         $config = ActiveRecord\Config::instance();
         $name = $config->get_default_connection();
         $url = parse_url($config->get_connection($name));
@@ -141,6 +141,8 @@ class AdapterTest extends DatabaseTest
         if ($this->connection->supports_sequences()) {
             $author_columns = $this->connection->columns('authors');
             $this->assert_equals('authors_author_id_seq', $author_columns['author_id']->sequence);
+        } else {
+            $this->expectNotToPerformAssertions();
         }
     }
 
@@ -391,7 +393,7 @@ class AdapterTest extends DatabaseTest
 
     public function test_datetime_to_string()
     {
-        $datetime = '2009-01-01 01:01:01 EST';
+        $datetime = '2009-01-01 01:01:01';
         $this->assert_equals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
     }
 

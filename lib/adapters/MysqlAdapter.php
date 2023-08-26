@@ -12,7 +12,7 @@ namespace ActiveRecord;
  */
 class MysqlAdapter extends Connection
 {
-    public static $DEFAULT_PORT = 3306;
+    public static $DEFAULT_PORT = 3320; // TODO: set back to 3306
 
     public function limit($sql, $offset, $limit)
     {
