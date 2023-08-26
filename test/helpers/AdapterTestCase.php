@@ -144,7 +144,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
     {
         if ($this->connection->supports_sequences()) {
             $author_columns = $this->connection->columns('authors');
-            $this->assertEquals('authors_author_id_seq', $author_columns['author_id']->sequence);
+            $this->assert_equals('authors_author_id_seq', $author_columns['author_id']->sequence);
         } else {
             $this->expectNotToPerformAssertions();
         }
@@ -395,7 +395,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
     public function test_datetime_to_string()
     {
         $datetime = '2009-01-01 01:01:01';
-        $this->assertEquals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
+        $this->assert_equals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
     }
 
     public function test_date_to_string()

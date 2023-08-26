@@ -1,13 +1,12 @@
 <?php
 
 use ActiveRecord\Config;
-use ActiveRecord\Exception\ConfigException;
-use PHPUnit\Framework\TestCase;
+use ActiveRecord\ConfigException;
 use Psr\Log\LoggerInterface;
 
 class TestLogger implements LoggerInterface
 {
-    public function emergency(string|\Stringable $message, array $context = []): void {
+    public function emergency(string|\Stringable $message, array $context = []) {
 
     }
 
@@ -22,7 +21,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function alert(string|\Stringable $message, array $context = []): void {
+    public function alert(string|\Stringable $message, array $context = []) {
 
     }
 
@@ -36,7 +35,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function critical(string|\Stringable $message, array $context = []): void {
+    public function critical(string|\Stringable $message, array $context = []) {
 
     }
 
@@ -49,7 +48,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function error(string|\Stringable $message, array $context = []): void {
+    public function error(string|\Stringable $message, array $context = []) {
 
     }
 
@@ -64,7 +63,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function warning(string|\Stringable $message, array $context = []): void
+    public function warning(string|\Stringable $message, array $context = [])
     {
 
     }
@@ -77,7 +76,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function notice(string|\Stringable $message, array $context = []): void {
+    public function notice(string|\Stringable $message, array $context = []) {
 
     }
 
@@ -91,7 +90,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function info(string|\Stringable $message, array $context = []): void {
+    public function info(string|\Stringable $message, array $context = []) {
 
     }
 
@@ -103,7 +102,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function debug(string|\Stringable $message, array $context = []): void {
+    public function debug(string|\Stringable $message, array $context = []) {
 
     }
 
@@ -118,7 +117,7 @@ class TestLogger implements LoggerInterface
      *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, string|\Stringable $message, array $context = []): void {
+    public function log($level, string|\Stringable $message, array $context = []) {
 
     }
 }
