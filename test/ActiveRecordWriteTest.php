@@ -41,6 +41,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 
     public function test_save()
     {
+        $this->expectNotToPerformAssertions();
         $venue = new Venue(['name' => 'Tito']);
         $venue->save();
     }

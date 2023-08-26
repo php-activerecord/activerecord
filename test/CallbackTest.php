@@ -78,6 +78,7 @@ class CallBackTest extends DatabaseTest
 
     public function test_register_with_closure()
     {
+        $this->expectNotToPerformAssertions();
         $this->callback->register('after_construct', function ($mode) { });
     }
 
