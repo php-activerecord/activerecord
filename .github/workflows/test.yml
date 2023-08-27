@@ -42,8 +42,8 @@ jobs:
 
       - name: Set database permissions
         run: |
-          touch test.db
-          chmod 666 test.db
+          touch test/test.db
+          chmod 666 test/test.db
 
       - name: Login to DockerHub
         run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
