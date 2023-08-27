@@ -7,12 +7,14 @@ namespace ActiveRecord\Serialize;
  *
  * @package ActiveRecord
  */
-class JsonSerializer extends Serialization
+class JsonSerializer extends ArraySerializer
 {
-    public function to_s(): string
-    {
-        $res = $this->options['include_root'] ? [strtolower(get_class($this->model)) => $this->to_a()] : $this->to_a();
+    public static $include_root = false;
 
-        return json_encode($res);
+    public function to_s()
+    {
+        parent::$include_root = self::$include_root;
+
+        return json_encode(parent::to_s());
     }
 }
