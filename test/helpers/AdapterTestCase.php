@@ -4,7 +4,7 @@ use ActiveRecord\Column;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Adapter\SqliteAdapter;
 
-abstract class AdapterTestCase extends DatabaseTestCase
+abstract class AdapterTest extends DatabaseTest
 {
     const InvalidDb = '__1337__invalid_db__';
 
