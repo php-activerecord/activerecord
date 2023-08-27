@@ -37,11 +37,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build Databases/Memcache
-        uses: isbang/compose-action@v1.5.1
-        with:
-            compose-file: "./docker-compose.yml"
-            down-flags: "--volumes"
+      - name: Login to DockerHub
+        run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
+
+      - name: Build and Run Docker Compose
+        run: |
+            sudo docker-compose up -d
 
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
