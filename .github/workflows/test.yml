@@ -37,10 +37,11 @@ jobs:
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
 
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Build Databases/Memcache
-        uses: |
-          actions/checkout@v3
-          isbang/compose-action@v1.5.1
+        uses: isbang/compose-action@v1.5.1
         with:
             compose-file: "./docker-compose.yml"
             down-flags: "--volumes"
