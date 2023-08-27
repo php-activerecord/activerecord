@@ -41,7 +41,10 @@ jobs:
         uses: isbang/compose-action@v1.5.1
         with:
             compose-file: "./docker-compose.yml"
+            up-flags: ""
             down-flags: "--volumes"
+            services: |
+              php
 
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
@@ -49,7 +52,7 @@ jobs:
       - name: Run PHPUnit
         run: |
           export $ENV
-          vendor/bin/phpunit --coverage-clover=coverage.xml
+          run: docker compose exec php bin/phpunit --coverage-clover=coverage.xml
 
       - name: Upload coverage file
         uses: actions/upload-artifact@v3
