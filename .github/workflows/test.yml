@@ -10,6 +10,10 @@ jobs:
   phpunit:
     name: PHPUnit
     runs-on: ubuntu-20.04
+  env:
+    DB_DATABASE: test
+    DB_USER: test
+    DB_PASSWORD: test
 
     strategy:
       fail-fast: false
@@ -32,6 +36,11 @@ jobs:
 
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
+
+      - name: Set up MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
 
       - name: Run PHPUnit
         run: |
