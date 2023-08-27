@@ -98,7 +98,7 @@ abstract class Connection
     /**
      * Retrieve a database connection.
      *
-     * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
+     * @param string|null $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
      *                                                     Everything after the protocol:// part is specific to the connection adapter.
      *                                                     OR
      *                                                     A connection name that is set in ActiveRecord\Config
@@ -108,11 +108,11 @@ abstract class Connection
      *
      * @see parse_connection_url
      */
-    public static function instance($connection_string_or_connection_name=null)
+    public static function instance(string $connection_string_or_connection_name=null)
     {
         $config = Config::instance();
 
-        if (false === strpos($connection_string_or_connection_name, '://')) {
+        if (!str_contains($connection_string_or_connection_name ?? '', '://')) {
             $connection_string = $connection_string_or_connection_name ?
                 $config->get_connection($connection_string_or_connection_name) :
                 $config->get_default_connection_string();

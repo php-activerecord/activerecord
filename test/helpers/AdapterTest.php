@@ -2,7 +2,7 @@
 
 use ActiveRecord\Column;
 
-class AdapterTest extends DatabaseTest
+abstract class AdapterTest extends DatabaseTest
 {
     const InvalidDb = '__1337__invalid_db__';
 
@@ -84,11 +84,12 @@ class AdapterTest extends DatabaseTest
         $conn = $this->connection;
         $port = $conn::$DEFAULT_PORT;
 
-        $connection_string = "{$url['scheme']}://{$url['user']}";
+        $connection_string = "{$url['scheme']}://" . $url['user'] ?? '';
         if (isset($url['pass'])) {
             $connection_string =  "{$connection_string}:{$url['pass']}";
         }
-        $connection_string = "{$connection_string}@{$url['host']}:$port{$url['path']}";
+
+        $connection_string = "{$connection_string}@{$url['host']}:" . $port . $url['path'] ?? '';
 
         if ('sqlite' != $this->connection->protocol) {
             ActiveRecord\Connection::instance($connection_string);
