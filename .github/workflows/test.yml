@@ -10,10 +10,10 @@ jobs:
   phpunit:
     name: PHPUnit
     runs-on: ubuntu-20.04
-  env:
-    DB_DATABASE: test
-    DB_USER: test
-    DB_PASSWORD: test
+    env:
+      DB_DATABASE: test
+      DB_USER: test
+      DB_PASSWORD: test
 
     strategy:
       fail-fast: false
