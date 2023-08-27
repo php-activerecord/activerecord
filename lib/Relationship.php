@@ -506,7 +506,7 @@ class HasMany extends AbstractRelationship
         $this->set_keys(get_class($model));
 
         // since through relationships depend on other relationships we can't do
-        // this initiailization in the constructor since the other relationship
+        // this initialization in the constructor since the other relationship
         // may not have been created yet and we only want this to run once
         if (!isset($this->initialized)) {
             if ($this->through) {
@@ -706,8 +706,6 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
-    private $primary_key;
-
     public function __construct($options=[])
     {
         parent::__construct($options);
