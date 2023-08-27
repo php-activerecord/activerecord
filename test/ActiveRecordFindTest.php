@@ -1,13 +1,5 @@
 <?php
 
-use ActiveRecord\Exception\ActiveRecordException;
-use ActiveRecord\Exception\DatabaseException;
-use ActiveRecord\Exception\RecordNotFound;
-use ActiveRecord\Exception\UndefinedPropertyException;
-use test\models\Author;
-use test\models\JoinBook;
-use test\models\Venue;
-
 class ActiveRecordFindTest extends DatabaseTestCase
 {
     public function test_find_with_no_params()

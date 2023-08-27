@@ -1,9 +1,5 @@
 <?php
 
-use ActiveRecord\Exception\ActiveRecordException;
-use test\models\VenueAfterCreate;
-use test\models\VenueCB;
-
 class CallBackTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void

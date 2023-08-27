@@ -1,16 +1,5 @@
 <?php
 
-use ActiveRecord\Exception\ActiveRecordException;
-use ActiveRecord\Exception\ReadOnlyException;
-use ActiveRecord\Exception\UndefinedPropertyException;
-use test\models\Author;
-use test\models\AwesomePerson;
-use test\models\Book;
-use test\models\BookAttrAccessible;
-use test\models\Event;
-use test\models\RmBldg;
-use test\models\Venue;
-
 class ActiveRecordTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void

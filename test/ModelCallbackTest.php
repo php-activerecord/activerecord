@@ -1,7 +1,5 @@
 <?php
 
-use test\models\Venue;
-
 class ModelCallbackTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
