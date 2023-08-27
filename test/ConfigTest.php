@@ -1,7 +1,7 @@
 <?php
 
 use ActiveRecord\Config;
-use ActiveRecord\ConfigException;
+use ActiveRecord\Exception\ConfigException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -152,7 +152,7 @@ class ConfigTest extends TestCase
 
     public function test_set_connections_must_be_array()
     {
-        $this->expectException(\ActiveRecord\ConfigException::class);
+        $this->expectException(ConfigException::class);
         $this->config->set_connections(null);
     }
 
@@ -209,19 +209,19 @@ class ConfigTest extends TestCase
 
     public function test_set_date_class_when_class_doesnt_exist()
     {
-        $this->expectException(\ActiveRecord\ConfigException::class);
+        $this->expectException(ConfigException::class);
         $this->config->set_date_class('doesntexist');
     }
 
     public function test_set_date_class_when_class_doesnt_have_format_or_createfromformat()
     {
-        $this->expectException(\ActiveRecord\ConfigException::class);
+        $this->expectException(ConfigException::class);
         $this->config->set_date_class('TestLogger');
     }
 
     public function test_set_date_class_when_class_doesnt_have_createfromformat()
     {
-        $this->expectException(\ActiveRecord\ConfigException::class);
+        $this->expectException(ConfigException::class);
         $this->config->set_date_class('TestDateTimeWithoutCreateFromFormat');
     }
 

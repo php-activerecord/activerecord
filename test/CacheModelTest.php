@@ -47,7 +47,7 @@ class CacheModelTest extends DatabaseTestCase
         $method = $this->set_method_public(Author::class, 'cache_key');
         $author = Author::first();
 
-        $this->assertEquals('Author-1', $method->invokeArgs($author, []));
+        $this->assertEquals('test\models\Author-1', $method->invokeArgs($author, []));
     }
 
     public function test_model_cache_find_by_pk()

@@ -62,9 +62,9 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function test_insert_with_no_sequence_defined()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         if (!$this->connection->supports_sequences()) {
-            throw new ActiveRecord\DatabaseException('');
+            throw new DatabaseException('');
         }
         AuthorWithoutSequence::create(['name' => 'Bob!']);
     }
@@ -153,7 +153,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function test_update_attributes_undefined_property()
     {
-        $this->expectException(\ActiveRecord\UndefinedPropertyException::class);
+        $this->expectException(UndefinedPropertyException::class);
         $book = Book::find(1);
         $book->update_attributes(['name' => 'new name', 'invalid_attribute' => true, 'another_invalid_attribute' => 'blah']);
     }
@@ -170,7 +170,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function test_update_attribute_undefined_property()
     {
-        $this->expectException(\ActiveRecord\UndefinedPropertyException::class);
+        $this->expectException(UndefinedPropertyException::class);
         $book = Book::find(1);
         $book->update_attribute('invalid_attribute', true);
     }
@@ -185,11 +185,6 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function test_save_blank_value()
     {
-        // oracle doesn't do blanks. probably an option to enable?
-        if ($this->connection instanceof ActiveRecord\OciAdapter) {
-            return;
-        }
-
         $book = Book::find(1);
         $book->name = '';
         $book->save();
@@ -299,7 +294,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function test_update_with_no_primary_key_defined()
     {
-        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->expectException(ActiveRecordException::class);
         Author::table()->pk = [];
         $author = Author::first();
         $author->name = 'blahhhhhhhhhh';
@@ -308,7 +303,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function test_delete_with_no_primary_key_defined()
     {
-        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->expectException(ActiveRecordException::class);
         Author::table()->pk = [];
         $author = author::first();
         $author->delete();
@@ -322,7 +317,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function test_readonly()
     {
-        $this->expectException(\ActiveRecord\ReadOnlyException::class);
+        $this->expectException(ReadOnlyException::class);
         $author = Author::first(['readonly' => true]);
         $author->save();
     }

@@ -37,7 +37,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function test_no_connection()
     {
-        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->expectException(ActiveRecordException::class);
         new SQLBuilder(null, 'authors');
     }
 
@@ -135,7 +135,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function test_insert_requires_hash()
     {
-        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->expectException(ActiveRecordException::class);
         $this->sql->insert([1]);
     }
 

@@ -11,7 +11,6 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\UndefinedPropertyException;
-use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
 
 /**

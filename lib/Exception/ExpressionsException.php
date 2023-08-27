@@ -1,7 +1,4 @@
 <?php
-/**
- * @package ActiveRecord
- */
 
 namespace ActiveRecord\Exception;
 

@@ -15,7 +15,7 @@ class ActiveRecordCacheTest extends DatabaseTestCase
         }
 
         parent::setUp($connection_name);
-        ActiveRecord\Config::instance()->set_cache('memcache://localhost');
+        Config::instance()->set_cache('memcache://localhost');
     }
 
     public function tearDown(): void
@@ -31,7 +31,7 @@ class ActiveRecordCacheTest extends DatabaseTestCase
 
     public function test_explicit_default_expire()
     {
-        ActiveRecord\Config::instance()->set_cache('memcache://localhost', ['expire' => 1]);
+        Config::instance()->set_cache('memcache://localhost', ['expire' => 1]);
         $this->assertEquals(1, Cache::$options['expire']);
     }
 
