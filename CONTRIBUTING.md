@@ -48,13 +48,20 @@ docker-composer up -d
 
 Then, the necessary services will be available and the tests should pass (although you may need to install PHP memcache extensions in a separate step, see below ).
 
+When you're done, you can take it down with:
+```sh
+docker-compose down
+```
+
 #### Installing memcache on Windows
-If you're a Windows user, finding the correct memcache dll can be a bit tricky, as the PECL repo seems to be in disrepair. You can find them here:
+If you're a Windows user, finding the correct memcache drivers can be a bit tricky, as the PECL repo seems to be in disrepair. You can find them here:
 
 https://github.com/nono303/PHP-memcache-dll/tree/master
 
-Download the .dll that matches your version of PHP, and add this line to your php.ini:
+Download the .dll that matches your version of PHP, install it into your /ext dir, and add this line to your php.ini:
+```ini
 extension=memcache
+```
 
 
 #### Alternate setup
