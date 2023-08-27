@@ -34,9 +34,6 @@ jobs:
           php-version: ${{ matrix.php-version }}
           tools: cs2pr
 
-      - name: Install dependencies with Composer
-        uses: ramsey/composer-install@v2
-
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -45,6 +42,9 @@ jobs:
         with:
             compose-file: "./docker-compose.yml"
             down-flags: "--volumes"
+
+      - name: Install dependencies with Composer
+        uses: ramsey/composer-install@v2
 
       - name: Run PHPUnit
         run: |
