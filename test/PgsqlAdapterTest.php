@@ -4,7 +4,7 @@ use ActiveRecord\Column;
 
 require_once __DIR__ . '/../lib/adapters/PgsqlAdapter.php';
 
-class PgsqlAdapterTest extends AdapterTest
+class PgsqlAdapterTest extends AdapterTestCase
 {
     public function setUp($connection_name=null): void
     {

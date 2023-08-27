@@ -147,7 +147,7 @@ class ColumnTest extends TestCase
 
     public function test_ar_date_time_attribute_copies_exact_tz()
     {
-        $dt = new DateTime(null, new \DateTimeZone('America/New_York'));
+        $dt = new DateTime('', new \DateTimeZone('America/New_York'));
 
         $column = new Column();
         $column->type = Column::DATETIME;

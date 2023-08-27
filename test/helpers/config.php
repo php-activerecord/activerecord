@@ -18,8 +18,8 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 require_once __DIR__ . '/../../vendor/phpunit/phpunit/src/Framework/TestCase.php';
-require_once 'DatabaseTest.php';
-require_once 'AdapterTest.php';
+require_once 'DatabaseTestCase.php';
+require_once 'AdapterTestCase.php';
 
 require_once __DIR__ . '/../../ActiveRecord.php';
 
@@ -30,7 +30,7 @@ $GLOBALS['slow_tests'] = false;
 $GLOBALS['show_warnings'] = true;
 
 if ('false' !== getenv('LOG')) {
-    DatabaseTest::$log = true;
+    DatabaseTestCase::$log = true;
 }
 
 ActiveRecord\Config::initialize(function ($cfg) {
@@ -64,7 +64,7 @@ ActiveRecord\Config::initialize(function ($cfg) {
             echo "(Logging SQL queries disabled, PEAR::Log not found.)\n";
         }
 
-        DatabaseTest::$log = false;
+        DatabaseTestCase::$log = false;
     }
 
     if ($GLOBALS['show_warnings']  && !isset($GLOBALS['show_warnings_done'])) {

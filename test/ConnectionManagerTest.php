@@ -3,7 +3,7 @@
 use ActiveRecord\Config;
 use ActiveRecord\ConnectionManager;
 
-class ConnectionManagerTest extends DatabaseTest
+class ConnectionManagerTest extends DatabaseTestCase
 {
     public function test_get_connection_with_null_connection()
     {

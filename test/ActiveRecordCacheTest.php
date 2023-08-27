@@ -2,7 +2,7 @@
 
 use ActiveRecord\Cache;
 
-class ActiveRecordCacheTest extends DatabaseTest
+class ActiveRecordCacheTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
     {

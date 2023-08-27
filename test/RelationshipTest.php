@@ -11,7 +11,7 @@ class AuthorWithNonModelRelationship extends ActiveRecord\Model
     public static $has_many = [['books', 'class_name' => 'NotModel']];
 }
 
-class RelationshipTest extends DatabaseTest
+class RelationshipTest extends DatabaseTestCase
 {
     protected $relationship_name;
     protected $relationship_names = ['has_many', 'belongs_to', 'has_one'];

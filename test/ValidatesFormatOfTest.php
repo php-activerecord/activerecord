@@ -8,7 +8,7 @@ class BookFormat extends ActiveRecord\Model
     ];
 }
 
-class ValidatesFormatOfTest extends DatabaseTest
+class ValidatesFormatOfTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
     {

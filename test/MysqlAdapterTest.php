@@ -4,7 +4,7 @@ use ActiveRecord\Column;
 
 require_once __DIR__ . '/../lib/adapters/MysqlAdapter.php';
 
-class MysqlAdapterTest extends AdapterTest
+class MysqlAdapterTest extends AdapterTestCase
 {
     public function setUp($connection_name=null): void
     {

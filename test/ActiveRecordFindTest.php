@@ -1,6 +1,6 @@
 <?php
 
-class ActiveRecordFindTest extends DatabaseTest
+class ActiveRecordFindTest extends DatabaseTestCase
 {
     public function test_find_with_no_params()
     {

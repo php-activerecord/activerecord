@@ -24,7 +24,7 @@ class AuthorExplicitSequence extends ActiveRecord\Model
     public static $sequence = 'blah_seq';
 }
 
-class ActiveRecordWriteTest extends DatabaseTest
+class ActiveRecordWriteTest extends DatabaseTestCase
 {
     private function make_new_book_and($save=true)
     {

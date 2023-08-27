@@ -200,7 +200,7 @@ class SQLBuilder
      */
     public static function reverse_order($order = '')
     {
-        if (!trim($order)) {
+        if (!trim($order ?? '')) {
             return $order;
         }
 

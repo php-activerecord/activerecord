@@ -4,7 +4,7 @@ require_once __DIR__ . '/../lib/Serialization.php';
 
 use ActiveRecord\DateTime;
 
-class SerializationTest extends DatabaseTest
+class SerializationTest extends DatabaseTestCase
 {
     public function tearDown(): void
     {

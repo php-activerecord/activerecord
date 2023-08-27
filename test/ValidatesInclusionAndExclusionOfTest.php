@@ -16,7 +16,7 @@ class BookInclusion extends ActiveRecord\Model
     ];
 }
 
-class ValidatesInclusionAndExclusionOfTest extends DatabaseTest
+class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
     {

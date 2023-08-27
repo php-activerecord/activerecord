@@ -3,7 +3,7 @@
 use ActiveRecord\SQLBuilder;
 use ActiveRecord\Table;
 
-class SQLBuilderTest extends DatabaseTest
+class SQLBuilderTest extends DatabaseTestCase
 {
     protected $table_name = 'authors';
     protected $class_name = 'Author';

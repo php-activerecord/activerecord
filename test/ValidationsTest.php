@@ -25,7 +25,7 @@ class ValuestoreValidations extends ActiveRecord\Model
     public static $validates_uniqueness_of = [];
 }
 
-class ValidationsTest extends DatabaseTest
+class ValidationsTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
     {

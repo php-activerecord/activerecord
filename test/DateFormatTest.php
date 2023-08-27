@@ -1,6 +1,6 @@
 <?php
 
-class DateFormatTest extends DatabaseTest
+class DateFormatTest extends DatabaseTestCase
 {
     public function test_datefield_gets_converted_to_ar_datetime()
     {

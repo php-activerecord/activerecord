@@ -1,6 +1,6 @@
 <?php
 
-class ActiveRecordTest extends DatabaseTest
+class ActiveRecordTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
     {

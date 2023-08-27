@@ -18,7 +18,7 @@ class AuthorPresence extends ActiveRecord\Model
     ];
 }
 
-class ValidatesPresenceOfTest extends DatabaseTest
+class ValidatesPresenceOfTest extends DatabaseTestCase
 {
     public function test_presence()
     {

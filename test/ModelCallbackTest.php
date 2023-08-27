@@ -1,6 +1,6 @@
 <?php
 
-class ModelCallbackTest extends DatabaseTest
+class ModelCallbackTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
     {

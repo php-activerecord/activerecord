@@ -12,7 +12,7 @@ class BookSize extends ActiveRecord\Model
     public static $validates_size_of = [];
 }
 
-class ValidatesLengthOfTest extends DatabaseTest
+class ValidatesLengthOfTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
     {
