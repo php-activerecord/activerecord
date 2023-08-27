@@ -40,8 +40,9 @@ jobs:
       - name: Build Databases/Memcache
         uses: isbang/compose-action@v1.5.1
         with:
+            compose-file: "./docker-compose.yml"
             down-flags: "--volumes"
-        run: docker-compose exec up -d
+
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
 
