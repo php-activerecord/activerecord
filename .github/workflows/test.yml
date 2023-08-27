@@ -37,10 +37,13 @@ jobs:
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
 
-      - name: Set up MySQL
-        run: |
-          sudo /etc/init.d/mysql start
-          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+      - name: Build Databases/Memcache
+        uses: |
+          actions/checkout@v3
+          isbang/compose-action@v1.5.1
+        with:
+            compose-file: "./docker-compose.yml"
+            down-flags: "--volumes"
 
       - name: Run PHPUnit
         run: |
