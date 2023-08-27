@@ -435,14 +435,14 @@ class Model
      * echo $user->name; # => BOB
      * ```
      *
-     * @param string $name  Name of attribute, relationship or other to set
-     * @param mixed  $value The value
+     * @param $name  Name of attribute, relationship or other to set
+     * @param $value The value
      *
-     * @throws {@link UndefinedPropertyException} if $name does not exist
+     * @throws UndefinedPropertyException if $name does not exist
      *
      * @return mixed The value
      */
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value)
     {
         if (array_key_exists($name, static::$alias_attribute)) {
             $name = static::$alias_attribute[$name];
@@ -529,13 +529,13 @@ class Model
      * accessed is 'id' then it will return the model's primary key no matter what the actual attribute name is
      * for the primary key.
      *
-     * @param string $name Name of an attribute
+     * @param $name Name of an attribute
      *
-     * @throws {@link UndefinedPropertyException} if name could not be resolved to an attribute, relationship, ...
+     * @throws UndefinedPropertyException if name could not be resolved to an attribute, relationship, ...
      *
      * @return mixed The value of the attribute
      */
-    public function &read_attribute($name)
+    public function &read_attribute(string $name)
     {
         // check for aliased attribute
         if (array_key_exists($name, static::$alias_attribute)) {
@@ -638,14 +638,7 @@ class Model
         return $this->attributes;
     }
 
-    /**
-     * Retrieve the primary key name.
-     *
-     * @param bool Set to true to return the first value in the pk array only
-     *
-     * @return string The primary key for the model
-     */
-    public function get_primary_key($first=false)
+    public function get_primary_key($first=false): array|string
     {
         $pk = static::table()->pk;
 
@@ -655,11 +648,11 @@ class Model
     /**
      * Returns the actual attribute name if $name is aliased.
      *
-     * @param string $name An attribute name
+     * @param $name An attribute name
      *
      * @return string
      */
-    public function get_real_attribute_name($name)
+    public function get_real_attribute_name(string $name)
     {
         if (array_key_exists($name, $this->attributes)) {
             return $name;
@@ -736,9 +729,8 @@ class Model
      * @param string $name     Name of an attribute
      * @param array  $delegate An array containing delegate data
      *
-     * @return delegated attribute name or null
      */
-    private function is_delegated($name, &$delegate)
+    private function is_delegated($name, &$delegate): string|null
     {
         if (is_array($delegate)) {
             if ('' != $delegate['prefix']) {
@@ -1462,16 +1454,16 @@ class Model
      * Person::find_or_create_by_name_and_id(array('name' => 'Tito', 'id' => 1));
      * ```
      *
-     * @param string $method Name of method
-     * @param mixed  $args   Method args
+     * @param $method Name of method
+     * @param $args   Method args
      *
-     * @throws {@link ActiveRecordException} if invalid query
+     * @throws ActiveRecordException
      *
-     * @return Model
+     * @return Model|null|int|Model[]
      *
      * @see find
      */
-    public static function __callStatic($method, $args)
+    public static function __callStatic(string $method, mixed $args)
     {
         $options = static::extract_and_validate_options($args);
         $create = false;
@@ -1676,7 +1668,7 @@ class Model
      * <li><b>group:</b> A SQL group by fragment</li>
      * </ul>
      *
-     * @throws {@link RecordNotFound} if no options are passed or finding by pk and no records matched
+     * @throws RecordNotFound if no options are passed or finding by pk and no records matched
      *
      * @return static|static[]|null
      *
@@ -1787,7 +1779,7 @@ class Model
      * @param array $values  An array containing values for the pk
      * @param array $options An options array
      *
-     * @throws {@link RecordNotFound} if a record could not be found
+     * @throws RecordNotFound if a record could not be found
      *
      * @return static|static[]
      */
@@ -1862,11 +1854,10 @@ class Model
      * @param array $array An options array
      * @param bool  $throw True to throw an exception if not valid
      *
-     * @throws {@link ActiveRecordException} if the array contained any invalid options
+     * @throws ActiveRecordException if the array contained any invalid options
      *
-     * @return bool True if valid otherwise valse
      */
-    public static function is_options_hash($array, $throw=true)
+    public static function is_options_hash($array, $throw=true): bool
     {
         if (is_hash($array)) {
             $keys = array_keys($array);

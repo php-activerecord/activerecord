@@ -152,7 +152,7 @@ abstract class Connection
      *
      * @return string the full name of the class including namespace
      */
-    private static function load_adapter_class($adapter)
+    protected static function load_adapter_class($adapter)
     {
         $class = ucwords($adapter) . 'Adapter';
         $fqclass = 'ActiveRecord\\Adapter\\' . $class;
@@ -257,11 +257,9 @@ abstract class Connection
     /**
      * Class Connection is a singleton. Access it via instance().
      *
-     * @param array $info Array containing URL parts
-     *
      * @return Connection
      */
-    protected function __construct($info)
+    protected function __construct(\stdClass $info)
     {
         try {
             // unix sockets start with a /
@@ -557,17 +555,15 @@ abstract class Connection
     /**
      * Query for column meta info and return statement handle.
      *
-     * @param string $table Name of a table
-     *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
-    abstract public function query_column_info($table);
+    abstract public function query_column_info(string $table);
 
     /**
      * Query for all tables in the current database. The result must only
      * contain one column which has the name of the table.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     abstract public function query_for_tables();
 

@@ -7,6 +7,7 @@ namespace ActiveRecord;
 
 use ActiveRecord\Adapter\PgsqlAdapter;
 use ActiveRecord\Exception\RelationshipException;
+use ActiveRecord\Relationship\AbstractRelationship;
 use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
@@ -398,12 +399,7 @@ class Table
         return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
     }
 
-    /**
-     * Add a relationship.
-     *
-     * @param Relationship $relationship a Relationship object
-     */
-    private function add_relationship($relationship)
+    private function add_relationship(AbstractRelationship $relationship)
     {
         $this->relationships[$relationship->attribute_name] = $relationship;
     }
