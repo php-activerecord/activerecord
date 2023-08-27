@@ -43,8 +43,6 @@ jobs:
             compose-file: "./docker-compose.yml"
             up-flags: ""
             down-flags: "--volumes"
-            services: |
-              php
 
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
