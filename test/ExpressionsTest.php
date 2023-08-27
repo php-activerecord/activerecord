@@ -142,7 +142,7 @@ class ExpressionsTest extends TestCase
         try {
             $conn = ConnectionManager::get_connection();
         } catch (DatabaseException $e) {
-            $this->mark_test_skipped('failed to connect. ' . $e->getMessage());
+            $this->markTestSkipped('failed to connect. ' . $e->getMessage());
         }
         $a = new Expressions(null, 'name=?', "Tito's Guild");
         $a->set_connection($conn);

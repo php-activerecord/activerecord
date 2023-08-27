@@ -13,7 +13,7 @@ class ColumnTest extends TestCase
         try {
             $this->conn = ActiveRecord\ConnectionManager::get_connection(ActiveRecord\Config::instance()->get_default_connection());
         } catch (DatabaseException $e) {
-            $this->mark_test_skipped('failed to connect using default connection. ' . $e->getMessage());
+            $this->markTestSkipped('failed to connect using default connection. ' . $e->getMessage());
         }
     }
 

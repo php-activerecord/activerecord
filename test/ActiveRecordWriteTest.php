@@ -374,7 +374,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function test_delete_all_with_limit_and_order()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
-            $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
+            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 
         $num_affected = Author::delete_all(['conditions' => ['parent_author_id = ?', 2], 'limit' => 1, 'order' => 'name asc']);
@@ -419,7 +419,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function test_update_all_with_limit_and_order()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
-            $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
+            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'limit' => 1, 'order' => 'name asc']);

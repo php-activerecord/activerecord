@@ -22,7 +22,7 @@ class DateTimeTest extends TestCase
         try {
             $model = new Author();
         } catch (DatabaseException $e) {
-            $this->mark_test_skipped('failed to connect. ' . $e->getMessage());
+            $this->markTestSkipped('failed to connect. ' . $e->getMessage());
         }
 
         return $model;

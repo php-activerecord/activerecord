@@ -159,7 +159,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function test_update_with_limit_and_order()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
-            $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE operation');
+            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE operation');
         }
 
         $this->sql->update(['id' => 1])->order('name asc')->limit(1);
@@ -201,7 +201,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function test_delete_with_limit_and_order()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
-            $this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
+            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
         }
 
         $this->sql->delete(['id' => 1])->order('name asc')->limit(1);
