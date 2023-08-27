@@ -1,16 +1,20 @@
 <?php
 
-require_once __DIR__ . '/../lib/Serialization.php';
-
 use ActiveRecord\DateTime;
+use ActiveRecord\Serialize\ArraySerializer;
+use ActiveRecord\Serialize\CsvSerializer;
+use ActiveRecord\Serialize\JsonSerializer;
+use test\models\Author;
+use test\models\Book;
+use test\models\Host;
 
 class SerializationTest extends DatabaseTestCase
 {
     public function tearDown(): void
     {
         parent::tearDown();
-        ActiveRecord\ArraySerializer::$include_root = false;
-        ActiveRecord\JsonSerializer::$include_root = false;
+        ArraySerializer::$include_root = false;
+        JsonSerializer::$include_root = false;
     }
 
     public function _a($options=[], $model=null)
@@ -19,7 +23,7 @@ class SerializationTest extends DatabaseTestCase
             $model = Book::find(1);
         }
 
-        $s = new ActiveRecord\JsonSerializer($model, $options);
+        $s = new JsonSerializer($model, $options);
 
         return $s->to_a();
     }
@@ -100,7 +104,7 @@ class SerializationTest extends DatabaseTestCase
     {
         $now = new DateTime();
         $a = $this->_a(['only' => 'created_at'], new Author(['created_at' => $now]));
-        $this->assertEquals($now->format(ActiveRecord\Serialization::$DATETIME_FORMAT), $a['created_at']);
+        $this->assertEquals($now->format(\ActiveRecord\Serialize\Serialization::$DATETIME_FORMAT), $a['created_at']);
     }
 
     public function test_to_json()
@@ -112,8 +116,8 @@ class SerializationTest extends DatabaseTestCase
 
     public function test_to_json_include_root()
     {
-        ActiveRecord\JsonSerializer::$include_root = true;
-        $this->assertNotNull(json_decode(Book::find(1)->to_json())->book);
+        JsonSerializer::$include_root = true;
+        $this->assertNotNull(json_decode(Book::find(1)->to_json())->{'test\models\book'});
     }
 
     public function test_to_xml_include()
@@ -139,10 +143,10 @@ class SerializationTest extends DatabaseTestCase
 
     public function test_to_array_include_root()
     {
-        ActiveRecord\ArraySerializer::$include_root = true;
+        ArraySerializer::$include_root = true;
         $book = Book::find(1);
         $array = $book->to_array();
-        $book_attributes = ['book' => $book->attributes()];
+        $book_attributes = ['test\models\book' => $book->attributes()];
         $this->assertEquals($book_attributes, $array);
     }
 
@@ -207,15 +211,15 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_csv_with_custom_delimiter()
     {
         $book = Book::find(1);
-        ActiveRecord\CsvSerializer::$delimiter=';';
+        CsvSerializer::$delimiter=';';
         $this->assertEquals('1;1;2;"Ancient Art of Main Tanking";0;0', $book->to_csv());
     }
 
     public function test_to_csv_with_custom_enclosure()
     {
         $book = Book::find(1);
-        ActiveRecord\CsvSerializer::$delimiter=',';
-        ActiveRecord\CsvSerializer::$enclosure="'";
+        CsvSerializer::$delimiter=',';
+        CsvSerializer::$enclosure="'";
         $this->assertEquals("1,1,2,'Ancient Art of Main Tanking',0,0", $book->to_csv());
     }
 }

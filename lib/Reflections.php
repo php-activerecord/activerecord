@@ -5,6 +5,7 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\ActiveRecordException;
 use ReflectionClass;
 
 /**

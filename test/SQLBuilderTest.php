@@ -1,12 +1,14 @@
 <?php
 
+use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\SQLBuilder;
 use ActiveRecord\Table;
+use test\models\Author;
 
 class SQLBuilderTest extends DatabaseTestCase
 {
     protected $table_name = 'authors';
-    protected $class_name = 'Author';
+    protected $class_name = Author::class;
     protected $table;
 
     public function setUp($connection_name=null): void
@@ -35,7 +37,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function test_no_connection()
     {
-        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->expectException(ActiveRecordException::class);
         new SQLBuilder(null, 'authors');
     }
 
@@ -133,7 +135,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function test_insert_requires_hash()
     {
-        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->expectException(ActiveRecordException::class);
         $this->sql->insert([1]);
     }
 

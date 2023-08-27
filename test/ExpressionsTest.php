@@ -1,9 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../lib/Expressions.php';
-
 use ActiveRecord\ConnectionManager;
 use ActiveRecord\DatabaseException;
+use ActiveRecord\Exception\ExpressionsException;
 use ActiveRecord\Expressions;
 use PHPUnit\Framework\TestCase;
 
@@ -56,7 +55,7 @@ class ExpressionsTest extends TestCase
 
     public function test_insufficient_variables()
     {
-        $this->expectException(\ActiveRecord\ExpressionsException::class);
+        $this->expectException(ExpressionsException::class);
         $c = new Expressions(null, 'name=? and id=?', 'Tito');
         $c->to_s();
     }
@@ -166,7 +165,7 @@ class ExpressionsTest extends TestCase
 
     public function test_bind_invalid_parameter_number()
     {
-        $this->expectException(\ActiveRecord\ExpressionsException::class);
+        $this->expectException(ExpressionsException::class);
         $a = new Expressions(null, 'name=?');
         $a->bind(0, 99);
     }

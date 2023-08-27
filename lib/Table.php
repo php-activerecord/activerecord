@@ -5,6 +5,8 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\RelationshipException;
+
 /**
  * Manages reading and writing to a database table.
  *

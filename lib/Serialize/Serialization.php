@@ -3,9 +3,11 @@
  * @package ActiveRecord
  */
 
-namespace ActiveRecord;
+namespace ActiveRecord\Serialize;
 
-use XmlWriter;
+use ActiveRecord\Config;
+use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Model;
 
 /**
  * Base class for Model serializers.
@@ -240,139 +242,4 @@ abstract class Serialization
      * @return string
      */
     abstract public function to_s();
-}
-
-/**
- * Array serializer.
- *
- * @package ActiveRecord
- */
-class ArraySerializer extends Serialization
-{
-    public static $include_root = false;
-
-    public function to_s()
-    {
-        return self::$include_root ? [strtolower(get_class($this->model)) => $this->to_a()] : $this->to_a();
-    }
-}
-
-/**
- * JSON serializer.
- *
- * @package ActiveRecord
- */
-class JsonSerializer extends ArraySerializer
-{
-    public static $include_root = false;
-
-    public function to_s()
-    {
-        parent::$include_root = self::$include_root;
-
-        return json_encode(parent::to_s());
-    }
-}
-
-/**
- * XML serializer.
- *
- * @package ActiveRecord
- */
-class XmlSerializer extends Serialization
-{
-    private $writer;
-
-    public function __construct(Model $model, &$options)
-    {
-        $this->includes_with_class_name_element = true;
-        parent::__construct($model, $options);
-    }
-
-    public function to_s()
-    {
-        return $this->xml_encode();
-    }
-
-    private function xml_encode()
-    {
-        $this->writer = new XmlWriter();
-        $this->writer->openMemory();
-        $this->writer->startDocument('1.0', 'UTF-8');
-        $this->writer->startElement(strtolower(denamespace(($this->model))));
-        $this->write($this->to_a());
-        $this->writer->endElement();
-        $this->writer->endDocument();
-        $xml = $this->writer->outputMemory(true);
-
-        if (true == @$this->options['skip_instruct']) {
-            $xml = preg_replace('/<\?xml version.*?\?>/', '', $xml);
-        }
-
-        return $xml;
-    }
-
-    private function write($data, $tag=null)
-    {
-        foreach ($data as $attr => $value) {
-            if (null != $tag) {
-                $attr = $tag;
-            }
-
-            if (is_array($value) || is_object($value)) {
-                if (!is_int(key($value))) {
-                    $this->writer->startElement($attr);
-                    $this->write($value);
-                    $this->writer->endElement();
-                } else {
-                    $this->write($value, $attr);
-                }
-
-                continue;
-            }
-
-            $this->writer->writeElement($attr, $value);
-        }
-    }
-}
-
-/**
- * CSV serializer.
- *
- * @package ActiveRecord
- */
-class CsvSerializer extends Serialization
-{
-    public static $delimiter = ',';
-    public static $enclosure = '"';
-
-    public function to_s()
-    {
-        if (true == @$this->options['only_header']) {
-            return $this->header();
-        }
-
-        return $this->row();
-    }
-
-    private function header()
-    {
-        return $this->to_csv(array_keys($this->to_a()));
-    }
-
-    private function row()
-    {
-        return $this->to_csv($this->to_a());
-    }
-
-    private function to_csv($arr)
-    {
-        $outstream = fopen('php://temp', 'w');
-        fputcsv($outstream, $arr, self::$delimiter, self::$enclosure);
-        rewind($outstream);
-        $buffer = trim(stream_get_contents($outstream));
-        fclose($outstream);
-
-        return $buffer;
-    }
 }

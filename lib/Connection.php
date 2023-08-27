@@ -8,6 +8,7 @@ namespace ActiveRecord;
 
 require_once 'Column.php';
 
+use ActiveRecord\Exception\DatabaseException;
 use Closure;
 use PDO;
 use PDOException;
@@ -152,8 +153,8 @@ abstract class Connection
     private static function load_adapter_class($adapter)
     {
         $class = ucwords($adapter) . 'Adapter';
-        $fqclass = 'ActiveRecord\\' . $class;
-        $source = __DIR__ . "/adapters/$class.php";
+        $fqclass = 'ActiveRecord\\Adapter\\' . $class;
+        $source = __DIR__ . "/Adapter/$class.php";
 
         if (!file_exists($source)) {
             throw new DatabaseException("$fqclass not found!");

@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Connection;
+use ActiveRecord\Exception\DatabaseException;
 use PHPUnit\Framework\TestCase;
 
 // Only use this to test static methods in Connection that are not specific
@@ -10,7 +11,7 @@ class ConnectionTest extends TestCase
 {
     public function test_connection_info_from_should_throw_exception_when_no_host()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::parse_connection_url('mysql://user:pass@');
     }
 
@@ -33,7 +34,7 @@ class ConnectionTest extends TestCase
 
     public function test_gh_103_sqlite_connection_string_absolute()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::parse_connection_url('sqlite:///some/path/to/file.db');
     }
 

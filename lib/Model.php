@@ -7,6 +7,12 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\ActiveRecordException;
+use ActiveRecord\Exception\ReadOnlyException;
+use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Serialize\Serialization;
+
 /**
  * The base class for your models.
  * Defining an ActiveRecord model for a table called people and orders:
@@ -772,7 +778,7 @@ class Model
      *
      * @param string $method_name Name of method that was invoked on model for exception message
      *
-     * @throws \ActiveRecord\ReadOnlyException
+     * @throws ReadOnlyException
      */
     private function verify_not_readonly($method_name)
     {
@@ -1305,7 +1311,7 @@ class Model
      * @param array $attributes       An array in the form array(name => value, ...)
      * @param bool  $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
      *
-     * @throws \ActiveRecord\UndefinedPropertyException
+     * @throws UndefinedPropertyException
      */
     private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
     {
@@ -2024,8 +2030,7 @@ class Model
      */
     private function serialize($type, $options)
     {
-        require_once 'Serialization.php';
-        $class = "ActiveRecord\\{$type}Serializer";
+        $class = "ActiveRecord\\Serialize\\" . $type . "Serializer";
         $serializer = new $class($this, $options);
 
         return $serializer->to_s();

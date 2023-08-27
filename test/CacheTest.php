@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Cache;
+use ActiveRecord\Exception\CacheException;
 use PHPUnit\Framework\TestCase;
 
 class CacheTest extends TestCase
@@ -84,7 +85,7 @@ class CacheTest extends TestCase
 
     public function test_exception_when_connect_fails()
     {
-        $this->expectException(\ActiveRecord\CacheException::class);
+        $this->expectException(CacheException::class);
         Cache::initialize('memcache://127.0.0.1:1234');
     }
 }
