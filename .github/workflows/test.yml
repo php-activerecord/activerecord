@@ -40,8 +40,10 @@ jobs:
       - name: Setup SQLite
         run: sudo apt-get install -y sqlite3
 
-      - name: Set directory permissions
-        run: chmod 777 ./
+      - name: Set database permissions
+        run: |
+          touch test.db
+          chmod 666 test.db
 
       - name: Login to DockerHub
         run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
