@@ -5,7 +5,12 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Adapter\PgsqlAdapter;
 use ActiveRecord\Exception\RelationshipException;
+use ActiveRecord\Relationship\BelongsTo;
+use ActiveRecord\Relationship\HasAndBelongsToMany;
+use ActiveRecord\Relationship\HasMany;
+use ActiveRecord\Relationship\HasOne;
 
 /**
  * Manages reading and writing to a database table.
@@ -164,7 +169,8 @@ class Table
         $sql = new SQLBuilder($this->conn, $table);
 
         if (array_key_exists('joins', $options)) {
-            $sql->joins($this->create_joins($options['joins']));
+            $joins = $this->create_joins($options['joins']);
+            $sql->joins($joins);
 
             // by default, an inner join will not fetch the fields from the joined table
             if (!array_key_exists('select', $options)) {
@@ -519,7 +525,6 @@ class Table
 
     private function set_associations()
     {
-        require_once __DIR__ . '/Relationship.php';
         $namespace = $this->class->getNamespaceName();
 
         foreach ($this->class->getStaticProperties() as $name => $definitions) {

@@ -11,6 +11,7 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Serialize\Serialization;
 
 /**
@@ -350,8 +351,7 @@ class Model
         // check for getter
         if (method_exists($this, "get_$name")) {
             $name = "get_$name";
-            $value = $this->$name();
-
+            $value = call_user_func([$this, $name]);
             return $value;
         }
 
@@ -613,7 +613,7 @@ class Model
 
         $dirty = array_intersect_key($this->attributes, $this->__dirty);
 
-        return !empty($dirty) ? $dirty : null;
+        return (count($dirty) > 0) ? $dirty : null;
     }
 
     /**
@@ -894,20 +894,13 @@ class Model
         $use_sequence = false;
 
         if ($table->sequence && !isset($attributes[$pk])) {
-            if (($conn = static::connection()) instanceof OciAdapter) {
-                // terrible oracle makes us select the nextval first
-                $attributes[$pk] = $conn->get_next_sequence_value($table->sequence);
-                $table->insert($attributes);
-                $this->attributes[$pk] = $attributes[$pk];
-            } else {
-                // unset pk that was set to null
-                if (array_key_exists($pk, $attributes)) {
-                    unset($attributes[$pk]);
-                }
-
-                $table->insert($attributes, $pk, $table->sequence);
-                $use_sequence = true;
+            // unset pk that was set to null
+            if (array_key_exists($pk, $attributes)) {
+                unset($attributes[$pk]);
             }
+
+            $table->insert($attributes, $pk, $table->sequence);
+            $use_sequence = true;
         } else {
             $table->insert($attributes);
         }

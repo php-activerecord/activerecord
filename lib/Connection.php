@@ -96,6 +96,8 @@ abstract class Connection
      */
     public static $DEFAULT_PORT = 0;
 
+    abstract public function create_column(&$column);
+
     /**
      * Retrieve a database connection.
      *

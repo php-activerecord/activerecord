@@ -14,6 +14,7 @@ use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Model;
 use ArrayIterator;
 use IteratorAggregate;
+use function PHPUnit\Framework\assertEquals;
 
 /**
  * Manages validations for a {@link Model}.
@@ -269,9 +270,7 @@ class Validations
                 $enum = $options['within'];
             }
 
-            if (!is_array($enum)) {
-                [$enum];
-            }
+            assert(isset($enum));
 
             $message = str_replace('%s', $var ?? '', $options['message']);
 

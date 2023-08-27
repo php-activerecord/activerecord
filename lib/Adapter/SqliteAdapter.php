@@ -48,7 +48,7 @@ class SqliteAdapter extends Connection
         return $this->query('SELECT name FROM sqlite_master');
     }
 
-    public function create_column($column)
+    public function create_column(&$column)
     {
         $c = new Column();
         $c->inflected_name  = Inflector::instance()->variablize($column['name']);
@@ -65,7 +65,7 @@ class SqliteAdapter extends Connection
         $column['type'] = Utils::squeeze(' ', $column['type']);
         $matches = explode(' ', $column['type']);
 
-        if (!empty($matches)) {
+        if (count($matches) > 0) {
             $c->raw_type = strtolower($matches[0]);
 
             if (count($matches) > 1) {

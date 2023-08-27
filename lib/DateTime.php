@@ -35,10 +35,10 @@ use DateInterval;
  * ```
  *
  * @package ActiveRecord
- *
+ * @phpstan-consistent-constructor
  * @see http://php.net/manual/en/class.datetime.php
  */
-class DateTime extends \DateTime implements DateTimeInterface
+final class DateTime extends \DateTime implements DateTimeInterface
 {
     /**
      * Default format used for format() and __toString()

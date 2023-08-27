@@ -133,13 +133,13 @@ class Column
      *
      * @return int|string type-casted value
      */
-    public static function castIntegerSafely($value)
+    public static function castIntegerSafely($value): string|int
     {
         if (is_int($value)) {
             return $value;
         }
 
-        // Its just a decimal number
+        // It's just a decimal number
         elseif (is_numeric($value) && floor($value) != $value) {
             return (int) $value;
         }
@@ -147,7 +147,7 @@ class Column
         // If adding 0 to a string causes a float conversion,
         // we have a number over PHP_INT_MAX
         elseif (is_string($value) && is_float($value + 0)) {
-            return (string) $value;
+            return $value;
         }
 
         // If a float was passed and its greater than PHP_INT_MAX
@@ -169,7 +169,7 @@ class Column
      *
      * @return mixed type-casted value
      */
-    public function cast($value, $connection)
+    public function cast($value, $connection): mixed
     {
         if (null === $value) {
             return null;
@@ -181,7 +181,7 @@ class Column
             case self::DECIMAL:    return (float) $value;
             case self::DATETIME:
             case self::DATE:
-                if (!$value) {
+                if ($value === '') {
                     return null;
                 }
 
