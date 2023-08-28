@@ -71,11 +71,6 @@ class Validations
     private Model $model;
 
     /**
-     * @var ValidationOptions
-     */
-    private array $options = [];
-
-    /**
      * @var array<string>
      */
     private array $validators = [];
