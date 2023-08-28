@@ -43,7 +43,7 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * @phpstan-type ValidationOptions array{
  *  in?: bool,
  *  within?: bool,
- *  message?: string,
+ *  message?: string|null,
  *  allow_blank?: bool,
  *  allow_null?: bool
  * }

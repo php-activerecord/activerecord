@@ -179,6 +179,9 @@ class ValidationsTest extends DatabaseTestCase
         $book = new BookValidations(['name' => 'test_custom_validation']);
         $book->save();
         $this->assertTrue($book->errors->is_invalid('name'));
-        $this->assertEquals(BookValidations::$custom_validator_error_msg, $book->errors->on('name'));
+        $this->assertEquals(
+            BookValidations::$custom_validator_error_msg,
+            $book->errors->first('name')
+        );
     }
 }

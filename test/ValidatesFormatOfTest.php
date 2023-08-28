@@ -103,6 +103,6 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         $book = new BookFormat();
         $book->name = null;
         $book->save();
-        $this->assertEquals('is using a custom message.', $book->errors->on('name'));
+        $this->assertEquals('is using a custom message.', $book->errors->first('name'));
     }
 }

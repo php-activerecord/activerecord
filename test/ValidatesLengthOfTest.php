@@ -124,7 +124,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = '';
         $book->save();
         $this->assertTrue($book->errors->is_invalid('name'));
-        $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->on('name'));
+        $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->first('name'));
     }
 
     public function test_invalid_null_within()
@@ -135,7 +135,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = null;
         $book->save();
         $this->assertTrue($book->errors->is_invalid('name'));
-        $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->on('name'));
+        $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->first('name'));
     }
 
     public function test_invalid_null_minimum()
@@ -146,7 +146,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->name = null;
         $book->save();
         $this->assertTrue($book->errors->is_invalid('name'));
-        $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->on('name'));
+        $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->first('name'));
     }
 
     public function test_valid_null_maximum()

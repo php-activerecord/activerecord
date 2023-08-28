@@ -146,10 +146,10 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $book = new BookInclusion();
         $book->name = 'not included';
         $book->save();
-        $this->assertEquals('is using a custom message.', $book->errors->on('name'));
+        $this->assertEquals('is using a custom message.', $book->errors->first('name'));
         $book = new BookExclusion();
         $book->name = 'bravo';
         $book->save();
-        $this->assertEquals('is using a custom message.', $book->errors->on('name'));
+        $this->assertEquals('is using a custom message.', $book->errors->first('name'));
     }
 }

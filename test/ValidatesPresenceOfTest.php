@@ -62,7 +62,7 @@ class ValidatesPresenceOfTest extends DatabaseTestCase
 
         $book = new BookPresence(['name' => null]);
         $book->is_valid();
-        $this->assertEquals('is using a custom message.', $book->errors->on('name'));
+        $this->assertEquals('is using a custom message.', $book->errors->first('name'));
     }
 
     public function test_valid_zero()
