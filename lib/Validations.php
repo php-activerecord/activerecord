@@ -353,7 +353,7 @@ class Validations
                     if (!is_numeric($option_value)) {
                         throw new ValidationsArgumentError("$option must be a number");
                     }
-                    $message = str_replace('%d', $option_value, $message);
+                    $message = str_replace('%d', $options[$option], $message);
 
                     if ('greater_than' == $option && !($var > $option_value)) {
                         $this->record->add($attribute, $message);

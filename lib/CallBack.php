@@ -156,7 +156,7 @@ class CallBack
      * model object. For (after|before)_(create|update) callbacks, it will merge with
      * a generic 'save' callback which is called first for the lease amount of precision.
      *
-     * @param string $model      model to invoke the callback on
+     * @param ?Model $model      model to invoke the callback on
      * @param string $name       Name of the callback to invoke
      * @param bool   $must_exist set to true to raise an exception if the callback does not exist
      *
@@ -164,7 +164,7 @@ class CallBack
      *               that was for a before_* callback and that method returned false. If this happens, execution
      *               of any other callbacks after the offending callback will not occur.
      */
-    public function invoke($model, $name, $must_exist=true)
+    public function invoke(Model|null $model, string $name, bool $must_exist=true)
     {
         if ($must_exist && !array_key_exists($name, $this->registry)) {
             throw new ActiveRecordException("No callbacks were defined for: $name on " . get_class($model));

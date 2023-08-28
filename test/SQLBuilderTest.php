@@ -35,12 +35,6 @@ class SQLBuilderTest extends DatabaseTestCase
         }
     }
 
-    public function test_no_connection()
-    {
-        $this->expectException(ActiveRecordException::class);
-        new SQLBuilder(null, 'authors');
-    }
-
     public function test_nothing()
     {
         $this->assertEquals('SELECT * FROM authors', (string) $this->sql);

@@ -188,7 +188,7 @@ class CallBackTest extends DatabaseTestCase
     public function test_invoke_unregistered_callback()
     {
         $this->expectException(ActiveRecordException::class);
-        $mock = $this->getMockBuilder('VenueCB', ['columns']);
+        $mock = $this->createMock(VenueCB::class, ['columns']);
         $this->callback->invoke($mock, 'before_validation_on_create');
     }
 

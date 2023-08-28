@@ -7,6 +7,7 @@
 
 namespace ActiveRecord;
 
+use _PHPStan_a4fa95a42\Nette\Neon\Exception;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
@@ -561,9 +562,9 @@ class Model
         $table = static::table();
 
         // this may be first access to the relationship so check Table
-        if (($relationship = $table->get_relationship($name))) {
-            $this->__relationships[$name] = $relationship->load($this);
-            return $this->__relationships[$name];
+        if ($table->get_relationship($name)) {
+            $rel = $this->initRelationships($name);
+            return $rel;
         }
 
         if ('id' == $name) {
@@ -590,6 +591,15 @@ class Model
         }
 
         throw new UndefinedPropertyException(get_called_class(), $name);
+    }
+
+    protected function initRelationships(string $name) {
+        $table = static::table();
+        if (($relationship = $table->get_relationship($name))) {
+            $this->__relationships[$name] = $relationship->load($this);
+            return $this->__relationships[$name];
+        }
+        return null;
     }
 
     /**
@@ -1519,8 +1529,7 @@ class Model
                 ($association = $table->get_relationship(($association_name = Utils::pluralize($association_name))))) {
                 // access association to ensure that the relationship has been loaded
                 // so that we do not double-up on records if we append a newly created
-                assert($this->$association_name);
-
+                $this->initRelationships($association_name);
                 return $association->$method($this, $args);
             }
         }
