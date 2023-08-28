@@ -50,7 +50,7 @@ jobs:
 
       - name: Build and Run Docker Compose
         run: |
-            sudo docker-compose up --detach --wait --wait-timeout 30
+            sudo docker-compose up --build --detach --wait --wait-timeout 30
 
       - name: Sleep for 30 seconds
         run: sleep 30s
