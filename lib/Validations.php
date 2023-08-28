@@ -118,7 +118,7 @@ class Validations
         foreach ($this->validators as $validate) {
             $attrs = $this->klass->getStaticPropertyValue($validate);
 
-            foreach (wrap_strings_in_arrays($attrs) as $attr) {
+            foreach (wrap_values_in_arrays($attrs) as $attr) {
                 $field = $attr[0];
                 $data[$field] ??= [];
 
@@ -140,7 +140,7 @@ class Validations
     {
         foreach ($this->validators as $validate) {
             $definition = $this->klass->getStaticPropertyValue($validate);
-            $this->$validate(wrap_strings_in_arrays($definition));
+            $this->$validate(wrap_values_in_arrays($definition));
         }
 
         $model_reflection = Reflections::instance()->get($this->model);

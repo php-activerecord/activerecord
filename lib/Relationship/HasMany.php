@@ -71,7 +71,6 @@ class HasMany extends AbstractRelationship
 
     protected $primary_key;
 
-    private $has_one = false;
     private $through;
 
     /**
@@ -174,17 +173,6 @@ class HasMany extends AbstractRelationship
 
         /** @phpstan-ignore-next-line */
         return [$primary_key => $model->id];
-    }
-
-    private function inject_foreign_key_for_new_association(Model $model, &$attributes)
-    {
-        $primary_key = $this->get_foreign_key_for_new_association($model);
-
-        if (!isset($attributes[key($primary_key)])) {
-            $attributes[key($primary_key)] = current($primary_key);
-        }
-
-        return $attributes;
     }
 
     public function build_association(Model $model, $attributes = [], $guard_attributes = true)

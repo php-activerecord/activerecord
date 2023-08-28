@@ -32,11 +32,11 @@ class SqliteAdapterTest extends AdapterTestCase
         }
     }
 
-    public function test_limit_with_null_offset_does_not_contain_offset()
+    public function test_limit_with_0_offset_does_not_contain_offset()
     {
         $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
-        $this->connection->query_and_fetch($this->connection->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
+        $this->connection->query_and_fetch($this->connection->limit($sql, 0, 1), function ($row) use (&$ret) { $ret[] = $row; });
 
         $this->assertTrue(false !== strpos($this->connection->last_query, 'LIMIT 1'));
     }

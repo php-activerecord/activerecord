@@ -95,9 +95,8 @@ class CallBack
     /**
      * List of public methods of the given model
      *
-     * @var array
      */
-    private $publicMethods;
+    private ?array $publicMethods;
 
     /**
      * Holds data for registered callbacks.

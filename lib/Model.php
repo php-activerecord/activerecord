@@ -608,12 +608,13 @@ class Model
      */
     public function dirty_attributes(): ?array
     {
-        if (!count($this->__dirty)) {
+        if (count($this->__dirty) <= 0) {
             return null;
         }
 
         $dirty = array_intersect_key($this->attributes, $this->__dirty);
 
+        /** @phpstan-ignore-next-line */
         return (count($dirty) > 0) ? $dirty : null;
     }
 
@@ -1016,7 +1017,7 @@ class Model
         $conn = static::connection();
         $sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
 
-        $conditions = is_array($options) ? $options['conditions'] : $options;
+        $conditions = $options['conditions'] ?? $options;
 
         if (is_array($conditions) && !is_hash($conditions)) {
             call_user_func_array([$sql, 'delete'], $conditions);
@@ -1518,7 +1519,7 @@ class Model
                 ($association = $table->get_relationship(($association_name = Utils::pluralize($association_name))))) {
                 // access association to ensure that the relationship has been loaded
                 // so that we do not double-up on records if we append a newly created
-                $this->$association_name;
+                assert($this->$association_name);
 
                 return $association->$method($this, $args);
             }
@@ -1770,14 +1771,14 @@ class Model
      *
      * @see find
      *
-     * @param array $values  An array containing values for the pk
+     * @param array|string|int|null $values  An array containing values for the pk
      * @param array $options An options array
      *
      * @throws RecordNotFound if a record could not be found
      *
      * @return static|static[]
      */
-    public static function find_by_pk($values, $options, $forceArray = false)
+    public static function find_by_pk(array|string|int|null $values, array $options, bool $forceArray = false)
     {
         $single = !is_array($values) && !$forceArray;
         if (null===$values) {

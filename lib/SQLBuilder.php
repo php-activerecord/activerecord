@@ -14,14 +14,14 @@ use ActiveRecord\Exception\ActiveRecordException;
  */
 class SQLBuilder
 {
-    private $connection;
-    private $operation = 'SELECT';
-    private $table;
+    private Connection $connection;
+    private string $operation = 'SELECT';
+    private string $table;
     private $select = '*';
     private $joins;
     private $order;
-    private $limit;
-    private $offset;
+    private int $limit = 0;
+    private int $offset = 0;
     private $group;
     private $having;
     private $update;
@@ -44,11 +44,8 @@ class SQLBuilder
      *
      * @return SQLBuilder
      */
-    public function __construct($connection, $table)
+    public function __construct(Connection $connection, string $table)
     {
-        if (!$connection) {
-            throw new ActiveRecordException('A valid database connection is required.');
-        }
         $this->connection    = $connection;
         $this->table        = $table;
     }
@@ -357,7 +354,7 @@ class SQLBuilder
             }
 
             if ($this->limit) {
-                $sql = $this->connection->limit($sql, null, $this->limit);
+                $sql = $this->connection->limit($sql, 0, $this->limit);
             }
         }
 
@@ -433,7 +430,7 @@ class SQLBuilder
             }
 
             if ($this->limit) {
-                $sql = $this->connection->limit($sql, null, $this->limit);
+                $sql = $this->connection->limit($sql, 0, $this->limit);
             }
         }
 

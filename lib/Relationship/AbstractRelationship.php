@@ -360,7 +360,8 @@ abstract class AbstractRelationship
         }
 
         // need to flip the logic when the key is on the other table
-        if ($this instanceof HasMany || $this instanceof HasOne) {
+        /** @phpstan-ignore-next-line */
+        if (($this instanceof HasMany) || ($this instanceof HasOne)) {
             $this->set_keys($from_table->class->getName());
 
             if ($using_through) {

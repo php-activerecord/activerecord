@@ -30,11 +30,9 @@ class SqliteAdapter extends Connection
         $this->connection = new PDO("sqlite:$info->host", null, null, static::$PDO_OPTIONS);
     }
 
-    public function limit($sql, $offset, $limit)
+    public function limit(string $sql, int $offset = 0, int $limit = 0)
     {
-        $offset = is_null($offset) ? '' : intval($offset) . ',';
-        $limit = intval($limit);
-
+        $offset = $offset == 0 ? '' : $offset . ',';
         return "$sql LIMIT {$offset}$limit";
     }
 
@@ -65,6 +63,7 @@ class SqliteAdapter extends Connection
         $column['type'] = Utils::squeeze(' ', $column['type']);
         $matches = explode(' ', $column['type']);
 
+        /** @phpstan-ignore-next-line */
         if (count($matches) > 0) {
             $c->raw_type = strtolower($matches[0]);
 

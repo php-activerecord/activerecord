@@ -520,7 +520,7 @@ class Table
                 continue;
             }
 
-            foreach (wrap_strings_in_arrays($definitions) as $definition) {
+            foreach (wrap_values_in_arrays($definitions) as $definition) {
                 $relationship = null;
                 $definition += ['namespace' => $namespace];
 

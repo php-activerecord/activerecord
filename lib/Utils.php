@@ -147,7 +147,7 @@ function collect(&$enumerable, $name_or_closure)
 /**
  * Wrap string definitions (if any) into arrays.
  */
-function wrap_strings_in_arrays(string|array &$strings): array
+function wrap_values_in_arrays(mixed &$strings): array
 {
     if (!is_array($strings)) {
         $strings = [[$strings]];

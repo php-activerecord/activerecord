@@ -18,7 +18,7 @@ use ActiveRecord\Model;
  *      only?:  string|string[],
  *      except?: string|string[],
  *      methods?: string|string[],
- *      include?: string|string[],
+ *      include?: string|array,
  *      only_method?: string,
  *      only_header?: string,
  *      skip_instruct? :bool,

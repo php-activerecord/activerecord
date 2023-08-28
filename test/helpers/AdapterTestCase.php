@@ -288,7 +288,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertTrue($columns['special']->length >= 10);
     }
 
-    private function limit($offset, $limit)
+    private function limit(int $offset = 0, int $limit = 0)
     {
         $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
@@ -314,12 +314,12 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_limit_with_null_offset()
     {
-        $this->assertEquals([3], $this->limit(null, 1));
+        $this->assertEquals([3], $this->limit(0, 1));
     }
 
-    public function test_limit_with_nulls()
+    public function test_limit_with_defaults()
     {
-        $this->assertEquals([], $this->limit(null, null));
+        $this->assertEquals([], $this->limit());
     }
 
     public function test_fetch_no_results()

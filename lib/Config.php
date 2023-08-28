@@ -87,13 +87,6 @@ class Config extends Singleton
     private $date_class = 'ActiveRecord\\DateTime';
 
     /**
-     * The format to serialize DateTime values into.
-     *
-     * @var string
-     */
-    private $date_format = \DateTime::ISO8601;
-
-    /**
      * Allows config initialization using a closure.
      *
      * This method is just syntatic sugar.

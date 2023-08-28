@@ -507,7 +507,7 @@ abstract class Connection
      *
      * @return string
      */
-    public function datetime_to_string($datetime)
+    public function datetime_to_string(\DateTime $datetime)
     {
         return $datetime->format(static::$datetime_format);
     }
@@ -541,12 +541,12 @@ abstract class Connection
      * Adds a limit clause to the SQL query.
      *
      * @param string $sql    the SQL statement
-     * @param int    $offset row offset to start at
-     * @param int    $limit  maximum number of rows to return
+     * @param int $offset row offset to start at
+     * @param int $limit  maximum number of rows to return
      *
      * @return string The SQL query that will limit results to specified parameters
      */
-    abstract public function limit($sql, $offset, $limit);
+    abstract public function limit(string $sql, int $offset = 0, int $limit = 0);
 
     /**
      * Query for column meta info and return statement handle.

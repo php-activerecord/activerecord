@@ -18,11 +18,9 @@ class MysqlAdapter extends Connection
 {
     public static $DEFAULT_PORT = 3306;
 
-    public function limit($sql, $offset, $limit)
+    public function limit(string $sql, int $offset = 0, int $limit = 0): string
     {
-        $offset = is_null($offset) ? '' : intval($offset) . ',';
-        $limit = intval($limit);
-
+        $offset = $offset == 0 ? '' : $offset . ',';
         return "$sql LIMIT {$offset}$limit";
     }
 

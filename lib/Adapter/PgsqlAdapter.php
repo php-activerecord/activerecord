@@ -34,9 +34,9 @@ class PgsqlAdapter extends Connection
         return "nextval('" . str_replace("'", "\\'", $sequence_name) . "')";
     }
 
-    public function limit($sql, $offset, $limit)
+    public function limit(string $sql, int $offset = 0, int $limit = 0): string
     {
-        return $sql . ' LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
+        return $sql . ' LIMIT ' . $limit . ' OFFSET ' . $offset;
     }
 
     public function query_column_info($table)
