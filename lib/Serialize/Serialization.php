@@ -52,8 +52,8 @@ abstract class Serialization
     /**
      * @var SerializeOptions
      */
-    protected $options;
-    protected $attributes;
+    protected array $options;
+    protected array $attributes;
 
     /**
      * The default format to serialize DateTime objects to.

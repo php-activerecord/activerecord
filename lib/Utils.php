@@ -80,16 +80,9 @@ function is_hash(&$array)
 /**
  * Strips a class name of any namespaces and namespace operator.
  *
- * @param string $class_name
- *
- * @return string stripped class name
  */
-function denamespace($class_name)
+function denamespace(string $class_name): string
 {
-    if (is_object($class_name)) {
-        $class_name = get_class($class_name);
-    }
-
     if (has_namespace($class_name)) {
         $parts = explode('\\', $class_name);
 
@@ -108,22 +101,14 @@ function get_namespaces($class_name)
     return null;
 }
 
-function has_namespace($class_name)
+function has_namespace(string $class_name): bool
 {
-    if (false !== strpos($class_name, '\\')) {
-        return true;
-    }
-
-    return false;
+    return str_contains($class_name, '\\');
 }
 
-function has_absolute_namespace($class_name)
+function has_absolute_namespace(string $class_name): bool
 {
-    if (0 === strpos($class_name, '\\')) {
-        return true;
-    }
-
-    return false;
+    return str_starts_with($class_name, '\\');
 }
 
 /**
@@ -162,7 +147,7 @@ function collect(&$enumerable, $name_or_closure)
 /**
  * Wrap string definitions (if any) into arrays.
  */
-function wrap_strings_in_arrays(&$strings)
+function wrap_strings_in_arrays(string|array &$strings): array
 {
     if (!is_array($strings)) {
         $strings = [[$strings]];

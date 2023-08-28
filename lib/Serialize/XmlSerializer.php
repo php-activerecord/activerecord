@@ -36,7 +36,7 @@ class XmlSerializer extends Serialization
         $this->writer = new \XMLWriter();
         $this->writer->openMemory();
         $this->writer->startDocument('1.0', 'UTF-8');
-        $this->writer->startElement(strtolower(denamespace(($this->model))));
+        $this->writer->startElement(strtolower(denamespace((get_class($this->model)))));
         $this->write($this->to_a());
         $this->writer->endElement();
         $this->writer->endDocument();

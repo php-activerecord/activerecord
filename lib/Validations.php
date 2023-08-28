@@ -120,10 +120,7 @@ class Validations
 
             foreach (wrap_strings_in_arrays($attrs) as $attr) {
                 $field = $attr[0];
-
-                if (!isset($data[$field]) || !is_array($data[$field])) {
-                    $data[$field] = [];
-                }
+                $data[$field] ??= [];
 
                 $attr['validator'] = $validate;
                 unset($attr[0]);
@@ -677,10 +674,6 @@ class Errors implements IteratorAggregate
      */
     public function add($attribute, $msg)
     {
-        if (is_null($msg)) {
-            $msg = self :: $DEFAULT_ERROR_MESSAGES['invalid'];
-        }
-
         if (!isset($this->errors[$attribute])) {
             $this->errors[$attribute] = [$msg];
         } else {
