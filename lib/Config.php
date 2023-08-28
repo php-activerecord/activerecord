@@ -162,9 +162,9 @@ class Config extends Singleton
      *
      * @param string $name Name of connection to retrieve
      *
-     * @return string connection info for specified connection name
+     * @return ?string connection info for specified connection name
      */
-    public function get_connection($name)
+    public function get_connection(string $name): ?string
     {
         if (array_key_exists($name, $this->connections)) {
             return $this->connections[$name];

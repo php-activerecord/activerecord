@@ -76,9 +76,8 @@ class Column
     /**
      * The maximum length of this column.
      *
-     * @var int
      */
-    public $length;
+    public int|null $length = null;
 
     /**
      * True if this column allows null.
@@ -111,7 +110,7 @@ class Column
     /**
      * Name of the sequence to use for this column if any.
      *
-     * @var bool
+     * @var string
      */
     public $sequence;
 
@@ -150,7 +149,7 @@ class Column
             return $value;
         }
 
-        // If a float was passed and its greater than PHP_INT_MAX
+        // If a float was passed and is greater than PHP_INT_MAX
         // (which could be wrong due to floating point precision)
         // We'll also check for equal to (>=) in case the precision
         // loss creates an overflow on casting

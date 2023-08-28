@@ -372,9 +372,8 @@ abstract class Connection
      * @param string $sql     raw SQL string to execute
      * @param array  &$values Optional array of values to bind to the query
      *
-     * @return string
      */
-    public function query_and_fetch_one($sql, &$values=[])
+    public function query_and_fetch_one($sql, &$values=[]): int
     {
         $sth = $this->query($sql, $values);
         $row = $sth->fetch(PDO::FETCH_NUM);
@@ -470,11 +469,8 @@ abstract class Connection
     /**
      * Return SQL for getting the next value in a sequence.
      *
-     * @param string $sequence_name Name of the sequence
-     *
-     * @return string
      */
-    public function next_sequence_value($sequence_name)
+    public function next_sequence_value(string $sequence_name): ?string
     {
         return null;
     }
@@ -521,9 +517,9 @@ abstract class Connection
      *
      * @param string $string A datetime in the form accepted by date_create()
      *
-     * @return object The date_class set in Config
+     * @return ?DateTime The date_class set in Config
      */
-    public function string_to_datetime($string)
+    public function string_to_datetime(string $string): ?DateTime
     {
         $date = date_create($string);
         $errors = \DateTime::getLastErrors();

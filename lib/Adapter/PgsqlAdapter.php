@@ -29,7 +29,7 @@ class PgsqlAdapter extends Connection
         return "{$table}_{$column_name}_seq";
     }
 
-    public function next_sequence_value($sequence_name)
+    public function next_sequence_value(string $sequence_name): ?string
     {
         return "nextval('" . str_replace("'", "\\'", $sequence_name) . "')";
     }

@@ -10,6 +10,7 @@ namespace ActiveRecord;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Serialize\JsonSerializer;
@@ -104,7 +105,7 @@ class Model
      *
      * @var array
      */
-    private $__dirty = null;
+    private array $__dirty = [];
 
     /**
      * Flag that determines of this model can have a writer method invoked such as: save/update/insert/delete
@@ -437,34 +438,37 @@ class Model
      * echo $user->name; # => BOB
      * ```
      *
-     * @param $name  Name of attribute, relationship or other to set
-     * @param $value The value
+     * @param $name  string Name of attribute, relationship or other to set
+     * @param $value mixed The value
      *
      * @throws UndefinedPropertyException if $name does not exist
      *
-     * @return mixed The value
      */
-    public function __set(string $name, mixed $value)
+    public function __set(string $name, mixed $value): void
     {
         if (array_key_exists($name, static::$alias_attribute)) {
             $name = static::$alias_attribute[$name];
         } elseif (method_exists($this, "set_$name")) {
             $name = "set_$name";
 
-            return $this->$name($value);
+            $this->$name($value);
+            return;
         }
 
         if (array_key_exists($name, $this->attributes)) {
-            return $this->assign_attribute($name, $value);
+            $this->assign_attribute($name, $value);
+            return;
         }
 
         if ('id' == $name) {
-            return $this->assign_attribute($this->get_primary_key(true), $value);
+            $this->assign_attribute($this->get_primary_key(true), $value);
+            return;
         }
 
         foreach (static::$delegate as &$item) {
             if (($delegated_name = $this->is_delegated($name, $item))) {
-                return $this->{$item['to']}->$delegated_name = $value;
+                $this->{$item['to']}->$delegated_name = $value;
+                return;
             }
         }
 
@@ -595,21 +599,16 @@ class Model
      */
     public function flag_dirty($name)
     {
-        if (!$this->__dirty) {
-            $this->__dirty = [];
-        }
-
         $this->__dirty[$name] = true;
     }
 
     /**
      * Returns hash of attributes that have been modified since loading the model.
      *
-     * @return mixed null if no dirty attributes otherwise returns array of dirty attributes
      */
-    public function dirty_attributes()
+    public function dirty_attributes(): ?array
     {
-        if (!$this->__dirty) {
+        if (!count($this->__dirty)) {
             return null;
         }
 
@@ -650,11 +649,8 @@ class Model
     /**
      * Returns the actual attribute name if $name is aliased.
      *
-     * @param $name An attribute name
-     *
-     * @return string
      */
-    public function get_real_attribute_name(string $name)
+    public function get_real_attribute_name(string $name): ?string
     {
         if (array_key_exists($name, $this->attributes)) {
             return $name;
@@ -1352,16 +1348,14 @@ class Model
      *
      * @internal This should <strong>only</strong> be used by eager load
      *
-     * @param Model $model
-     * @param $name of relationship for this table
      */
-    public function set_relationship_from_eager_load(Model $model=null, $name)
+    public function set_relationship_from_eager_load(Model $model=null, string $name)
     {
         $table = static::table();
 
         if (($rel = $table->get_relationship($name))) {
             if ($rel->is_poly()) {
-                // if the related model is null and it is a poly then we should have an empty array
+                // if the related model is null and a poly then we should have an empty array
                 if (is_null($model)) {
                     return $this->__relationships[$name] = [];
                 }
@@ -1396,14 +1390,11 @@ class Model
     /**
      * Magic Method. Called when cloning a model.
      *
-     * @return Model}
      */
     public function __clone()
     {
         $this->__relationships = [];
         $this->reset_dirty();
-
-        return $this;
     }
 
     /**
@@ -1413,7 +1404,7 @@ class Model
      */
     public function reset_dirty()
     {
-        $this->__dirty = null;
+        $this->__dirty = [];
     }
 
     /**
@@ -1577,7 +1568,8 @@ class Model
         $sql = $table->options_to_sql($options);
         $values = $sql->get_where_values();
 
-        return static::connection()->query_and_fetch_one($sql->to_s(), $values);
+        $res = static::connection()->query_and_fetch_one($sql->to_s(), $values);
+        return $res;
     }
 
     /**
