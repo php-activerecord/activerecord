@@ -1,5 +1,5 @@
 parameters:
-    level: 5
+    level: 6
     tmpDir: .stan-cache
     paths:
         - %currentWorkingDirectory%/lib

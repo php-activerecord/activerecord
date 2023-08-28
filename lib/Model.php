@@ -88,9 +88,9 @@ use ActiveRecord\Serialize\Serialization;
 class Model
 {
     /**
-     * An instance of {@link Errors} and will be instantiated once a write method is called.
+     * An instance of {@link ValidationErrors} and will be instantiated once a write method is called.
      *
-     * @var Errors
+     * @var ValidationErrors
      */
     public $errors;
 
@@ -1191,7 +1191,7 @@ class Model
         }
 
         // need to store reference b4 validating so that custom validators have access to add errors
-        $this->errors = $validator->get_record();
+        $this->errors = $validator->get_errors();
         $validator->validate();
 
         foreach (['after_validation', "after_$validation_on"] as $callback) {
