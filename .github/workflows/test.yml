@@ -34,9 +34,6 @@ jobs:
           php-version: ${{ matrix.php-version }}
           tools: cs2pr
 
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: Setup SQLite
         run: sudo apt-get install -y sqlite3
 
@@ -48,12 +45,12 @@ jobs:
       - name: Login to DockerHub
         run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
 
-      - name: Build and Run Docker Compose
-        run: |
-            sudo docker-compose up -d
-
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
+
+      - name: Build and Run Docker Compose
+        run: |
+            sudo docker-compose up -d --wait
 
       - name: Run PHPUnit
         run: |
