@@ -517,12 +517,7 @@ class Validations
                 }
                 if (!('maximum' == $range_option && is_null($this->model->$attribute))) {
                     $messageOptions = ['is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long'];
-
-                    if (isset($options['message'])) {
-                        $message = $options['message'];
-                    } else {
-                        $message = $options[$messageOptions[$range_option]];
-                    }
+                    $message = $options['message'] ?? $options[$messageOptions[$range_option]];
 
                     $message = str_replace('%d', $option, $message);
                     $attribute_value = $this->model->$attribute;
