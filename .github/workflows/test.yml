@@ -52,6 +52,9 @@ jobs:
         run: |
             sudo docker-compose up --detach --wait --wait-timeout 30
 
+      - name: Sleep for 30 seconds
+        run: sleep 30s
+
       - name: Run PHPUnit
         run: |
           export $ENV
