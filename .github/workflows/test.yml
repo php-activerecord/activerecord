@@ -50,7 +50,7 @@ jobs:
 
       - name: Build and Run Docker Compose
         run: |
-            sudo docker-compose up -d --wait
+            sudo docker-compose up --detach --wait --wait-timeout 30
 
       - name: Run PHPUnit
         run: |
