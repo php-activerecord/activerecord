@@ -12,6 +12,7 @@ use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
+use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
 
 /**
@@ -72,6 +73,7 @@ use ActiveRecord\Serialize\Serialization;
  * For a more in-depth look at defining models, relationships, callbacks and many other things
  * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
  *
+ * @phpstan-import-type SerializeOptions from Serialization
  * @package ActiveRecord
  *
  * @see BelongsTo
@@ -1930,7 +1932,7 @@ class Model
      *
      * @see Serialization
      *
-     * @param array $options An array containing options for json serialization (see {@link Serialization} for valid options)
+     * @param SerializeOptions $options An array containing options for json serialization (see {@link Serialization} for valid options)
      *
      * @return string JSON representation of the model
      */
@@ -1989,10 +1991,10 @@ class Model
      *
      * @return array Array representation of the model
      */
-    public function to_array(array $options=[])
+    public function to_array(bool $include_root=false, array $options=[])
     {
         $serializer = new JsonSerializer($this, $options);
-        return !empty($options['include_root']) ? array(strtolower(get_class($this)) => $serializer->to_a()) : $serializer->to_a();
+        return $include_root ? array(strtolower(get_class($this)) => $serializer->to_a()) : $serializer->to_a();
     }
 
     /**

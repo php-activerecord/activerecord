@@ -8,12 +8,17 @@ use function ActiveRecord\denamespace;
 /**
  * XML serializer.
  *
+ * @phpstan-import-type SerializeOptions from Serialization
  * @package ActiveRecord
  */
 class XmlSerializer extends Serialization
 {
     private $writer;
 
+    /**
+     * @param Model $model
+     * @param SerializeOptions $options
+     */
     public function __construct(Model $model, &$options)
     {
         $this->includes_with_class_name_element = true;
@@ -22,7 +27,8 @@ class XmlSerializer extends Serialization
 
     public function to_s()
     {
-        return $this->xml_encode();
+        $res = $this->xml_encode();
+        return $res;
     }
 
     private function xml_encode()

@@ -41,7 +41,7 @@ abstract class AbstractRelationship
     /**
      * Name of the foreign key.
      *
-     * @var string
+     * @var string|string[]
      */
     public $foreign_key = [];
 
@@ -105,6 +105,8 @@ abstract class AbstractRelationship
     {
         return Table::load($this->class_name);
     }
+
+    abstract public function load_eagerly($models, $attributes, $includes, Table $table): void;
 
     /**
      * What is this relationship's cardinality?

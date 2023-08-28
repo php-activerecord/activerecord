@@ -712,7 +712,7 @@ class Errors implements IteratorAggregate
      *
      * @return array or null if there is no error
      */
-    public function __get($attribute)
+    public function __get($attribute): ?array
     {
         if (!isset($this->errors[$attribute])) {
             return null;

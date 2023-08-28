@@ -10,13 +10,6 @@ use test\models\Host;
 
 class SerializationTest extends DatabaseTestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        ArraySerializer::$include_root = false;
-        JsonSerializer::$include_root = false;
-    }
-
     public function _a($options=[], $model=null)
     {
         if (!$model) {
@@ -116,8 +109,9 @@ class SerializationTest extends DatabaseTestCase
 
     public function test_to_json_include_root()
     {
-        JsonSerializer::$include_root = true;
-        $this->assertNotNull(json_decode(Book::find(1)->to_json())->{'test\models\book'});
+        $this->assertNotNull(json_decode(Book::find(1)->to_json([
+            'include_root' => true
+        ]))->{'test\models\book'});
     }
 
     public function test_to_xml_include()
@@ -143,9 +137,8 @@ class SerializationTest extends DatabaseTestCase
 
     public function test_to_array_include_root()
     {
-        ArraySerializer::$include_root = true;
         $book = Book::find(1);
-        $array = $book->to_array();
+        $array = $book->to_array(true);
         $book_attributes = ['test\models\book' => $book->attributes()];
         $this->assertEquals($book_attributes, $array);
     }
@@ -153,10 +146,7 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_array_except()
     {
         $book = Book::find(1);
-        $array = $book->to_array([
-            'except' => ['special'],
-            'include_root' => false
-        ]);
+        $array = $book->to_array(false, ['except' => ['special']]);
         $book_attributes = $book->attributes();
         unset($book_attributes['special']);
         $this->assertEquals($book_attributes, $array);

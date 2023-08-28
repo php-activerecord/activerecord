@@ -3,6 +3,7 @@
 namespace ActiveRecord\Relationship;
 
 use ActiveRecord\Model;
+use ActiveRecord\Table;
 
 /**
  * @todo implement me
@@ -27,5 +28,9 @@ class HasAndBelongsToMany extends AbstractRelationship
 
     public function load(Model $model)
     {
+    }
+
+    public function load_eagerly($models, $attributes, $includes, Table $table): void {
+        throw new \Exception("load_eagerly undefined for " . __CLASS__);
     }
 }

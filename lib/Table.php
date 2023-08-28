@@ -281,23 +281,19 @@ class Table
     /**
      * Executes an eager load of a given named relationship for this table.
      *
-     * @param $models array found modesl for this table
-     * @param $attrs array of attrs from $models
-     * @param $includes array eager load directives
      */
-    private function execute_eager_load($models=[], $attrs=[], $includes=[])
+    private function execute_eager_load(array $models=[], array $attrs=[], array|string $includes=[]): void
     {
         if (!is_array($includes)) {
             $includes = [$includes];
         }
 
         foreach ($includes as $index => $name) {
+            $nested_includes = [];
             // nested include
             if (is_array($name)) {
-                $nested_includes = count($name) > 0 ? $name : $name[0];
+                $nested_includes = $name;
                 $name = $index;
-            } else {
-                $nested_includes = [];
             }
 
             $rel = $this->get_relationship($name, true);
@@ -331,14 +327,10 @@ class Table
      * Retrieve a relationship object for this table. Strict as true will throw an error
      * if the relationship name does not exist.
      *
-     * @param $name string name of Relationship
-     * @param $strict bool
-     *
      * @throws RelationshipException
      *
-     * @return HasOne|HasMany|BelongsTo Relationship or null
      */
-    public function get_relationship($name, $strict=false)
+    public function get_relationship(string $name, bool $strict=false): ?AbstractRelationship
     {
         if ($this->has_relationship($name)) {
             return $this->relationships[$name];

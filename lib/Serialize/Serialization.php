@@ -18,7 +18,7 @@ use ActiveRecord\Model;
  *      only?:  string|string[],
  *      except?: string|string[],
  *      methods?: string|string[],
- *      include?: string|array,
+ *      include?: string|string[],
  *      only_method?: string,
  *      only_header?: string,
  *      skip_instruct? :bool,
@@ -52,8 +52,8 @@ abstract class Serialization
     /**
      * @var SerializeOptions
      */
-    protected array $options;
-    protected array $attributes;
+    protected $options;
+    protected $attributes;
 
     /**
      * The default format to serialize DateTime objects to.
