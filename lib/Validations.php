@@ -73,8 +73,8 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * }
  *
  * @phpstan-type ValidateUniquenessOptions array{
- *  scope?: string,
- *  case_sensitive?: bool
+ *  allow_blank?: bool,
+ *  allow_null?: bool
  * }
  *
  * @phpstan-type ValidateInclusionOptions array{
