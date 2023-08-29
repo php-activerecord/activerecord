@@ -34,6 +34,7 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\ValidationsArgumentError;
 use Closure;
 
 function classify($class_name, $singularize=false)
@@ -208,6 +209,10 @@ class Utils
     {
         switch ($type) {
             case 'range':
+                if(!is_array($var) || !is_int($var[0]) || !is_int($var[1])){
+                    throw new ValidationsArgumentError("Range must be an array of two ints.");
+                }
+
                 if (is_array($var) && (int) $var[0] < (int) $var[1]) {
                     return true;
                 }

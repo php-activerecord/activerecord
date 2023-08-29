@@ -76,6 +76,10 @@ use ActiveRecord\Serialize\Serialization;
  * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
  *
  * @phpstan-import-type SerializeOptions from Serialization
+ * @phpstan-import-type ValidationOptions from Validations
+ * @phpstan-import-type ValidateInclusionOptions from Validations
+ * @phpstan-import-type ValidateLengthOptions from Validations
+ * @phpstan-import-type ValidateExclusionOptions from Validations
  * @package ActiveRecord
  *
  * @see BelongsTo
@@ -179,7 +183,25 @@ class Model
      */
     public static $cache_expire;
 
-    public static array $validates_presence_of;
+    /**
+     * @var ValidationOptions
+     */
+    public static array $validates_presence_of = [];
+
+    /**
+     * @var ValidateInclusionOptions
+     */
+    public static array $validates_inclusion_of = [];
+
+    /**
+     * @var ValidateInclusionOptions
+     */
+    public static array $validates_exclusion_of = [];
+
+    /**
+     * @var ValidateLengthOptions
+     */
+    public static array $validates_length_of = [];
 
     /**
      * Allows you to create aliases for attributes.

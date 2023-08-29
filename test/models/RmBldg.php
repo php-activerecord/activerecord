@@ -11,7 +11,7 @@ class RmBldg extends Model
         'rm_name' => true
     ];
 
-    public static $validates_length_of = [
+    public static array $validates_length_of = [
         'space_out' => [
             'within' => [1, 5],
             'minimum' => 9,

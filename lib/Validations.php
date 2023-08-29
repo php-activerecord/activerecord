@@ -41,11 +41,10 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * @see http://www.phpactiverecord.org/guides/validations
  *
  * @phpstan-type ValidationOptions array{
- *  in?: bool,
- *  within?: bool,
  *  message?: string|null,
+ *  on?: string,
+ *  allow_null?: bool,
  *  allow_blank?: bool,
- *  allow_null?: bool
  * }
  *
  * Available options:
@@ -61,6 +60,24 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *  allow_blank: bool,
  *  allow_null:bool,
  * }
+ *
+ * @phpstan-type ValidateLengthOptions array{
+ *  is?: int,
+ *  in?: int,
+ *  within?: int,
+ *  maximum?: int,
+ *  minimum?: int,
+ *  message?: string|null,
+ *  allow_blank?: bool,
+ *  allow_null?: bool
+ * }
+ *
+ * @phpstan-type ValidateInclusionOptions array{
+ *  message?: string|null,
+ *  in?: array<string>,
+ *  within?: array<string>
+ * }
+ *
  */
 class Validations
 {
@@ -213,15 +230,15 @@ class Validations
      * }
      * ```
      *
-     * @param array<array<string>> $attrs Validation definition
+     * @param array<string, bool|ValidationOptions> $attrs Validation definition
      */
     public function validates_presence_of(array $attrs): void
     {
-        $configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, ['message' => ValidationErrors::$DEFAULT_ERROR_MESSAGES['blank'], 'on' => 'save']);
-
-        foreach ($attrs as $attr) {
-            $options = array_merge($configuration, $attr);
-            $this->errors->add_on_blank($options[0], $options['message']);
+        foreach ($attrs as $attr => $options) {
+            $this->errors->add_on_blank(
+                $attr,
+           $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['blank']
+            );
         }
     }
 
@@ -238,16 +255,7 @@ class Validations
      * }
      * ```
      *
-     * Available options:
-     *
-     * <ul>
-     * <li><b>in/within:</b> attribute should/shouldn't be a value within an array</li>
-     * <li><b>message:</b> custom error message</li>
-     * <li><b>allow_blank:</b> allow blank strings</li>
-     * <li><b>allow_null:</b> allow null strings</li>
-     * </ul>
-     *
-     * @param array<array<string>> $attrs Validation definition
+     * @param array<string, ValidateInclusionOptions> $attrs Validation definition
      */
     public function validates_inclusion_of(array $attrs): void
     {
@@ -266,7 +274,7 @@ class Validations
      * <li><b>allow_null:</b> allow null strings</li>
      * </ul>
      *
-     * @param array<array<string>> $attrs Validation definition
+     * @param array<string, ValidateInclusionOptions> $attrs Validation definition
      *
      * @see validates_inclusion_of
      */
@@ -291,26 +299,17 @@ class Validations
      * @see validates_exclusion_of
      *
      * @param string $type Either inclusion or exclusion
-     * @param array<array<string>> $attrs Validation definition
+     * @param array<string, ValidateInclusionOptions> $attrs Validation definition
      */
     public function validates_inclusion_or_exclusion_of(string $type, array $attrs): void
     {
-        $configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, ['message' => ValidationErrors::$DEFAULT_ERROR_MESSAGES[$type], 'on' => 'save']);
-
-        foreach ($attrs as $attr) {
-            $options = array_merge($configuration, $attr);
-            $attribute = $options[0];
+        foreach ($attrs as $attribute => $options) {
             $var = $this->model->$attribute;
 
-            if (isset($options['in'])) {
-                $enum = $options['in'];
-            } elseif (isset($options['within'])) {
-                $enum = $options['within'];
-            }
-
+            $enum = $options['in'] ?? $options['within'];
             assert(isset($enum));
 
-            $message = str_replace('%s', $var ?? '', $options['message']);
+            $message = str_replace('%s', $var ?? '', $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES[$type]);
 
             if ($this->is_null_with_option($var, $options) || $this->is_blank_with_option($var, $options)) {
                 continue;
@@ -326,11 +325,14 @@ class Validations
      * Validates that a value is numeric.
      *
      * ```
-     * class Person extends ActiveRecord\Model {
-     *   static $validates_numericality_of = array(
-     *     array('salary', 'greater_than' => 19.99, 'less_than' => 99.99)
-     *   );
-     * }
+     *  class Person extends ActiveRecord\Model {
+     *      static $validates_numericality_of = [
+     *          'salary' => [
+     *              'greater_than' => 19.99,
+     *              'less_than' => 99.99
+     *          ]
+     *      ];
+     *  ]
      * ```
      * @param array<array<string>> $attrs Validation definition
      */
@@ -453,41 +455,29 @@ class Validations
      *
      * ```
      * class Person extends ActiveRecord\Model {
-     *   static $validates_length_of = array(
-     *     array('name', 'within' => array(1,50))
-     *   );
+     *   static $validates_length_of = [
+     *     'name' => ['within' => [1,50]]
+     *   ];
      * }
      * ```
      *
-     * Available options:
-     *
-     * <ul>
-     * <li><b>is:</b> attribute should be exactly n characters long</li>
-     * <li><b>in/within:</b> attribute should be within range array(min,max)</li>
-     * <li><b>maximum/minimum:</b> attribute should not be above/below respectively</li>
-     * <li><b>message:</b> custom error message</li>
-     * <li><b>allow_blank:</b> allow blank strings</li>
-     * <li><b>allow_null:</b> allow null strings. (Even if this is set to false, a null string is always shorter than a maximum value.)</li>
-     * </ul>
-     *
-     * @param array<array<string>> $attrs Validation definition
+     * @param array<string, ValidateLengthOptions> $attrs Validation definition
      */
     public function validates_length_of(array $attrs): void
     {
-        $configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, [
+        $defaultMessages = [
             'too_long'     => ValidationErrors::$DEFAULT_ERROR_MESSAGES['too_long'],
             'too_short'    => ValidationErrors::$DEFAULT_ERROR_MESSAGES['too_short'],
             'wrong_length' => ValidationErrors::$DEFAULT_ERROR_MESSAGES['wrong_length']
-        ]);
+        ];
 
-        foreach ($attrs as $attr) {
-            $options = array_merge($configuration, $attr);
-            $range_options = array_intersect(self::$ALL_RANGE_OPTIONS, array_keys($attr));
+        foreach ($attrs as $attribute => $options) {
+            $range_options = array_intersect(self::$ALL_RANGE_OPTIONS, array_keys($options));
             sort($range_options);
 
             switch (sizeof($range_options)) {
                 case 0:
-                    throw new  ValidationsArgumentError('Range unspecified.  Specify the [within], [maximum], or [is] option.');
+                    throw new ValidationsArgumentError('Range unspecified.  Specify the [within], [maximum], or [is] option.');
                 case 1:
                     break;
 
@@ -495,7 +485,6 @@ class Validations
                     throw new  ValidationsArgumentError('Too many range options specified.  Choose only one.');
             }
 
-            $attribute = $options[0];
             $var = $this->model->$attribute;
             if ($this->is_null_with_option($var, $options) || $this->is_blank_with_option($var, $options)) {
                 continue;
@@ -507,25 +496,26 @@ class Validations
                     throw new  ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
                 }
                 $range_options = ['minimum', 'maximum'];
-                $attr['minimum'] = $range[0];
-                $attr['maximum'] = $range[1];
+                $options['minimum'] = $range[0];
+                $options['maximum'] = $range[1];
             }
             foreach ($range_options as $range_option) {
-                $option = $attr[$range_option];
+                $value = $options[$range_option];
 
-                if ((int) $option <= 0) {
+                if ((int) $value <= 0) {
                     throw new  ValidationsArgumentError("$range_option value cannot use a signed integer.");
                 }
-                if (is_float($option)) {
-                    throw new  ValidationsArgumentError("$range_option value cannot use a float for length.");
-                }
+
                 if (!('maximum' == $range_option && is_null($this->model->$attribute))) {
-                    $messageOptions = ['is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long'];
-                    $message = $options['message'] ?? $options[$messageOptions[$range_option]];
-                    $message = str_replace('%d', $option, $message);
+                    $messageOptions = [
+                        'is' => 'wrong_length',
+                        'minimum' => 'too_short',
+                        'maximum' => 'too_long'
+                    ];
+                    $message = $options['message'] ?? $defaultMessages[$messageOptions[$range_option]];
+                    $message = str_replace('%d', $value, $message);
                     $attribute_value = $this->model->$attribute;
                     $len = strlen($attribute_value ?? '');
-                    $value = (int) $attr[$range_option];
 
                     if ('maximum' == $range_option && $len > $value) {
                         $this->errors->add($attribute, $message);
@@ -547,11 +537,12 @@ class Validations
      * Validates the uniqueness of a value.
      *
      * ```
-     * class Person extends ActiveRecord\Model {
-     *   static $validates_uniqueness_of = array(
-     *     array('name'),
-     *     array(array('blah','bleh'), 'message' => 'blech')
-     *   );
+     *  class Person extends ActiveRecord\Model {
+     *      static $validates_uniqueness_of = [
+     *          'name' => [
+     *              'message' => 'blech'
+     *          ]
+     *      ];
      * }
      * ```
      *
@@ -617,7 +608,7 @@ class Validations
      */
     private function is_null_with_option(mixed $var, array &$options): bool
     {
-        return is_null($var) && (isset($options['allow_null']) && $options['allow_null']);
+        return is_null($var) && ($options['allow_null'] ?? static::$DEFAULT_VALIDATION_OPTIONS['allow_null']);
     }
 
     /**
@@ -626,6 +617,6 @@ class Validations
      */
     private function is_blank_with_option(mixed $var, array &$options): bool
     {
-        return Utils::is_blank($var) && (isset($options['allow_blank']) && $options['allow_blank']);
+        return Utils::is_blank($var) && ($options['allow_blank'] ?? static::$DEFAULT_VALIDATION_OPTIONS['allow_blank']);
     }
 }

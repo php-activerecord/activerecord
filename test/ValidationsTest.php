@@ -32,10 +32,9 @@ class ValidationsTest extends DatabaseTestCase
     {
         parent::setUp($connection_name);
 
-        BookValidations::$validates_presence_of['name'] = true;
-        BookValidations::$validates_uniqueness_of['name'] = true;
-
-        ValuestoreValidations::$validates_uniqueness_of['key'] = true;
+        BookValidations::$validates_presence_of = ['name' => true ];
+        BookValidations::$validates_uniqueness_of =  ['name' => true ];
+        ValuestoreValidations::$validates_uniqueness_of = ['name' => ['key' => true]];
     }
 
     public function test_is_valid_invokes_validations()
@@ -122,7 +121,10 @@ class ValidationsTest extends DatabaseTestCase
 
     public function test_validates_uniqueness_of_with_multiple_fields()
     {
-        BookValidations::$validates_uniqueness_of[0] = [['name', 'special']];
+        BookValidations::$validates_uniqueness_of = [
+            'name' => true,
+            'special' => true
+        ];
         $book1 = BookValidations::first();
         $book2 = new BookValidations(['name' => $book1->name, 'special' => $book1->special+1]);
         $this->assertTrue($book2->is_valid());
@@ -130,7 +132,10 @@ class ValidationsTest extends DatabaseTestCase
 
     public function test_validates_uniqueness_of_with_multiple_fields_is_not_unique()
     {
-        BookValidations::$validates_uniqueness_of[0] = [['name', 'special']];
+        BookValidations::$validates_uniqueness_of  = [
+            'name' => true,
+            'special' => true
+        ];
         $book1 = BookValidations::first();
         $book2 = new BookValidations(['name' => $book1->name, 'special' => $book1->special]);
         $this->assertFalse($book2->is_valid());

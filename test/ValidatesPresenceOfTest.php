@@ -58,7 +58,9 @@ class ValidatesPresenceOfTest extends DatabaseTestCase
 
     public function test_custom_message()
     {
-        BookPresence::$validates_presence_of[0]['message'] = 'is using a custom message.';
+        BookPresence::$validates_presence_of = [
+            'name' => ['message' => 'is using a custom message.']
+        ];
 
         $book = new BookPresence(['name' => null]);
         $book->is_valid();
