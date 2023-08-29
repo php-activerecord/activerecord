@@ -12,6 +12,10 @@ namespace ActiveRecord;
 class ValidationErrors implements \IteratorAggregate
 {
     private Model|null $model;
+
+    /**
+     * @var array<string, array<string>>
+     */
     private array $errors;
 
     /**
@@ -88,18 +92,6 @@ class ValidationErrors implements \IteratorAggregate
     }
 
     /**
-     * Retrieve error messages for an attribute.
-     *
-     * @param string $attribute Name of an attribute on the model
-     *
-     * @return array<array<string>>|null
-     */
-    public function __get(string $attribute): ?array
-    {
-        return $this->errors[$attribute] ?? null;
-    }
-
-    /**
      * Adds the error message only if the attribute value was null or an empty string.
      *
      * @param string $attribute Name of an attribute on the model
@@ -129,11 +121,11 @@ class ValidationErrors implements \IteratorAggregate
      *
      * @param string $attribute Name of an attribute on the model
      *
-     * @return array<string> array of strings if several error occurred on this attribute
+     * @return array<string>|null array of strings if several error occurred on this attribute
      */
-    public function on(string $attribute)
+    public function on(string $attribute): ?array
     {
-        return $this->$attribute;
+        return $this->errors[$attribute] ?? null;
     }
 
     /**
@@ -216,10 +208,6 @@ class ValidationErrors implements \IteratorAggregate
         if ($this->errors) {
             foreach ($this->errors as $attribute => $messages) {
                 foreach ($messages as $msg) {
-                    if (is_null($msg)) {
-                        continue;
-                    }
-
                     $errors[$attribute][] = ($message = Utils::human_attribute($attribute) . ' ' . $msg);
 
                     if ($closure) {

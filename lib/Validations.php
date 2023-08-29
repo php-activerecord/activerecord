@@ -73,6 +73,7 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * }
  *
  * @phpstan-type ValidateUniquenessOptions array{
+ *  message?: string|null,
  *  allow_blank?: bool,
  *  allow_null?: bool,
  *  scope?: array<string>
@@ -171,10 +172,7 @@ class Validations
             $attrs = $this->klass->getStaticPropertyValue($validate);
 
             foreach (wrap_values_in_arrays($attrs) as $field => $attr) {
-                if (!isset($data[$field]) || !is_array($data[$field])) {
-                    $data[$field] = [];
-                }
-
+                $data[$field] ??= [];
                 $attr['validator'] = $validate;
                 unset($attr[0]);
                 array_push($data[$field], $attr);
@@ -428,7 +426,7 @@ class Validations
         foreach ($attrs as $attribute => $options) {
             $var = $this->model->$attribute;
 
-            if (!isset($options['with']) || !is_string($options['with'])) {
+            if (!is_string($options['with'])) {
                 throw new ValidationsArgumentError('A regular expression must be supplied as the [with] option of the configuration array.');
             }
             $expression = $options['with'];
@@ -541,7 +539,7 @@ class Validations
      *
      * @param array<string, bool|ValidateUniquenessOptions> $attrs Validation definition
      */
-    public function validates_uniqueness_of($attrs)
+    public function validates_uniqueness_of($attrs): void
     {
         // Retrieve connection from model for quote_name method
         $connection = $this->klass->getMethod('connection')->invoke(null);

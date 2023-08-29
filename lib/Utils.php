@@ -37,7 +37,7 @@ namespace ActiveRecord;
 use ActiveRecord\Exception\ValidationsArgumentError;
 use Closure;
 
-function classify($class_name, $singularize=false)
+function classify(string $class_name, bool $singularize=false): string
 {
     if ($singularize) {
         $class_name = Utils::singularize($class_name);
@@ -200,9 +200,9 @@ class Utils
         return ucfirst(str_replace('_', ' ', $normal));
     }
 
-    public static function is_odd(int $number): bool
+    public static function is_odd(int|float $number): bool
     {
-        return !!($number & 1);
+        return !!((int)$number & 1);
     }
 
     public static function is_a($type, $var): bool
