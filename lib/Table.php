@@ -105,7 +105,6 @@ class Table
         $this->set_sequence_name();
         $this->set_delegates();
         $this->set_cache();
-        $this->set_setters_and_getters();
 
         $this->callback = new CallBack($class_name);
         $this->callback->register('before_save', function (Model $model) { $model->set_timestamps(); }, ['prepend' => true]);
@@ -350,7 +349,7 @@ class Table
      *
      * @return bool
      */
-    public function has_relationship($name)
+    public function has_relationship($name): bool
     {
         return array_key_exists($name, $this->relationships);
     }
@@ -391,12 +390,12 @@ class Table
         return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
     }
 
-    private function add_relationship(AbstractRelationship $relationship)
+    private function add_relationship(AbstractRelationship $relationship): void
     {
         $this->relationships[$relationship->attribute_name] = $relationship;
     }
 
-    private function get_meta_data()
+    private function get_meta_data(): void
     {
         // as more adapters are added probably want to do this a better way
         // than using instanceof but gud enuff for now
@@ -415,7 +414,7 @@ class Table
      *
      * @return array Array with any aliases replaced with their read field name
      */
-    private function map_names(&$hash, &$map)
+    private function map_names(array &$hash, array &$map): array
     {
         $ret = [];
 
@@ -452,7 +451,7 @@ class Table
         return $hash;
     }
 
-    private function set_primary_key()
+    private function set_primary_key(): void
     {
         if (($pk = $this->class->getStaticPropertyValue('pk', null)) || ($pk = $this->class->getStaticPropertyValue('primary_key', null))) {
             $this->pk = is_array($pk) ? $pk : [$pk];
@@ -467,7 +466,7 @@ class Table
         }
     }
 
-    private function set_table_name()
+    private function set_table_name(): void
     {
         if (($table = $this->class->getStaticPropertyValue('table', null)) || ($table = $this->class->getStaticPropertyValue('table_name', null))) {
             $this->table = $table;
@@ -485,7 +484,7 @@ class Table
         }
     }
 
-    private function set_cache()
+    private function set_cache(): void
     {
         if (!Cache::$adapter) {
             return;
@@ -500,7 +499,7 @@ class Table
         }
     }
 
-    private function set_sequence_name()
+    private function set_sequence_name(): void
     {
         if (!$this->conn->supports_sequences()) {
             return;
@@ -511,7 +510,7 @@ class Table
         }
     }
 
-    private function set_associations()
+    private function set_associations(): void
     {
         $namespace = $this->class->getNamespaceName();
 
@@ -557,7 +556,7 @@ class Table
      *       'to'       => 'delegate_to_relationship',
      *       'prefix'	=> 'prefix')
      */
-    private function set_delegates()
+    private function set_delegates(): void
     {
         $delegates = $this->class->getStaticPropertyValue('delegate', []);
         $new = [];
@@ -590,20 +589,6 @@ class Table
 
             $new['processed'] = true;
             $this->class->setStaticPropertyValue('delegate', $new);
-        }
-    }
-
-    /**
-     * @deprecated Model.php now checks for get|set_ methods via method_exists so there is no need for declaring static g|setters.
-     */
-    private function set_setters_and_getters()
-    {
-        $getters = $this->class->getStaticPropertyValue('getters', []);
-        $setters = $this->class->getStaticPropertyValue('setters', []);
-
-        if (!empty($getters) || !empty($setters)) {
-            trigger_error('static::$getters and static::$setters are deprecated. Please define your setters and getters by declaring methods in your model prefixed with get_ or set_. See
-			http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-setters and http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-getters on how to make use of this option.', E_USER_DEPRECATED);
         }
     }
 }
