@@ -162,14 +162,16 @@ class Validations
         foreach ($this->validators as $validate) {
             $attrs = $this->klass->getStaticPropertyValue($validate);
 
-            foreach (wrap_values_in_arrays($attrs) as $field => $options) {
-                $data[$field] ??= [];
+            foreach (wrap_values_in_arrays($attrs) as $field => $attr) {
+                if (!isset($data[$field]) || !is_array($data[$field])) {
+                    $data[$field] = [];
+                }
 
-                $attr['$options'] = $validate;
-                array_push($data[$field], $options);
+                $attr['validator'] = $validate;
+                unset($attr[0]);
+                array_push($data[$field], $attr);
             }
         }
-
         return $data;
     }
 
