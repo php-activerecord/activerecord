@@ -48,7 +48,12 @@ function classify(string $class_name, bool $singular = false): string
     return ucfirst($class_name);
 }
 
-// http://snippets.dzone.com/posts/show/4660
+/**
+ * @param array<mixed> $array
+ * @return array<mixed>
+ *
+ * http://snippets.dzone.com/posts/show/4660
+ */
 function array_flatten(array $array): array
 {
     $i = 0;
@@ -67,7 +72,7 @@ function array_flatten(array $array): array
 /**
  * Somewhat naive way to determine if an array is a hash.
  */
-function is_hash(&$array): bool
+function is_hash(mixed &$array): bool
 {
     return is_array($array) && !array_is_list($array);
 }
@@ -87,14 +92,14 @@ function denamespace(string $class_name): string
     return $class_name;
 }
 
-function get_namespaces($class_name)
-{
-    if (has_namespace($class_name)) {
-        return explode('\\', $class_name);
-    }
-
-    return null;
-}
+//function get_namespaces($class_name)
+//{
+//    if (has_namespace($class_name)) {
+//        return explode('\\', $class_name);
+//    }
+//
+//    return null;
+//}
 
 function has_namespace(string $class_name): bool
 {
@@ -109,11 +114,11 @@ function has_absolute_namespace(string $class_name): bool
 /**
  * Returns true if all values in $haystack === $needle
  *
- * @param $needle
- * @param $haystack
+ * @param mixed $needle
+ * @param array<mixed> $haystack
  *
  */
-function all($needle, array $haystack): bool
+function all(mixed $needle, array $haystack): bool
 {
     foreach ($haystack as $value) {
         if ($value !== $needle) {
@@ -132,7 +137,6 @@ function all($needle, array $haystack): bool
 function collect(array &$enumerable, string|Closure $name_or_closure): array
 {
     $ret = [];
-
     foreach ($enumerable as $value) {
         if (is_string($name_or_closure)) {
             $ret[] = is_array($value) ? $value[$name_or_closure] : $value->$name_or_closure;
