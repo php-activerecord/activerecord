@@ -884,7 +884,6 @@ class Model
         $class_name = get_called_class();
         $model = new $class_name($attributes, $guard_attributes);
         $model->save($validate);
-
         return $model;
     }
 

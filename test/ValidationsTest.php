@@ -33,8 +33,8 @@ class ValidationsTest extends DatabaseTestCase
         parent::setUp($connection_name);
 
         BookValidations::$validates_presence_of = ['name' => true ];
-        BookValidations::$validates_uniqueness_of =  ['name' => true ];
-        ValuestoreValidations::$validates_uniqueness_of = ['name' => ['key' => true]];
+        BookValidations::$validates_uniqueness_of =  ['name' => true];
+        ValuestoreValidations::$validates_uniqueness_of = ['key' => true];
     }
 
     public function test_is_valid_invokes_validations()
