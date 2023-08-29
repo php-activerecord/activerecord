@@ -72,6 +72,11 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *  allow_null?: bool
  * }
  *
+ * @phpstan-type ValidateUniquenessOptions array{
+ *  scope?: string,
+ *  case_sensitive?: bool
+ * }
+ *
  * @phpstan-type ValidateInclusionOptions array{
  *  message?: string|null,
  *  in?: array<string>,
@@ -546,37 +551,19 @@ class Validations
      * }
      * ```
      *
-     * Available options:
-     *
-     * <ul>
-     * <li><b>with:</b> a regular expression</li>
-     * <li><b>message:</b> custom error message</li>
-     * <li><b>allow_blank:</b> allow blank strings</li>
-     * <li><b>allow_null:</b> allow null strings</li>
-     * </ul>
-     *
-     * @param array<array<string>> $attrs Validation definition
+     * @param array<string, bool|ValidateUniquenessOptions> $attrs Validation definition
      */
     public function validates_uniqueness_of(array $attrs): void
     {
-        $configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, [
-            'message' => ValidationErrors::$DEFAULT_ERROR_MESSAGES['unique']
-        ]);
         // Retrieve connection from model for quote_name method
         $connection = $this->klass->getMethod('connection')->invoke(null);
 
-        foreach ($attrs as $attr) {
-            $options = array_merge($configuration, $attr);
+        foreach ($attrs as $attr => $options) {
             $pk = $this->model->get_primary_key();
             $pk_value = $this->model->{$pk[0]};
 
-            if (is_array($options[0])) {
-                $add_record = join('_and_', $options[0]);
-                $fields = $options[0];
-            } else {
-                $add_record = $options[0];
-                $fields = [$options[0]];
-            }
+            $add_record = $attr;
+            $fields = [$attr];
 
             $conditions = [''];
             $pk_quoted = $connection->quote_name($pk[0]);
@@ -597,7 +584,10 @@ class Validations
             $conditions[0] = $sql;
 
             if ($this->model->exists(['conditions' => $conditions])) {
-                $this->errors->add($add_record, $options['message']);
+                $this->errors->add(
+                    $add_record,
+                    $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['unique']
+                );
             }
         }
     }
@@ -608,7 +598,7 @@ class Validations
      */
     private function is_null_with_option(mixed $var, array &$options): bool
     {
-        return is_null($var) && ($options['allow_null'] ?? static::$DEFAULT_VALIDATION_OPTIONS['allow_null']);
+        return is_null($var) && ($options['allow_null'] ?? self::$DEFAULT_VALIDATION_OPTIONS['allow_null']);
     }
 
     /**
@@ -617,6 +607,6 @@ class Validations
      */
     private function is_blank_with_option(mixed $var, array &$options): bool
     {
-        return Utils::is_blank($var) && ($options['allow_blank'] ?? static::$DEFAULT_VALIDATION_OPTIONS['allow_blank']);
+        return Utils::is_blank($var) && ($options['allow_blank'] ?? self::$DEFAULT_VALIDATION_OPTIONS['allow_blank']);
     }
 }

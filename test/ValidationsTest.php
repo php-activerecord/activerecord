@@ -6,10 +6,10 @@ use test\models\Book;
 class BookValidations extends ActiveRecord\Model
 {
     public static $table_name = 'books';
-    public static $alias_attribute = ['name_alias' => 'name', 'x' => 'secondary_author_id'];
+    public static array $alias_attribute = ['name_alias' => 'name', 'x' => 'secondary_author_id'];
     public static array $validates_presence_of = [];
-    public static $validates_uniqueness_of = [];
-    public static $custom_validator_error_msg = 'failed custom validation';
+    public static array $validates_uniqueness_of = [];
+    public static string $custom_validator_error_msg = 'failed custom validation';
 
     // fired for every validation - but only used for custom validation test
     public function validate()
@@ -23,7 +23,7 @@ class BookValidations extends ActiveRecord\Model
 class ValuestoreValidations extends ActiveRecord\Model
 {
     public static $table_name = 'valuestore';
-    public static $validates_uniqueness_of = [];
+    public static array $validates_uniqueness_of = [];
 }
 
 class ValidationsTest extends DatabaseTestCase

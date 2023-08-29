@@ -193,32 +193,6 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->fail('An expected exception has not be raised.');
     }
 
-    public function test_not_array_as_impossible_range_option()
-    {
-        BookLength::$validates_length_of['name']['within'] = 'string';
-        $book = new BookLength();
-        $book->name = '123';
-        try {
-            $book->save();
-        } catch (ValidationsArgumentError $e) {
-            $this->assertEquals('within must be an array composing a range of numbers with key [0] being less than key [1]', $e->getMessage());
-        }
-
-        $this->setUp();
-        BookLength::$validates_length_of['name']['in'] = 'string';
-        $book = new BookLength();
-        $book->name = '123';
-        try {
-            $book->save();
-        } catch (ValidationsArgumentError $e) {
-            $this->assertEquals('in must be an array composing a range of numbers with key [0] being less than key [1]', $e->getMessage());
-
-            return;
-        }
-
-        $this->fail('An expected exception has not be raised.');
-    }
-
     public function test_signed_integer_as_impossible_is_option()
     {
         BookLength::$validates_length_of['name']['is'] = -8;

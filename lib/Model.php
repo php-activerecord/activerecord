@@ -80,6 +80,7 @@ use ActiveRecord\Serialize\Serialization;
  * @phpstan-import-type ValidateInclusionOptions from Validations
  * @phpstan-import-type ValidateLengthOptions from Validations
  * @phpstan-import-type ValidateExclusionOptions from Validations
+ * @phpstan-import-type ValidateUniquenessOptions from Validations
  * @package ActiveRecord
  *
  * @see BelongsTo
@@ -199,6 +200,11 @@ class Model
     public static array $validates_exclusion_of = [];
 
     /**
+     * @var ValidateUniquenessOptions
+     */
+    public static array $validates_uniqueness_of = [];
+
+    /**
      * @var ValidateLengthOptions
      */
     public static array $validates_length_of = [];
@@ -220,7 +226,7 @@ class Model
      *
      * @var array
      */
-    public static $alias_attribute = [];
+    public static array $alias_attribute = [];
 
     /**
      * Whitelist of attributes that are checked from mass-assignment calls such as constructing a model or using update_attributes.
