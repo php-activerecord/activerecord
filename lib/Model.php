@@ -82,6 +82,7 @@ use ActiveRecord\Serialize\Serialization;
  * @phpstan-import-type ValidateFormatOptions from Validations
  * @phpstan-import-type ValidateExclusionOptions from Validations
  * @phpstan-import-type ValidateUniquenessOptions from Validations
+ * @phpstan-import-type ValidateNumericOptions from Validations
  * @package ActiveRecord
  *
  * @see BelongsTo
@@ -188,32 +189,37 @@ class Model
     /**
      * @var ValidationOptions
      */
-    public static array $validates_presence_of = [];
+    public static array $validates_presence_of;
 
     /**
-     * @var ValidationFormatOptions
+     * @var ValidateFormatOptions
      */
-    public static array $validates_format_of = [];
-
-    /**
-     * @var ValidateInclusionOptions
-     */
-    public static array $validates_inclusion_of = [];
+    public static array $validates_format_of;
 
     /**
      * @var ValidateInclusionOptions
      */
-    public static array $validates_exclusion_of = [];
+    public static array $validates_inclusion_of;
+
+    /**
+     * @var ValidateInclusionOptions
+     */
+    public static array $validates_exclusion_of;
 
     /**
      * @var ValidateUniquenessOptions
      */
-    public static array $validates_uniqueness_of = [];
+    public static array $validates_uniqueness_of;
+
+    /**
+     * @var ValidateNumericOptions
+     */
+    public static array $validates_numericality_of;
 
     /**
      * @var ValidateLengthOptions
      */
-    public static array $validates_length_of = [];
+    public static array $validates_length_of;
 
     /**
      * Allows you to create aliases for attributes.

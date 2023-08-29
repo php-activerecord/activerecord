@@ -31,6 +31,7 @@ class ValidationErrors implements \IteratorAggregate
         'taken' => 'has already been taken',
         'not_a_number' => 'is not a number',
         'greater_than' => 'must be greater than %d',
+        'only_integer' => 'must be an integer',
         'equal_to' => 'must be equal to %d',
         'less_than' => 'must be less than %d',
         'odd' => 'must be odd',

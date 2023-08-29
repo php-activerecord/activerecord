@@ -4,9 +4,7 @@ class BookNumericality extends ActiveRecord\Model
 {
     public static $table_name = 'books';
 
-    public static $validates_numericality_of = [
-        'name' => true
-    ];
+    public static array $validates_numericality_of = [];
 }
 
 class ValidatesNumericalityOfTest extends DatabaseTestCase
@@ -23,7 +21,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
     {
         parent::setUp($connection_name);
         BookNumericality::$validates_numericality_of = [
-            'numeric_test' => true
+            'numeric_test' => []
         ];
     }
 
@@ -89,30 +87,30 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
 
     public function test_valid_null()
     {
-        BookNumericality::$validates_numericality_of['name'] = ['allow_null' => true];
+        BookNumericality::$validates_numericality_of = [
+            'numeric_test' => [
+                'allow_null' => true
+            ]
+        ];
         $this->assert_valid([null]);
     }
 
     public function test_only_integer()
     {
-        BookNumericality::$validates_numericality_of['name'] = ['only_integer' => true];
+        BookNumericality::$validates_numericality_of = [
+            'numeric_test' => [
+                'only_integer' => true
+            ]
+        ];
 
         $this->assert_valid([1, '1']);
         $this->assert_invalid([1.5, '1.5']);
     }
 
-    public function test_only_integer_matching_does_not_ignore_other_options()
-    {
-        BookNumericality::$validates_numericality_of['name'] = ['only_integer' => true];
-        BookNumericality::$validates_numericality_of['name'] = ['greater_than' => 0];
-
-        $this->assert_invalid([-1, '-1']);
-    }
-
     public function test_greater_than()
     {
         BookNumericality::$validates_numericality_of = [
-            'name' => ['greater_than' => 5]
+            'numeric_test' => ['greater_than' => 5]
         ];
 
         $this->assert_valid([6, '7']);
@@ -122,7 +120,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
     public function test_greater_than_or_equal_to()
     {
         BookNumericality::$validates_numericality_of = [
-            'name' => ['greater_than_or_equal_to' => 5]
+            'numeric_test' => ['greater_than_or_equal_to' => 5]
         ];
 
         $this->assert_valid([5, 5.1, '5.1']);
@@ -132,7 +130,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
     public function test_less_than()
     {
         BookNumericality::$validates_numericality_of = [
-            'name' => ['less_than' => 5]
+            'numeric_test' => ['less_than' => 5]
         ];
 
         $this->assert_valid([4.9, -1, 0, '-5']);
@@ -142,7 +140,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
     public function test_less_than_or_equal_to()
     {
         BookNumericality::$validates_numericality_of = [
-            'name' => ['less_than_or_equal_to' => 5]
+            'numeric_test' => ['less_than_or_equal_to' => 5]
         ];
 
         $this->assert_valid([5, -1, 0, 4.9, '-5']);

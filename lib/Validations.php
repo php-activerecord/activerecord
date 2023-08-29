@@ -346,29 +346,23 @@ class Validations
      *      ];
      *  ]
      * ```
-     * @param array<array<string>> $attrs Validation definition
+     * @param array<string, ValidateNumericOptions> $attrs Validation definition
      */
     public function validates_numericality_of(array $attrs): void
     {
-        $configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, ['only_integer' => false]);
-
         // Notice that for fixnum and float columns empty strings are converted to nil.
         // Validates whether the value of the specified attribute is numeric by trying to convert it to a float with Kernel.Float
         // (if only_integer is false) or applying it to the regular expression /\A[+\-]?\d+\Z/ (if only_integer is set to true).
-        foreach ($attrs as $attr) {
-            $options = array_merge($configuration, $attr);
-            $attribute = $options[0];
+        foreach ($attrs as $attribute => $options) {
             $var = $this->model->$attribute;
-
-            $numericalityOptions = $options;
 
             if ($this->is_null_with_option($var, $options)) {
                 continue;
             }
 
-            $not_a_number_message = (isset($options['message']) ? $options['message'] : ValidationErrors::$DEFAULT_ERROR_MESSAGES['not_a_number']);
+            $not_a_number_message = $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['not_a_number'];
 
-            if (true === $options['only_integer'] && !is_integer($var)) {
+            if (($options['only_integer'] ?? false) && !is_integer($var)) {
                 if (!preg_match('/\A[+-]?\d+\Z/', (string) ($var))) {
                     $this->errors->add($attribute, $not_a_number_message);
                     continue;
@@ -382,9 +376,8 @@ class Validations
                 $var = (float) $var;
             }
 
-            foreach ($numericalityOptions as $option => $check) {
-                $option_value = $options[$option];
-                $message = (isset($options['message']) ? $options['message'] : ValidationErrors::$DEFAULT_ERROR_MESSAGES[$option]);
+            foreach ($options as $option => $check) {
+                $message = $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES[$option];
 
                 if ('odd' != $option && 'even' != $option) {
                     $option_value = (float) $options[$option];
