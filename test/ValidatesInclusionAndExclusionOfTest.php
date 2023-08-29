@@ -4,15 +4,19 @@ class BookExclusion extends ActiveRecord\Model
 {
     public static $table = 'books';
     public static $validates_exclusion_of = [
-        ['name', 'in' => ['blah', 'alpha', 'bravo']]
+        'name' => [
+            'in' => ['blah', 'alpha', 'bravo']
+        ]
     ];
 }
 
 class BookInclusion extends ActiveRecord\Model
 {
     public static $table = 'books';
-    public static $validates_inclusion_of = [
-        ['name', 'in' => ['blah', 'tanker', 'shark']]
+    public static array $validates_inclusion_of = [
+        'name' => [
+            'in' => ['blah', 'tanker', 'shark']
+        ]
     ];
 }
 

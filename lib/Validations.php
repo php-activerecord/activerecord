@@ -21,10 +21,10 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *
  * ```
  * class Person extends ActiveRecord\Model {
- *   static $validates_length_of = array(
- *     array('name', 'within' => array(30,100),
- *     array('state', 'is' => 2)
- *   );
+ *   static $validates_length_of = [
+ *     'name' => ['within' => [30,100]],
+ *     'state' => ['is' => 2]
+ *   ];
  * }
  *
  * $person = new Person();
@@ -206,10 +206,10 @@ class Validations
      *
      * ```
      * class Person extends ActiveRecord\Model {
-     *   static $validates_presence_of = array(
-     *     array('first_name'),
-     *     array('last_name')
-     *   );
+     *   static $validates_presence_of = [
+     *     'first_name' => true,
+     *     'last_name' => true
+     *   ];
      * }
      * ```
      *
@@ -230,9 +230,11 @@ class Validations
      *
      * ```
      * class Car extends ActiveRecord\Model {
-     *   static $validates_inclusion_of = array(
-     *     array('fuel_type', 'in' => array('hyrdogen', 'petroleum', 'electric')),
-     *   );
+     *   static $validates_inclusion_of = [
+     *      'fuel_type' => [
+     *          'in' => ['hydrogen', 'petroleum', 'electric']
+     *      ]
+     *   ];
      * }
      * ```
      *
@@ -403,9 +405,11 @@ class Validations
      *
      * ```
      * class Person extends ActiveRecord\Model {
-     *   static $validates_format_of = array(
-     *     array('email', 'with' => '/^.*?@.*$/')
-     *   );
+     *   static $validates_format_of = [
+     *     'email' => [
+     *          'with' => '/^.*?@.*$/'
+     *      ]
+     *   ];
      * }
      * ```
      *

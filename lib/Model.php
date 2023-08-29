@@ -48,23 +48,23 @@ use ActiveRecord\Serialize\Serialization;
  *     array('orders')
  *   );
  *
- *   static $validates_length_of = array(
- *     array('first_name', 'within' => array(1,50)),
- *     array('last_name', 'within' => array(1,50))
+ *   static $validates_length_of = [
+ *     'first_name' => ['within' => [1,50]],
+ *     'last_name' => [1,50]
  *   );
  * }
  *
  * class Order extends ActiveRecord\Model {
- *   static $belongs_to = array(
- *     array('person')
+ *   static $belongs_to = [
+ *     'person'
+ *   ];
+ *
+ *   static $validates_numericality_of = [
+ *     'cost' => ['greater_than' => 0],
+ *     'total' => ['greater_than' => 0]
  *   );
  *
- *   static $validates_numericality_of = array(
- *     array('cost', 'greater_than' => 0),
- *     array('total', 'greater_than' => 0)
- *   );
- *
- *   static $before_save = array('calculate_total_with_tax');
+ *   static $before_save = ['calculate_total_with_tax'];
  *
  *   public function calculate_total_with_tax() {
  *     $this->total = $this->cost * 0.045;
@@ -178,6 +178,8 @@ class Model
      * @var number
      */
     public static $cache_expire;
+
+    public static array $validates_presence_of;
 
     /**
      * Allows you to create aliases for attributes.
@@ -681,13 +683,13 @@ class Model
      *
      * ```
      * array(
-     *   'name' => array(
+     *   'name' => [
      *     array('validator' => 'validates_presence_of'),
      *     array('validator' => 'validates_inclusion_of', 'in' => array('Bob','Joe','John')),
      *   'password' => array(
      *     array('validator' => 'validates_length_of', 'minimum' => 6))
      *   )
-     * );
+     * ];
      * ```
      *
      * @return array an array containing validator data for this model

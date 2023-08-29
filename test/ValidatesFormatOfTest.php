@@ -6,7 +6,7 @@ class BookFormat extends ActiveRecord\Model
 {
     public static $table = 'books';
     public static $validates_format_of = [
-        ['name']
+        'name' => true
     ];
 }
 
@@ -15,7 +15,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
-        BookFormat::$validates_format_of[0] = ['name'];
+        BookFormat::$validates_format_of['name'] = true;
     }
 
     public function test_format()

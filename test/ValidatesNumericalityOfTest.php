@@ -5,7 +5,7 @@ class BookNumericality extends ActiveRecord\Model
     public static $table_name = 'books';
 
     public static $validates_numericality_of = [
-        ['name']
+        'name' => true
     ];
 }
 
@@ -143,7 +143,11 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
 
     public function test_greater_than_less_than_and_even()
     {
-        BookNumericality::$validates_numericality_of[0] = ['numeric_test', 'greater_than' => 1, 'less_than' => 4, 'even' => true];
+        BookNumericality::$validates_numericality_of['numeric_test'] = [
+            'greater_than' => 1,
+            'less_than' => 4,
+            'even' => true
+        ];
 
         $this->assert_valid([2]);
         $this->assert_invalid([1, 3, 4]);
@@ -152,7 +156,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
     public function test_custom_message()
     {
         BookNumericality::$validates_numericality_of = [
-            ['numeric_test', 'message' => 'Hello']
+            'numeric_test' => ['message' => 'Hello']
         ];
         $book = new BookNumericality(['numeric_test' => 'NaN']);
         $book->is_valid();

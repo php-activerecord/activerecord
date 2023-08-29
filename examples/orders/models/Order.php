@@ -16,9 +16,10 @@ class Order extends ActiveRecord\Model
             'conditions' => 'payments.amount < 200']];
 
     // order must have a price and tax > 0
-    public static $validates_numericality_of = [
-        ['price', 'greater_than' => 0],
-        ['tax',   'greater_than' => 0]];
+    public static array $validates_numericality_of = [
+        'price' => ['greater_than' => 0],
+        'tax' => ['greater_than' => 0]
+    ];
 
     // setup a callback to automatically apply a tax
     public static $before_validation_on_create = ['apply_tax'];

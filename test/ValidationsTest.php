@@ -7,7 +7,7 @@ class BookValidations extends ActiveRecord\Model
 {
     public static $table_name = 'books';
     public static $alias_attribute = ['name_alias' => 'name', 'x' => 'secondary_author_id'];
-    public static $validates_presence_of = [];
+    public static array $validates_presence_of = [];
     public static $validates_uniqueness_of = [];
     public static $custom_validator_error_msg = 'failed custom validation';
 
@@ -32,10 +32,10 @@ class ValidationsTest extends DatabaseTestCase
     {
         parent::setUp($connection_name);
 
-        BookValidations::$validates_presence_of[0] = 'name';
-        BookValidations::$validates_uniqueness_of[0] = 'name';
+        BookValidations::$validates_presence_of['name'] = true;
+        BookValidations::$validates_uniqueness_of['name'] = true;
 
-        ValuestoreValidations::$validates_uniqueness_of[0] = 'key';
+        ValuestoreValidations::$validates_uniqueness_of['key'] = true;
     }
 
     public function test_is_valid_invokes_validations()
@@ -169,7 +169,11 @@ class ValidationsTest extends DatabaseTestCase
 
     public function test_validations_takes_strings()
     {
-        BookValidations::$validates_presence_of = ['numeric_test', ['special'], 'name'];
+        BookValidations::$validates_presence_of = [
+            'numeric_test' => true,
+            'special' => true,
+            'name' => true
+        ];
         $book = new BookValidations(['numeric_test' => 1, 'special' => 1]);
         $this->assertFalse($book->is_valid());
     }
