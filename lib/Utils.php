@@ -175,7 +175,7 @@ class Utils
         return is_array(end($options)) ? end($options) : [];
     }
 
-    public static function add_condition(&$conditions, $condition, $conjuction='AND')
+    public static function add_condition(array &$conditions, string|array $condition, string $conjuction='AND'): array
     {
         if (is_array($condition)) {
             if (empty($conditions)) {
@@ -191,7 +191,7 @@ class Utils
         return $conditions;
     }
 
-    public static function human_attribute($attr)
+    public static function human_attribute($attr): string
     {
         $inflector = Inflector::instance();
         $inflected = $inflector->variablize($attr);
@@ -200,12 +200,12 @@ class Utils
         return ucfirst(str_replace('_', ' ', $normal));
     }
 
-    public static function is_odd($number)
+    public static function is_odd(int $number): bool
     {
-        return $number & 1;
+        return !!($number & 1);
     }
 
-    public static function is_a($type, $var)
+    public static function is_a($type, $var): bool
     {
         switch ($type) {
             case 'range':
@@ -221,12 +221,15 @@ class Utils
         return false;
     }
 
-    public static function is_blank($var)
+    public static function is_blank(string|null $var): bool
     {
         return 0 === strlen($var ?? '');
     }
 
-    private static $plural = [
+    /**
+     * @var array<string>
+     */
+    private static array $plural = [
         '/(quiz)$/i'               => '$1zes',
         '/^(ox)$/i'                => '$1en',
         '/([m|l])ouse$/i'          => '$1ice',
@@ -248,7 +251,10 @@ class Utils
         '/$/'                      => 's'
     ];
 
-    private static $singular = [
+    /**
+     * @var array<string>
+     */
+    private static array $singular = [
         '/(quiz)zes$/i'             => '$1',
         '/(matr)ices$/i'            => '$1ix',
         '/(vert|ind)ices$/i'        => '$1ex',
@@ -280,7 +286,10 @@ class Utils
         '/s$/i'                     => ''
     ];
 
-    private static $irregular = [
+    /**
+     * @var array<string, string>
+     */
+    private static array $irregular = [
         'move'   => 'moves',
         'foot'   => 'feet',
         'goose'  => 'geese',
@@ -291,7 +300,10 @@ class Utils
         'person' => 'people'
     ];
 
-    private static $uncountable = [
+    /**
+     * @var array<string>
+     */
+    private static array $uncountable = [
         'sheep',
         'fish',
         'deer',
@@ -303,7 +315,7 @@ class Utils
         'equipment'
     ];
 
-    public static function pluralize($string)
+    public static function pluralize(string $string): string
     {
         // save some time in the case that singular and plural are the same
         if (in_array(strtolower($string), self::$uncountable)) {
@@ -329,7 +341,7 @@ class Utils
         return $string;
     }
 
-    public static function singularize($string)
+    public static function singularize(string $string)
     {
         // save some time in the case that singular and plural are the same
         if (in_array(strtolower($string), self::$uncountable)) {
@@ -355,7 +367,7 @@ class Utils
         return $string;
     }
 
-    public static function pluralize_if($count, $string)
+    public static function pluralize_if(int $count, string $string)
     {
         if (1 == $count) {
             return $string;
@@ -364,12 +376,12 @@ class Utils
         return self::pluralize($string);
     }
 
-    public static function squeeze($char, $string)
+    public static function squeeze(string $char, string $string): mixed
     {
         return preg_replace("/$char+/", $char, $string);
     }
 
-    public static function add_irregular($singular, $plural)
+    public static function add_irregular($singular, $plural): void
     {
         self::$irregular[$singular] = $plural;
     }

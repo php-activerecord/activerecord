@@ -79,6 +79,7 @@ use ActiveRecord\Serialize\Serialization;
  * @phpstan-import-type ValidationOptions from Validations
  * @phpstan-import-type ValidateInclusionOptions from Validations
  * @phpstan-import-type ValidateLengthOptions from Validations
+ * @phpstan-import-type ValidateFormatOptions from Validations
  * @phpstan-import-type ValidateExclusionOptions from Validations
  * @phpstan-import-type ValidateUniquenessOptions from Validations
  * @package ActiveRecord
@@ -188,6 +189,11 @@ class Model
      * @var ValidationOptions
      */
     public static array $validates_presence_of = [];
+
+    /**
+     * @var ValidationFormatOptions
+     */
+    public static array $validates_format_of = [];
 
     /**
      * @var ValidateInclusionOptions

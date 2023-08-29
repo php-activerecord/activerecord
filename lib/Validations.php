@@ -83,6 +83,13 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *  within?: array<string>
  * }
  *
+ * @phpstan-type ValidateFormatOptions array{
+ *  with: string,
+ *  message?: string|null,
+ *  allow_blank?:bool,
+ *  allow_null?: bool
+ * }
+ *
  */
 class Validations
 {
@@ -420,27 +427,14 @@ class Validations
      * }
      * ```
      *
-     * Available options:
-     *
-     * <ul>
-     * <li><b>with:</b> a regular expression</li>
-     * <li><b>message:</b> custom error message</li>
-     * <li><b>allow_blank:</b> allow blank strings</li>
-     * <li><b>allow_null:</b> allow null strings</li>
-     * </ul>
-     *
-     * @param array<array<string>> $attrs Validation definition
+     * @param array<string, ValidateFormatOptions> $attrs Validation definition
      */
     public function validates_format_of(array $attrs): void
     {
-        $configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, ['message' => ValidationErrors::$DEFAULT_ERROR_MESSAGES['invalid'], 'on' => 'save', 'with' => null]);
-
-        foreach ($attrs as $attr) {
-            $options = array_merge($configuration, $attr);
-            $attribute = $options[0];
+        foreach ($attrs as $attribute => $options) {
             $var = $this->model->$attribute;
 
-            if (is_null($options['with']) || !is_string($options['with'])) {
+            if (!isset($options['with']) || !is_string($options['with'])) {
                 throw new ValidationsArgumentError('A regular expression must be supplied as the [with] option of the configuration array.');
             }
             $expression = $options['with'];
@@ -450,7 +444,7 @@ class Validations
             }
 
             if (!@preg_match($expression, $var)) {
-                $this->errors->add($attribute, $options['message']);
+                $this->errors->add($attribute, $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['invalid']);
             }
         }
     }
