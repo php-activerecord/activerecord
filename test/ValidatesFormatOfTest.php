@@ -76,29 +76,6 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_lack_of_with_key()
-    {
-        BookFormat::$validates_format_of = ['name' => []];
-        $this->expectException(ValidationsArgumentError::class);
-        $book = new BookFormat();
-        $book->name = null;
-        $book->save();
-    }
-
-    public function test_invalid_with_expression_as_non_string()
-    {
-        $this->expectException(ValidationsArgumentError::class);
-
-        BookFormat::$validates_format_of = [
-            'name' => [
-                'with' => ['test']
-            ]
-        ];
-        $book = new BookFormat();
-        $book->name = null;
-        $book->save();
-    }
-
     public function test_invalid_with_expression_as_non_regexp()
     {
         BookFormat::$validates_format_of = [

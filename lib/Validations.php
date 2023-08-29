@@ -425,10 +425,6 @@ class Validations
     {
         foreach ($attrs as $attribute => $options) {
             $var = $this->model->$attribute;
-
-            if (!is_string($options['with'])) {
-                throw new ValidationsArgumentError('A regular expression must be supplied as the [with] option of the configuration array.');
-            }
             $expression = $options['with'];
 
             if ($this->is_null_with_option($var, $options) || $this->is_blank_with_option($var, $options)) {
@@ -439,6 +435,19 @@ class Validations
                 $this->errors->add($attribute, $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['invalid']);
             }
         }
+    }
+
+    public static function is_range(mixed $var): bool
+    {
+        if(!is_array($var) || !is_int($var[0]) || !is_int($var[1])){
+            throw new ValidationsArgumentError("Range must be an array of two ints.");
+        }
+
+        if (is_array($var) && (int) $var[0] < (int) $var[1]) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -483,7 +492,7 @@ class Validations
             if ('within' == $range_options[0] || 'in' == $range_options[0]) {
                 $range = $options[$range_options[0]];
 
-                if (!(Utils::is_a('range', $range))) {
+                if (!($this->is_range($range))) {
                     throw new  ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
                 }
                 $range_options = ['minimum', 'maximum'];

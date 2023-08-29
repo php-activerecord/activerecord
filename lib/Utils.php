@@ -37,9 +37,9 @@ namespace ActiveRecord;
 use ActiveRecord\Exception\ValidationsArgumentError;
 use Closure;
 
-function classify(string $class_name, bool $singularize=false): string
+function classify(string $class_name, bool $singular = false): string
 {
-    if ($singularize) {
+    if ($singular) {
         $class_name = Utils::singularize($class_name);
     }
 
@@ -49,7 +49,7 @@ function classify(string $class_name, bool $singularize=false): string
 }
 
 // http://snippets.dzone.com/posts/show/4660
-function array_flatten(array $array)
+function array_flatten(array $array): array
 {
     $i = 0;
 
@@ -67,15 +67,9 @@ function array_flatten(array $array)
 /**
  * Somewhat naive way to determine if an array is a hash.
  */
-function is_hash(&$array)
+function is_hash(&$array): bool
 {
-    if (!is_array($array)) {
-        return false;
-    }
-
-    $keys = array_keys($array);
-
-    return @is_string($keys[0]) ? true : false;
+    return is_array($array) && !array_is_list($array);
 }
 
 /**
@@ -130,7 +124,12 @@ function all($needle, array $haystack): bool
     return true;
 }
 
-function collect(&$enumerable, $name_or_closure)
+/**
+ * @param array<mixed> $enumerable
+ * @param string|Closure $name_or_closure
+ * @return array<mixed>
+ */
+function collect(array &$enumerable, string|Closure $name_or_closure): array
 {
     $ret = [];
 
@@ -147,6 +146,10 @@ function collect(&$enumerable, $name_or_closure)
 
 /**
  * Wrap string definitions (if any) into arrays.
+ *
+ * @param string|array<mixed> $strings
+ *
+ * @return array<mixed>
  */
 function wrap_values_in_arrays(mixed &$strings): array
 {
@@ -170,12 +173,13 @@ function wrap_values_in_arrays(mixed &$strings): array
  */
 class Utils
 {
-    public static function extract_options($options)
-    {
-        return is_array(end($options)) ? end($options) : [];
-    }
-
-    public static function add_condition(array &$conditions, string|array $condition, string $conjuction='AND'): array
+    /**
+     * @param array<string> $conditions
+     * @param string|array<mixed> $condition
+     * @param string $conjuction
+     * @return array<mixed>
+     */
+    public static function add_condition(array &$conditions, string|array $condition, string $conjuction = 'AND'): array
     {
         if (is_array($condition)) {
             if (empty($conditions)) {
@@ -191,7 +195,7 @@ class Utils
         return $conditions;
     }
 
-    public static function human_attribute($attr): string
+    public static function human_attribute(string $attr): string
     {
         $inflector = Inflector::instance();
         $inflected = $inflector->variablize($attr);
@@ -203,22 +207,6 @@ class Utils
     public static function is_odd(int|float $number): bool
     {
         return !!((int)$number & 1);
-    }
-
-    public static function is_a($type, $var): bool
-    {
-        switch ($type) {
-            case 'range':
-                if(!is_array($var) || !is_int($var[0]) || !is_int($var[1])){
-                    throw new ValidationsArgumentError("Range must be an array of two ints.");
-                }
-
-                if (is_array($var) && (int) $var[0] < (int) $var[1]) {
-                    return true;
-                }
-        }
-
-        return false;
     }
 
     public static function is_blank(string|null $var): bool
@@ -327,21 +315,25 @@ class Utils
             $pattern = '/' . $pattern . '$/i';
 
             if (preg_match($pattern, $string)) {
-                return preg_replace($pattern, $result, $string);
+                $res = preg_replace($pattern, $result, $string);
+                assert(is_string($res));
+                return $res;
             }
         }
 
         // check for matches using regular expressions
         foreach (self::$plural as $pattern => $result) {
             if (preg_match($pattern, $string)) {
-                return preg_replace($pattern, $result, $string);
+                $res = preg_replace($pattern, $result, $string);
+                assert(is_string($res));
+                return $res;
             }
         }
 
         return $string;
     }
 
-    public static function singularize(string $string)
+    public static function singularize(string $string): string
     {
         // save some time in the case that singular and plural are the same
         if (in_array(strtolower($string), self::$uncountable)) {
@@ -353,36 +345,31 @@ class Utils
             $pattern = '/' . $pattern . '$/i';
 
             if (preg_match($pattern, $string)) {
-                return preg_replace($pattern, $result, $string);
+                $res = preg_replace($pattern, $result, $string);
+                assert(is_string($res));
+                return $res;
             }
         }
 
         // check for matches using regular expressions
         foreach (self::$singular as $pattern => $result) {
             if (preg_match($pattern, $string)) {
-                return preg_replace($pattern, $result, $string);
+                $res = preg_replace($pattern, $result, $string);
+                assert(is_string($res));
+                return $res;
             }
         }
 
         return $string;
     }
 
-    public static function pluralize_if(int $count, string $string)
-    {
-        if (1 == $count) {
-            return $string;
-        }
-
-        return self::pluralize($string);
-    }
-
+    /**
+     * @param string $char
+     * @param string $string
+     * @return null|string|string[]
+     */
     public static function squeeze(string $char, string $string): mixed
     {
         return preg_replace("/$char+/", $char, $string);
-    }
-
-    public static function add_irregular($singular, $plural): void
-    {
-        self::$irregular[$singular] = $plural;
     }
 }
