@@ -121,9 +121,10 @@ class ValidationsTest extends DatabaseTestCase
 
     public function test_validates_uniqueness_of_with_multiple_fields()
     {
-        BookValidations::$validates_uniqueness_of = [
-            'name' => true,
-            'special' => true
+        BookValidations::$validates_uniqueness_of  = [
+            'name' => [
+                'scope' => ['special']
+            ]
         ];
         $book1 = BookValidations::first();
         $book2 = new BookValidations(['name' => $book1->name, 'special' => $book1->special+1]);
@@ -133,8 +134,9 @@ class ValidationsTest extends DatabaseTestCase
     public function test_validates_uniqueness_of_with_multiple_fields_is_not_unique()
     {
         BookValidations::$validates_uniqueness_of  = [
-            'name' => true,
-            'special' => true
+            'name' => [
+                'scope' => ['special']
+            ]
         ];
         $book1 = BookValidations::first();
         $book2 = new BookValidations(['name' => $book1->name, 'special' => $book1->special]);
@@ -144,7 +146,7 @@ class ValidationsTest extends DatabaseTestCase
 
     public function test_validates_uniqueness_of_works_with_alias_attribute()
     {
-        BookValidations::$validates_uniqueness_of[0] = [['name_alias', 'x']];
+        BookValidations::$validates_uniqueness_of = ['name_alias'=> ['scope'=>['x']]];
         $book = BookValidations::create(['name_alias' => 'Another Book', 'x' => 2]);
         $this->assertFalse($book->is_valid());
         $this->assertEquals(['Name alias and x must be unique'], $book->errors->full_messages());

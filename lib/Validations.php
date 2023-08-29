@@ -74,7 +74,8 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *
  * @phpstan-type ValidateUniquenessOptions array{
  *  allow_blank?: bool,
- *  allow_null?: bool
+ *  allow_null?: bool,
+ *  scope?: array<string>
  * }
  *
  * @phpstan-type ValidateInclusionOptions array{
@@ -540,7 +541,7 @@ class Validations
      *
      * @param array<string, bool|ValidateUniquenessOptions> $attrs Validation definition
      */
-    public function validates_uniqueness_of(array $attrs): void
+    public function validates_uniqueness_of($attrs)
     {
         // Retrieve connection from model for quote_name method
         $connection = $this->klass->getMethod('connection')->invoke(null);
@@ -549,8 +550,8 @@ class Validations
             $pk = $this->model->get_primary_key();
             $pk_value = $this->model->{$pk[0]};
 
-            $add_record = $attr;
-            $fields = [$attr];
+            $fields = array_merge([$attr], $options['scope'] ?? []);
+            $add_record = join("_and_", $fields);
 
             $conditions = [''];
             $pk_quoted = $connection->quote_name($pk[0]);
@@ -571,10 +572,7 @@ class Validations
             $conditions[0] = $sql;
 
             if ($this->model->exists(['conditions' => $conditions])) {
-                $this->errors->add(
-                    $add_record,
-                    $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['unique']
-                );
+                $this->errors->add($add_record, $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['unique']);
             }
         }
     }
