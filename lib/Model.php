@@ -724,8 +724,6 @@ class Model
      */
     public function get_validation_rules()
     {
-        require_once 'Validations.php';
-
         $validator = new Validations($this);
 
         return $validator->rules();
