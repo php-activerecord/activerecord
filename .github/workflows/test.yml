@@ -10,7 +10,7 @@ jobs:
   phpunit:
     name: PHPUnit
     permissions:
-      pull-requests: read-all|write-all
+      pull-requests: read|write
 
     runs-on: ubuntu-20.04
     env:
