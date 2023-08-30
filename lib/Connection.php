@@ -358,7 +358,7 @@ abstract class Connection
                 throw new DatabaseException($msg);
             }
         } catch (PDOException $e) {
-            throw new DatabaseException($msg);
+            throw new DatabaseException($msg . ": " . $e->getMessage());
         }
 
         return $sth;
