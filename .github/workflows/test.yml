@@ -65,7 +65,7 @@ jobs:
             sudo docker-compose up -d --wait
 
       - name: Verify MySQL
-        run: mysql -u test -ptest test -e "show tables"
+        run: mysql --host=127.0.0.1 -port=3306 -u test -ptest test -e "show tables"
 
       - name: Run PHPUnit
         run: |
