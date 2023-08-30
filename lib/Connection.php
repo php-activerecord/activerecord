@@ -353,7 +353,8 @@ abstract class Connection
         $sth->setFetchMode(PDO::FETCH_ASSOC);
 
         try {
-            $msg = "couldn't execute query on " . get_class($this);
+            $msg = "couldn't execute query on " . get_class($this) . ". ";
+            $msg .= "user: " .getenv('USER');
             if (!$sth->execute($values)) {
                 throw new DatabaseException($msg);
             }
