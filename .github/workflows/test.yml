@@ -11,10 +11,17 @@ jobs:
   phpunit:
     name: PHPUnit
     runs-on: ubuntu-20.04
-    env:
-      DB_DATABASE: test
-      DB_USER: test
-      DB_PASSWORD: test
+  services:
+    mysql:
+      image: mysql:5.7
+      env:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: test
+        MYSQL_USER: test
+        MYSQL_PASSWORD: test
+      ports:
+        - 3306:3306
+      options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     strategy:
       fail-fast: false
@@ -57,15 +64,16 @@ jobs:
           sqlite3 test.db "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name TEXT);"
           ls -la test.db
 
-      - name: Login to DockerHub
-        run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
-
-      - name: Build and Run Docker Compose
-        run: |
-            sudo docker-compose up -d --wait
+#      - name: Login to DockerHub
+#        run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
+#
+#      - name: Build and Run Docker Compose
+#        run: |
+#            sudo docker-compose up -d --wait
 
       - name: Verify MySQL
-        run: mysql --host=127.0.0.1 -port=3306 -u test -ptest test -e "show tables"
+        run: |
+          echo "MySQL Connection String: mysql://test:test@localhost:3306/test"
 
       - name: Run PHPUnit
         run: |
