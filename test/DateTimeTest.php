@@ -3,6 +3,7 @@
 use ActiveRecord\DatabaseException;
 use ActiveRecord\DateTime as DateTime;
 use PHPUnit\Framework\TestCase;
+use test\models\Author;
 
 class DateTimeTest extends TestCase
 {

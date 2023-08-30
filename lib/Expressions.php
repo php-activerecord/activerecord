@@ -5,6 +5,8 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\ExpressionsException;
+
 /**
  * Templating like class for building SQL statements.
  *

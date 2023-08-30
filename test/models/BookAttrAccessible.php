@@ -1,6 +1,8 @@
 <?php
+namespace test\models;
 
-class BookAttrAccessible extends ActiveRecord\Model
+use ActiveRecord\Model;
+class BookAttrAccessible extends Model
 {
     public static $pk = 'book_id';
     public static $table_name = 'books';

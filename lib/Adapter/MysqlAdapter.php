@@ -3,7 +3,11 @@
  * @package ActiveRecord
  */
 
-namespace ActiveRecord;
+namespace ActiveRecord\Adapter;
+
+use ActiveRecord\Column;
+use ActiveRecord\Connection;
+use ActiveRecord\Inflector;
 
 /**
  * Adapter for MySQL.
