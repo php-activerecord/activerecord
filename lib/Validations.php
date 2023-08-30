@@ -218,7 +218,7 @@ class Validations
             }
         }
 
-        $model_reflection = Reflections::instance()->get($this->model);
+        $model_reflection = Reflections::instance()->get(get_class($this->model));
 
         if (method_exists($this->model, 'validate') && $model_reflection->getMethod('validate')->isPublic()) {
             $this->model->validate();

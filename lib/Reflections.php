@@ -57,31 +57,29 @@ class Reflections extends Singleton
     /**
      * Get a cached ReflectionClass.
      *
-     * @param string $class Optional name of a class
+     * @param string|object $class Optional name of a class or an instance of the class
      *
      * @throws ActiveRecordException if class was not found
      *
      * @return mixed null or a ReflectionClass instance
      */
-    public function get($class=null)
+    public function get(string $className=null)
     {
-        $class = $this->get_class($class);
-
-        if (isset($this->reflections[$class])) {
-            return $this->reflections[$class];
+        if (isset($this->reflections[$className])) {
+            return $this->reflections[$className];
         }
 
-        throw new ActiveRecordException("Class not found: $class");
+        throw new ActiveRecordException("Class not found: $className");
     }
 
     /**
      * Retrieve a class name to be reflected.
      *
-     * @param mixed $mixed An object or name of a class
+     * @param mixed string|object An object or name of a class
      *
      * @return string
      */
-    private function get_class($mixed=null)
+    private function get_class(string|object $mixed=null)
     {
         if (is_object($mixed)) {
             return get_class($mixed);

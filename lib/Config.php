@@ -240,16 +240,11 @@ class Config extends Singleton
      */
     public function set_logger(LoggerInterface $logger)
     {
-        $klass = Reflections::instance()->add($logger)->get($logger);
-
-        if (!$klass->getMethod('log') || !$klass->getMethod('log')->isPublic()) {
-            throw new ConfigException('Logger object must implement a public log method');
-        }
         $this->logger = $logger;
     }
 
     /**
-     * Return whether or not logging is on
+     * Return whether logging is on
      *
      * @return bool
      */

@@ -25,9 +25,8 @@ abstract class Singleton
     /**
      * Static method for instantiating a singleton object.
      *
-     * @return Singleton
      */
-    final public static function instance(): Singleton
+    final public static function instance(): static
     {
         $class_name = get_called_class();
         return self::$instances[$class_name] ??= new $class_name();
