@@ -10,10 +10,12 @@
     processIsolation="false"
     stopOnFailure="false"
     bootstrap="test/helpers/config.php"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd" cacheDirectory=".phpunit.cache" backupStaticProperties="false">
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd"
+    cacheDirectory=".phpunit.cache"
+    backupStaticProperties="false">
     <coverage>
         <include>
-            <directory suffix=".php">./src</directory>
+            <directory suffix=".php">./lib</directory>
         </include>
     </coverage>
     <testsuites>
