@@ -933,7 +933,7 @@ class Model
         $pk = $this->get_primary_key(true);
         $use_sequence = false;
 
-        if ($table->sequence && !isset($attributes[$pk])) {
+        if (!empty($table->sequence) && !isset($attributes[$pk])) {
             // unset pk that was set to null
             if (array_key_exists($pk, $attributes)) {
                 unset($attributes[$pk]);
@@ -951,7 +951,7 @@ class Model
 
         $column = $table->get_column_by_inflected_name($pk);
 
-        if ($column->auto_increment || $use_sequence) {
+        if (!empty($table->sequence) && ($column->auto_increment || $use_sequence)) {
             $this->attributes[$pk] = $column->cast(static::connection()->insert_id($table->sequence), static::connection());
         }
 
@@ -1007,7 +1007,7 @@ class Model
     protected function update_cache()
     {
         $table = static::table();
-        if ($table->cache_individual_model) {
+        if (!empty($table->cache_individual_model)) {
             Cache::set($this->cache_key(), $this, $table->cache_model_expire);
         }
     }
@@ -1835,7 +1835,7 @@ class Model
 
         $table = static::table();
 
-        if ($table->cache_individual_model) {
+        if ($table->cache_individual_model ?? false) {
             $pks = is_array($values) ? $values : [$values];
             $list = static::get_models_from_cache($pks);
         } else {

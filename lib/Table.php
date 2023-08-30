@@ -255,7 +255,7 @@ class Table
             $cb = function () use ($row, $self) {
                 return new $self->class->name($row, false, true, false);
             };
-            if ($this->cache_individual_model) {
+            if ($this->cache_individual_model ?? false) {
                 $key = $this->cache_key_for_model(array_intersect_key($row, array_flip($this->pk)));
                 $model = Cache::get($key, $cb, $this->cache_model_expire);
             } else {
@@ -318,7 +318,7 @@ class Table
     {
         $table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
 
-        if ($this->db_name) {
+        if (isset($this->db_name)) {
             $table = $this->conn->quote_name($this->db_name) . ".$table";
         }
 
@@ -453,22 +453,20 @@ class Table
      * @param array<string,mixed> $hash
      * @return array<string,mixed> $hash
      */
-    private function &process_data(array $hash): array
+    private function &process_data(array|null $hash): array|null
     {
-        if (!$hash) {
-            return $hash;
-        }
-
-        $date_class = Config::instance()->get_date_class();
-        foreach ($hash as $name => &$value) {
-            if ($value instanceof $date_class || $value instanceof \DateTime) {
-                if (isset($this->columns[$name]) && Column::DATE == $this->columns[$name]->type) {
-                    $hash[$name] = $this->conn->date_to_string($value);
+        if ($hash) {
+            $date_class = Config::instance()->get_date_class();
+            foreach ($hash as $name => &$value) {
+                if ($value instanceof $date_class || $value instanceof \DateTime) {
+                    if (isset($this->columns[$name]) && Column::DATE == $this->columns[$name]->type) {
+                        $hash[$name] = $this->conn->date_to_string($value);
+                    } else {
+                        $hash[$name] = $this->conn->datetime_to_string($value);
+                    }
                 } else {
-                    $hash[$name] = $this->conn->datetime_to_string($value);
+                    $hash[$name] = $value;
                 }
-            } else {
-                $hash[$name] = $value;
             }
         }
 
@@ -516,11 +514,7 @@ class Table
 
         $model_class_name = $this->class->name;
         $this->cache_individual_model = $model_class_name::$cache;
-        if (property_exists($model_class_name, 'cache_expire') && isset($model_class_name::$cache_expire)) {
-            $this->cache_model_expire =  $model_class_name::$cache_expire;
-        } else {
-            $this->cache_model_expire = Cache::$options['expire'];
-        }
+        $this->cache_model_expire = $model_class_name::$cache_expire ?? Cache::$options['expire'];
     }
 
     private function set_sequence_name(): void
