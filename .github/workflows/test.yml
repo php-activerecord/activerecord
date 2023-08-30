@@ -12,6 +12,11 @@ jobs:
     name: PHPUnit
     runs-on: ubuntu-20.04
     services:
+      memcached:
+        image: memcached:1.6
+        ports:
+          - 11211:11211
+        options: --name memcached-container
       mysql:
         image: mysql:5.7
         env:
@@ -76,13 +81,6 @@ jobs:
           ls -la test.db
           sqlite3 test.db "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name TEXT);"
           ls -la test.db
-
-#      - name: Login to DockerHub
-#        run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
-#
-#      - name: Build and Run Docker Compose
-#        run: |
-#            sudo docker-compose up -d --wait
 
       - name: Verify MySQL
         run: |
