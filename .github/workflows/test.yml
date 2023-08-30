@@ -92,7 +92,7 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          vendor/bin/phpunit -c phpunit.xml.dist test/PgsqlAdapterTest.php
+          vendor/bin/phpunit -c phpunit.xml.dist test/ActiveRecordCacheTest.php
 
       - name: Upload coverage file
         uses: actions/upload-artifact@v3
