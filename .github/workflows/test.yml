@@ -36,6 +36,9 @@ jobs:
           extensions: memcached
           tools: cs2pr
 
+      - name: Check drivers
+        run: php drivers.php
+
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
 
