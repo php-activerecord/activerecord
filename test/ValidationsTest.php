@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord as AR;
+use test\models\Book;
 
 class BookValidations extends ActiveRecord\Model
 {

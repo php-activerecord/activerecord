@@ -1,5 +1,7 @@
 <?php
 
+use ActiveRecord\Exception\ValidationsArgumentError;
+
 class BookFormat extends ActiveRecord\Model
 {
     public static $table = 'books';
@@ -69,7 +71,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
 
     public function test_invalid_lack_of_with_key()
     {
-        $this->expectException(\ActiveRecord\ValidationsArgumentError::class);
+        $this->expectException(ValidationsArgumentError::class);
         $book = new BookFormat();
         $book->name = null;
         $book->save();
@@ -77,7 +79,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
 
     public function test_invalid_with_expression_as_non_string()
     {
-        $this->expectException(\ActiveRecord\ValidationsArgumentError::class);
+        $this->expectException(ValidationsArgumentError::class);
         BookFormat::$validates_format_of[0]['with'] = ['test'];
         $book = new BookFormat();
         $book->name = null;

@@ -2,6 +2,8 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\CacheException;
+
 class Memcache
 {
     const DEFAULT_PORT = 11211;

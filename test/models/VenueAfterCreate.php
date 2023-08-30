@@ -1,6 +1,8 @@
 <?php
+namespace test\models;
 
-class VenueAfterCreate extends ActiveRecord\Model
+use ActiveRecord\Model;
+class VenueAfterCreate extends Model
 {
     public static $table_name = 'venues';
     public static $after_create = ['change_name_after_create_if_name_is_change_me'];

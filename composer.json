@@ -13,12 +13,20 @@
       "friendsofphp/php-cs-fixer": "^2.1",
       "monolog/monolog": "^3.4"
 	},
-    "autoload": {
-        "files": [ "ActiveRecord.php" ]
-    },
+  "autoload": {
+    "files": [
+      "ActiveRecord.php",
+      "lib/Utils.php"
+    ],
+    "psr-4": {
+      "ActiveRecord\\": "lib/",
+      "test\\": "test/"
+    }
+  },
 	"scripts": {
 		"style-check" : "php vendor/bin/php-cs-fixer fix --dry-run --verbose --diff",
 		"style-fix" : "php vendor/bin/php-cs-fixer fix --verbose",
 		"test": "phpunit"
 	}
 }
+

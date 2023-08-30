@@ -1,6 +1,8 @@
 <?php
+namespace test\models;
 
-class Event extends ActiveRecord\Model
+use ActiveRecord\Model;
+class Event extends Model
 {
     public static $belongs_to = [
         'host',

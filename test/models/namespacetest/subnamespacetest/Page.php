@@ -1,8 +1,10 @@
 <?php
 
-namespace NamespaceTest\SubNamespaceTest;
+namespace test\models\namespacetest\subnamespacetest;
 
-class Page extends \ActiveRecord\Model
+use ActiveRecord\Model;
+
+class Page extends Model
 {
     public static $belong_to = [
         ['book', 'class_name' => '\NamespaceTest\Book'],

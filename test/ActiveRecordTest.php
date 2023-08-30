@@ -1,5 +1,16 @@
 <?php
 
+use ActiveRecord\Exception\ActiveRecordException;
+use ActiveRecord\Exception\ReadOnlyException;
+use ActiveRecord\Exception\UndefinedPropertyException;
+use test\models\Author;
+use test\models\AwesomePerson;
+use test\models\Book;
+use test\models\BookAttrAccessible;
+use test\models\Event;
+use test\models\RmBldg;
+use test\models\Venue;
+
 class ActiveRecordTest extends DatabaseTestCase
 {
     public function setUp($connection_name=null): void
@@ -19,7 +30,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_options_hash_with_unknown_keys()
     {
-        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->expectException(ActiveRecordException::class);
         $this->assertFalse(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
     }
 
@@ -63,7 +74,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_invalid_attribute()
     {
-        $this->expectException(\ActiveRecord\UndefinedPropertyException::class);
+        $this->expectException(UndefinedPropertyException::class);
         $author = Author::find('first', ['conditions' => 'author_id=1']);
         $author->some_invalid_field_name;
     }
@@ -73,7 +84,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $book = Book::find(1);
         try {
             $book->update_attributes(['name' => 'new name', 'invalid_attribute' => true, 'another_invalid_attribute' => 'something']);
-        } catch (ActiveRecord\UndefinedPropertyException $e) {
+        } catch (UndefinedPropertyException $e) {
             $exceptions = explode("\r\n", $e->getMessage());
         }
 
@@ -114,20 +125,12 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_hyphenated_column_names_to_underscore()
     {
-        if ($this->connection instanceof ActiveRecord\OciAdapter) {
-            return;
-        }
-
         $keys = array_keys(RmBldg::first()->attributes());
         $this->assertTrue(in_array('rm_name', $keys));
     }
 
     public function test_column_names_with_spaces()
     {
-        if ($this->connection instanceof ActiveRecord\OciAdapter) {
-            return;
-        }
-
         $keys = array_keys(RmBldg::first()->attributes());
         $this->assertTrue(in_array('space_out', $keys));
     }
@@ -176,18 +179,18 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_auto_load_with_namespaced_model()
     {
-        $this->assertTrue(class_exists('NamespaceTest\Book'));
+        $this->assertTrue(class_exists(\test\models\namespacetest\Book::class));
     }
 
     public function test_namespace_gets_stripped_from_table_name()
     {
-        $model = new NamespaceTest\Book();
+        $model = new \test\models\namespacetest\Book();
         $this->assertEquals('books', $model->table()->table);
     }
 
     public function test_namespace_gets_stripped_from_inferred_foreign_key()
     {
-        $model = new NamespaceTest\Book();
+        $model = new \test\models\namespacetest\Book();
         $table = ActiveRecord\Table::load(get_class($model));
 
         $this->assertEquals($table->get_relationship('parent_book')->foreign_key[0], 'book_id');
@@ -197,7 +200,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_namespaced_relationship_associates_correctly()
     {
-        $model = new NamespaceTest\Book();
+        $model = new \test\models\namespacetest\Book();
         $table = ActiveRecord\Table::load(get_class($model));
 
         $this->assertNotNull($table->get_relationship('parent_book'));
@@ -307,7 +310,7 @@ class ActiveRecordTest extends DatabaseTestCase
         try {
             $book->save();
             $this->fail('expected exception ActiveRecord\ReadonlyException');
-        } catch (ActiveRecord\ReadonlyException $e) {
+        } catch (ReadOnlyException $e) {
         }
 
         $book->name = 'some new name';
@@ -323,7 +326,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_cast_when_loading()
     {
-        $book = Book::find(1);
+        $book = \test\models\Book::find(1);
         $this->assertSame(1, $book->book_id);
         $this->assertSame('Ancient Art of Main Tanking', $book->name);
     }
@@ -488,16 +491,16 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_undefined_instance_method()
     {
-        $this->expectException(\ActiveRecord\ActiveRecordException::class);
+        $this->expectException(ActiveRecordException::class);
         Author::first()->find_by_name('sdf');
     }
 
     public function test_clear_cache_for_specific_class()
     {
-        $book_table1 = ActiveRecord\Table::load('Book');
-        $book_table2 = ActiveRecord\Table::load('Book');
+        $book_table1 = ActiveRecord\Table::load(Book::class);
+        $book_table2 = ActiveRecord\Table::load(Book::class);
         ActiveRecord\Table::clear_cache('Book');
-        $book_table3 = ActiveRecord\Table::load('Book');
+        $book_table3 = ActiveRecord\Table::load(Book::class);
 
         $this->assertTrue($book_table1 === $book_table2);
         $this->assertTrue($book_table1 !== $book_table3);

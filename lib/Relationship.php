@@ -5,6 +5,9 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\HasManyThroughAssociationException;
+use ActiveRecord\Exception\RelationshipException;
+
 /**
  * Interface for a table relationship.
  *

@@ -1,6 +1,8 @@
 <?php
+namespace test\models;
 
-class PropertyAmenity extends ActiveRecord\Model
+use ActiveRecord\Model;
+class PropertyAmenity extends Model
 {
     public static $table_name = 'property_amenities';
     public static $primary_key = 'id';
