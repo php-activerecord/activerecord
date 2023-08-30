@@ -22,6 +22,19 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     strategy:
       fail-fast: false
@@ -75,9 +88,12 @@ jobs:
         run: |
           echo "MySQL Connection String: mysql://test:test@localhost:3306/test"
 
+      - name: Verify PostgreSQL
+        run: echo "PostgreSQL Connection String: postgres://test:test@localhost:5432/test"
+
       - name: Run PHPUnit
         run: |
-          vendor/bin/phpunit -c phpunit.xml.dist test/MysqlAdapterTest.php
+          vendor/bin/phpunit -c phpunit.xml.dist test/PgsqlAdapterTest.php
 
       - name: Upload coverage file
         uses: actions/upload-artifact@v3
