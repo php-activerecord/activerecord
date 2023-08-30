@@ -79,7 +79,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
     {
         $this->expectNotToPerformAssertions();
         $config = ActiveRecord\Config::instance();
-        $name = $config->get_default_connection();
+        $name = $this->connection_name;
         $url = parse_url($config->get_connection($name));
         $conn = $this->connection;
         $port = $conn::$DEFAULT_PORT;
