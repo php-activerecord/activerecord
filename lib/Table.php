@@ -29,12 +29,21 @@ class Table
      */
     private static array $cache = [];
 
+    /**
+     * @var \ReflectionClass<Model>
+     */
     public \ReflectionClass $class;
-    public $conn;
-    public $pk;
-    public $last_sql;
+    public Connection $conn;
 
-    // Name/value pairs of columns in this table
+    /**
+     * @var array<string>
+     */
+    public array $pk = [];
+    public string $last_sql = '';
+
+    /**
+     * @var array<string, Column>
+     */
     public $columns = [];
 
     /**
@@ -50,17 +59,17 @@ class Table
     /**
      * Name of the sequence for this table (optional). Defaults to {$table}_seq
      */
-    public string $sequence;
+    public ?string $sequence = null;
 
     /**
      * Whether to cache individual models or not (not to be confused with caching of table schemas).
      */
-    public bool $cache_individual_model;
+    public bool $cache_individual_model = false;
 
     /**
      * Expiration period for model caching.
      */
-    public $cache_model_expire;
+    public int $cache_model_expire;
 
     /**
      * A instance of CallBack for this model/table
@@ -72,11 +81,11 @@ class Table
     public $callback;
 
     /**
-     * List of relationships for this table.
+     * @var array<string, AbstractRelationship>
      */
-    private $relationships = [];
+    private array $relationships = [];
 
-    public static function load($model_class_name)
+    public static function load(string $model_class_name): Table
     {
         if (!isset(self::$cache[$model_class_name])) {
             /* do not place set_assoc in constructor..it will lead to infinite loop due to
@@ -88,7 +97,7 @@ class Table
         return self::$cache[$model_class_name];
     }
 
-    public static function clear_cache($model_class_name=null)
+    public static function clear_cache(string $model_class_name=null): void
     {
         if ($model_class_name && array_key_exists($model_class_name, self::$cache)) {
             unset(self::$cache[$model_class_name]);
@@ -97,7 +106,7 @@ class Table
         }
     }
 
-    public function __construct($class_name)
+    public function __construct(string $class_name)
     {
         $this->class = Reflections::instance()->add($class_name)->get($class_name);
 
@@ -114,7 +123,7 @@ class Table
         $this->callback->register('after_save', function (Model $model) { $model->reset_dirty(); }, ['prepend' => true]);
     }
 
-    public function reestablish_connection($close=true)
+    public function reestablish_connection(bool $close=true): Connection
     {
         // if connection name property is null the connection manager will use the default connection
         $connection = $this->class->getStaticPropertyValue('connection', null);
@@ -127,7 +136,12 @@ class Table
         return $this->conn = ConnectionManager::get_connection($connection);
     }
 
-    public function create_joins($joins)
+    /**
+     * @param array<string>|string $joins
+     * @return string
+     * @throws RelationshipException
+     */
+    public function create_joins(array|string $joins): string
     {
         if (!is_array($joins)) {
             return $joins;
@@ -166,7 +180,12 @@ class Table
         return $ret;
     }
 
-    public function options_to_sql($options)
+    /**
+     * @param array<string, mixed> $options
+     * @throws Exception\ActiveRecordException
+     * @throws RelationshipException
+     */
+    public function options_to_sql(array $options): SQLBuilder
     {
         $table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
         $sql = new SQLBuilder($this->conn, $table);
@@ -224,16 +243,25 @@ class Table
         return $sql;
     }
 
-    public function find($options)
+    /**
+     * @param array<string, array<string,mixed>> $options
+     * @return array<Model>
+     * @throws Exception\ActiveRecordException
+     * @throws RelationshipException
+     */
+    public function find(array $options): array
     {
         $sql = $this->options_to_sql($options);
         $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
-        $eager_load = array_key_exists('include', $options) ? $options['include'] : null;
+        $eager_load = $options['include'] ?? null;
 
         return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, $eager_load);
     }
 
-    public function cache_key_for_model($pk)
+    /**
+     * @param string|array<string> $pk
+     */
+    public function cache_key_for_model(string|array $pk): string
     {
         if (is_array($pk)) {
             $pk = implode('-', $pk);
@@ -242,13 +270,22 @@ class Table
         return $this->class->name . '-' . $pk;
     }
 
-    public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
+    /**
+     * @param string $sql
+     * @param array<string,mixed>|null $values
+     * @param bool $readonly
+     * @param string|array<string>|null $includes
+     * @return array<Model>
+     * @throws RelationshipException
+     */
+    public function find_by_sql(string $sql, array $values = null, bool $readonly=false, string|array $includes=null): array
     {
         $this->last_sql = $sql;
 
-        $collect_attrs_for_includes = is_null($includes) ? false : true;
+        $collect_attrs_for_includes = !is_null($includes);
         $list = $attrs = [];
-        $sth = $this->conn->query($sql, $this->process_data($values));
+        $processedData = $this->process_data($values);
+        $sth = $this->conn->query($sql, $processedData);
 
         $self = $this;
         while (($row = $sth->fetch())) {
@@ -283,8 +320,12 @@ class Table
     /**
      * Executes an eager load of a given named relationship for this table.
      *
+     * @param array<Model> $models
+     * @param array<array<string,mixed>> $attrs
+     * @param array<string|array<string>>|string $includes
+     * @throws RelationshipException
      */
-    private function execute_eager_load(array $models=[], array $attrs=[], array|string $includes=[]): void
+    private function execute_eager_load(array $models, array $attrs, array|string $includes): void
     {
         if (!is_array($includes)) {
             $includes = [$includes];
@@ -303,7 +344,7 @@ class Table
         }
     }
 
-    public function get_column_by_inflected_name($inflected_name)
+    public function get_column_by_inflected_name(string $inflected_name): Column|null
     {
         foreach ($this->columns as $raw_name => $column) {
             if ($column->inflected_name == $inflected_name) {
@@ -314,7 +355,7 @@ class Table
         return null;
     }
 
-    public function get_fully_qualified_table_name($quote_name=true)
+    public function get_fully_qualified_table_name(bool $quote_name=true): string
     {
         $table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
 
@@ -348,17 +389,16 @@ class Table
     /**
      * Does a given relationship exist?
      *
-     * @param $name string name of Relationship
+     * @param string $name name of Relationship
      *
-     * @return bool
      */
-    public function has_relationship($name): bool
+    public function has_relationship(string $name): bool
     {
         return array_key_exists($name, $this->relationships);
     }
 
     /**
-     * @param array $data
+     * @param array<string,mixed> $data
      * @param (string|int)|null $pk
      * @param string|null $sequence_name
      * @throws Exception\ActiveRecordException
