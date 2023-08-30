@@ -11,6 +11,7 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
 
 /**
@@ -2007,7 +2008,8 @@ class Model
      */
     public function to_array(array $options=[])
     {
-        return $this->serialize('Array', $options);
+        $serializer = new JsonSerializer($this, $options);
+        return !empty($options['include_root']) ? array(strtolower(get_class($this)) => $serializer->to_a()) : $serializer->to_a();
     }
 
     /**

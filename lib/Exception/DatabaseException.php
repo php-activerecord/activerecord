@@ -2,6 +2,8 @@
 
 namespace ActiveRecord\Exception;
 
+use ActiveRecord\Connection;
+
 /**
  * Thrown when there was an error performing a database operation.
  *
