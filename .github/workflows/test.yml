@@ -1,5 +1,5 @@
 name: Test
-
+permissions: read|write
 on:
   pull_request:
   push:
@@ -9,9 +9,6 @@ on:
 jobs:
   phpunit:
     name: PHPUnit
-    permissions:
-      pull-requests: read|write
-
     runs-on: ubuntu-20.04
     env:
       DB_DATABASE: test
