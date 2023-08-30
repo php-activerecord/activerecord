@@ -8,8 +8,10 @@ on:
 
 jobs:
   phpunit:
-    permissions: read-all|write-all
     name: PHPUnit
+    permissions:
+      pull-requests: read-all|write-all
+
     runs-on: ubuntu-20.04
     env:
       DB_DATABASE: test
