@@ -67,7 +67,7 @@ jobs:
       - name: Run PHPUnit
         run: |
           export $ENV
-          vendor/bin/phpunit test/MysqlAdapterTest.php
+          vendor/bin/phpunit --verbose test/MysqlAdapterTest.php
 
       - name: Upload coverage file
         uses: actions/upload-artifact@v3

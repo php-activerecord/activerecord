@@ -34,7 +34,7 @@ abstract class DatabaseTestCase extends TestCase
         try {
             $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
         } catch (ActiveRecord\DatabaseException $e) {
-//            $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
+            $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
 
         $GLOBALS['ACTIVERECORD_LOG'] = false;
