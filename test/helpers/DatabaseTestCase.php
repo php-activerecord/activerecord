@@ -8,6 +8,7 @@ require_once __DIR__ . '/DatabaseLoader.php';
 
 abstract class DatabaseTestCase extends TestCase
 {
+    protected string $connection_name;
     protected \ActiveRecord\Connection $connection;
     protected $original_date_class;
     public static $log = false;
@@ -18,13 +19,10 @@ abstract class DatabaseTestCase extends TestCase
         ActiveRecord\Table::clear_cache();
 
         $config = ActiveRecord\Config::instance();
-        $this->original_default_connection = $config->get_default_connection();
+        $connection_name ??= $config->get_default_connection();
 
         $this->original_date_class = $config->get_date_class();
 
-        if ($connection_name) {
-            $config->set_default_connection($connection_name);
-        }
 
         if ('sqlite' == $connection_name || 'sqlite' == $config->get_default_connection()) {
             // need to create the db. the adapter specifically does not create it for us.
@@ -32,9 +30,9 @@ abstract class DatabaseTestCase extends TestCase
             new SQLite3(static::$db);
         }
 
-        $this->connection_name = $connection_name;
         try {
             $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
+            $this->connection_name = $connection_name;
         } catch (DatabaseException $e) {
             $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
@@ -52,9 +50,6 @@ abstract class DatabaseTestCase extends TestCase
     public function tearDown(): void
     {
         ActiveRecord\Config::instance()->set_date_class($this->original_date_class);
-        if ($this->original_default_connection) {
-            ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
-        }
     }
 
     public function assert_exception_message_contains($contains, $closure)

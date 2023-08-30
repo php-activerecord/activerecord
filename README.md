@@ -1,6 +1,6 @@
 # PHP ActiveRecord
-
-[![Build Status](https://travis-ci.org/jpfuentes2/php-activerecord.png?branch=master)](https://travis-ci.org/php-activerecord/activerecord)
+[![Test](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml/badge.svg)](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml)
+[![Coverage Status](https://codecov.io/gh/shmax/graphql-php-validation-toolkit/branch/master/graph/badge.svg)](https://codecov.io/gh/shmax/graphql-php-validation-toolkit/branch/master)
 
 **We encourage pull requests, and issues will be dealt with thoroughly and in a timely manner.**
 

@@ -49,7 +49,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function error(string|\Stringable $message, array $context = []): void  {
+    public function error(string|\Stringable $message, array $context = []): void {
 
     }
 
