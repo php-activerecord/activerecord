@@ -1,5 +1,5 @@
 name: Test
-permissions: read|write
+permissions: write
 on:
   pull_request:
   push:
