@@ -354,6 +354,7 @@ abstract class Connection
 
         try {
             if (!$sth->execute($values)) {
+                echo "couldn't execute query on " . get_class($this);
                 throw new DatabaseException($this);
             }
         } catch (PDOException $e) {
