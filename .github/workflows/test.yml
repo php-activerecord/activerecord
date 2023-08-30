@@ -89,7 +89,8 @@ jobs:
           echo "MySQL Connection String: mysql://test:test@localhost:3306/test"
 
       - name: Verify PostgreSQL
-        run: echo "PostgreSQL Connection String: postgres://test:test@localhost:5432/test"
+        run: |
+          echo "PostgreSQL Connection String: postgres://test:test@localhost:5432/test"
 
       - name: Run PHPUnit
         run: |
