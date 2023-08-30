@@ -354,8 +354,8 @@ abstract class Connection
 
         try {
             if (!$sth->execute($values)) {
-                echo "couldn't execute query on " . get_class($this);
-                throw new DatabaseException($this);
+                $msg = "couldn't execute query on " . get_class($this);
+                throw new DatabaseException($msg);
             }
         } catch (PDOException $e) {
             throw new DatabaseException($e);
