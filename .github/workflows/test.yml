@@ -51,7 +51,7 @@ jobs:
         run: |
           sqlite3 --version
           sqlite3 test.db "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name TEXT);"
-          ls -l test.db
+          ls -la test.db
 
       - name: Login to DockerHub
         run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
