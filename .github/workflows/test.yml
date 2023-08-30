@@ -8,6 +8,7 @@ on:
 
 jobs:
   phpunit:
+    permissions: read-all|write-all
     name: PHPUnit
     runs-on: ubuntu-20.04
     env:
