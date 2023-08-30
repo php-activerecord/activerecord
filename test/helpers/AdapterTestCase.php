@@ -8,10 +8,10 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function setUp($connection_name=null): void
     {
-//        if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
-//            'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
-//            $this->markTestSkipped($connection_name . ' drivers are not present');
-//        }
+        if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
+            'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
+            $this->markTestSkipped($connection_name . ' drivers are not present');
+        }
 
         parent::setUp($connection_name);
     }
