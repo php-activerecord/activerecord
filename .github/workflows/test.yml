@@ -64,6 +64,9 @@ jobs:
         run: |
             sudo docker-compose up -d --wait
 
+      - name: Verify MySQL
+        run: mysql -u test -ptest test -e "show tables"
+
       - name: Run PHPUnit
         run: |
           vendor/bin/phpunit --testdox -c phpunit.xml.dist test/MysqlAdapterTest.php
