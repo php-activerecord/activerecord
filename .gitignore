@@ -14,3 +14,4 @@ phpunit.xml
 .php_cs
 docs/api
 .phpunit.result.cache
+.stan-cache
