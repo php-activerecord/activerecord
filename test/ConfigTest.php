@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 
 class TestLogger implements LoggerInterface
 {
-    public function emergency(string|\Stringable $message, array $context = []) {
+    public function emergency(string|\Stringable $message, array $context = []): void {
 
     }
 
@@ -22,7 +22,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function alert(string|\Stringable $message, array $context = []) {
+    public function alert(string|\Stringable $message, array $context = []): void {
 
     }
 
@@ -36,7 +36,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function critical(string|\Stringable $message, array $context = []) {
+    public function critical(string|\Stringable $message, array $context = []): void {
 
     }
 
@@ -49,7 +49,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function error(string|\Stringable $message, array $context = []) {
+    public function error(string|\Stringable $message, array $context = []): void {
 
     }
 
@@ -64,7 +64,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function warning(string|\Stringable $message, array $context = [])
+    public function warning(string|\Stringable $message, array $context = []): void
     {
 
     }
@@ -77,7 +77,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function notice(string|\Stringable $message, array $context = []) {
+    public function notice(string|\Stringable $message, array $context = []): void {
 
     }
 
@@ -91,7 +91,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function info(string|\Stringable $message, array $context = []) {
+    public function info(string|\Stringable $message, array $context = []): void {
 
     }
 
@@ -103,7 +103,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function debug(string|\Stringable $message, array $context = []) {
+    public function debug(string|\Stringable $message, array $context = []): void {
 
     }
 
@@ -118,7 +118,7 @@ class TestLogger implements LoggerInterface
      *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, string|\Stringable $message, array $context = []) {
+    public function log($level, string|\Stringable $message, array $context = []): void {
 
     }
 }

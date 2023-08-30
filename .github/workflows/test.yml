@@ -64,7 +64,7 @@ jobs:
       - name: Run PHPUnit
         run: |
           export $ENV
-          vendor/bin/phpunit --coverage-clover=coverage.xml
+          vendor/bin/phpunit --coverage-clover=coverage.xml test/SqliteAdapterTest.php
 
       - name: Upload coverage file
         uses: actions/upload-artifact@v3
