@@ -15,14 +15,11 @@
  *
  *    $ vendor/bin/phpunit test/InflectorTest.php
  **/
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-require_once 'vendor/phpunit/phpunit/src/Framework/TestCase.php';
-require_once 'SnakeCase_PHPUnit_Framework_TestCase.php';
-
-
-require_once 'DatabaseTest.php';
-require_once 'AdapterTest.php';
+require_once __DIR__ . '/../../vendor/phpunit/phpunit/src/Framework/TestCase.php';
+require_once 'DatabaseTestCase.php';
+require_once 'AdapterTestCase.php';
 
 require_once __DIR__ . '/../../ActiveRecord.php';
 
@@ -33,15 +30,14 @@ $GLOBALS['slow_tests'] = false;
 $GLOBALS['show_warnings'] = true;
 
 if ('false' !== getenv('LOG')) {
-    DatabaseTest::$log = true;
+    DatabaseTestCase::$log = true;
 }
 
 ActiveRecord\Config::initialize(function ($cfg) {
     $cfg->set_model_directory(realpath(__DIR__ . '/../models'));
     $cfg->set_connections([
-        'mysql'  => getenv('PHPAR_MYSQL') ?: 'mysql://test:test@127.0.0.1/test',
-        'pgsql'  => getenv('PHPAR_PGSQL') ?: 'pgsql://test:test@127.0.0.1/test',
-        'oci'    => getenv('PHPAR_OCI') ?: 'oci://test:test@127.0.0.1/dev',
+        'mysql'  => getenv('PHPAR_MYSQL') ?: 'mysql://test:test@127.0.0.1:3306/test',
+        'pgsql'  => getenv('PHPAR_PGSQL') ?: 'pgsql://test:test@127.0.0.1:5432/test',
         'sqlite' => getenv('PHPAR_SQLITE') ?: 'sqlite://test.db']);
 
     $cfg->set_default_connection('mysql');
@@ -54,17 +50,21 @@ ActiveRecord\Config::initialize(function ($cfg) {
         }
     }
 
-    if (class_exists('Log_file')) { // PEAR Log installed
-        $logger = new Log_file(dirname(__FILE__) . '/../log/query.log', 'ident', ['mode' => 0664, 'timeFormat' =>  '%Y-%m-%d %H:%M:%S']);
+    if (class_exists('Monolog\Logger')) { // Monolog installed
+        $log = new Monolog\Logger("arlog");
+        $log->pushHandler(new \Monolog\Handler\StreamHandler(
+            dirname(__FILE__) . '/../log/query.log',
+            \Monolog\Level::Warning)
+        );
 
         $cfg->set_logging(true);
-        $cfg->set_logger($logger);
+        $cfg->set_logger($log);
     } else {
         if ($GLOBALS['show_warnings'] && !isset($GLOBALS['show_warnings_done'])) {
             echo "(Logging SQL queries disabled, PEAR::Log not found.)\n";
         }
 
-        DatabaseTest::$log = false;
+        DatabaseTestCase::$log = false;
     }
 
     if ($GLOBALS['show_warnings']  && !isset($GLOBALS['show_warnings_done'])) {

@@ -551,7 +551,6 @@ class Model
         // this may be first access to the relationship so check Table
         if (($relationship = $table->get_relationship($name))) {
             $this->__relationships[$name] = $relationship->load($this);
-
             return $this->__relationships[$name];
         }
 
@@ -735,12 +734,14 @@ class Model
      */
     private function is_delegated($name, &$delegate)
     {
-        if ('' != $delegate['prefix']) {
-            $name = substr($name, strlen($delegate['prefix'])+1);
-        }
+        if (is_array($delegate)) {
+            if ('' != $delegate['prefix']) {
+                $name = substr($name, strlen($delegate['prefix'])+1);
+            }
 
-        if (is_array($delegate) && in_array($name, $delegate['delegate'])) {
-            return $name;
+            if(in_array($name, $delegate['delegate'])) {
+                return $name;
+            }
         }
 
         return null;

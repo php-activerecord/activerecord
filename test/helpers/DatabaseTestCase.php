@@ -1,25 +1,26 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once __DIR__ . '/DatabaseLoader.php';
 
-class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
+abstract class DatabaseTestCase extends TestCase
 {
-    protected $conn;
+    protected string $connection_name;
+    protected \ActiveRecord\Connection $connection;
+    protected $original_date_class;
     public static $log = false;
     public static $db;
 
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
         ActiveRecord\Table::clear_cache();
 
         $config = ActiveRecord\Config::instance();
-        $this->original_default_connection = $config->get_default_connection();
+        $connection_name ??= $config->get_default_connection();
 
         $this->original_date_class = $config->get_date_class();
 
-        if ($connection_name) {
-            $config->set_default_connection($connection_name);
-        }
 
         if ('sqlite' == $connection_name || 'sqlite' == $config->get_default_connection()) {
             // need to create the db. the adapter specifically does not create it for us.
@@ -27,16 +28,16 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
             new SQLite3(static::$db);
         }
 
-        $this->connection_name = $connection_name;
         try {
-            $this->conn = ActiveRecord\ConnectionManager::get_connection($connection_name);
+            $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
+            $this->connection_name = $connection_name;
         } catch (ActiveRecord\DatabaseException $e) {
-            $this->mark_test_skipped($connection_name . ' failed to connect. ' . $e->getMessage());
+            $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
 
         $GLOBALS['ACTIVERECORD_LOG'] = false;
 
-        $loader = new DatabaseLoader($this->conn);
+        $loader = new DatabaseLoader($this->connection);
         $loader->reset_table_data();
 
         if (self::$log) {
@@ -44,12 +45,9 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
         }
     }
 
-    public function tear_down()
+    public function tearDown(): void
     {
         ActiveRecord\Config::instance()->set_date_class($this->original_date_class);
-        if ($this->original_default_connection) {
-            ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
-        }
     }
 
     public function assert_exception_message_contains($contains, $closure)
@@ -62,7 +60,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
             $message = $e->getMessage();
         }
 
-        $this->assertContains($contains, $message);
+        $this->assertStringContainsString($contains, $message);
     }
 
     /**
@@ -76,7 +74,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
         $needle = str_replace(['"', '`'], '', $needle);
         $haystack = str_replace(['"', '`'], '', $haystack);
 
-        return $this->assertContains($needle, $haystack);
+        return $this->assertStringContainsString($needle, $haystack);
     }
 
     public function assert_sql_doesnt_has($needle, $haystack)
@@ -84,6 +82,6 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
         $needle = str_replace(['"', '`'], '', $needle);
         $haystack = str_replace(['"', '`'], '', $haystack);
 
-        return $this->assertNotContains($needle, $haystack);
+        return $this->assertStringNotContainsString($needle, $haystack);
     }
 }

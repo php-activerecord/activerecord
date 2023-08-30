@@ -2,17 +2,15 @@
 
 require_once __DIR__ . '/../lib/adapters/SqliteAdapter.php';
 
-class SqliteAdapterTest extends AdapterTest
+class SqliteAdapterTest extends AdapterTestCase
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up('sqlite');
+        parent::setUp('sqlite');
     }
 
     public function tearDown(): void
     {
-        parent::tearDown();
-
         @unlink(self::InvalidDb);
     }
 
@@ -37,44 +35,45 @@ class SqliteAdapterTest extends AdapterTest
     {
         $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
-        $this->conn->query_and_fetch($this->conn->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
+        $this->connection->query_and_fetch($this->connection->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
 
-        $this->assert_true(false !== strpos($this->conn->last_query, 'LIMIT 1'));
+        $this->assertTrue(false !== strpos($this->connection->last_query, 'LIMIT 1'));
     }
 
     public function test_gh183_sqliteadapter_autoincrement()
     {
         // defined in lowercase: id integer not null primary key
-        $columns = $this->conn->columns('awesome_people');
-        $this->assert_true($columns['id']->auto_increment);
+        $columns = $this->connection->columns('awesome_people');
+        $this->assertTrue($columns['id']->auto_increment);
 
         // defined in uppercase: `amenity_id` INTEGER NOT NULL PRIMARY KEY
-        $columns = $this->conn->columns('amenities');
-        $this->assert_true($columns['amenity_id']->auto_increment);
+        $columns = $this->connection->columns('amenities');
+        $this->assertTrue($columns['amenity_id']->auto_increment);
 
         // defined using int: `rm-id` INT NOT NULL
-        $columns = $this->conn->columns('`rm-bldg`');
-        $this->assert_false($columns['rm-id']->auto_increment);
+        $columns = $this->connection->columns('`rm-bldg`');
+        $this->assertFalse($columns['rm-id']->auto_increment);
 
         // defined using int: id INT NOT NULL PRIMARY KEY
-        $columns = $this->conn->columns('hosts');
-        $this->assert_true($columns['id']->auto_increment);
+        $columns = $this->connection->columns('hosts');
+        $this->assertTrue($columns['id']->auto_increment);
     }
 
     public function test_datetime_to_string()
     {
         $datetime = '2009-01-01 01:01:01';
-        $this->assert_equals($datetime, $this->conn->datetime_to_string(date_create($datetime)));
+        $this->assertEquals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
     }
 
     public function test_date_to_string()
     {
         $datetime = '2009-01-01';
-        $this->assert_equals($datetime, $this->conn->date_to_string(date_create($datetime)));
+        $this->assertEquals($datetime, $this->connection->date_to_string(date_create($datetime)));
     }
 
     // not supported
     public function test_connect_with_port()
     {
+        $this->expectNotToPerformAssertions();
     }
 }

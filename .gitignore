@@ -5,6 +5,7 @@
 *.log
 *.db
 *.swp
+.phpunit.cache
 vendor/*
 output/*
 composer.lock
@@ -13,3 +14,4 @@ phpunit.xml
 .php_cs
 docs/api
 .phpunit.result.cache
+.stan-cache

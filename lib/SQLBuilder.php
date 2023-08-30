@@ -198,9 +198,9 @@ class SQLBuilder
     /**
      * Reverses an order clause.
      */
-    public static function reverse_order($order)
+    public static function reverse_order($order = '')
     {
-        if (!trim($order)) {
+        if (!trim($order ?? '')) {
             return $order;
         }
 

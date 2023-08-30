@@ -6,6 +6,7 @@
 namespace ActiveRecord;
 
 use Closure;
+use Psr\Log\LoggerInterface;
 
 /**
  * Manages configuration options for ActiveRecord.
@@ -242,9 +243,9 @@ class Config extends Singleton
      *
      * @param object $logger
      *
-     * @throws ConfigException if Logger objecct does not implement public log()
+     * @throws ConfigException if Logger object does not implement public log()
      */
-    public function set_logger($logger)
+    public function set_logger(LoggerInterface $logger)
     {
         $klass = Reflections::instance()->add($logger)->get($logger);
 

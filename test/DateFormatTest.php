@@ -1,6 +1,6 @@
 <?php
 
-class DateFormatTest extends DatabaseTest
+class DateFormatTest extends DatabaseTestCase
 {
     public function test_datefield_gets_converted_to_ar_datetime()
     {
@@ -10,6 +10,6 @@ class DateFormatTest extends DatabaseTest
         $author->save();
 
         $author = Author::first();
-        $this->assert_is_a('ActiveRecord\\DateTime', $author->some_date);
+        $this->assertInstanceOf('ActiveRecord\\DateTime', $author->some_date);
     }
 }

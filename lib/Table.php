@@ -567,9 +567,7 @@ class Table
         $delegates = $this->class->getStaticPropertyValue('delegate', []);
         $new = [];
 
-        if (!array_key_exists('processed', $delegates)) {
-            $delegates['processed'] = false;
-        }
+        $delegates['processed'] ??= false;
 
         if (!empty($delegates) && !$delegates['processed']) {
             foreach ($delegates as &$delegate) {
