@@ -38,18 +38,18 @@ jobs:
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
 
-      - name: Setup SQLite
+      - name: Create and set permissions on SQLite Database
         run: |
-          sudo apt-get update
-          sudo apt-get install -y sqlite3 libsqlite3-dev
-          sudo chown $USER:$USER /usr/bin/sqlite3
-      - name: Set SQLite permissions
-        run: |
-          sudo chmod 755 /usr/bin/sqlite3
+          touch my-database.db
+          sudo chown $USER:$USER test.db
+          chmod 755 test.db
+
+          # Verify SQLite installation and permissions
       - name: Verify SQLite setup
         run: |
           sqlite3 --version
-          ls -l /usr/bin/sqlite3
+          sqlite3 test.db "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name TEXT);"
+          ls -l test.db
 
       - name: Login to DockerHub
         run: echo ${{ secrets.docker_password }} | docker login -u ${{ secrets.docker_username }} --password-stdin
