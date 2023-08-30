@@ -1,7 +1,6 @@
 <?php
 
 use ActiveRecord\DateTime;
-use ActiveRecord\Serialize\ArraySerializer;
 use ActiveRecord\Serialize\CsvSerializer;
 use ActiveRecord\Serialize\JsonSerializer;
 use test\models\Author;
@@ -13,8 +12,6 @@ class SerializationTest extends DatabaseTestCase
     public function tearDown(): void
     {
         parent::tearDown();
-        ArraySerializer::$include_root = false;
-        JsonSerializer::$include_root = false;
     }
 
     public function _a($options=[], $model=null)
@@ -116,8 +113,9 @@ class SerializationTest extends DatabaseTestCase
 
     public function test_to_json_include_root()
     {
-        JsonSerializer::$include_root = true;
-        $this->assertNotNull(json_decode(Book::find(1)->to_json())->{'test\models\book'});
+        $this->assertNotNull(json_decode(Book::find(1)->to_json([
+            'include_root'=>true
+        ]))->{'test\models\book'});
     }
 
     public function test_to_xml_include()
@@ -143,7 +141,6 @@ class SerializationTest extends DatabaseTestCase
 
     public function test_to_array_include_root()
     {
-        ArraySerializer::$include_root = true;
         $book = Book::find(1);
         $array = $book->to_array();
         $book_attributes = ['test\models\book' => $book->attributes()];

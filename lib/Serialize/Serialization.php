@@ -14,15 +14,16 @@ use ActiveRecord\Model;
  *
  * All serializers support the following options:
  *
- * <ul>
- * <li><b>only:</b> a string or array of attributes to be included.</li>
- * <li><b>except:</b> a string or array of attributes to be excluded.</li>
- * <li><b>methods:</b> a string or array of methods to invoke. The method's name will be used as a key for the final attributes array
- * along with the method's returned value</li>
- * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
- * <li><b>only_method:</b> a method that's called and only the resulting array is serialized
- * <li><b>skip_instruct:</b> set to true to skip the <?xml ...?> declaration.</li>
- * </ul>
+ * @phpstan-type SerializeOptions array{
+ *      only?:  string|string[],
+ *      except?: string|string[],
+ *      methods?: string|string[],
+ *      include?: string|array,
+ *      only_method?: string,
+ *      only_header?: string,
+ *      skip_instruct? :bool,
+ *      include_root?: bool
+ *  }
  *
  * Example usage:
  *
@@ -48,8 +49,11 @@ use ActiveRecord\Model;
 abstract class Serialization
 {
     protected $model;
-    protected $options;
-    protected $attributes;
+    /**
+     * @var SerializeOptions
+     */
+    protected array $options;
+    protected array $attributes;
 
     /**
      * The default format to serialize DateTime objects to.
@@ -95,7 +99,7 @@ abstract class Serialization
      * Constructs a {@link Serialization} object.
      *
      * @param Model $model    The model to serialize
-     * @param array &$options Options for serialization
+     * @param SerializeOptions &$options Options for serialization
      *
      * @return Serialization
      */
@@ -103,6 +107,7 @@ abstract class Serialization
     {
         $this->model = $model;
         $this->options = $options;
+        $this->options['include_root'] ??= false;
         $this->attributes = $model->attributes();
         $this->parse_options();
     }
@@ -239,7 +244,6 @@ abstract class Serialization
     /**
      * Performs the serialization.
      *
-     * @return string
      */
     abstract public function to_s();
 }
