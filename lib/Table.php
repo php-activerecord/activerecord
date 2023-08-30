@@ -24,9 +24,12 @@ use ActiveRecord\Relationship\HasOne;
  */
 class Table
 {
-    private static $cache = [];
+    /**
+     * @var array<string, Model>
+     */
+    private static array $cache = [];
 
-    public $class;
+    public \ReflectionClass $class;
     public $conn;
     public $pk;
     public $last_sql;
@@ -37,22 +40,22 @@ class Table
     /**
      * Name of the table.
      */
-    public $table;
+    public string $table;
 
     /**
      * Name of the database (optional)
      */
-    public $db_name;
+    public string $db_name;
 
     /**
      * Name of the sequence for this table (optional). Defaults to {$table}_seq
      */
-    public $sequence;
+    public string $sequence;
 
     /**
      * Whether to cache individual models or not (not to be confused with caching of table schemas).
      */
-    public $cache_individual_model;
+    public bool $cache_individual_model;
 
     /**
      * Expiration period for model caching.
@@ -354,7 +357,13 @@ class Table
         return array_key_exists($name, $this->relationships);
     }
 
-    public function insert(&$data, $pk=null, $sequence_name=null)
+    /**
+     * @param array $data
+     * @param (string|int)|null $pk
+     * @param string|null $sequence_name
+     * @throws Exception\ActiveRecordException
+     */
+    public function insert(array &$data, string|int|null $pk=null, string $sequence_name=null): \PDOStatement
     {
         $data = $this->process_data($data);
 
@@ -366,7 +375,13 @@ class Table
         return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
     }
 
-    public function update(&$data, $where)
+    /**
+     * @param array<string,mixed> $data
+     * @param array<string, mixed> $where
+     * @return \PDOStatement
+     * @throws Exception\ActiveRecordException
+     */
+    public function update(array &$data, array $where): \PDOStatement
     {
         $data = $this->process_data($data);
 
@@ -378,7 +393,11 @@ class Table
         return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
     }
 
-    public function delete($data)
+    /**
+     * @param array<string,mixed> $data
+     * @throws Exception\ActiveRecordException
+     */
+    public function delete(array $data): \PDOStatement
     {
         $data = $this->process_data($data);
 
@@ -409,11 +428,12 @@ class Table
     /**
      * Replaces any aliases used in a hash based condition.
      *
-     * @param $hash array A hash
-     * @param $map array Hash of used_name => real_name
+     * @param array<string, string> $hash A hash
+     * @param array<string, string> $map Hash of used_name => real_name
      *
-     * @return array Array with any aliases replaced with their read field name
+     * @return array<string, string> Array with any aliases replaced with their read field name
      */
+
     private function map_names(array &$hash, array &$map): array
     {
         $ret = [];
@@ -429,7 +449,11 @@ class Table
         return $ret;
     }
 
-    private function &process_data($hash)
+    /**
+     * @param array<string,mixed> $hash
+     * @return array<string,mixed> $hash
+     */
+    private function &process_data(array $hash): array
     {
         if (!$hash) {
             return $hash;
