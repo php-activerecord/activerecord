@@ -23,7 +23,7 @@ class Memcache
     public function __construct($options)
     {
         $this->memcache = new \Memcache();
-        $options['port'] = isset($options['port']) ? $options['port'] : self::DEFAULT_PORT;
+        $options['port'] = $options['port'] ?? self::DEFAULT_PORT;
 
         if (!@$this->memcache->connect($options['host'], $options['port'])) {
             if ($error = error_get_last()) {
@@ -47,7 +47,7 @@ class Memcache
 
     public function write($key, $value, $expire)
     {
-        $this->memcache->set($key, $value, null, $expire);
+        $this->memcache->set($key, $value, 0, $expire);
     }
 
     public function delete($key)

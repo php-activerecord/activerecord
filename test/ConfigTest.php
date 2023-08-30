@@ -2,11 +2,124 @@
 
 use ActiveRecord\Config;
 use ActiveRecord\ConfigException;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
-class TestLogger
+class TestLogger implements LoggerInterface
 {
-    private function log()
+    public function emergency(string|\Stringable $message, array $context = []): void {
+
+    }
+
+    /**
+     * Action must be taken immediately.
+     *
+     * Example: Entire website down, database unavailable, etc. This should
+     * trigger the SMS alerts and wake you up.
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
+     *
+     * @return void
+     */
+    public function alert(string|\Stringable $message, array $context = []): void {
+
+    }
+
+    /**
+     * Critical conditions.
+     *
+     * Example: Application component unavailable, unexpected exception.
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
+     *
+     * @return void
+     */
+    public function critical(string|\Stringable $message, array $context = []): void {
+
+    }
+
+    /**
+     * Runtime errors that do not require immediate action but should typically
+     * be logged and monitored.
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
+     *
+     * @return void
+     */
+    public function error(string|\Stringable $message, array $context = []): void {
+
+    }
+
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
+     *
+     * @return void
+     */
+    public function warning(string|\Stringable $message, array $context = []): void
     {
+
+    }
+
+    /**
+     * Normal but significant events.
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
+     *
+     * @return void
+     */
+    public function notice(string|\Stringable $message, array $context = []): void {
+
+    }
+
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs.
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
+     *
+     * @return void
+     */
+    public function info(string|\Stringable $message, array $context = []): void {
+
+    }
+
+    /**
+     * Detailed debug information.
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
+     *
+     * @return void
+     */
+    public function debug(string|\Stringable $message, array $context = []): void {
+
+    }
+
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed   $level
+     * @param string|\Stringable $message
+     * @param mixed[] $context
+     *
+     * @return void
+     *
+     * @throws \Psr\Log\InvalidArgumentException
+     */
+    public function log($level, string|\Stringable $message, array $context = []): void {
+
     }
 }
 
@@ -28,102 +141,94 @@ class TestDateTime
     }
 }
 
-class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
-    public function set_up()
+    public function setUp(): void
     {
         $this->config = new Config();
         $this->connections = ['development' => 'mysql://blah/development', 'test' => 'mysql://blah/test'];
         $this->config->set_connections($this->connections);
     }
 
-    /**
-     * @expectedException \ActiveRecord\ConfigException
-     */
     public function test_set_connections_must_be_array()
     {
+        $this->expectException(\ActiveRecord\ConfigException::class);
         $this->config->set_connections(null);
     }
 
     public function test_get_connections()
     {
-        $this->assert_equals($this->connections, $this->config->get_connections());
+        $this->assertEquals($this->connections, $this->config->get_connections());
     }
 
     public function test_get_connection()
     {
-        $this->assert_equals($this->connections['development'], $this->config->get_connection('development'));
+        $this->assertEquals($this->connections['development'], $this->config->get_connection('development'));
     }
 
     public function test_get_invalid_connection()
     {
-        $this->assert_null($this->config->get_connection('whiskey tango foxtrot'));
+        $this->assertNull($this->config->get_connection('whiskey tango foxtrot'));
     }
 
     public function test_get_default_connection_and_connection()
     {
         $this->config->set_default_connection('development');
-        $this->assert_equals('development', $this->config->get_default_connection());
-        $this->assert_equals($this->connections['development'], $this->config->get_default_connection_string());
+        $this->assertEquals('development', $this->config->get_default_connection());
+        $this->assertEquals($this->connections['development'], $this->config->get_default_connection_string());
     }
 
     public function test_get_default_connection_and_connection_string_defaults_to_development()
     {
-        $this->assert_equals('development', $this->config->get_default_connection());
-        $this->assert_equals($this->connections['development'], $this->config->get_default_connection_string());
+        $this->assertEquals('development', $this->config->get_default_connection());
+        $this->assertEquals($this->connections['development'], $this->config->get_default_connection_string());
     }
 
     public function test_get_default_connection_string_when_connection_name_is_not_valid()
     {
         $this->config->set_default_connection('little mac');
-        $this->assert_null($this->config->get_default_connection_string());
+        $this->assertNull($this->config->get_default_connection_string());
     }
 
     public function test_default_connection_is_set_when_only_one_connection_is_present()
     {
         $this->config->set_connections(['development' => $this->connections['development']]);
-        $this->assert_equals('development', $this->config->get_default_connection());
+        $this->assertEquals('development', $this->config->get_default_connection());
     }
 
     public function test_set_connections_with_default()
     {
         $this->config->set_connections($this->connections, 'test');
-        $this->assert_equals('test', $this->config->get_default_connection());
+        $this->assertEquals('test', $this->config->get_default_connection());
     }
 
     public function test_get_date_class_with_default()
     {
-        $this->assert_equals('ActiveRecord\\DateTime', $this->config->get_date_class());
+        $this->assertEquals('ActiveRecord\\DateTime', $this->config->get_date_class());
     }
 
-    /**
-     * @expectedException \ActiveRecord\ConfigException
-     */
     public function test_set_date_class_when_class_doesnt_exist()
     {
+        $this->expectException(\ActiveRecord\ConfigException::class);
         $this->config->set_date_class('doesntexist');
     }
 
-    /**
-     * @expectedException \ActiveRecord\ConfigException
-     */
     public function test_set_date_class_when_class_doesnt_have_format_or_createfromformat()
     {
+        $this->expectException(\ActiveRecord\ConfigException::class);
         $this->config->set_date_class('TestLogger');
     }
 
-    /**
-     * @expectedException \ActiveRecord\ConfigException
-     */
     public function test_set_date_class_when_class_doesnt_have_createfromformat()
     {
+        $this->expectException(\ActiveRecord\ConfigException::class);
         $this->config->set_date_class('TestDateTimeWithoutCreateFromFormat');
     }
 
     public function test_set_date_class_with_valid_class()
     {
         $this->config->set_date_class('TestDateTime');
-        $this->assert_equals('TestDateTime', $this->config->get_date_class());
+        $this->assertEquals('TestDateTime', $this->config->get_date_class());
     }
 
     public function test_initialize_closure()
@@ -131,18 +236,8 @@ class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
         $test = $this;
 
         Config::initialize(function ($cfg) use ($test) {
-            $test->assert_not_null($cfg);
-            $test->assert_equals('ActiveRecord\Config', get_class($cfg));
+            $test->assertNotNull($cfg);
+            $test->assertEquals('ActiveRecord\Config', get_class($cfg));
         });
-    }
-
-    public function test_logger_object_must_implement_log_method()
-    {
-        try {
-            $this->config->set_logger(new TestLogger());
-            $this->fail();
-        } catch (ConfigException $e) {
-            $this->assert_equals($e->getMessage(), 'Logger object must implement a public log method');
-        }
     }
 }

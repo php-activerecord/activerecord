@@ -9,7 +9,7 @@ class BookNumericality extends ActiveRecord\Model
     ];
 }
 
-class ValidatesNumericalityOfTest extends DatabaseTest
+class ValidatesNumericalityOfTest extends DatabaseTestCase
 {
     public static $NULL = [null];
     public static $BLANK = ['', ' ', " \t \r \n"];
@@ -19,9 +19,9 @@ class ValidatesNumericalityOfTest extends DatabaseTest
     public static $INTEGERS = [0, 10, -10];
     public static $JUNK = ['not a number', '42 not a number', '00-1', '--3', '+-3', '+3-1', '-+019.0', '12.12.13.12', "123\nnot a number"];
 
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
         BookNumericality::$validates_numericality_of = [
             ['numeric_test']
         ];
@@ -33,14 +33,14 @@ class ValidatesNumericalityOfTest extends DatabaseTest
         $book->numeric_test = $value;
 
         if ('valid' == $boolean) {
-            $this->assert_true($book->save());
-            $this->assert_false($book->errors->is_invalid('numeric_test'));
+            $this->assertTrue($book->save());
+            $this->assertFalse($book->errors->is_invalid('numeric_test'));
         } else {
-            $this->assert_false($book->save());
-            $this->assert_true($book->errors->is_invalid('numeric_test'));
+            $this->assertFalse($book->save());
+            $this->assertTrue($book->errors->is_invalid('numeric_test'));
 
             if (!is_null($msg)) {
-                $this->assert_same($msg, $book->errors->on('numeric_test'));
+                $this->assertSame($msg, $book->errors->on('numeric_test'));
             }
         }
     }
@@ -156,7 +156,7 @@ class ValidatesNumericalityOfTest extends DatabaseTest
         ];
         $book = new BookNumericality(['numeric_test' => 'NaN']);
         $book->is_valid();
-        $this->assert_equals(['Numeric test Hello'], $book->errors->full_messages());
+        $this->assertEquals(['Numeric test Hello'], $book->errors->full_messages());
     }
 }
 

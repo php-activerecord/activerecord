@@ -1,10 +1,10 @@
 <?php
 
-class ModelCallbackTest extends DatabaseTest
+class ModelCallbackTest extends DatabaseTestCase
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
 
         $this->venue = new Venue();
         $this->callback = Venue::table()->callback;
@@ -34,13 +34,13 @@ class ModelCallbackTest extends DatabaseTest
     public function assert_fires($callbacks, $closure)
     {
         $executed = $this->register_and_invoke_callbacks($callbacks, true, $closure);
-        $this->assert_equals(count((array) $callbacks), count((array) $executed));
+        $this->assertEquals(count((array) $callbacks), count((array) $executed));
     }
 
     public function assert_does_not_fire($callbacks, $closure)
     {
         $executed = $this->register_and_invoke_callbacks($callbacks, true, $closure);
-        $this->assert_equals(0, count($executed));
+        $this->assertEquals(0, count($executed));
     }
 
     public function assert_fires_returns_false($callbacks, $only_fire, $closure)
@@ -53,7 +53,7 @@ class ModelCallbackTest extends DatabaseTest
         sort($only_fire);
         $intersect = array_intersect($only_fire, $executed);
         sort($intersect);
-        $this->assert_equals($only_fire, $intersect);
+        $this->assertEquals($only_fire, $intersect);
     }
 
     public function test_after_construct_fires_by_default()

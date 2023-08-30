@@ -2,9 +2,9 @@
 
 use ActiveRecord\Cache;
 
-class ActiveRecordCacheTest extends DatabaseTest
+class ActiveRecordCacheTest extends DatabaseTestCase
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
         if (!extension_loaded('memcache')) {
             $this->markTestSkipped('The memcache extension is not available');
@@ -12,11 +12,11 @@ class ActiveRecordCacheTest extends DatabaseTest
             return;
         }
 
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
         ActiveRecord\Config::instance()->set_cache('memcache://localhost');
     }
 
-    public function tear_down()
+    public function tearDown(): void
     {
         Cache::flush();
         Cache::initialize(null);
@@ -24,21 +24,21 @@ class ActiveRecordCacheTest extends DatabaseTest
 
     public function test_default_expire()
     {
-        $this->assert_equals(30, Cache::$options['expire']);
+        $this->assertEquals(30, Cache::$options['expire']);
     }
 
     public function test_explicit_default_expire()
     {
         ActiveRecord\Config::instance()->set_cache('memcache://localhost', ['expire' => 1]);
-        $this->assert_equals(1, Cache::$options['expire']);
+        $this->assertEquals(1, Cache::$options['expire']);
     }
 
     public function test_caches_column_meta_data()
     {
         Author::first();
 
-        $table_name = Author::table()->get_fully_qualified_table_name(!($this->conn instanceof ActiveRecord\PgsqlAdapter));
+        $table_name = Author::table()->get_fully_qualified_table_name(!($this->connection instanceof ActiveRecord\PgsqlAdapter));
         $value = Cache::$adapter->read("get_meta_data-$table_name");
-        $this->assert_true(is_array($value));
+        $this->assertTrue(is_array($value));
     }
 }

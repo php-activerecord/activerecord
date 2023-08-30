@@ -49,7 +49,7 @@ abstract class Connection
      */
     private $logging = false;
     /**
-     * Contains a Logger object that must impelement a log() method.
+     * Contains a Logger object that must implement a log() method.
      *
      * @var object
      */
@@ -71,7 +71,7 @@ abstract class Connection
      *
      * @var string
      */
-    public static $datetime_format = 'Y-m-d H:i:s T';
+    public static $datetime_format = 'Y-m-d H:i:s';
     /**
      * Default PDO options to set for each connection.
      *
@@ -98,7 +98,7 @@ abstract class Connection
     /**
      * Retrieve a database connection.
      *
-     * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
+     * @param string|null $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
      *                                                     Everything after the protocol:// part is specific to the connection adapter.
      *                                                     OR
      *                                                     A connection name that is set in ActiveRecord\Config
@@ -108,11 +108,11 @@ abstract class Connection
      *
      * @see parse_connection_url
      */
-    public static function instance($connection_string_or_connection_name=null)
+    public static function instance(string $connection_string_or_connection_name=null)
     {
         $config = Config::instance();
 
-        if (false === strpos($connection_string_or_connection_name, '://')) {
+        if (!str_contains($connection_string_or_connection_name ?? '', '://')) {
             $connection_string = $connection_string_or_connection_name ?
                 $config->get_connection($connection_string_or_connection_name) :
                 $config->get_default_connection_string();
@@ -272,7 +272,8 @@ abstract class Connection
                 $host = "unix_socket=$info->host";
             }
 
-            $this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+            $dsn = "$info->protocol:$host;dbname=$info->db";
+            $this->connection = new PDO($dsn, $info->user, $info->pass, static::$PDO_OPTIONS);
         } catch (PDOException $e) {
             throw new DatabaseException($e);
         }
@@ -333,9 +334,9 @@ abstract class Connection
     public function query($sql, &$values=[])
     {
         if ($this->logging) {
-            $this->logger->log($sql);
+            $this->logger->info($sql);
             if ($values) {
-                $this->logger->log($values);
+                $this->logger->info(var_export($values, true));
             }
         }
 
@@ -352,11 +353,13 @@ abstract class Connection
         $sth->setFetchMode(PDO::FETCH_ASSOC);
 
         try {
+            $msg = "couldn't execute query on " . get_class($this) . ". ";
+            $msg .= "user: " .getenv('USER');
             if (!$sth->execute($values)) {
-                throw new DatabaseException($this);
+                throw new DatabaseException($msg);
             }
         } catch (PDOException $e) {
-            throw new DatabaseException($e);
+            throw new DatabaseException($msg . ": " . $e->getMessage());
         }
 
         return $sth;

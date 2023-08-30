@@ -2,16 +2,16 @@
 
 use ActiveRecord\Cache;
 
-class CacheModelTest extends DatabaseTest
+class CacheModelTest extends DatabaseTestCase
 {
-    public function set_up($connection_name=null)
+    public function setUp($connection_name=null): void
     {
         if (!extension_loaded('memcache')) {
             $this->markTestSkipped('The memcache extension is not available');
 
             return;
         }
-        parent::set_up($connection_name);
+        parent::setUp($connection_name);
         ActiveRecord\Config::instance()->set_cache('memcache://localhost');
     }
 
@@ -24,7 +24,7 @@ class CacheModelTest extends DatabaseTest
         return $method;
     }
 
-    public function tear_down()
+    public function tearDown(): void
     {
         Cache::flush();
         Cache::initialize(null);
@@ -32,12 +32,12 @@ class CacheModelTest extends DatabaseTest
 
     public function test_default_expire()
     {
-        $this->assert_equals(30, Author::table()->cache_model_expire);
+        $this->assertEquals(30, Author::table()->cache_model_expire);
     }
 
     public function test_explicit_expire()
     {
-        $this->assert_equals(2592000, Publisher::table()->cache_model_expire);
+        $this->assertEquals(2592000, Publisher::table()->cache_model_expire);
     }
 
     public function test_cache_key()
@@ -45,7 +45,7 @@ class CacheModelTest extends DatabaseTest
         $method = $this->set_method_public('Author', 'cache_key');
         $author = Author::first();
 
-        $this->assert_equals('Author-1', $method->invokeArgs($author, []));
+        $this->assertEquals('Author-1', $method->invokeArgs($author, []));
     }
 
     public function test_model_cache_find_by_pk()
