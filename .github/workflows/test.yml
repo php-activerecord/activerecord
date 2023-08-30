@@ -77,7 +77,7 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          vendor/bin/phpunit --testdox -c phpunit.xml.dist test/MysqlAdapterTest.php
+          vendor/bin/phpunit -c phpunit.xml.dist test/MysqlAdapterTest.php
 
       - name: Upload coverage file
         uses: actions/upload-artifact@v3
