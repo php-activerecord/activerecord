@@ -5,7 +5,7 @@ use ActiveRecord\Exception\DatabaseException;
 
 class SqliteAdapterTest extends AdapterTestCase
 {
-    public function setUp($connection_name=null): void
+    public function setUp(string $connection_name=null): void
     {
         parent::setUp('sqlite');
     }

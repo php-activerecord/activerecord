@@ -18,7 +18,7 @@ use ActiveRecord\Model;
  *      only?:  string|string[],
  *      except?: string|string[],
  *      methods?: string|string[],
- *      include?: string|array,
+ *      include?: string|array<string>,
  *      only_method?: string,
  *      only_header?: string,
  *      skip_instruct? :bool,
@@ -100,10 +100,8 @@ abstract class Serialization
      *
      * @param Model $model    The model to serialize
      * @param SerializeOptions &$options Options for serialization
-     *
-     * @return Serialization
      */
-    public function __construct(Model $model, &$options)
+    public function __construct(Model $model, $options)
     {
         $this->model = $model;
         $this->options = $options;

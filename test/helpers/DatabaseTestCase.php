@@ -13,7 +13,7 @@ abstract class DatabaseTestCase extends TestCase
     public static $log = false;
     public static $db;
 
-    public function setUp($connection_name=null): void
+    public function setUp(string $connection_name=null): void
     {
         ActiveRecord\Table::clear_cache();
 

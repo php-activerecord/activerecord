@@ -8,7 +8,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 {
     const InvalidDb = '__1337__invalid_db__';
 
-    public function setUp($connection_name=null): void
+    public function setUp(string $connection_name=null): void
     {
         if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
             'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
