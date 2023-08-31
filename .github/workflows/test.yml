@@ -58,7 +58,7 @@ jobs:
       - name: Run PHPUnit
         run: |
           export $ENV
-          vendor/bin/phpunit --coverage-clover=coverage.xml
+          vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml
 
       - name: Upload coverage file
         uses: actions/upload-artifact@v3
