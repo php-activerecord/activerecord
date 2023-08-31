@@ -17,22 +17,34 @@ class SQLBuilder
     private Connection $connection;
     private string $operation = 'SELECT';
     private string $table;
-    private $select = '*';
-    private $joins;
-    private $order;
+    private string $select = '*';
+
+    /**
+     * @var array<string>
+     */
+    private array $joins = [];
+    private string $order = '';
     private int $limit = 0;
     private int $offset = 0;
-    private $group;
-    private $having;
-    private $update;
+    private string $group = '';
+    private string $having = '';
+    private string $update = '';
 
     // for where
-    private $where;
-    private $where_values = [];
+    private string $where = '';
+
+    /**
+     * @var array<mixed>
+     */
+    private array $where_values = [];
 
     // for insert/update
     private $data;
-    private $sequence;
+
+    /**
+     * @var array<string>
+     */
+    private array $sequence;
 
     /**
      * Constructor.
@@ -289,14 +301,14 @@ class SQLBuilder
     }
 
     /**
-     * prepends table name to hash of field names to get around ambiguous fields when SQL builder
+     * Prepends table name to hash of field names to get around ambiguous fields when SQL builder
      * has joins
      *
-     * @param array $hash
+     * @param array<string,string> $hash
      *
-     * @return array $new
+     * @return array<string,string> $new
      */
-    private function prepend_table_name_to_fields($hash=[])
+    private function prepend_table_name_to_fields(array $hash=[])
     {
         $new = [];
         $table = $this->connection->quote_name($this->table);
@@ -309,13 +321,12 @@ class SQLBuilder
         return $new;
     }
 
-    private function apply_where_conditions($args)
+    private function apply_where_conditions($args): void
     {
-        require_once 'Expressions.php';
         $num_args = count($args);
 
         if (1 == $num_args && is_hash($args[0])) {
-            $hash = is_null($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
+            $hash = empty($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
             $e = new Expressions($this->connection, $hash);
             $this->where = $e->to_s();
             $this->where_values = array_flatten($e->values());
@@ -340,7 +351,7 @@ class SQLBuilder
         }
     }
 
-    private function build_delete()
+    private function build_delete(): string
     {
         $sql = "DELETE FROM $this->table";
 
@@ -361,7 +372,7 @@ class SQLBuilder
         return $sql;
     }
 
-    private function build_insert()
+    private function build_insert(): string
     {
         require_once 'Expressions.php';
         $keys = join(',', $this->quoted_key_names());
@@ -379,11 +390,11 @@ class SQLBuilder
         return $e->to_s();
     }
 
-    private function build_select()
+    private function build_select(): string
     {
         $sql = "SELECT $this->select FROM $this->table";
 
-        if ($this->joins) {
+        if (!empty($this->joins)) {
             $sql .= ' ' . $this->joins;
         }
 
@@ -410,7 +421,7 @@ class SQLBuilder
         return $sql;
     }
 
-    private function build_update()
+    private function build_update(): string
     {
         if (strlen($this->update ?? '') > 0) {
             $set = $this->update;
@@ -437,7 +448,10 @@ class SQLBuilder
         return $sql;
     }
 
-    private function quoted_key_names()
+    /**
+     * @return array<string>
+     */
+    private function quoted_key_names(): array
     {
         $keys = [];
 

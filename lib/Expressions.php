@@ -89,12 +89,8 @@ class Expressions
         $this->connection = $connection;
     }
 
-    public function to_s($substitute=false, &$options=null)
+    public function to_s($substitute=false, &$options=[])
     {
-        if (!$options) {
-            $options = [];
-        }
-
         $values = array_key_exists('values', $options) ? $options['values'] : $this->values;
 
         $ret = '';
