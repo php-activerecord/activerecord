@@ -916,7 +916,7 @@ class Model
         // if we've got an autoincrementing/sequenced pk set it
         // don't need this check until the day comes that we decide to support composite pks
         // if (count($pk) == 1)
-
+        $pk = strtolower($pk);
         $column = $table->get_column_by_inflected_name($pk);
 
         if ($column->auto_increment || $use_sequence) {
