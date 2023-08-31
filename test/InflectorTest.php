@@ -6,6 +6,8 @@ require_once __DIR__ . '/../lib/Inflector.php';
 
 class InflectorTest extends TestCase
 {
+    private $inflector;
+
     public function setUp(): void
     {
         $this->inflector = ActiveRecord\Inflector::instance();

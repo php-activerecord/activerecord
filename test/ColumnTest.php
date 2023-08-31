@@ -7,6 +7,9 @@ use PHPUnit\Framework\TestCase;
 
 class ColumnTest extends TestCase
 {
+    private $column;
+    private $conn;
+    
     public function setUp($connection_name = null): void
     {
         $this->column = new Column();
