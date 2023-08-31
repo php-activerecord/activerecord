@@ -349,13 +349,12 @@ class Model
     public function &__get($name)
     {
         // check for getter
+        $name = strtolower($name);
         if (method_exists($this, "get_$name")) {
             $name = "get_$name";
-            $value = $this->$name();
-
-            return $value;
+            $retValue = $this->$name();
+            return $retValue;
         }
-
         return $this->read_attribute($name);
     }
 
@@ -445,6 +444,7 @@ class Model
      */
     public function __set($name, $value)
     {
+        $name = strtolower($name);
         if (array_key_exists($name, static::$alias_attribute)) {
             $name = static::$alias_attribute[$name];
         } elseif (method_exists($this, "set_$name")) {

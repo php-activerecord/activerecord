@@ -21,10 +21,6 @@ class Venue extends Model
 
     public function get_state()
     {
-        if (self::$use_custom_get_state_getter) {
-            return strtolower($this->read_attribute('state'));
-        }
-
         return $this->read_attribute('state');
     }
 

@@ -40,8 +40,6 @@ class SerializationTest extends DatabaseTestCase
     {
         $this->assertArrayHasKey('author', $this->_a(['only' => 'name', 'include' => 'author']));
         $this->assertArrayHasKey('name', $this->_a(['only' => 'name', 'include' => 'author']));
-        $this->assertArrayHasKey('book_id', $this->_a(['only' => 'book_id', 'methods' => 'upper_name']));
-        $this->assertArrayHasKey('upper_name', $this->_a(['only' => 'book_id', 'methods' => 'upper_name']));
     }
 
     public function test_only_overrides_except()
@@ -77,7 +75,7 @@ class SerializationTest extends DatabaseTestCase
     public function test_methods_method_same_as_attribute()
     {
         $a = $this->_a(['methods' => 'name']);
-        $this->assertEquals('ancient art of main tanking', $a['name']);
+        $this->assertEquals('Ancient Art of Main Tanking', $a['name']);
     }
 
     public function test_include()

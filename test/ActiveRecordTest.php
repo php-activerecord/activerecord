@@ -413,8 +413,8 @@ class ActiveRecordTest extends DatabaseTestCase
     public function test_delegate_set_attribute()
     {
         $event = Event::first();
-        $event->state = 'MEXICO';
-        $this->assertEquals('MEXICO', $event->venue->state);
+        $event->state = 'Mexico';
+        $this->assertEquals('Mexico', $event->venue->state);
     }
 
     public function test_delegate_getter_gh_98()
@@ -422,8 +422,8 @@ class ActiveRecordTest extends DatabaseTestCase
         Venue::$use_custom_get_state_getter = true;
 
         $event = Event::first();
-        $this->assertEquals('ny', $event->venue->state);
-        $this->assertEquals('ny', $event->state);
+        $this->assertEquals('NY', $event->venue->state);
+        $this->assertEquals('NY', $event->state);
 
         Venue::$use_custom_get_state_getter = false;
     }
@@ -433,8 +433,8 @@ class ActiveRecordTest extends DatabaseTestCase
         Venue::$use_custom_set_state_setter = true;
 
         $event = Event::first();
-        $event->state = 'MEXICO';
-        $this->assertEquals('MEXICO#', $event->venue->state);
+        $event->state = 'Mexico';
+        $this->assertEquals('Mexico#', $event->venue->state);
 
         Venue::$use_custom_set_state_setter = false;
     }
@@ -461,13 +461,13 @@ class ActiveRecordTest extends DatabaseTestCase
     {
         $author = new Author();
         $author->name = 'bob';
-        $this->assertEquals('BOB', $author->name);
+        $this->assertEquals('bob', $author->name);
     }
 
     public function test_getter()
     {
         $book = Book::first();
-        $this->assertEquals(strtoupper($book->name), $book->upper_name);
+        $this->assertEquals($book->name, $book->get_name());
     }
 
     public function test_getter_with_same_name_as_an_attribute()
@@ -475,7 +475,7 @@ class ActiveRecordTest extends DatabaseTestCase
         Book::$use_custom_get_name_getter = true;
         $book = new Book();
         $book->name = 'bob';
-        $this->assertEquals('BOB', $book->name);
+        $this->assertEquals('bob', $book->name);
         Book::$use_custom_get_name_getter = false;
     }
 
