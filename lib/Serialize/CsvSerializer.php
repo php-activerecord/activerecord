@@ -12,7 +12,7 @@ class CsvSerializer extends Serialization
     public static $delimiter = ',';
     public static $enclosure = '"';
 
-    public function to_s()
+    public function to_s(): string
     {
         if (true == @$this->options['only_header']) {
             return $this->header();

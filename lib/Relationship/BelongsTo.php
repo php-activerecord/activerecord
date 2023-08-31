@@ -45,9 +45,7 @@ class BelongsTo extends AbstractRelationship
      * @return array<string>
      */
     public function primary_key(): array {
-        if(!isset($this->primary_key)) {
-            $this->primary_key = [Table::load($this->class_name)->pk[0]];
-        }
+        $this->primary_key ??= [Table::load($this->class_name)->pk[0]];
         return $this->primary_key;
     }
 
