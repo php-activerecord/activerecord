@@ -5,6 +5,9 @@ use PHPUnit\Framework\TestCase;
 
 class UtilsTest extends TestCase
 {
+    private $object_array;
+    private $array_hash;
+
     public function setUp(): void
     {
         $this->object_array = [null, null];
