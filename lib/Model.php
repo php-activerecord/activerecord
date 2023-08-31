@@ -12,6 +12,7 @@ use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Relationship\AbstractRelationship;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
@@ -114,7 +115,7 @@ class Model
     /**
      * Flag whether this model's attributes have been modified since it will either be null or an array of column_names that have been modified
      *
-     * @var array
+     * @var array<string, bool>
      */
     private array $__dirty = [];
 
@@ -177,7 +178,7 @@ class Model
     /**
      * Set this to true in your subclass to use caching for this model. Note that you must also configure a cache object.
      */
-    public static $cache = false;
+    public static bool $cache = false;
 
     /**
      * Set this to specify an expiration period for this model. If not set, the expire value you set in your cache options will be used.
@@ -236,7 +237,7 @@ class Model
      * echo $person->alias_first_name;
      * ```
      *
-     * @var array
+     * @var array<string,string>
      */
     public static array $alias_attribute = [];
 
@@ -258,9 +259,9 @@ class Model
      * echo $person->id; # => null
      * ```
      *
-     * @var array
+     * @var array<string>
      */
-    public static $attr_accessible = [];
+    public static array $attr_accessible = [];
 
     /**
      * Blacklist of attributes that cannot be mass-assigned.
@@ -270,9 +271,9 @@ class Model
      *
      * If the attribute is both accessible and protected, it is treated as protected.
      *
-     * @var array
+     * @var array<string>
      */
-    public static $attr_protected = [];
+    public static array $attr_protected = [];
 
     /**
      * Delegates calls to a relationship.
@@ -309,14 +310,13 @@ class Model
      * new Person(array('first_name' => 'Tito', 'last_name' => 'the Grief'));
      * ```
      *
-     * @param array $attributes             Hash containing names and values to mass assign to the model
+     * @param Attributes $attributes             Hash containing names and values to mass assign to the model
      * @param bool  $guard_attributes       Set to true to guard protected/non-accessible attributes
      * @param bool  $instantiating_via_find Set to true if this model is being created from a find call
      * @param bool  $new_record             Set to true if this should be considered a new record
      *
-     * @return Model
      */
-    public function __construct(array $attributes=[], $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
+    public function __construct(array $attributes=[], bool $guard_attributes=true, bool $instantiating_via_find=false, bool $new_record=true)
     {
         $this->__new_record = $new_record;
 
@@ -397,8 +397,8 @@ class Model
         // check for getter
         if (method_exists($this, "get_$name")) {
             $name = "get_$name";
-            $value = call_user_func([$this, $name]);
-            return $value;
+            $res = call_user_func([$this, $name]);
+            return $res;
         }
 
         return $this->read_attribute($name);
@@ -605,8 +605,8 @@ class Model
 
         // this may be first access to the relationship so check Table
         if ($table->get_relationship($name)) {
-            $rel = $this->initRelationships($name);
-            return $rel;
+            $res = $this->initRelationships($name);
+            return $res;
         }
 
         if ('id' == $name) {
@@ -638,7 +638,12 @@ class Model
         throw new UndefinedPropertyException(get_called_class(), $name);
     }
 
-    protected function initRelationships(string $name) {
+    /**
+     * @param string $name
+     * @return Model|AbstractRelationship|null
+     * @throws RelationshipException
+     */
+    protected function initRelationships(string $name): mixed {
         $table = static::table();
         if (($relationship = $table->get_relationship($name))) {
             $this->__relationships[$name] = $relationship->load($this);
@@ -649,28 +654,23 @@ class Model
 
     /**
      * Flags an attribute as dirty.
-     *
-     * @param string $name Attribute name
      */
-    public function flag_dirty($name)
+    public function flag_dirty(string $attribute): void
     {
-        $this->__dirty[$name] = true;
+        $this->__dirty[$attribute] = true;
     }
 
     /**
      * Returns hash of attributes that have been modified since loading the model.
-     *
+     * @return Attributes
      */
-    public function dirty_attributes(): ?array
+    public function dirty_attributes(): array
     {
         if (count($this->__dirty) <= 0) {
-            return null;
+            return [];
         }
 
-        $dirty = array_intersect_key($this->attributes, $this->__dirty);
-
-        /** @phpstan-ignore-next-line */
-        return (count($dirty) > 0) ? $dirty : null;
+        return array_intersect_key($this->attributes, $this->__dirty);
     }
 
     /**
@@ -695,10 +695,13 @@ class Model
         return $this->attributes;
     }
 
-    public function get_primary_key($first=false): array|string
+    /**
+     * @param bool $first
+     * @return array<string>|string
+     */
+    public function get_primary_key(bool $first=false): array|string
     {
         $pk = static::table()->pk;
-
         return $first ? $pk[0] : $pk;
     }
 
@@ -735,9 +738,9 @@ class Model
      * ];
      * ```
      *
-     * @return array an array containing validator data for this model
+     * @return array<string, array<mixed>> an array containing validator data for this model
      */
-    public function get_validation_rules()
+    public function get_validation_rules(): array
     {
         $validator = new Validations($this);
 
@@ -782,7 +785,7 @@ class Model
      * @param DelegateOptions  $delegate An array containing delegate data
      *
      */
-    private function is_delegated(string $name, &$delegate): string|null
+    private function is_delegated(string $name, $delegate): string|null
     {
         if (is_array($delegate)) {
             if ('' != $delegate['prefix']) {

@@ -14,7 +14,7 @@ use test\models\Venue;
 class ActiveRecordTest extends DatabaseTestCase
 {
     private $options;
-    
+
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
@@ -522,7 +522,7 @@ class ActiveRecordTest extends DatabaseTestCase
     {
         $author = new Author();
         $author->flag_dirty('some_inexistant_property');
-        $this->assertNull($author->dirty_attributes());
+        $this->assertEquals([],$author->dirty_attributes());
         $this->assertFalse($author->attribute_is_dirty('some_inexistant_property'));
     }
 

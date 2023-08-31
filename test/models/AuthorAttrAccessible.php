@@ -16,5 +16,5 @@ class AuthorAttrAccessible extends Model
     public static array $belongs_to = [];
 
     // No attributes should be accessible
-    public static $attr_accessible = [null];
+    public static array $attr_accessible = [null];
 }
