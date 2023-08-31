@@ -65,24 +65,3 @@ jobs:
         with:
           name: phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage
           path: coverage.xml
-  upload_coverage:
-    name: Upload coverage to Codecov
-    runs-on: ubuntu-20.04
-    needs:
-      - phpunit
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
-      - name: Download coverage files
-        uses: actions/download-artifact@v3
-        with:
-          path: reports
-
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          directory: reports
