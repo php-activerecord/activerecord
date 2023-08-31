@@ -96,7 +96,7 @@ abstract class Connection
      */
     public static $DEFAULT_PORT = 0;
 
-    abstract public function create_column(&$column);
+    abstract public function create_column(array $column): Column;
 
     /**
      * Retrieve a database connection.
@@ -551,9 +551,8 @@ abstract class Connection
     /**
      * Query for column meta info and return statement handle.
      *
-     * @return \PDOStatement
      */
-    abstract public function query_column_info(string $table);
+    abstract public function query_column_info(string $table): \PDOStatement;
 
     /**
      * Query for all tables in the current database. The result must only
@@ -561,12 +560,12 @@ abstract class Connection
      *
      * @return \PDOStatement
      */
-    abstract public function query_for_tables();
+    abstract public function query_for_tables(): \PDOStatement;
 
     /**
      * Executes query to specify the character set for this connection.
      */
-    abstract public function set_encoding($charset);
+    abstract public function set_encoding(string $charset): void;
 
     /*
      * Returns an array mapping of native database types
@@ -575,12 +574,12 @@ abstract class Connection
     abstract public function native_database_types();
 
     /**
-     * Specifies whether or not adapter can use LIMIT/ORDER clauses with DELETE & UPDATE operations
+     * Specifies whether adapter can use LIMIT/ORDER clauses with DELETE & UPDATE operations
      *
      * @internal
      * @returns boolean (FALSE by default)
      */
-    public function accepts_limit_and_order_for_update_and_delete()
+    public function accepts_limit_and_order_for_update_and_delete(): bool
     {
         return false;
     }

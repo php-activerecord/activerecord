@@ -24,17 +24,21 @@ class MysqlAdapter extends Connection
         return "$sql LIMIT {$offset}$limit";
     }
 
-    public function query_column_info($table)
+    public function query_column_info(string $table): \PDOStatement
     {
         return $this->query("SHOW COLUMNS FROM $table");
     }
 
-    public function query_for_tables()
+    public function query_for_tables(): \PDOStatement
     {
         return $this->query('SHOW TABLES');
     }
 
-    public function create_column(&$column)
+    /**
+     * @param array<string, string|null> $column
+     * @return Column
+     */
+    public function create_column(array $column): Column
     {
         $c = new Column();
         $c->inflected_name    = Inflector::instance()->variablize($column['field']);
@@ -68,18 +72,21 @@ class MysqlAdapter extends Connection
         return $c;
     }
 
-    public function set_encoding($charset)
+    public function set_encoding(string $charset): void
     {
         $params = [$charset];
         $this->query('SET NAMES ?', $params);
     }
 
-    public function accepts_limit_and_order_for_update_and_delete()
+    public function accepts_limit_and_order_for_update_and_delete(): bool
     {
         return true;
     }
 
-    public function native_database_types()
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    public function native_database_types(): array
     {
         return [
             'primary_key' => 'int(11) UNSIGNED DEFAULT NULL auto_increment PRIMARY KEY',
