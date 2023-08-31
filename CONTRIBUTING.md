@@ -18,13 +18,13 @@ After that you can run the tests by invoking the local PHPUnit
 To run all test simply use:
 
 ```sh
-vendor/bin/phpunit
+composer test
 ```
 
 Or run a single test file by specifying its path:
 
 ```sh
-vendor/bin/phpunit test/InflectorTest.php
+composer test test/InflectorTest.php
 ```
 
 #### Skipped Tests ####
@@ -36,14 +36,14 @@ tests, pass the `--verbose` flag to PHPUnit:
 vendor/bin/phpunit --verbose
 ```
 
-For Docker users, a docker-compose.yml has been provided in the project root that will provide:
+For [Docker](https://docs.docker.com/get-docker/) users, a docker-compose.yml has been provided in the project root that will provide:
 - mysql
 - postgres
 - memcached
 
 Simply run:
 ```shell
-docker-composer up -d
+docker-compose up -d
 ```
 
 Then, the necessary services will be available and the tests should pass (although you may need to install PHP memcache extensions in a separate step, see below ).
@@ -63,10 +63,16 @@ Download the .dll that matches your version of PHP, install it into your /ext di
 extension=memcache
 ```
 
-
 #### Alternate setup
 If Docker is not available to you, or you would simply not use it, you will have to do your best to install the various services on your own.
 
 * Install `memcached` and the PHP memcached extension (e.g., `brew install php56-memcache memcached` on macOS)
 * Install the PDO drivers for PostgreSQL (e.g., `brew install php56-pdo-pgsql` on macOS)
 * Create a MySQL database and a PostgreSQL database. You can either create these such that they are available at the default locations of `mysql://test:test@127.0.0.1/test` and `pgsql://test:test@127.0.0.1/test` respectively. Alternatively, you can set the `PHPAR_MYSQL` and `PHPAR_PGSQL` environment variables to specify a different location for the MySQL and PostgreSQL databases.
+
+#### Static checks
+
+* You can check your code with a PSR-2 style checker locally with the command:
+```sh
+composer style-check
+```

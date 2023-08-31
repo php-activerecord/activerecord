@@ -7,6 +7,9 @@ use test\models\Author;
 
 class DateTimeTest extends TestCase
 {
+    private $date;
+    private $original_format;
+
     public function setUp(): void
     {
         $this->date = new DateTime();

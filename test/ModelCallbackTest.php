@@ -4,6 +4,9 @@ use test\models\Venue;
 
 class ModelCallbackTest extends DatabaseTestCase
 {
+    private $callback;
+    private $venue;
+
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
