@@ -22,7 +22,6 @@ class Author extends Model
 
     public function set_name($value)
     {
-        $value = strtoupper($value);
         $this->assign_attribute('name', $value);
     }
 

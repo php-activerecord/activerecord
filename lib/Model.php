@@ -385,6 +385,7 @@ class Model
     public function &__get($name)
     {
         // check for getter
+        $name = strtolower($name);
         if (method_exists($this, "get_$name")) {
             $name = "get_$name";
             $res = call_user_func([$this, $name]);
@@ -479,11 +480,11 @@ class Model
      */
     public function __set(string $name, mixed $value): void
     {
+        $name = strtolower($name);
         if (array_key_exists($name, static::$alias_attribute)) {
             $name = static::$alias_attribute[$name];
         } elseif (method_exists($this, "set_$name")) {
             $name = "set_$name";
-
             $this->$name($value);
 
             return;
