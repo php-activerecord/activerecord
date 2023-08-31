@@ -36,6 +36,8 @@ use ActiveRecord\Table;
  */
 class BelongsTo extends AbstractRelationship
 {
+    public $class_name;
+
     /**
      * @var array<string>
      */
