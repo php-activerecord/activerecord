@@ -39,7 +39,7 @@ class PgsqlAdapter extends Connection
         return $sql . ' LIMIT ' . $limit . ' OFFSET ' . $offset;
     }
 
-    public function query_column_info($table)
+    public function query_column_info(string $table): \PDOStatement
     {
         $sql = <<<SQL
 SELECT
@@ -77,12 +77,12 @@ SQL;
         return $this->query($sql, $values);
     }
 
-    public function query_for_tables()
+    public function query_for_tables(): \PDOStatement
     {
         return $this->query("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')");
     }
 
-    public function create_column(&$column)
+    public function create_column(array $column): Column
     {
         $c = new Column();
         $c->inflected_name    = Inflector::instance()->variablize($column['field']);
@@ -123,12 +123,12 @@ SQL;
         return $c;
     }
 
-    public function set_encoding($charset)
+    public function set_encoding(string $charset): void
     {
         $this->query("SET NAMES '$charset'");
     }
 
-    public function native_database_types()
+    public function native_database_types(): array
     {
         return [
             'primary_key' => 'serial primary key',
