@@ -1,6 +1,8 @@
 <?php
+namespace test\models;
 
-class Venue extends ActiveRecord\Model
+use ActiveRecord\Model;
+class Venue extends Model
 {
     public static $use_custom_get_state_getter = false;
     public static $use_custom_set_state_setter = false;

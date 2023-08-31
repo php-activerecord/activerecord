@@ -1,5 +1,7 @@
 <?php
 
+use test\models\Venue;
+
 class ModelCallbackTest extends DatabaseTestCase
 {
     private $callback;

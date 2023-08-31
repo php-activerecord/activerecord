@@ -1,5 +1,7 @@
 <?php
 
+use ActiveRecord\Exception\DatabaseException;
+
 class DatabaseLoader
 {
     private $db;
@@ -59,7 +61,7 @@ class DatabaseLoader
             if ('oci' == $this->db->protocol) {
                 try {
                     $this->db->query("DROP SEQUENCE {$table}_seq");
-                } catch (ActiveRecord\DatabaseException $e) {
+                } catch (DatabaseException $e) {
                     // ignore
                 }
             }

@@ -1,6 +1,8 @@
 <?php
+namespace test\models;
 
-class BookAttrProtected extends ActiveRecord\Model
+use ActiveRecord\Model;
+class BookAttrProtected extends Model
 {
     public static $pk = 'book_id';
     public static $table_name = 'books';

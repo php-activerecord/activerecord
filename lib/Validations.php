@@ -10,6 +10,7 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Model;
 use ArrayIterator;
 use IteratorAggregate;

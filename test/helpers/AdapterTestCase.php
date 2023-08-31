@@ -1,6 +1,8 @@
 <?php
 
 use ActiveRecord\Column;
+use ActiveRecord\Exception\DatabaseException;
+use ActiveRecord\Adapter\SqliteAdapter;
 
 abstract class AdapterTestCase extends DatabaseTestCase
 {
@@ -18,7 +20,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_i_has_a_default_port_unless_im_sqlite()
     {
-        if ($this->connection instanceof ActiveRecord\SqliteAdapter) {
+        if ($this->connection instanceof SqliteAdapter) {
             $this->expectNotToPerformAssertions();
             return;
         }
@@ -41,37 +43,37 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_invalid_connection_protocol()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::instance('terribledb://user:pass@host/db');
     }
 
     public function test_no_host_connection()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         if (!$GLOBALS['slow_tests']) {
-            throw new ActiveRecord\DatabaseException('');
+            throw new DatabaseException('');
         }
         ActiveRecord\Connection::instance("{$this->connection->protocol}://user:pass");
     }
 
     public function test_connection_failed_invalid_host()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         if (!$GLOBALS['slow_tests']) {
-            throw new ActiveRecord\DatabaseException('');
+            throw new DatabaseException('');
         }
         ActiveRecord\Connection::instance("{$this->connection->protocol}://user:pass/1.1.1.1/db");
     }
 
     public function test_connection_failed()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://baduser:badpass@127.0.0.1/db");
     }
 
     public function test_connect_failed()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://zzz:zzz@127.0.0.1/test");
     }
 
@@ -98,7 +100,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_connect_to_invalid_database()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://test:test@127.0.0.1/" . self::InvalidDb);
     }
 
@@ -191,7 +193,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_invalid_query()
     {
-        $this->expectException(\ActiveRecord\DatabaseException::class);
+        $this->expectException(DatabaseException::class);
         $this->connection->query('alsdkjfsdf');
     }
 
@@ -259,10 +261,6 @@ abstract class AdapterTestCase extends DatabaseTestCase
     {
         $columns = $this->connection->columns('authors');
         $names = ['author_id', 'parent_author_id', 'name', 'updated_at', 'created_at', 'some_Date', 'some_time', 'some_text', 'encrypted_password', 'mixedCaseField'];
-
-        if ($this->connection instanceof ActiveRecord\OciAdapter) {
-            $names = array_filter(array_map('strtolower', $names), function ($s) { return 'some_time' !== $s; });
-        }
 
         foreach ($names as $field) {
             $this->assertTrue(array_key_exists($field, $columns));

@@ -1,5 +1,7 @@
 <?php
 
+use test\models\Author;
+
 class DateFormatTest extends DatabaseTestCase
 {
     public function test_datefield_gets_converted_to_ar_datetime()

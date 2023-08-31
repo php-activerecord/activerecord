@@ -4,6 +4,7 @@ include 'helpers/foo.php';
 
 use foo\bar\biz\Newsletter;
 use foo\bar\biz\User;
+use test\models\Venue;
 
 class HasManyThroughTest extends DatabaseTestCase
 {
