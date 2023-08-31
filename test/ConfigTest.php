@@ -143,6 +143,9 @@ class TestDateTime
 
 class ConfigTest extends TestCase
 {
+    private $config;
+    private $connections;
+
     public function setUp(): void
     {
         $this->config = new Config();

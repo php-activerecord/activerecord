@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 class DateTimeTest extends TestCase
 {
+    private $date;
+    private $original_format;
+
     public function setUp(): void
     {
         $this->date = new DateTime();

@@ -5,6 +5,8 @@ use ActiveRecord\Table;
 
 class SQLBuilderTest extends DatabaseTestCase
 {
+    private $sql;
+
     protected $table_name = 'authors';
     protected $class_name = 'Author';
     protected $table;

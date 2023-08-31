@@ -4,6 +4,8 @@ use ActiveRecord\DateTime;
 
 class DirtyAuthor extends ActiveRecord\Model
 {
+    private $name;
+
     public static $table = 'authors';
     public static $before_save = 'before_save';
 

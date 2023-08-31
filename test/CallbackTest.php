@@ -2,6 +2,8 @@
 
 class CallBackTest extends DatabaseTestCase
 {
+    private $callback;
+    
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
