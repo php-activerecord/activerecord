@@ -3,7 +3,7 @@
 class Order extends ActiveRecord\Model
 {
     // order belongs to a person
-    public static $belongs_to = [
+    public static array $belongs_to = [
         ['person']];
 
     // order can have many payments by many people

@@ -4,5 +4,5 @@ namespace test\models;
 use ActiveRecord\Model;
 class AwesomePerson extends Model
 {
-    public static $belongs_to = ['author'];
+    public static array $belongs_to = ['author'];
 }

@@ -22,13 +22,13 @@ class DirtyAuthor extends ActiveRecord\Model
 
 class AuthorWithoutSequence extends ActiveRecord\Model
 {
-    public static $table = 'authors';
-    public static $sequence = 'invalid_seq';
+    public static string $table = 'authors';
+    public static string $sequence = 'invalid_seq';
 }
 
 class AuthorExplicitSequence extends ActiveRecord\Model
 {
-    public static $sequence = 'blah_seq';
+    public static string $sequence = 'blah_seq';
 }
 
 class ActiveRecordWriteTest extends DatabaseTestCase

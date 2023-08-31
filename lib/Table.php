@@ -133,7 +133,7 @@ class Table
             static::clear_cache();
         }
 
-        return $this->conn = ConnectionManager::get_connection($connection);
+        return $this->conn = ConnectionManager::get_connection($connection ?? null);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 class BookPresence extends ActiveRecord\Model
 {
-    public static $table_name = 'books';
+    public static string $table_name = 'books';
 
     public static array $validates_presence_of = [
         'name' => true
@@ -11,7 +11,7 @@ class BookPresence extends ActiveRecord\Model
 
 class AuthorPresence extends ActiveRecord\Model
 {
-    public static $table_name = 'authors';
+    public static string $table_name = 'authors';
 
     public static array $validates_presence_of = [
         'some_date' => true

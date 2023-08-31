@@ -13,7 +13,7 @@ use ActiveRecord\Table;
  * class School extends ActiveRecord\Model {}
  *
  * class Person extends ActiveRecord\Model {
- *   static $belongs_to = array(
+ *   static array $belongs_to = array(
  *     array('school')
  *   );
  * }
@@ -25,7 +25,7 @@ use ActiveRecord\Table;
  * class School extends ActiveRecord\Model {}
  *
  * class Person extends ActiveRecord\Model {
- *   static $belongs_to = array(
+ *   static array $belongs_to = array(
  *     array('school', 'primary_key' => 'school_id')
  *   );
  * }

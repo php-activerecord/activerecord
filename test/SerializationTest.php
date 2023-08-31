@@ -138,7 +138,7 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_array_include_root()
     {
         $book = Book::find(1);
-        $array = $book->to_array(true);
+        $array = $book->to_array(['include_root'=>true]);
         $book_attributes = ['test\models\book' => $book->attributes()];
         $this->assertEquals($book_attributes, $array);
     }
@@ -146,7 +146,7 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_array_except()
     {
         $book = Book::find(1);
-        $array = $book->to_array(false, ['except' => ['special']]);
+        $array = $book->to_array(['except' => ['special']]);
         $book_attributes = $book->attributes();
         unset($book_attributes['special']);
         $this->assertEquals($book_attributes, $array);

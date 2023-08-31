@@ -5,6 +5,7 @@ namespace ActiveRecord\Serialize;
 use ActiveRecord\Config;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Model;
+use ActiveRecord\Types;
 
 /**
  * Base class for Model serializers.
@@ -39,8 +40,7 @@ use ActiveRecord\Model;
  * $model->to_xml(['except' => 'password']);
  * ```
  *
- * @phpstan-import-type Attributes from Model
- *
+ * @phpstan-import-type Attributes from Types
  * @see http://www.phpactiverecord.org/guides/utilities#topic-serialization
  */
 abstract class Serialization
@@ -108,7 +108,6 @@ abstract class Serialization
     {
         $this->model = $model;
         $this->options = $options;
-        $this->options['include_root'] ??= false;
         $this->attributes = $model->attributes();
         $this->parse_options();
     }

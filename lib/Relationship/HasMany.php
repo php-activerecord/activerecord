@@ -29,7 +29,7 @@ use ActiveRecord\Table;
  *
  * ```php
  * class Payment extends ActiveRecord\Model {
- *   static $belongs_to = array(
+ *   static array $belongs_to = array(
  *     array('person'),
  *     array('order')
  *   );

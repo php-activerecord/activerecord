@@ -13,7 +13,7 @@ class Author extends Model
     public static $has_one = [
         ['awesome_person', 'foreign_key' => 'author_id', 'primary_key' => 'author_id'],
         ['parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id']];
-    public static $belongs_to = [];
+    public static array $belongs_to = [];
 
     public function set_password($plaintext)
     {

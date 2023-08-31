@@ -127,7 +127,7 @@ class CallBackTest extends DatabaseTestCase
     {
         $this->expectException(ActiveRecordException::class);
         $class_name = 'Venues_' . md5(uniqid());
-        eval("class $class_name extends ActiveRecord\\Model { static \$table_name = 'venues'; static \$after_save = 'method_that_does_not_exist'; };");
+        eval("class $class_name extends ActiveRecord\\Model { static string \$table_name = 'venues'; static \$after_save = 'method_that_does_not_exist'; };");
         new $class_name();
         new ActiveRecord\CallBack($class_name);
     }

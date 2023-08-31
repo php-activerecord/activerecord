@@ -2,7 +2,7 @@
 
 class BookNumericality extends ActiveRecord\Model
 {
-    public static $table_name = 'books';
+    public static string $table_name = 'books';
 
     public static array $validates_numericality_of = [];
 }
