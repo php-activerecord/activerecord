@@ -61,7 +61,7 @@ class BelongsTo extends AbstractRelationship
         }
     }
 
-    public function load(Model $model)
+    public function load(Model $model): ?Model
     {
         $keys = [];
         $inflector = Inflector::instance();

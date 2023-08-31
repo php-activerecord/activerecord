@@ -18,8 +18,7 @@ use function ActiveRecord\has_absolute_namespace;
 /**
  * Abstract class that all relationships must extend from.
  *
- * @package ActiveRecord
- *
+ * @phpstan-import-type Attributes from Model
  * @see http://www.phpactiverecord.org/guides/associations
  */
 abstract class AbstractRelationship
@@ -48,7 +47,7 @@ abstract class AbstractRelationship
     /**
      * Options of the relationship.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $options = [];
 
@@ -62,14 +61,14 @@ abstract class AbstractRelationship
     /**
      * List of valid options for relationships.
      *
-     * @var array
+     * @var array<string>
      */
     protected static $valid_association_options = ['class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly', 'namespace'];
 
     /**
      * Constructs a relationship.
      *
-     * @param array $options Options for the relationship (see {@link valid_association_options})
+     * @param array<mixed> $options Options for the relationship (see {@link valid_association_options})
      *
      * @return mixed
      */
@@ -101,19 +100,23 @@ abstract class AbstractRelationship
         }
     }
 
-    protected function get_table()
+    protected function get_table(): Table
     {
         return Table::load($this->class_name);
     }
 
-    abstract public function load_eagerly($models, $attributes, $includes, Table $table): void;
+    /**
+     * @param array<Model> $models of model objects
+     * @param array<Attributes> $attributes of attributes from $models
+     * @param array<array<string>> $includes of eager load directives
+     */
+    abstract public function load_eagerly(array $models, array $attributes, array $includes, Table $table): void;
 
     /**
      * What is this relationship's cardinality?
      *
-     * @return bool
      */
-    public function is_poly()
+    public function is_poly(): bool
     {
         return $this->poly_relationship;
     }
@@ -126,13 +129,13 @@ abstract class AbstractRelationship
      * $models.
      *
      * @param Table $table
-     * @param $models array of model objects
-     * @param $attributes array of attributes from $models
-     * @param $includes array of eager load directives
-     * @param $query_keys -> key(s) to be queried for on included/related table
-     * @param $model_values_keys -> key(s)/value(s) to be used in query from model which is including
+     * @param array<Model> $models of model objects
+     * @param array<Attributes> $attributes of attributes from $models
+     * @param array<array<string>> $includes of eager load directives
+     * @param array<string> $query_keys -> key(s) to be queried for on included/related table
+     * @param array<string> $model_values_keys -> key(s)/value(s) to be used in query from model which is including
      */
-    protected function query_and_attach_related_models_eagerly(Table $table, $models, $attributes, $includes = [], $query_keys = [], $model_values_keys = [])
+    protected function query_and_attach_related_models_eagerly(Table $table, array $models, array $attributes, array $includes = [], array $query_keys = [], array $model_values_keys = []): void
     {
         $values = [];
         $options = $this->options;
@@ -224,12 +227,12 @@ abstract class AbstractRelationship
      * Creates a new instance of specified {@link Model} with the attributes pre-loaded.
      *
      * @param Model $model The model which holds this association
-     * @param array $attributes Hash containing attributes to initialize the model with
+     * @param Attributes $attributes Hash containing attributes to initialize the model with
      * @param bool $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
      *
      * @return Model
      */
-    public function build_association(Model $model, $attributes = [], $guard_attributes = true)
+    public function build_association(Model $model, array $attributes = [], bool $guard_attributes = true): Model
     {
         $class_name = $this->class_name;
 
@@ -240,12 +243,12 @@ abstract class AbstractRelationship
      * Creates a new instance of {@link Model} and invokes save.
      *
      * @param Model $model The model which holds this association
-     * @param array $attributes Hash containing attributes to initialize the model with
+     * @param Attributes $attributes Hash containing attributes to initialize the model with
      * @param bool $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
      *
      * @return Model
      */
-    public function create_association(Model $model, $attributes = [], $guard_attributes = true)
+    public function create_association(Model $model, array $attributes = [], bool $guard_attributes = true): Model
     {
         $class_name = $this->class_name;
         $new_record = $class_name::create($attributes, true, $guard_attributes);
@@ -253,7 +256,7 @@ abstract class AbstractRelationship
         return $this->append_record_to_associate($model, $new_record);
     }
 
-    protected function append_record_to_associate(Model $associate, Model $record)
+    protected function append_record_to_associate(Model $associate, Model $record): Model
     {
         $association =& $associate->{$this->attribute_name};
 
@@ -266,7 +269,11 @@ abstract class AbstractRelationship
         return $record;
     }
 
-    protected function merge_association_options($options)
+    /**
+     * @param array<string,mixed> $options
+     * @return array<string,mixed>
+     */
+    protected function merge_association_options(array $options): array
     {
         $available_options = array_merge(self::$valid_association_options, static::$valid_association_options);
         $valid_options = array_intersect_key(array_flip($available_options), $options);
@@ -278,7 +285,11 @@ abstract class AbstractRelationship
         return $valid_options;
     }
 
-    protected function unset_non_finder_options($options)
+    /**
+     * @param array<string,mixed> $options
+     * @return array<string,mixed>
+     */
+    protected function unset_non_finder_options(array $options): array
     {
         foreach (array_keys($options) as $option) {
             if (!in_array($option, Model::$VALID_OPTIONS)) {
@@ -296,13 +307,13 @@ abstract class AbstractRelationship
      *
      * @see attribute_name
      */
-    protected function set_inferred_class_name()
+    protected function set_inferred_class_name(): void
     {
         $singularize = ($this instanceof HasMany ? true : false);
         $this->set_class_name(classify($this->attribute_name, $singularize));
     }
 
-    protected function set_class_name($class_name)
+    protected function set_class_name(string $class_name): void
     {
         if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
             $class_name = $this->options['namespace'] . '\\' . $class_name;
@@ -316,9 +327,16 @@ abstract class AbstractRelationship
         $this->class_name = $class_name;
     }
 
-    protected function create_conditions_from_keys(Model $model, $condition_keys = [], $value_keys = [])
+    /**
+     * @param Model $model
+     * @param array<string> $condition_keys
+     * @param array<string> $value_keys
+     *
+     * @return array<mixed>
+     */
+    protected function create_conditions_from_keys(Model $model, array $condition_keys = [], array $value_keys = []): ?array
     {
-        $condition_string = implode('_and_', $condition_keys ?? []);
+        $condition_string = implode('_and_', $condition_keys);
         $condition_values = array_values($model->get_values_for($value_keys));
 
         // return null if all the foreign key values are null so that we don't try to do a query like "id is null"
@@ -393,6 +411,8 @@ abstract class AbstractRelationship
      * This will load the related model data.
      *
      * @param Model $model The model this relationship belongs to
+     *
+     * @return null|Model|array<Model>
      */
-    abstract public function load(Model $model);
+    abstract public function load(Model $model): mixed;
 }

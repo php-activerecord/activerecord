@@ -44,8 +44,7 @@ use ActiveRecord\Table;
  *     );
  * }
  * ```
- *
- * @package ActiveRecord
+ * @phpstan-import-type Attributes from Model
  *
  * @see http://www.phpactiverecord.org/guides/associations
  * @see valid_association_options
@@ -113,7 +112,13 @@ class HasMany extends AbstractRelationship
         }
     }
 
-    public function load(Model $model)
+    /**
+     * @param Model $model
+     * @return null|Model|array<Model>
+     * @throws HasManyThroughAssociationException
+     * @throws \ActiveRecord\Exception\RelationshipException
+     */
+    public function load(Model $model): mixed
     {
         $class_name = $this->class_name;
         $this->set_keys(get_class($model));
@@ -156,7 +161,8 @@ class HasMany extends AbstractRelationship
         $options = $this->unset_non_finder_options($this->options);
         $options['conditions'] = $conditions;
 
-        return $class_name::find($this->poly_relationship ? 'all' : 'first', $options);
+        $res = $class_name::find($this->poly_relationship ? 'all' : 'first', $options);
+        return $res;
     }
 
     /**
@@ -175,7 +181,12 @@ class HasMany extends AbstractRelationship
         return [$primary_key => $model->id];
     }
 
-    public function build_association(Model $model, $attributes = [], $guard_attributes = true)
+    /**
+     * @param Model $model
+     * @param Attributes $attributes
+     * @param bool $guard_attributes
+     */
+    public function build_association(Model $model, array $attributes = [], $guard_attributes = true): Model
     {
         $relationship_attributes = $this->get_foreign_key_for_new_association($model);
 
@@ -196,7 +207,7 @@ class HasMany extends AbstractRelationship
         return $record;
     }
 
-    public function create_association(Model $model, $attributes = [], $guard_attributes = true)
+    public function create_association(Model $model, $attributes = [], $guard_attributes = true): Model
     {
         $relationship_attributes = $this->get_foreign_key_for_new_association($model);
 
