@@ -6,21 +6,13 @@
 
 This is a badly-needed relaunch of the project originally created by Kien La and Jacques Fuentes. Both authors and the current maintainers have lost interest in PHP, moved onto other languages, and no longer review pull requests or issues. Some of us still depend on the project and want to see it move forward, so we've moved it here under new ownership. 
 
-
-The code has been refreshed with a number of improvements:
-
-* A PSR-2 style checker has been added to the travis build, and a fixer has been run on the codebase. You can check your code locally with the command:
-    ```sh
-    composer style-check
-    ```
-* API and Usage documentation is now automatically generated and deployed to github pages. You'll find the usage documentation in `/docs` if you want to make any changes.  
-
-
 Note that the original website, <http://www.phpactiverecord.org/>, has also fallen into neglect and disrepair, and is not 
  advised as a primary reference. A new documentation site has been launched here: 
  
 http://php-activerecord.github.io/activerecord/
- 
+
+and can be found in in `/docs` if you want to make any changes.
+
 ## Installation
 
 Via composer:
@@ -47,14 +39,13 @@ Of course, there are some differences which will be obvious to the user if they 
 ## Minimum Requirements ##
 
 - PHP 8.1+
-- PDO driver for your respective database
+- [PDO driver for your respective database](https://www.php.net/manual/en/pdo.installation.php)
 
 ## Supported Databases ##
 
 - MySQL
 - SQLite
 - PostgreSQL
-- Oracle
 
 ## Features ##
 
@@ -81,41 +72,14 @@ Setup is very easy and straight-forward. There are essentially only three config
 Example:
 
 ```php
-ActiveRecord\Config::initialize(function($cfg)
-{
-   $cfg->set_model_directory('/path/to/your/model_directory');
-   $cfg->set_connections(
-     array(
-       'development' => 'mysql://username:password@localhost/development_database_name',
-       'test' => 'mysql://username:password@localhost/test_database_name',
-       'production' => 'mysql://username:password@localhost/production_database_name'
-     )
-   );
-});
-```
-
-Alternatively (w/o the 5.3 closure):
-
-```php
 $cfg = ActiveRecord\Config::instance();
 $cfg->set_model_directory('/path/to/your/model_directory');
-$cfg->set_connections(
-  array(
+$cfg->set_connections([
     'development' => 'mysql://username:password@localhost/development_database_name',
     'test' => 'mysql://username:password@localhost/test_database_name',
     'production' => 'mysql://username:password@localhost/production_database_name'
-  )
-);
-```
-
-PHP ActiveRecord will default to use your development database. For testing or production, you simply set the default
-connection according to your current environment ('test' or 'production'):
-
-```php
-ActiveRecord\Config::initialize(function($cfg)
-{
-  $cfg->set_default_connection(your_environment);
-});
+]);
+$cfg->set_default_connection('development'); // Set to development | test | production, development is default
 ```
 
 Once you have configured these three settings you are done. ActiveRecord takes care of the rest for you.

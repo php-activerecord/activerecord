@@ -461,6 +461,7 @@ class HasMany extends AbstractRelationship
     protected $primary_key;
 
     private $has_one = false;
+    private $initialized;
     private $through;
 
     /**
@@ -709,6 +710,10 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
+    public $class_name;
+    public $foreign_key;
+    public $primary_key;
+
     public function __construct($options=[])
     {
         parent::__construct($options);
