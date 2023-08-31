@@ -2026,7 +2026,7 @@ class Model
     public function to_array(array $options=[]): array
     {
         $serializer = new JsonSerializer($this, $options);
-        return $options['include_root'] ? array(strtolower(get_class($this)) => $serializer->to_a()) : $serializer->to_a();
+        return !empty($options['include_root']) ? array(strtolower(get_class($this)) => $serializer->to_a()) : $serializer->to_a();
     }
 
     /**
