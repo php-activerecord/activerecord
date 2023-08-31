@@ -85,6 +85,8 @@ use ActiveRecord\Serialize\Serialization;
  * @phpstan-import-type ValidateNumericOptions from Validations
  * @package ActiveRecord
  *
+ * @phpstan-type Attributes array<string,mixed>
+ *
  * @see BelongsTo
  * @see CallBack
  * @see HasMany
@@ -109,7 +111,7 @@ class Model
     private $attributes = [];
 
     /**
-     * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified
+     * Flag whether this model's attributes have been modified since it will either be null or an array of column_names that have been modified
      *
      * @var array
      */
@@ -2056,7 +2058,7 @@ class Model
      *
      * @return string Serialized representation of the model
      */
-    private function serialize($type, $options)
+    private function serialize(string $type, $options): string
     {
         $class = "ActiveRecord\\Serialize\\" . $type . "Serializer";
         $serializer = new $class($this, $options);

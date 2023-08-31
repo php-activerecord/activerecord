@@ -89,14 +89,15 @@ class Expressions
         $this->connection = $connection;
     }
 
-    public function to_s($substitute=false, &$options=[])
+    public function to_s($substitute=false, array &$options=[])
     {
+        if(is_null($options)) {
+            xdebug_break();
+        }
         $values = array_key_exists('values', $options) ? $options['values'] : $this->values;
 
         $ret = '';
-        $replace = [];
         $num_values = count($values);
-        $len = strlen($this->expressions);
         $quotes = 0;
 
         for ($i=0, $n=strlen($this->expressions), $j=0; $i<$n; ++$i) {

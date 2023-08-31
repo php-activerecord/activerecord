@@ -46,10 +46,10 @@ class ExpressionsTest extends TestCase
         $this->assertEquals('name IN(?,?) and id=?', $c->to_s());
     }
 
-    public function test_to_string_with_null_options()
+    public function test_to_string_with_empty_options()
     {
         $c = new Expressions(null, 'name=? and book=?', 'Tito', 'Sharks');
-        $x = null;
+        $x = [];
         $this->assertEquals('name=? and book=?', $c->to_s(false, $x));
     }
 
