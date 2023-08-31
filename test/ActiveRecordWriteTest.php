@@ -11,14 +11,12 @@ use test\models\Book;
 
 class DirtyAuthor extends ActiveRecord\Model
 {
-    private $name;
-
     public static $table = 'authors';
     public static $before_save = 'before_save';
 
     public function before_save()
     {
-        $this->name = 'i saved';
+        $this->assign_attribute('name', 'i saved');
     }
 }
 
@@ -330,6 +328,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $author->encrypted_password = 'coco';
         $author->save();
         $this->assertEquals('i saved', DirtyAuthor::find($author->id)->name);
+        $this->assertEquals('coco', DirtyAuthor::find($author->id)->encrypted_password);
     }
 
     public function test_is_dirty()
