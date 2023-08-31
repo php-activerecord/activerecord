@@ -90,6 +90,9 @@ jobs:
         run: |
           echo "PostgreSQL Connection String: postgres://test:test@localhost:5432/test"
 
+      - name: PHPStan Analysis
+        run: vendor/bin/phpstan analyze --ansi
+
       - name: Run PHPUnit
         run: |
           vendor/bin/phpunit -c phpunit.xml.dist
