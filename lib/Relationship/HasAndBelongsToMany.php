@@ -26,8 +26,9 @@ class HasAndBelongsToMany extends AbstractRelationship
         parent::__construct($options);
     }
 
-    public function load(Model $model)
+    public function load(Model $model): mixed
     {
+        throw new \Exception("HasAndBelongsToMany doesn't need to load anything.");
     }
 
     public function load_eagerly($models, $attributes, $includes, Table $table): void {

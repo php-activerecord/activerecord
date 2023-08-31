@@ -42,21 +42,20 @@ abstract class AbstractRelationship
      *
      * @var string|string[]
      */
-    public $foreign_key = [];
+    public mixed $foreign_key = [];
 
     /**
      * Options of the relationship.
      *
      * @var array<string, mixed>
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Is the relationship single or multi.
      *
-     * @var bool
      */
-    protected $poly_relationship = false;
+    protected bool $poly_relationship = false;
 
     /**
      * List of valid options for relationships.
@@ -131,7 +130,7 @@ abstract class AbstractRelationship
      * @param Table $table
      * @param array<Model> $models of model objects
      * @param array<Attributes> $attributes of attributes from $models
-     * @param array<array<string>> $includes of eager load directives
+     * @param array<mixed> $includes of eager load directives
      * @param array<string> $query_keys -> key(s) to be queried for on included/related table
      * @param array<string> $model_values_keys -> key(s)/value(s) to be used in query from model which is including
      */

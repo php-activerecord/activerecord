@@ -37,14 +37,23 @@ use ActiveRecord\Table;
  *
  * class Order extends ActiveRecord\Model {
  *   static $has_many = array(
- *     array('people',
- *           'through'    => 'payments',
- *           'select'     => 'people.*, payments.amount',
- *           'conditions' => 'payments.amount < 200')
- *     );
+ *     [
+ *          'people',
+ *          'through'    => 'payments',
+ *          'select'     => 'people.*, payments.amount',
+ *          'conditions' => 'payments.amount < 200')
+ *     ];
  * }
  * ```
  * @phpstan-import-type Attributes from Model
+ * @phpstan-type HasManyOptions array{
+ *  limit?: int,
+ *  offset?: int,
+ *  primary_key?: string|array<string>,
+ *  group?: string,
+ *  order?: string,
+ *  through?: string
+ * }
  *
  * @see http://www.phpactiverecord.org/guides/associations
  * @see valid_association_options
@@ -56,30 +65,33 @@ class HasMany extends AbstractRelationship
     /**
      * Valid options to use for a {@link HasMany} relationship.
      *
-     * <ul>
-     * <li><b>limit/offset:</b> limit the number of records</li>
-     * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
-     * <li><b>group:</b> GROUP BY clause</li>
-     * <li><b>order:</b> ORDER BY clause</li>
-     * <li><b>through:</b> name of a model</li>
-     * </ul>
-     *
-     * @var array
+     * @var array<string>
      */
-    protected static $valid_association_options = ['primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source'];
+    protected static $valid_association_options = [
+        'primary_key',
+        'order',
+        'group',
+        'having',
+        'limit',
+        'offset',
+        'through',
+        'source'
+    ];
 
-    protected $primary_key;
+    /**
+     * @var string|array<string>
+     */
+    protected string|array $primary_key;
 
-    private $through;
+    private string $through;
 
     /**
      * Constructs a {@link HasMany} relationship.
      *
-     * @param array $options Options for the association
+     * @param HasManyOptions $options Options for the association
      *
-     * @return HasMany
      */
-    public function __construct($options = [])
+    public function __construct(array $options = [])
     {
         parent::__construct($options);
 
@@ -91,7 +103,7 @@ class HasMany extends AbstractRelationship
             }
         }
 
-        if (!$this->primary_key && isset($this->options['primary_key'])) {
+        if (isset($this->options['primary_key'])) {
             $this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : [$this->options['primary_key']];
         }
 
@@ -100,14 +112,14 @@ class HasMany extends AbstractRelationship
         }
     }
 
-    protected function set_keys($model_class_name, $override = false)
+    protected function set_keys(string $model_class_name, bool $override = false): void
     {
         //infer from class_name
         if (!$this->foreign_key || $override) {
             $this->foreign_key = [Inflector::instance()->keyify($model_class_name)];
         }
 
-        if (!$this->primary_key || $override) {
+        if (!isset($this->primary_key) || $override) {
             $this->primary_key = Table::load($model_class_name)->pk;
         }
     }
@@ -125,9 +137,9 @@ class HasMany extends AbstractRelationship
 
         // since through relationships depend on other relationships we can't do
         // this initialization in the constructor since the other relationship
-        // may not have been created yet and we only want this to run once
+        // may not have been created yet, and we only want this to run once
         if (!isset($this->initialized)) {
-            if ($this->through) {
+            if (isset($this->through)) {
                 // verify through is a belongs_to or has_many for access of keys
                 if (!($through_relationship = $this->get_table()->get_relationship($this->through))) {
                     throw new HasManyThroughAssociationException("Could not find the association $this->through in model " . get_class($model));
@@ -170,14 +182,18 @@ class HasMany extends AbstractRelationship
      *
      * @param Model $model
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    private function get_foreign_key_for_new_association(Model $model)
+    private function get_foreign_key_for_new_association(Model $model): array
     {
-        $this->set_keys($model);
+        $this->set_keys(get_class($model));
         $primary_key = Inflector::instance()->variablize($this->foreign_key[0]);
 
-        /** @phpstan-ignore-next-line */
+        /**
+         * TODO: set up model property reflection stanning
+         *
+         * @phpstan-ignore-next-line
+         */
         return [$primary_key => $model->id];
     }
 
