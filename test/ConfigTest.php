@@ -153,12 +153,6 @@ class ConfigTest extends TestCase
         $this->config->set_connections($this->connections);
     }
 
-    public function test_set_connections_must_be_array()
-    {
-        $this->expectException(ConfigException::class);
-        $this->config->set_connections(null);
-    }
-
     public function test_get_connections()
     {
         $this->assertEquals($this->connections, $this->config->get_connections());

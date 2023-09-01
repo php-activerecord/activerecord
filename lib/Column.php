@@ -21,13 +21,11 @@ class Column
     const TIME        = 6;
 
     /**
-     * Map a type to an column type.
+     * Map type to column type.
      *
-     * @static
-     *
-     * @var array
+     * @var array<string, int>
      */
-    public static $TYPE_MAPPING = [
+    public static array $TYPE_MAPPING = [
         'datetime'    => self::DATETIME,
         'timestamp'    => self::DATETIME,
         'date'        => self::DATE,
@@ -50,7 +48,7 @@ class Column
      *
      * @var string
      */
-    public $name;
+    public string $name = '';
 
     /**
      * The inflected name of this columns .. hyphens/spaces will be => _.

@@ -56,7 +56,9 @@ use Closure;
  * <li><b>prepend:</b> puts the callback at the top of the callback chain instead of the bottom</li>
  * </ul>
  *
- * @package ActiveRecord
+ * @phpstan-type CallbackOptions array{
+ *  prepend?: bool
+ * }
  *
  * @see http://www.phpactiverecord.org/guides/callbacks
  */
@@ -65,9 +67,9 @@ class CallBack
     /**
      * List of available callbacks.
      *
-     * @var array
+     * @var array<string>
      */
-    protected static $VALID_CALLBACKS = [
+    protected static array $VALID_CALLBACKS = [
         'after_construct',
         'before_save',
         'after_save',
@@ -88,31 +90,29 @@ class CallBack
     /**
      * Container for reflection class of given model
      *
-     * @var object
+     * @var \ReflectionClass<Model>
      */
-    private $klass;
+    private \ReflectionClass $klass;
 
     /**
-     * List of public methods of the given model
-     *
+     * @var array<string>
      */
-    private ?array $publicMethods;
+    private array $publicMethods;
 
     /**
      * Holds data for registered callbacks.
      *
-     * @var array
+     * @var array<string, CallBack>
      */
-    private $registry = [];
+    private array $registry = [];
 
     /**
      * Creates a CallBack.
      *
-     * @param string $model_class_name The name of a {@link Model} class
+     * @param class-string $model_class_name The name of a {@link Model} class
      *
-     * @return CallBack
      */
-    public function __construct($model_class_name)
+    public function __construct(string $model_class_name)
     {
         $this->klass = Reflections::instance()->get($model_class_name);
 
@@ -142,11 +142,11 @@ class CallBack
      *
      * @param $name string Name of a callback (see {@link VALID_CALLBACKS $VALID_CALLBACKS})
      *
-     * @return array array of callbacks or null if invalid callback name
+     * @return array<CallBack> array of callbacks or null if invalid callback name
      */
-    public function get_callbacks($name)
+    public function get_callbacks(string $name): array
     {
-        return isset($this->registry[$name]) ? $this->registry[$name] : null;
+        return $this->registry[$name] ?? [];
     }
 
     /**
@@ -212,18 +212,14 @@ class CallBack
      * </ul>
      *
      * @param string $name                   Name of callback type (see {@link VALID_CALLBACKS $VALID_CALLBACKS})
-     * @param mixed  $closure_or_method_name Either a closure or the name of a method on the {@link Model}
-     * @param array  $options                Options array
+     * @param Closure|string $closure_or_method_name Either a closure or the name of a method on the {@link Model}
+     * @param CallbackOptions $options                Options array
      *
      * @throws ActiveRecordException if invalid callback type or callback method was not found
      */
-    public function register($name, $closure_or_method_name=null, $options=[])
+    public function register(string $name, Closure|string $closure_or_method_name=null, array $options=[]): void
     {
-        $options = array_merge(['prepend' => false], $options);
-
-        if (!$closure_or_method_name) {
-            $closure_or_method_name = $name;
-        }
+        $closure_or_method_name ??= $name;
 
         if (!in_array($name, self::$VALID_CALLBACKS)) {
             throw new ActiveRecordException("Invalid callback: $name");
@@ -241,8 +237,9 @@ class CallBack
                 }
 
                 // i'm a dirty ruby programmer
-                throw new ActiveRecordException("Unknown method for callback: $name" .
-                        (is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ''));
+                throw new ActiveRecordException(
+                    "Unknown method for callback: $name" . ": #$closure_or_method_name"
+                );
             }
         }
 
@@ -250,7 +247,7 @@ class CallBack
             $this->registry[$name] = [];
         }
 
-        if ($options['prepend']) {
+        if ($options['prepend'] ?? false) {
             array_unshift($this->registry[$name], $closure_or_method_name);
         } else {
             $this->registry[$name][] = $closure_or_method_name;

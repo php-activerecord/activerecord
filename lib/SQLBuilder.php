@@ -310,7 +310,7 @@ class SQLBuilder
      *
      * @return array<string,mixed> A hash of array(name => value, ...)
      */
-    public static function create_hash_from_underscored_string(string $name, array&$values=[], array &$map=[])
+    public static function create_hash_from_underscored_string(string $name, array $values=[], array &$map=[])
     {
         $parts = preg_split('/(_and_|_or_)/i', $name);
         assert(is_array($parts));

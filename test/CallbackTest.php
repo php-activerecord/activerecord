@@ -7,7 +7,7 @@ use test\models\VenueCB;
 class CallBackTest extends DatabaseTestCase
 {
     private $callback;
-    
+
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
@@ -154,9 +154,9 @@ class CallBackTest extends DatabaseTestCase
         $this->assertTrue(is_array($this->callback->get_callbacks('after_construct')));
     }
 
-    public function test_get_callbacks_returns_null()
+    public function test_get_callbacks_returns_empty()
     {
-        $this->assertNull($this->callback->get_callbacks('this_callback_name_should_never_exist'));
+        $this->assertEquals([], $this->callback->get_callbacks('this_callback_name_should_never_exist'));
     }
 
     public function test_invoke_runs_all_callbacks()

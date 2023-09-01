@@ -508,7 +508,7 @@ class Model
             return;
         }
 
-        foreach (static::$delegate as &$item) {
+        foreach (static::$delegate as $item) {
             if (($delegated_name = $this->is_delegated($name, $item))) {
                 $this->{$item['to']}->$delegated_name = $value;
                 return;
@@ -531,7 +531,7 @@ class Model
      * Assign a value to an attribute.
      *
      * @param string $name   Name of the attribute
-     * @param mixed  &$value Value of the attribute
+     * @param mixed $value Value of the attribute
      *
      * @return mixed the attribute value
      */

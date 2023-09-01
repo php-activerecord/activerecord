@@ -493,11 +493,11 @@ class Table
      * @param array<string,mixed> $hash
      * @return array<string,mixed> $hash
      */
-    private function &process_data(array|null $hash): array|null
+    private function process_data(array|null $hash): array|null
     {
         if ($hash) {
             $date_class = Config::instance()->get_date_class();
-            foreach ($hash as $name => &$value) {
+            foreach ($hash as $name => $value) {
                 if ($value instanceof $date_class || $value instanceof \DateTime) {
                     if (isset($this->columns[$name]) && Column::DATE == $this->columns[$name]->type) {
                         $hash[$name] = $this->conn->date_to_string($value);

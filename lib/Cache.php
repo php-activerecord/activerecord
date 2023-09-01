@@ -11,12 +11,17 @@ use Closure;
  * });
  *
  * @phpstan-type CacheOptions array{
- *      expire?: int
+ *  expire?: int,
+ *  namespace?: string
  * }
  */
 class Cache
 {
-    public static $adapter = null;
+    public static ?Memcache $adapter = null;
+
+    /**
+     * @var CacheOptions
+     */
     public static $options = [];
 
     /**
@@ -60,7 +65,7 @@ class Cache
         static::$options = array_merge(['expire' => 30, 'namespace' => ''], $options);
     }
 
-    public static function flush()
+    public static function flush(): void
     {
         static::$adapter?->flush();
     }
@@ -69,9 +74,9 @@ class Cache
      * Attempt to retrieve a value from cache using a key. If the value is not found, then the closure method
      * will be invoked, and the result will be stored in cache using that key.
      *
-     * @param $key
-     * @param $closure
-     * @param $expire in seconds
+     * @param string $key
+     * @param Closure $closure
+     * @param int $expire in seconds
      *
      * @return mixed
      */
@@ -90,7 +95,7 @@ class Cache
         return $value;
     }
 
-    public static function set($key, $var, $expire=null)
+    public static function set(string $key, mixed $var, int $expire=null): void
     {
         if (!static::$adapter) {
             return;
@@ -102,18 +107,17 @@ class Cache
 
         $key = static::get_namespace() . $key;
 
-        return static::$adapter->write($key, $var, $expire);
+        static::$adapter->write($key, $var, $expire);
     }
 
-    public static function delete($key)
+    public static function delete(string $key): void
     {
         if (!static::$adapter) {
             return;
         }
 
         $key = static::get_namespace() . $key;
-
-        return static::$adapter->delete($key);
+        static::$adapter->delete($key);
     }
 
     protected static function get_namespace(): string
