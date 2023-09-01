@@ -35,11 +35,9 @@ abstract class Connection
     /**
      * The PDO connection object.
      */
-    public PDO $connection;
+    public \PDO $connection;
     /**
      * The last query run.
-     *
-     * @var string
      */
     public string $last_query;
     /**
@@ -315,12 +313,10 @@ abstract class Connection
      * Retrieve the insert id of the last model saved.
      *
      * @param string $sequence Optional name of a sequence to use
-     *
-     * @return int
      */
     public function insert_id($sequence = null): int
     {
-        return (int)$this->connection->lastInsertId($sequence);
+        return (int) $this->connection->lastInsertId($sequence);
     }
 
     /**

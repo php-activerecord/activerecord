@@ -2,9 +2,9 @@
 
 namespace ActiveRecord\Serialize;
 
-use ActiveRecord\Model;
-
 use function ActiveRecord\denamespace;
+
+use ActiveRecord\Model;
 
 /**
  * XML serializer.

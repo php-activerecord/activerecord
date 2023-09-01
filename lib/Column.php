@@ -64,8 +64,6 @@ class Column
 
     /**
      * The raw database specific type.
-     *
-     * @var string
      */
     public string $raw_type;
 
