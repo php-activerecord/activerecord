@@ -35,7 +35,7 @@ abstract class Connection
     /**
      * The PDO connection object.
      */
-    public Connection $connection;
+    public PDO $connection;
     /**
      * The last query run.
      *
@@ -318,9 +318,9 @@ abstract class Connection
      *
      * @return int
      */
-    public function insert_id($sequence = null)
+    public function insert_id($sequence = null): int
     {
-        return $this->connection->lastInsertId($sequence);
+        return (int)$this->connection->lastInsertId($sequence);
     }
 
     /**

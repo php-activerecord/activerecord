@@ -67,7 +67,7 @@ class Column
      *
      * @var string
      */
-    public $raw_type;
+    public string $raw_type;
 
     /**
      * The maximum length of this column.
@@ -91,7 +91,7 @@ class Column
     /**
      * The default value of the column.
      */
-    public $default;
+    public mixed $default;
 
     /**
      * True if this column is set to auto_increment.
@@ -200,7 +200,7 @@ class Column
     /**
      * Sets the $type member variable.
      */
-    public function map_raw_type(): void
+    public function map_raw_type(): int
     {
         if ('integer' == $this->raw_type) {
             $this->raw_type = 'int';
@@ -211,5 +211,7 @@ class Column
         } else {
             $this->type = self::STRING;
         }
+
+        return $this->type;
     }
 }
