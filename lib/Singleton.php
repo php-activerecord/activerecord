@@ -29,6 +29,12 @@ abstract class Singleton
     final public static function instance(): static
     {
         $class_name = get_called_class();
+        /**
+         * TODO: the proper way to prepare this for static checking
+         * with PHPStan is to write a custom extension.
+         *
+         * @phpstan-ignore-next-line
+         */
         return self::$instances[$class_name] ??= new $class_name();
     }
 

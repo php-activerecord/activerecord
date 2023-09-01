@@ -106,7 +106,7 @@ abstract class Inflector
  */
 class StandardInflector extends Inflector
 {
-    public function tableize($s)
+    public function tableize(string $s): string
     {
         return Utils::pluralize(strtolower($this->underscorify($s)));
     }

@@ -21,10 +21,8 @@ interface DateTimeInterface
     /**
      * Indicates this object is an attribute of the specified model, with the given attribute name.
      *
-     * @param Model  $model          The model this object is an attribute of
-     * @param string $attribute_name The attribute name
      */
-    public function attribute_of($model, $attribute_name);
+    public function attribute_of(Model $model, string $attribute_name): void;
 
     /**
      * Formats the DateTime to the specified format.
@@ -34,5 +32,5 @@ interface DateTimeInterface
     /**
      * See http://php.net/manual/en/datetime.createfromformat.php
      */
-    public static function createFromFormat(string $format, string $time, DateTimeZone|null $timezone = null);
+    public static function createFromFormat(string $format, string $time, DateTimeZone|null $timezone = null): static;
 }

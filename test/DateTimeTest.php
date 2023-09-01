@@ -146,8 +146,8 @@ class DateTimeTest extends TestCase
 
     public function test_create_from_format_error_handling()
     {
-        $d = DateTime::createFromFormat('H:i:s Y-d-m', '!!!');
-        $this->assertFalse($d);
+        $this->expectException(AssertionError::class);
+        DateTime::createFromFormat('H:i:s Y-d-m', '!!!');
     }
 
     public function test_create_from_format_without_tz()
