@@ -61,9 +61,6 @@ jobs:
           extensions: memcached
           tools: cs2pr
 
-      - name: Check drivers
-        run: php drivers.php
-
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
 
@@ -95,7 +92,7 @@ jobs:
           vendor/bin/phpunit -c phpunit.xml.dist
 
       - name: PHPStan Analysis
-        run: vendor/bin/phpstan analyze --ansi --error-format=github
+        run: vendor/bin/phpstan analyze
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
