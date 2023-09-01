@@ -8,6 +8,7 @@ namespace ActiveRecord;
 
 require_once 'Column.php';
 
+use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use Closure;
 use PDO;
@@ -280,7 +281,7 @@ abstract class Connection
             $dsn = "$info->protocol:$host;dbname=$info->db";
             $this->connection = new PDO($dsn, $info->user, $info->pass, static::$PDO_OPTIONS);
         } catch (PDOException $e) {
-            throw new DatabaseException($e);
+            throw new Exception\PdoException($e);
         }
     }
 
@@ -352,7 +353,7 @@ abstract class Connection
                 throw new DatabaseException($this);
             }
         } catch (PDOException $e) {
-            throw new DatabaseException($this);
+            throw new ConnectionException($this);
         }
 
         $sth->setFetchMode(PDO::FETCH_ASSOC);

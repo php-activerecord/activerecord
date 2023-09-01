@@ -113,10 +113,6 @@ class Expressions
     public function to_s(bool $substitute=false, array $options=[]): string
     {
         $values = $options['values'] ?? $this->values;
-        if(!empty($options)) {
-            xdebug_break();
-        }
-
         $ret = '';
         $num_values = count($values);
         $quotes = 0;

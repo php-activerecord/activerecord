@@ -67,7 +67,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_connection_failed()
     {
-        $this->expectException(DatabaseException::class);
+        $this->expectException(\ActiveRecord\Exception\PdoException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://baduser:badpass@127.0.0.1/db");
     }
 
