@@ -47,20 +47,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assertInstanceOf(Model::class, $author );
     }
 
-    public function test_find_returns_null() {
-        $lawyer = HonestLawyer::first();
-        $this->assertNull($lawyer);
-
-        $lawyer = HonestLawyer::last();
-        $this->assertNull($lawyer);
-
-        $lawyer = HonestLawyer::find("first", ["name"=>"Abe"]);
-        $this->assertNull($lawyer);
-
-        $lawyer = HonestLawyer::find("last", ["name"=>"Abe"]);
-        $this->assertNull($lawyer);
-    }
-
     public function test_find_returns_array_of_models()
     {
         $authors = Author::all();
@@ -86,6 +72,41 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
         $authors = Author::find(['conditions'=>["author_id = ?", 3]]);
         $this->assertIsArray($authors);
+    }
+
+    public function test_find_returns_null() {
+        $lawyer = HonestLawyer::first();
+        $this->assertNull($lawyer);
+
+        $lawyer = HonestLawyer::last();
+        $this->assertNull($lawyer);
+
+        $lawyer = HonestLawyer::find("first", ["name"=>"Abe"]);
+        $this->assertNull($lawyer);
+
+        $lawyer = HonestLawyer::find("last", ["name"=>"Abe"]);
+        $this->assertNull($lawyer);
+    }
+
+    static public function noReturnValues(): array
+    {
+        return [
+            [
+                -1,
+                null,
+                ["first", ["name"=>"Abe"]],
+                ["last", ["name"=>"Abe"]],
+                ["conditions"=> ["name" => "Bill Clinton"]]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider noReturnValues
+     */
+    public function test_find_doesnt_return($badValue) {
+        $this->expectException(RecordNotFound::class);
+        Author::find($badValue);
     }
 
     public function test_find_by_pk()
