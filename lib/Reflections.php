@@ -18,7 +18,7 @@ class Reflections extends Singleton
     /**
      * Current reflections.
      *
-     * @var array<string, ReflectionClass<mixed>>
+     * @var array<string, ReflectionClass<Model>>
      */
     private $reflections = [];
 
@@ -63,7 +63,7 @@ class Reflections extends Singleton
      *
      * @return mixed null or a ReflectionClass instance
      */
-    public function get(string $className)
+    public function get($className)
     {
         if (isset($this->reflections[$className])) {
             return $this->reflections[$className];
@@ -75,18 +75,18 @@ class Reflections extends Singleton
     /**
      * Retrieve a class name to be reflected.
      *
-     * @param mixed string|object An object or name of a class
+     * @param class-string|object $class An object or name of a class
      *
      * @return string
      */
-    private function get_class(string|object $mixed=null)
+    private function get_class(string|object $class=null)
     {
-        if (is_object($mixed)) {
-            return get_class($mixed);
+        if (is_object($class)) {
+            return get_class($class);
         }
 
-        if (!is_null($mixed)) {
-            return $mixed;
+        if (!is_null($class)) {
+            return $class;
         }
 
         return $this->get_called_class();
