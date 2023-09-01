@@ -11,6 +11,11 @@ CREATE TABLE authors(
 	mixedCaseField varchar(50)
 );
 
+CREATE TABLE honest_lawyers(
+  lawyer_id INTEGER NOT NULL PRIMARY KEY,
+  name VARCHAR  (25) NOT NULL DEFAULT default_name -- don't touch those spaces
+);
+
 CREATE TABLE books(
 	book_id INTEGER NOT NULL PRIMARY KEY,
 	Author_Id INT,
