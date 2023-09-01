@@ -170,7 +170,7 @@ class ExpressionsTest extends TestCase
         $a->bind(0, 99);
     }
 
-    public function test_subsitute_using_alternate_values()
+    public function test_substitute_using_alternate_values()
     {
         $a = new Expressions(null, 'name=?', 'Tito');
         $this->assertEquals("name='Tito'", $a->to_s(true));

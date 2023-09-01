@@ -15,17 +15,25 @@ use ActiveRecord\Exception\ExpressionsException;
  * 'id = IN(:ids)'
  * 'id IN(:subselect)'
  *
- * @package ActiveRecord
+ * @phpstan-import-type Attributes from Types
  */
 class Expressions
 {
     const ParameterMarker = '?';
 
-    private $expressions;
-    private $values = [];
-    private $connection;
+    private string $expressions;
 
-    public function __construct($connection, $expressions=null /* [, $values ... ] */)
+    /**
+     * @var array<mixed>
+     */
+    private array $values = [];
+    private Connection|null $connection;
+
+    /**
+     * @param $connection
+     * @param string|array<mixed>|null $expressions
+     */
+    public function __construct(Connection|null $connection, string|array $expressions=null)
     {
         $values = null;
         $this->connection = $connection;
@@ -49,7 +57,7 @@ class Expressions
      * Bind a value to the specific one based index. There must be a bind marker
      * for each value bound or to_s() will throw an exception.
      */
-    public function bind($parameter_number, $value)
+    public function bind(int $parameter_number, mixed $value): void
     {
         if ($parameter_number <= 0) {
             throw new ExpressionsException("Invalid parameter index: $parameter_number");
@@ -57,15 +65,20 @@ class Expressions
         $this->values[$parameter_number-1] = $value;
     }
 
-    public function bind_values($values)
+    /**
+     * @param array<mixed> $values
+     */
+    public function bind_values(array $values): void
     {
         $this->values = $values;
     }
 
     /**
      * Returns all the values currently bound.
+     *
+     * @return array<mixed>
      */
-    public function values()
+    public function values(): array
     {
         return $this->values;
     }
@@ -73,7 +86,7 @@ class Expressions
     /**
      * Returns the connection object.
      */
-    public function get_connection()
+    public function get_connection(): ?Connection
     {
         return $this->connection;
     }
@@ -82,19 +95,27 @@ class Expressions
      * Sets the connection object. It is highly recommended to set this so we can
      * use the adapter's native escaping mechanism.
      *
-     * @param string $connection a Connection instance
+     * @param Connection $connection a Connection instance
      */
-    public function set_connection($connection)
+    public function set_connection(Connection $connection): void
     {
         $this->connection = $connection;
     }
 
-    public function to_s($substitute=false, array &$options=[])
+    /**
+     * @param bool $substitute
+     * @param array{
+     *   values?: array<mixed>
+     * } $options
+     * @return string
+     * @throws ExpressionsException
+     */
+    public function to_s(bool $substitute=false, array $options=[]): string
     {
-        if(is_null($options)) {
+        $values = $options['values'] ?? $this->values;
+        if(!empty($options)) {
             xdebug_break();
         }
-        $values = array_key_exists('values', $options) ? $options['values'] : $this->values;
 
         $ret = '';
         $num_values = count($values);
@@ -120,7 +141,13 @@ class Expressions
         return $ret;
     }
 
-    private function build_sql_from_hash(&$hash, $glue)
+    /**
+     * @param Attributes $hash
+     * @param string $glue
+     *
+     * @return array<mixed>
+     */
+    private function build_sql_from_hash(array $hash, string $glue): array
     {
         $sql = $g = '';
 
@@ -143,7 +170,14 @@ class Expressions
         return [$sql, array_values($hash)];
     }
 
-    private function substitute(&$values, $substitute, $pos, $parameter_index)
+    /**
+     * @param array<mixed> $values
+     * @param bool $substitute
+     * @param int $pos
+     * @param int $parameter_index
+     * @return mixed|string
+     */
+    private function substitute(array $values, bool $substitute, int $pos, int $parameter_index)
     {
         $value = $values[$parameter_index];
 
@@ -178,7 +212,7 @@ class Expressions
         return $this->expressions[$pos];
     }
 
-    private function stringify_value($value)
+    private function stringify_value(mixed $value): string
     {
         if (is_null($value)) {
             return 'NULL';
@@ -187,7 +221,7 @@ class Expressions
         return is_string($value) ? $this->quote_string($value) : $value;
     }
 
-    private function quote_string($value)
+    private function quote_string(string $value): string
     {
         if ($this->connection) {
             return $this->connection->escape($value);

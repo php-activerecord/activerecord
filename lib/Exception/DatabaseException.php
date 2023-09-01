@@ -13,7 +13,7 @@ use ActiveRecord\Connection;
  */
 class DatabaseException extends ActiveRecordException
 {
-    public function __construct($adapter_or_string_or_mystery)
+    public function __construct(string|Connection|\PDOStatement $adapter_or_string_or_mystery)
     {
         if ($adapter_or_string_or_mystery instanceof Connection) {
             parent::__construct(
