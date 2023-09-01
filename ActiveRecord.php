@@ -1,10 +1,10 @@
 <?php
 
-if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300) {
-    exit('PHP ActiveRecord requires PHP 5.3 or higher');
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 80100) {
+    exit('PHP ActiveRecord requires PHP 8.1 or higher');
 }
 
-define('PHP_ACTIVERECORD_VERSION_ID', '1.0');
+define('PHP_ACTIVERECORD_VERSION_ID', '2.0');
 
 if (!defined('PHP_ACTIVERECORD_AUTOLOAD_PREPEND')) {
     define('PHP_ACTIVERECORD_AUTOLOAD_PREPEND', true);
