@@ -3,16 +3,20 @@
 class BookExclusion extends ActiveRecord\Model
 {
     public static $table = 'books';
-    public static $validates_exclusion_of = [
-        ['name', 'in' => ['blah', 'alpha', 'bravo']]
+    public static array $validates_exclusion_of = [
+        'name' => [
+            'in' => ['blah', 'alpha', 'bravo']
+        ]
     ];
 }
 
 class BookInclusion extends ActiveRecord\Model
 {
     public static $table = 'books';
-    public static $validates_inclusion_of = [
-        ['name', 'in' => ['blah', 'tanker', 'shark']]
+    public static array $validates_inclusion_of = [
+        'name' => [
+            'in' => ['blah', 'tanker', 'shark']
+        ]
     ];
 }
 
@@ -21,8 +25,12 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
-        BookInclusion::$validates_inclusion_of[0] = ['name', 'in' => ['blah', 'tanker', 'shark']];
-        BookExclusion::$validates_exclusion_of[0] = ['name', 'in' => ['blah', 'alpha', 'bravo']];
+        BookInclusion::$validates_inclusion_of['name'] = [
+            'in' => ['blah', 'tanker', 'shark']
+        ];
+        BookExclusion::$validates_exclusion_of['name'] = [
+            'in' => ['blah', 'alpha', 'bravo']
+        ];
     }
 
     public function test_inclusion()
@@ -67,7 +75,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
 
     public function test_inclusion_with_numeric()
     {
-        BookInclusion::$validates_inclusion_of[0]['in']= [0, 1, 2];
+        BookInclusion::$validates_inclusion_of['name']['in'] = [0, 1, 2];
         $book = new BookInclusion();
         $book->name = 2;
         $book->save();
@@ -76,7 +84,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
 
     public function test_inclusion_with_boolean()
     {
-        BookInclusion::$validates_inclusion_of[0]['in']= [true];
+        BookInclusion::$validates_inclusion_of['name']['in'] = [true];
         $book = new BookInclusion();
         $book->name = true;
         $book->save();
@@ -85,7 +93,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
 
     public function test_inclusion_with_null()
     {
-        BookInclusion::$validates_inclusion_of[0]['in']= [null];
+        BookInclusion::$validates_inclusion_of['name']['in']= [null];
         $book = new BookInclusion();
         $book->name = null;
         $book->save();
@@ -94,7 +102,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
 
     public function test_invalid_inclusion_with_numeric()
     {
-        BookInclusion::$validates_inclusion_of[0]['in']= [0, 1, 2];
+        BookInclusion::$validates_inclusion_of['name']['in']= [0, 1, 2];
         $book = new BookInclusion();
         $book->name = 5;
         $book->save();
@@ -103,16 +111,20 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
 
     public function tes_inclusion_within_option()
     {
-        BookInclusion::$validates_inclusion_of[0] = ['name', 'within' => ['okay']];
+        BookInclusion::$validates_inclusion_of['name'] = [
+            'within' => ['okay']
+        ];
         $book = new BookInclusion();
         $book->name = 'okay';
         $book->save();
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function tes_inclusion_scalar_value()
+    public function test_inclusion_scalar_value(): void
     {
-        BookInclusion::$validates_inclusion_of[0] = ['name', 'within' => 'okay'];
+        BookInclusion::$validates_inclusion_of['name'] = [
+            'within' => ['okay']
+        ];
         $book = new BookInclusion();
         $book->name = 'okay';
         $book->save();
@@ -121,7 +133,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
 
     public function test_valid_null()
     {
-        BookInclusion::$validates_inclusion_of[0]['allow_null'] = true;
+        BookInclusion::$validates_inclusion_of['name']['allow_null'] = true;
         $book = new BookInclusion();
         $book->name = null;
         $book->save();
@@ -130,7 +142,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
 
     public function test_valid_blank()
     {
-        BookInclusion::$validates_inclusion_of[0]['allow_blank'] = true;
+        BookInclusion::$validates_inclusion_of['name']['allow_blank'] = true;
         $book = new BookInclusion();
         $book->name = '';
         $book->save();
@@ -140,16 +152,16 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
     public function test_custom_message()
     {
         $msg = 'is using a custom message.';
-        BookInclusion::$validates_inclusion_of[0]['message'] = $msg;
-        BookExclusion::$validates_exclusion_of[0]['message'] = $msg;
+        BookInclusion::$validates_inclusion_of['name']['message'] = $msg;
+        BookExclusion::$validates_exclusion_of['name']['message'] = $msg;
 
         $book = new BookInclusion();
         $book->name = 'not included';
         $book->save();
-        $this->assertEquals('is using a custom message.', $book->errors->on('name'));
+        $this->assertEquals('is using a custom message.', $book->errors->first('name'));
         $book = new BookExclusion();
         $book->name = 'bravo';
         $book->save();
-        $this->assertEquals('is using a custom message.', $book->errors->on('name'));
+        $this->assertEquals('is using a custom message.', $book->errors->first('name'));
     }
 }

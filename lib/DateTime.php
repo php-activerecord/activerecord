@@ -35,20 +35,22 @@ use DateInterval;
  * ```
  *
  * @package ActiveRecord
- *
+ * @phpstan-consistent-constructor
  * @see http://php.net/manual/en/class.datetime.php
  */
-class DateTime extends \DateTime implements DateTimeInterface
+final class DateTime extends \DateTime implements DateTimeInterface
 {
     /**
      * Default format used for format() and __toString()
      */
-    public static $DEFAULT_FORMAT = 'rfc2822';
+    public static string $DEFAULT_FORMAT = 'rfc2822';
 
     /**
      * Pre-defined format strings.
+     *
+     * @var array<string, string>
      */
-    public static $FORMATS = [
+    public static array $FORMATS = [
         'db'      => 'Y-m-d H:i:s',
         'number'  => 'YmdHis',
         'time'    => 'H:i',
@@ -66,10 +68,10 @@ class DateTime extends \DateTime implements DateTimeInterface
         'rss'     => \DateTime::RSS,
         'w3c'     => \DateTime::W3C];
 
-    private $model;
-    private $attribute_name;
+    private Model|null $model = null;
+    private string|null $attribute_name = null;
 
-    public function attribute_of($model, $attribute_name)
+    public function attribute_of(Model $model, string $attribute_name): void
     {
         $this->model = $model;
         $this->attribute_name = $attribute_name;
@@ -108,7 +110,7 @@ class DateTime extends \DateTime implements DateTimeInterface
      *
      * @return string a format string
      */
-    public static function get_format($format=null)
+    public static function get_format(string $format=null): string
     {
         // use default format if no format specified
         if (!$format) {
@@ -125,15 +127,14 @@ class DateTime extends \DateTime implements DateTimeInterface
     }
 
     /**
-     * This needs to be overriden so it returns an instance of this class instead of PHP's \DateTime.
+     * This needs to be overridden so it returns an instance of this class instead of PHP's \DateTime.
      * See http://php.net/manual/en/datetime.createfromformat.php
      */
-    public static function createFromFormat(string $format, string $datetime, DateTimeZone|null $timezone = null): DateTime|false
+    public static function createFromFormat(string $format, string $time, ?DateTimeZone $timezone = null): static
     {
-        $phpDate = $timezone ? parent::createFromFormat($format, $datetime, $timezone) : parent::createFromFormat($format, $datetime);
-        if (!$phpDate) {
-            return false;
-        }
+        $phpDate = parent::createFromFormat($format, $time, $timezone);
+        assert($phpDate);
+
         // convert to this class using the timestamp
         $ourDate = new static('', $phpDate->getTimezone());
         $ourDate->setTimestamp($phpDate->getTimestamp());
@@ -158,11 +159,9 @@ class DateTime extends \DateTime implements DateTimeInterface
         $this->attribute_name = null;
     }
 
-    private function flag_dirty()
+    private function flag_dirty(): void
     {
-        if ($this->model) {
-            $this->model->flag_dirty($this->attribute_name);
-        }
+        $this->model?->flag_dirty($this->attribute_name);
     }
 
     public function setDate(int $year, int $month, int $day): DateTime

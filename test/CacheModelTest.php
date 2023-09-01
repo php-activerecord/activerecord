@@ -29,7 +29,7 @@ class CacheModelTest extends DatabaseTestCase
     public function tearDown(): void
     {
         Cache::flush();
-        Cache::initialize(null);
+        Cache::initialize();
     }
 
     public function test_default_expire()

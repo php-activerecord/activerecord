@@ -77,7 +77,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function notice(string|\Stringable $message, array $context = []): void {
+    public function notice(string|\Stringable $message, array $context = []):void {
 
     }
 
@@ -91,7 +91,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function info(string|\Stringable $message, array $context = []): void {
+    public function info(string|\Stringable $message, array $context = []):void {
 
     }
 
@@ -103,7 +103,7 @@ class TestLogger implements LoggerInterface
      *
      * @return void
      */
-    public function debug(string|\Stringable $message, array $context = []): void {
+    public function debug(string|\Stringable $message, array $context = []):void {
 
     }
 
@@ -118,7 +118,7 @@ class TestLogger implements LoggerInterface
      *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, string|\Stringable $message, array $context = []): void {
+    public function log($level, string|\Stringable $message, array $context = []):void {
 
     }
 }
@@ -151,12 +151,6 @@ class ConfigTest extends TestCase
         $this->config = new Config();
         $this->connections = ['development' => 'mysql://blah/development', 'test' => 'mysql://blah/test'];
         $this->config->set_connections($this->connections);
-    }
-
-    public function test_set_connections_must_be_array()
-    {
-        $this->expectException(ConfigException::class);
-        $this->config->set_connections(null);
     }
 
     public function test_get_connections()

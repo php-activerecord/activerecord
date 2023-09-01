@@ -18,24 +18,24 @@ abstract class Singleton
     /**
      * Array of cached singleton objects.
      *
-     * @var array
+     * @var array<string, Singleton>
      */
-    private static $instances = [];
+    private static array $instances = [];
 
     /**
      * Static method for instantiating a singleton object.
      *
-     * @return object
      */
-    final public static function instance()
+    final public static function instance(): static
     {
         $class_name = get_called_class();
-
-        if (!isset(self::$instances[$class_name])) {
-            self::$instances[$class_name] = new $class_name();
-        }
-
-        return self::$instances[$class_name];
+        /**
+         * TODO: the proper way to prepare this for static checking
+         * with PHPStan is to write a custom extension.
+         *
+         * @phpstan-ignore-next-line
+         */
+        return self::$instances[$class_name] ??= new $class_name();
     }
 
     /**

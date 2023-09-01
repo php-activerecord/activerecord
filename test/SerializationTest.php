@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\DateTime;
+use ActiveRecord\Serialize\ArraySerializer;
 use ActiveRecord\Serialize\CsvSerializer;
 use ActiveRecord\Serialize\JsonSerializer;
 use test\models\Author;
@@ -9,11 +10,6 @@ use test\models\Host;
 
 class SerializationTest extends DatabaseTestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-    }
-
     public function _a($options=[], $model=null)
     {
         if (!$model) {
@@ -114,7 +110,7 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_json_include_root()
     {
         $this->assertNotNull(json_decode(Book::find(1)->to_json([
-            'include_root'=>true
+            'include_root' => true
         ]))->{'test\models\book'});
     }
 
@@ -142,7 +138,7 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_array_include_root()
     {
         $book = Book::find(1);
-        $array = $book->to_array(['include_root' => true]);
+        $array = $book->to_array(['include_root'=>true]);
         $book_attributes = ['test\models\book' => $book->attributes()];
         $this->assertEquals($book_attributes, $array);
     }
@@ -150,10 +146,7 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_array_except()
     {
         $book = Book::find(1);
-        $array = $book->to_array([
-            'except' => ['special'],
-            'include_root' => false
-        ]);
+        $array = $book->to_array(['except' => ['special']]);
         $book_attributes = $book->attributes();
         unset($book_attributes['special']);
         $this->assertEquals($book_attributes, $array);

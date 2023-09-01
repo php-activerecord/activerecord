@@ -16,30 +16,30 @@ use ActiveRecord\Inflector;
  */
 class PgsqlAdapter extends Connection
 {
-    public static $QUOTE_CHARACTER = '"';
-    public static $DEFAULT_PORT = 5432;
+    public static string $QUOTE_CHARACTER = '"';
+    public static int $DEFAULT_PORT = 5432;
 
-    public function supports_sequences()
+    public function supports_sequences(): bool
     {
         return true;
     }
 
-    public function get_sequence_name($table, $column_name)
+    public function get_sequence_name(string $table, string $column_name): string
     {
         return "{$table}_{$column_name}_seq";
     }
 
-    public function next_sequence_value($sequence_name)
+    public function next_sequence_value(string $sequence_name): ?string
     {
         return "nextval('" . str_replace("'", "\\'", $sequence_name) . "')";
     }
 
-    public function limit($sql, $offset, $limit)
+    public function limit(string $sql, int $offset = 0, int $limit = 0): string
     {
-        return $sql . ' LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
+        return $sql . ' LIMIT ' . $limit . ' OFFSET ' . $offset;
     }
 
-    public function query_column_info($table)
+    public function query_column_info(string $table): \PDOStatement
     {
         $sql = <<<SQL
 SELECT
@@ -77,12 +77,12 @@ SQL;
         return $this->query($sql, $values);
     }
 
-    public function query_for_tables()
+    public function query_for_tables(): \PDOStatement
     {
         return $this->query("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')");
     }
 
-    public function create_column(&$column)
+    public function create_column(array $column): Column
     {
         $c = new Column();
         $c->inflected_name    = Inflector::instance()->variablize($column['field']);
@@ -123,12 +123,12 @@ SQL;
         return $c;
     }
 
-    public function set_encoding($charset)
+    public function set_encoding(string $charset): void
     {
         $this->query("SET NAMES '$charset'");
     }
 
-    public function native_database_types()
+    public function native_database_types(): array
     {
         return [
             'primary_key' => 'serial primary key',

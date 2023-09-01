@@ -2,11 +2,13 @@
 
 namespace ActiveRecord\Exception;
 
+use ActiveRecord\Connection;
+
 /**
  * Thrown by {@link Expressions}.
  *
  * @package ActiveRecord
  */
-class ExpressionsException extends ActiveRecordException
+class ConnectionException extends ActiveRecordException
 {
 }

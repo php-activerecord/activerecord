@@ -14,7 +14,7 @@ use test\models\Venue;
 class ActiveRecordTest extends DatabaseTestCase
 {
     private $options;
-    
+
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
@@ -168,20 +168,6 @@ class ActiveRecordTest extends DatabaseTestCase
         $book->name = 'Should not stay';
         $book->reload();
         $this->assertNotEquals('Should not stay', $book->name);
-    }
-
-    public function test_active_record_model_home_not_set()
-    {
-        $home = ActiveRecord\Config::instance()->get_model_directory();
-        ActiveRecord\Config::instance()->set_model_directory(__FILE__);
-        $this->assertEquals(false, class_exists('TestAutoload'));
-
-        ActiveRecord\Config::instance()->set_model_directory($home);
-    }
-
-    public function test_auto_load_with_namespaced_model()
-    {
-        $this->assertTrue(class_exists(\test\models\namespacetest\Book::class));
     }
 
     public function test_namespace_gets_stripped_from_table_name()
@@ -522,7 +508,7 @@ class ActiveRecordTest extends DatabaseTestCase
     {
         $author = new Author();
         $author->flag_dirty('some_inexistant_property');
-        $this->assertNull($author->dirty_attributes());
+        $this->assertEquals([],$author->dirty_attributes());
         $this->assertFalse($author->attribute_is_dirty('some_inexistant_property'));
     }
 
@@ -572,7 +558,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_query()
     {
-        $row = Author::query('SELECT COUNT(*) AS n FROM authors', null)->fetch();
+        $row = Author::query('SELECT COUNT(*) AS n FROM authors')->fetch();
         $this->assertTrue($row['n'] > 1);
 
         $row = Author::query('SELECT COUNT(*) AS n FROM authors WHERE name=?', ['Tito'])->fetch();

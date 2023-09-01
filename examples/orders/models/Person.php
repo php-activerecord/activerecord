@@ -8,6 +8,8 @@ class Person extends ActiveRecord\Model
         ['payments']];
 
     // must have a name and a state
-    public static $validates_presence_of = [
-        ['name'], ['state']];
+    public static array $validates_presence_of = [
+        'name' => true,
+        'state' => true
+    ];
 }

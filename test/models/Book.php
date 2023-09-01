@@ -5,7 +5,7 @@ use ActiveRecord\Model;
 
 class Book extends Model
 {
-    public static $belongs_to = ['author'];
+    public static array $belongs_to = ['author'];
     public static $has_one = [];
     public static $use_custom_get_name_getter = false;
 

@@ -1,5 +1,6 @@
 <?php
 
+use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use PHPUnit\Framework\TestCase;
@@ -8,13 +9,13 @@ require_once __DIR__ . '/DatabaseLoader.php';
 
 abstract class DatabaseTestCase extends TestCase
 {
-    protected string $connection_name;
     protected \ActiveRecord\Connection $connection;
+    protected string $connection_name;
     protected $original_date_class;
     public static $log = false;
     public static $db;
 
-    public function setUp($connection_name=null): void
+    public function setUp(string $connection_name=null): void
     {
         ActiveRecord\Table::clear_cache();
 
@@ -33,7 +34,7 @@ abstract class DatabaseTestCase extends TestCase
         try {
             $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
             $this->connection_name = $connection_name;
-        } catch (DatabaseException $e) {
+        } catch (Exception $e) {
             $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
 

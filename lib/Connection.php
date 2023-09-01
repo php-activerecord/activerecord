@@ -8,6 +8,8 @@ namespace ActiveRecord;
 
 require_once 'Column.php';
 
+use ActiveRecord\Adapter\SqliteAdapter;
+use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use Closure;
 use PDO;
@@ -76,25 +78,34 @@ abstract class Connection
     /**
      * Default PDO options to set for each connection.
      *
-     * @var array
+     * @var array<mixed>
      */
-    public static $PDO_OPTIONS = [
+    public static array $PDO_OPTIONS = [
         PDO::ATTR_CASE => PDO::CASE_LOWER,
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-        PDO::ATTR_STRINGIFY_FETCHES => false];
+        PDO::ATTR_STRINGIFY_FETCHES => false
+    ];
+
     /**
      * The quote character for stuff like column and field names.
      *
      * @var string
      */
-    public static $QUOTE_CHARACTER = '`';
+    public static string $QUOTE_CHARACTER = '`';
+
     /**
      * Default port.
      *
      * @var int
      */
-    public static $DEFAULT_PORT = 0;
+    public static int $DEFAULT_PORT = 0;
+
+    /**
+     * @param array<string, string|null> $column
+     * @return Column
+     */
+    abstract public function create_column(array $column): Column;
 
     /**
      * Retrieve a database connection.
@@ -148,9 +159,9 @@ abstract class Connection
      *
      * @param string $adapter name of the adapter
      *
-     * @return string the full name of the class including namespace
+     * @return class-string the full name of the class including namespace
      */
-    private static function load_adapter_class($adapter)
+    protected static function load_adapter_class(string $adapter)
     {
         $class = ucwords($adapter) . 'Adapter';
         $fqclass = 'ActiveRecord\\Adapter\\' . $class;
@@ -187,7 +198,7 @@ abstract class Connection
      *
      * @return object the parsed URL as an object
      */
-    public static function parse_connection_url($connection_url)
+    public static function parse_connection_url(string $connection_url)
     {
         $url = @parse_url($connection_url);
 
@@ -255,11 +266,8 @@ abstract class Connection
     /**
      * Class Connection is a singleton. Access it via instance().
      *
-     * @param array $info Array containing URL parts
-     *
-     * @return Connection
      */
-    protected function __construct($info)
+    protected function __construct(\stdClass $info)
     {
         try {
             // unix sockets start with a /
@@ -276,18 +284,18 @@ abstract class Connection
             $dsn = "$info->protocol:$host;dbname=$info->db";
             $this->connection = new PDO($dsn, $info->user, $info->pass, static::$PDO_OPTIONS);
         } catch (PDOException $e) {
-            throw new DatabaseException($e);
+            throw new Exception\ConnectionException($e);
         }
     }
 
     /**
-     * Retrieves column meta data for the specified table.
+     * Retrieves column metadata for the specified table.
      *
      * @param string $table Name of a table
      *
-     * @return array an array of {@link Column} objects
+     * @return array<Column> an array of {@link Column} objects
      */
-    public function columns($table)
+    public function columns(string $table): array
     {
         $columns = [];
         $sth = $this->query_column_info($table);
@@ -328,11 +336,11 @@ abstract class Connection
      * Execute a raw SQL query on the database.
      *
      * @param string $sql     raw SQL string to execute
-     * @param array  &$values Optional array of bind values
+     * @param array<mixed>  &$values Optional array of bind values
      *
      * @return mixed A result set object
      */
-    public function query($sql, &$values=[])
+    public function query(string $sql, array &$values=[])
     {
         if ($this->logging) {
             $this->logger->info($sql);
@@ -345,17 +353,20 @@ abstract class Connection
 
         try {
             if (!($sth = $this->connection->prepare($sql))) {
-                throw new DatabaseException($this);
+                throw new DatabaseException();
             }
         } catch (PDOException $e) {
-            throw new DatabaseException($this);
+            if($this instanceof SqliteAdapter && $e->getCode() === "HY000") {
+                throw new DatabaseException($e);
+            }
+            throw new ConnectionException($e);
         }
 
         $sth->setFetchMode(PDO::FETCH_ASSOC);
 
+        $msg = "couldn't execute query on " . get_class($this) . ". ";
+        $msg .= "user: " .getenv('USER');
         try {
-            $msg = "couldn't execute query on " . get_class($this) . ". ";
-            $msg .= "user: " .getenv('USER');
             if (!$sth->execute($values)) {
                 throw new DatabaseException($msg);
             }
@@ -370,11 +381,10 @@ abstract class Connection
      * Execute a query that returns maximum of one row with one field and return it.
      *
      * @param string $sql     raw SQL string to execute
-     * @param array  &$values Optional array of values to bind to the query
+     * @param array<mixed>  &$values Optional array of values to bind to the query
      *
-     * @return string
      */
-    public function query_and_fetch_one($sql, &$values=[])
+    public function query_and_fetch_one(string $sql, array &$values=[]): int
     {
         $sth = $this->query($sql, $values);
         $row = $sth->fetch(PDO::FETCH_NUM);
@@ -388,7 +398,7 @@ abstract class Connection
      * @param string  $sql     raw SQL string to execute
      * @param Closure $handler closure that will be passed the fetched results
      */
-    public function query_and_fetch($sql, Closure $handler)
+    public function query_and_fetch(string $sql, Closure $handler): void
     {
         $sth = $this->query($sql);
 
@@ -400,9 +410,9 @@ abstract class Connection
     /**
      * Returns all tables for the current database.
      *
-     * @return array array containing table names
+     * @return array<string> array containing table names
      */
-    public function tables()
+    public function tables(): array
     {
         $tables = [];
         $sth = $this->query_for_tables();
@@ -417,39 +427,40 @@ abstract class Connection
     /**
      * Starts a transaction.
      */
-    public function transaction()
+    public function transaction(): void
     {
         if (!$this->connection->beginTransaction()) {
-            throw new DatabaseException($this);
+            throw new DatabaseException();
         }
     }
 
     /**
      * Commits the current transaction.
+     *
+     * @throws DatabaseException
      */
-    public function commit()
+    public function commit(): void
     {
         if (!$this->connection->commit()) {
-            throw new DatabaseException($this);
+            throw new DatabaseException();
         }
     }
 
     /**
      * Rollback a transaction.
      */
-    public function rollback()
+    public function rollback(): void
     {
         if (!$this->connection->rollback()) {
-            throw new DatabaseException($this);
+            throw new DatabaseException();
         }
     }
 
     /**
      * Tells you if this adapter supports sequences or not.
      *
-     * @return bool
      */
-    public function supports_sequences()
+    public function supports_sequences(): bool
     {
         return false;
     }
@@ -462,7 +473,7 @@ abstract class Connection
      *
      * @return string sequence name or null if not supported
      */
-    public function get_sequence_name($table, $column_name)
+    public function get_sequence_name(string $table, string $column_name): string
     {
         return "{$table}_seq";
     }
@@ -470,11 +481,8 @@ abstract class Connection
     /**
      * Return SQL for getting the next value in a sequence.
      *
-     * @param string $sequence_name Name of the sequence
-     *
-     * @return string
      */
-    public function next_sequence_value($sequence_name)
+    public function next_sequence_value(string $sequence_name): ?string
     {
         return null;
     }
@@ -511,7 +519,7 @@ abstract class Connection
      *
      * @return string
      */
-    public function datetime_to_string($datetime)
+    public function datetime_to_string(\DateTime $datetime)
     {
         return $datetime->format(static::$datetime_format);
     }
@@ -521,9 +529,9 @@ abstract class Connection
      *
      * @param string $string A datetime in the form accepted by date_create()
      *
-     * @return object The date_class set in Config
+     * @return ?DateTime The date_class set in Config
      */
-    public function string_to_datetime($string)
+    public function string_to_datetime(string $string): ?DateTime
     {
         $date = date_create($string);
         $errors = \DateTime::getLastErrors();
@@ -545,48 +553,48 @@ abstract class Connection
      * Adds a limit clause to the SQL query.
      *
      * @param string $sql    the SQL statement
-     * @param int    $offset row offset to start at
-     * @param int    $limit  maximum number of rows to return
+     * @param int $offset row offset to start at
+     * @param int $limit  maximum number of rows to return
      *
      * @return string The SQL query that will limit results to specified parameters
      */
-    abstract public function limit($sql, $offset, $limit);
+    abstract public function limit(string $sql, int $offset = 0, int $limit = 0);
 
     /**
      * Query for column meta info and return statement handle.
      *
-     * @param string $table Name of a table
-     *
-     * @return PDOStatement
      */
-    abstract public function query_column_info($table);
+    abstract public function query_column_info(string $table): \PDOStatement;
 
     /**
      * Query for all tables in the current database. The result must only
      * contain one column which has the name of the table.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      */
-    abstract public function query_for_tables();
+    abstract public function query_for_tables(): \PDOStatement;
 
     /**
      * Executes query to specify the character set for this connection.
      */
-    abstract public function set_encoding($charset);
+    abstract public function set_encoding(string $charset): void;
 
     /*
      * Returns an array mapping of native database types
      */
 
-    abstract public function native_database_types();
+    /**
+     * @return array<string, string|array<string, mixed>>
+     */
+    abstract public function native_database_types(): array;
 
     /**
-     * Specifies whether or not adapter can use LIMIT/ORDER clauses with DELETE & UPDATE operations
+     * Specifies whether adapter can use LIMIT/ORDER clauses with DELETE & UPDATE operations
      *
      * @internal
      * @returns boolean (FALSE by default)
      */
-    public function accepts_limit_and_order_for_update_and_delete()
+    public function accepts_limit_and_order_for_update_and_delete(): bool
     {
         return false;
     }

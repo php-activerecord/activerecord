@@ -1,13 +1,11 @@
 <?php
-/**
- * @package ActiveRecord
- */
 
 namespace ActiveRecord\Serialize;
 
 use ActiveRecord\Config;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Model;
+use ActiveRecord\Types;
 
 /**
  * Base class for Model serializers.
@@ -18,7 +16,7 @@ use ActiveRecord\Model;
  *      only?:  string|string[],
  *      except?: string|string[],
  *      methods?: string|string[],
- *      include?: string|array,
+ *      include?: array<mixed>,
  *      only_method?: string,
  *      only_header?: string,
  *      skip_instruct? :bool,
@@ -32,35 +30,38 @@ use ActiveRecord\Model;
  * # run $model->encoded_description() and include its return value
  * # include the comments association
  * # include posts association with its own options (nested)
- * $model->to_json(array(
- *   'only' => array('id','name', 'encoded_description'),
- *   'methods' => array('encoded_description'),
- *   'include' => array('comments', 'posts' => array('only' => 'id'))
- * ));
+ * $model->to_json([
+ *   'only' => ['id','name', 'encoded_description'],
+ *   'methods' => ['encoded_description'],
+ *   'include' => ['comments', 'posts' => ['only' => 'id']]
+ * ]);
  *
  * # except the password field from being included
- * $model->to_xml(array('except' => 'password')));
+ * $model->to_xml(['except' => 'password']);
  * ```
  *
- * @package ActiveRecord
- *
+ * @phpstan-import-type Attributes from Types
  * @see http://www.phpactiverecord.org/guides/utilities#topic-serialization
  */
 abstract class Serialization
 {
-    protected $model;
+    protected Model $model;
     /**
      * @var SerializeOptions
      */
     protected array $options;
-    protected array $attributes;
+
+    /**
+     * @var Attributes
+     */
+    protected array $attributes = [];
 
     /**
      * The default format to serialize DateTime objects to.
      *
      * @see DateTime
      */
-    public static $DATETIME_FORMAT = 'iso8601';
+    public static string $DATETIME_FORMAT = 'iso8601';
 
     /**
      * Set this to true if the serializer needs to create a nested array keyed
@@ -70,14 +71,16 @@ abstract class Serialization
      * the include option was used:
      *
      * ```
-     * $user = array('id' => 1, 'name' => 'Tito',
-     *   'permissions' => array(
-     *     'permission' => array(
-     *       array('id' => 100, 'name' => 'admin'),
-     *       array('id' => 101, 'name' => 'normal')
-     *     )
-     *   )
-     * );
+     * $user = [
+     *  'id' => 1,
+     *  'name' => 'Tito',
+     *  'permissions' => [
+     *     'permission' => [
+     *       ['id' => 100, 'name' => 'admin'],
+     *       ['id' => 101, 'name' => 'normal']
+     *     ]
+     *   ]
+     * ];
      * ```
      *
      * Setting to false will produce this:
@@ -93,26 +96,23 @@ abstract class Serialization
      *
      * @var bool
      */
-    protected $includes_with_class_name_element = false;
+    protected bool $includes_with_class_name_element = false;
 
     /**
      * Constructs a {@link Serialization} object.
      *
      * @param Model $model    The model to serialize
-     * @param SerializeOptions &$options Options for serialization
-     *
-     * @return Serialization
+     * @param SerializeOptions $options Options for serialization
      */
-    public function __construct(Model $model, &$options)
+    public function __construct(Model $model, $options)
     {
         $this->model = $model;
         $this->options = $options;
-        $this->options['include_root'] ??= false;
         $this->attributes = $model->attributes();
         $this->parse_options();
     }
 
-    private function parse_options()
+    private function parse_options(): void
     {
         $this->check_only();
         $this->check_except();
@@ -121,7 +121,7 @@ abstract class Serialization
         $this->check_only_method();
     }
 
-    private function check_only()
+    private function check_only(): void
     {
         if (isset($this->options['only'])) {
             $this->options_to_a('only');
@@ -131,7 +131,7 @@ abstract class Serialization
         }
     }
 
-    private function check_except()
+    private function check_except(): void
     {
         if (isset($this->options['except']) && !isset($this->options['only'])) {
             $this->options_to_a('except');
@@ -139,7 +139,7 @@ abstract class Serialization
         }
     }
 
-    private function check_methods()
+    private function check_methods(): void
     {
         if (isset($this->options['methods'])) {
             $this->options_to_a('methods');
@@ -152,7 +152,7 @@ abstract class Serialization
         }
     }
 
-    private function check_only_method()
+    private function check_only_method(): void
     {
         if (isset($this->options['only_method'])) {
             $method = $this->options['only_method'];
@@ -162,7 +162,7 @@ abstract class Serialization
         }
     }
 
-    private function check_include()
+    private function check_include(): void
     {
         if (isset($this->options['include'])) {
             $this->options_to_a('include');
@@ -205,7 +205,7 @@ abstract class Serialization
         }
     }
 
-    final protected function options_to_a($key)
+    final protected function options_to_a(string $key): void
     {
         if (!is_array($this->options[$key])) {
             $this->options[$key] = [$this->options[$key]];
@@ -215,9 +215,9 @@ abstract class Serialization
     /**
      * Returns the attributes array.
      *
-     * @return array
+     * @return Attributes
      */
-    final public function to_a()
+    final public function to_a(): array
     {
         $date_class = Config::instance()->get_date_class();
         foreach ($this->attributes as &$value) {
@@ -236,7 +236,7 @@ abstract class Serialization
      *
      * @return string
      */
-    final public function __toString()
+    final public function __toString(): string
     {
         return $this->to_s();
     }
@@ -245,5 +245,5 @@ abstract class Serialization
      * Performs the serialization.
      *
      */
-    abstract public function to_s();
+    abstract public function to_s(): string;
 }

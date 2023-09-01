@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Column;
+use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Adapter\SqliteAdapter;
 
@@ -8,7 +9,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 {
     const InvalidDb = '__1337__invalid_db__';
 
-    public function setUp($connection_name=null): void
+    public function setUp(string $connection_name=null): void
     {
         if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
             'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
@@ -67,13 +68,13 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_connection_failed()
     {
-        $this->expectException(DatabaseException::class);
+        $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://baduser:badpass@127.0.0.1/db");
     }
 
     public function test_connect_failed()
     {
-        $this->expectException(DatabaseException::class);
+        $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://zzz:zzz@127.0.0.1/test");
     }
 
@@ -100,7 +101,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_connect_to_invalid_database()
     {
-        $this->expectException(DatabaseException::class);
+        $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://test:test@127.0.0.1/" . self::InvalidDb);
     }
 
@@ -288,7 +289,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertTrue($columns['special']->length >= 10);
     }
 
-    private function limit($offset, $limit)
+    private function limit(int $offset = 0, int $limit = 0)
     {
         $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
@@ -314,12 +315,12 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_limit_with_null_offset()
     {
-        $this->assertEquals([3], $this->limit(null, 1));
+        $this->assertEquals([3], $this->limit(0, 1));
     }
 
-    public function test_limit_with_nulls()
+    public function test_limit_with_defaults()
     {
-        $this->assertEquals([], $this->limit(null, null));
+        $this->assertEquals([], $this->limit());
     }
 
     public function test_fetch_no_results()

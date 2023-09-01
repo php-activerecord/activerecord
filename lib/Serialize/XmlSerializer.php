@@ -13,25 +13,26 @@ use function ActiveRecord\denamespace;
  */
 class XmlSerializer extends Serialization
 {
-    private $writer;
+    private \XMLWriter $writer;
 
     /**
      * @param Model $model
      * @param SerializeOptions $options
      */
-    public function __construct(Model $model, &$options)
+    public function __construct(Model $model, array $options)
     {
         $this->includes_with_class_name_element = true;
         parent::__construct($model, $options);
     }
 
-    public function to_s()
+    public function to_s(): string
     {
         $res = $this->xml_encode();
+        assert(is_string($res));
         return $res;
     }
 
-    private function xml_encode()
+    private function xml_encode(): string
     {
         $this->writer = new \XMLWriter();
         $this->writer->openMemory();
@@ -49,12 +50,14 @@ class XmlSerializer extends Serialization
         return $xml;
     }
 
-    private function write($data, $tag = null)
+    /**
+     * @param array<string,mixed> $data
+     * @param $tag
+     */
+    private function write(array $data, string $tag = null): void
     {
         foreach ($data as $attr => $value) {
-            if (null != $tag) {
-                $attr = $tag;
-            }
+            $attr = $tag ?? $attr;
 
             if (is_array($value) || is_object($value)) {
                 if (!is_int(key($value))) {

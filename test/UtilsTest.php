@@ -104,9 +104,9 @@ class UtilsTest extends TestCase
     public function test_wrap_strings_in_arrays()
     {
         $x = ['1', ['2']];
-        $this->assertEquals([['1'], ['2']], ActiveRecord\wrap_strings_in_arrays($x));
+        $this->assertEquals([['1'], ['2']], ActiveRecord\wrap_values_in_arrays($x));
 
         $x = '1';
-        $this->assertEquals([['1']], ActiveRecord\wrap_strings_in_arrays($x));
+        $this->assertEquals([['1']], ActiveRecord\wrap_values_in_arrays($x));
     }
 }

@@ -22,13 +22,13 @@ class DirtyAuthor extends ActiveRecord\Model
 
 class AuthorWithoutSequence extends ActiveRecord\Model
 {
-    public static $table = 'authors';
-    public static $sequence = 'invalid_seq';
+    public static string $table = 'authors';
+    public static string $sequence = 'invalid_seq';
 }
 
 class AuthorExplicitSequence extends ActiveRecord\Model
 {
-    public static $sequence = 'blah_seq';
+    public static string $sequence = 'blah_seq';
 }
 
 class ActiveRecordWriteTest extends DatabaseTestCase
@@ -213,21 +213,21 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $book = $this->make_new_book_and();
         $this->assertTrue(false !== strpos($book->table()->last_sql, 'name'));
         $this->assertTrue(false !== strpos($book->table()->last_sql, 'special'));
-        $this->assertEquals(null, $book->dirty_attributes());
+        $this->assertEquals([], $book->dirty_attributes());
     }
 
     public function test_dirty_attributes_cleared_after_inserting()
     {
         $book = $this->make_new_book_and();
-        $this->assertEquals(null, $book->dirty_attributes());
+        $this->assertEquals([], $book->dirty_attributes());
     }
 
     public function test_no_dirty_attributes_but_still_insert_record()
     {
         $book = new Book();
-        $this->assertEquals(null, $book->dirty_attributes());
+        $this->assertEquals([], $book->dirty_attributes());
         $book->save();
-        $this->assertEquals(null, $book->dirty_attributes());
+        $this->assertEquals([], $book->dirty_attributes());
         $this->assertNotNull($book->id);
     }
 
@@ -236,7 +236,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $book = Book::first();
         $book->name = 'rivers cuomo';
         $book->save();
-        $this->assertEquals(null, $book->dirty_attributes());
+        $this->assertEquals([], $book->dirty_attributes());
     }
 
     public function test_dirty_attributes_after_reloading()
@@ -244,7 +244,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $book = Book::first();
         $book->name = 'rivers cuomo';
         $book->reload();
-        $this->assertEquals(null, $book->dirty_attributes());
+        $this->assertEquals([], $book->dirty_attributes());
     }
 
     public function test_dirty_attributes_with_mass_assignment()
