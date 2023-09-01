@@ -284,7 +284,7 @@ class Table
 
         $collect_attrs_for_includes = !is_null($includes);
         $list = $attrs = [];
-        $processedData = $this->process_data($values);
+        $processedData = $this->process_data($values) ?? [];
         $sth = $this->conn->query($sql, $processedData);
 
         $self = $this;

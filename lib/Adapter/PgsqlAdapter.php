@@ -16,15 +16,15 @@ use ActiveRecord\Inflector;
  */
 class PgsqlAdapter extends Connection
 {
-    public static $QUOTE_CHARACTER = '"';
-    public static $DEFAULT_PORT = 5432;
+    public static string $QUOTE_CHARACTER = '"';
+    public static int $DEFAULT_PORT = 5432;
 
-    public function supports_sequences()
+    public function supports_sequences(): bool
     {
         return true;
     }
 
-    public function get_sequence_name($table, $column_name)
+    public function get_sequence_name(string $table, string $column_name): string
     {
         return "{$table}_{$column_name}_seq";
     }

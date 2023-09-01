@@ -78,25 +78,28 @@ abstract class Connection
     /**
      * Default PDO options to set for each connection.
      *
-     * @var array
+     * @var array<mixed>
      */
-    public static $PDO_OPTIONS = [
+    public static array $PDO_OPTIONS = [
         PDO::ATTR_CASE => PDO::CASE_LOWER,
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-        PDO::ATTR_STRINGIFY_FETCHES => false];
+        PDO::ATTR_STRINGIFY_FETCHES => false
+    ];
+
     /**
      * The quote character for stuff like column and field names.
      *
      * @var string
      */
-    public static $QUOTE_CHARACTER = '`';
+    public static string $QUOTE_CHARACTER = '`';
+
     /**
      * Default port.
      *
      * @var int
      */
-    public static $DEFAULT_PORT = 0;
+    public static int $DEFAULT_PORT = 0;
 
     /**
      * @param array<string, string|null> $column
@@ -156,9 +159,9 @@ abstract class Connection
      *
      * @param string $adapter name of the adapter
      *
-     * @return string the full name of the class including namespace
+     * @return class-string the full name of the class including namespace
      */
-    protected static function load_adapter_class($adapter)
+    protected static function load_adapter_class(string $adapter)
     {
         $class = ucwords($adapter) . 'Adapter';
         $fqclass = 'ActiveRecord\\Adapter\\' . $class;
@@ -195,7 +198,7 @@ abstract class Connection
      *
      * @return object the parsed URL as an object
      */
-    public static function parse_connection_url($connection_url)
+    public static function parse_connection_url(string $connection_url)
     {
         $url = @parse_url($connection_url);
 
@@ -263,7 +266,6 @@ abstract class Connection
     /**
      * Class Connection is a singleton. Access it via instance().
      *
-     * @return Connection
      */
     protected function __construct(\stdClass $info)
     {
@@ -291,9 +293,9 @@ abstract class Connection
      *
      * @param string $table Name of a table
      *
-     * @return array an array of {@link Column} objects
+     * @return array<Column> an array of {@link Column} objects
      */
-    public function columns($table)
+    public function columns(string $table): array
     {
         $columns = [];
         $sth = $this->query_column_info($table);
@@ -334,11 +336,11 @@ abstract class Connection
      * Execute a raw SQL query on the database.
      *
      * @param string $sql     raw SQL string to execute
-     * @param array  &$values Optional array of bind values
+     * @param array<mixed>  &$values Optional array of bind values
      *
      * @return mixed A result set object
      */
-    public function query($sql, &$values=[])
+    public function query(string $sql, array &$values=[])
     {
         if ($this->logging) {
             $this->logger->info($sql);
@@ -362,9 +364,9 @@ abstract class Connection
 
         $sth->setFetchMode(PDO::FETCH_ASSOC);
 
+        $msg = "couldn't execute query on " . get_class($this) . ". ";
+        $msg .= "user: " .getenv('USER');
         try {
-            $msg = "couldn't execute query on " . get_class($this) . ". ";
-            $msg .= "user: " .getenv('USER');
             if (!$sth->execute($values)) {
                 throw new DatabaseException($msg);
             }
@@ -379,10 +381,10 @@ abstract class Connection
      * Execute a query that returns maximum of one row with one field and return it.
      *
      * @param string $sql     raw SQL string to execute
-     * @param array  &$values Optional array of values to bind to the query
+     * @param array<mixed>  &$values Optional array of values to bind to the query
      *
      */
-    public function query_and_fetch_one($sql, &$values=[]): int
+    public function query_and_fetch_one(string $sql, array &$values=[]): int
     {
         $sth = $this->query($sql, $values);
         $row = $sth->fetch(PDO::FETCH_NUM);
@@ -396,7 +398,7 @@ abstract class Connection
      * @param string  $sql     raw SQL string to execute
      * @param Closure $handler closure that will be passed the fetched results
      */
-    public function query_and_fetch($sql, Closure $handler)
+    public function query_and_fetch(string $sql, Closure $handler): void
     {
         $sth = $this->query($sql);
 
@@ -408,9 +410,9 @@ abstract class Connection
     /**
      * Returns all tables for the current database.
      *
-     * @return array array containing table names
+     * @return array<string> array containing table names
      */
-    public function tables()
+    public function tables(): array
     {
         $tables = [];
         $sth = $this->query_for_tables();
@@ -425,39 +427,40 @@ abstract class Connection
     /**
      * Starts a transaction.
      */
-    public function transaction()
+    public function transaction(): void
     {
         if (!$this->connection->beginTransaction()) {
-            throw new DatabaseException($this);
+            throw new DatabaseException();
         }
     }
 
     /**
      * Commits the current transaction.
+     *
+     * @throws DatabaseException
      */
-    public function commit()
+    public function commit(): void
     {
         if (!$this->connection->commit()) {
-            throw new DatabaseException($this);
+            throw new DatabaseException();
         }
     }
 
     /**
      * Rollback a transaction.
      */
-    public function rollback()
+    public function rollback(): void
     {
         if (!$this->connection->rollback()) {
-            throw new DatabaseException($this);
+            throw new DatabaseException();
         }
     }
 
     /**
      * Tells you if this adapter supports sequences or not.
      *
-     * @return bool
      */
-    public function supports_sequences()
+    public function supports_sequences(): bool
     {
         return false;
     }
@@ -470,7 +473,7 @@ abstract class Connection
      *
      * @return string sequence name or null if not supported
      */
-    public function get_sequence_name($table, $column_name)
+    public function get_sequence_name(string $table, string $column_name): string
     {
         return "{$table}_seq";
     }

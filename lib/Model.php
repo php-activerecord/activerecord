@@ -1887,7 +1887,7 @@ class Model
      * @param array<mixed>  $values Bind values, if any, for the query
      *
      */
-    public static function query(string $sql, array $values=null): \PDOStatement
+    public static function query(string $sql, array $values=[]): \PDOStatement
     {
         return static::connection()->query($sql, $values);
     }

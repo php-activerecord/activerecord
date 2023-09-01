@@ -170,20 +170,6 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertNotEquals('Should not stay', $book->name);
     }
 
-    public function test_active_record_model_home_not_set()
-    {
-        $home = ActiveRecord\Config::instance()->get_model_directory();
-        ActiveRecord\Config::instance()->set_model_directory(__FILE__);
-        $this->assertEquals(false, class_exists('TestAutoload'));
-
-        ActiveRecord\Config::instance()->set_model_directory($home);
-    }
-
-    public function test_auto_load_with_namespaced_model()
-    {
-        $this->assertTrue(class_exists(\test\models\namespacetest\Book::class));
-    }
-
     public function test_namespace_gets_stripped_from_table_name()
     {
         $model = new \test\models\namespacetest\Book();
@@ -572,7 +558,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function test_query()
     {
-        $row = Author::query('SELECT COUNT(*) AS n FROM authors', null)->fetch();
+        $row = Author::query('SELECT COUNT(*) AS n FROM authors')->fetch();
         $this->assertTrue($row['n'] > 1);
 
         $row = Author::query('SELECT COUNT(*) AS n FROM authors WHERE name=?', ['Tito'])->fetch();

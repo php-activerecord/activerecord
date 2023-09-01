@@ -16,7 +16,7 @@ use ActiveRecord\Inflector;
  */
 class MysqlAdapter extends Connection
 {
-    public static $DEFAULT_PORT = 3306;
+    public static int $DEFAULT_PORT = 3306;
 
     public function limit(string $sql, int $offset = 0, int $limit = 0): string
     {
