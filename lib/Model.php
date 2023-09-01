@@ -307,7 +307,7 @@ class Model
      * @param bool       $instantiating_via_find Set to true if this model is being created from a find call
      * @param bool       $new_record             Set to true if this should be considered a new record
      */
-    public function __construct(array $attributes=[], bool $guard_attributes=true, bool $instantiating_via_find=false, bool $new_record=true)
+    public function __construct(array $attributes = [], bool $guard_attributes = true, bool $instantiating_via_find = false, bool $new_record = true)
     {
         $this->__new_record = $new_record;
 
@@ -621,7 +621,7 @@ class Model
             if ($delegated_name = $this->is_delegated($name, $item)) {
                 $to = $item['to'];
                 if ($this->$to) {
-                    $val =&$this->$to->__get($delegated_name);
+                    $val = &$this->$to->__get($delegated_name);
 
                     return $val;
                 }
@@ -697,7 +697,7 @@ class Model
     /**
      * @return array<string>|string
      */
-    public function get_primary_key(bool $first=false): array|string
+    public function get_primary_key(bool $first = false): array|string
     {
         $pk = static::table()->pk;
 
@@ -786,7 +786,7 @@ class Model
     {
         if (is_array($delegate)) {
             if ('' != $delegate['prefix']) {
-                $name = substr($name, strlen($delegate['prefix'])+1);
+                $name = substr($name, strlen($delegate['prefix']) + 1);
             }
 
             if (in_array($name, $delegate['delegate'])) {
@@ -832,7 +832,7 @@ class Model
      *
      * @param bool $readonly Set to true to put the model into readonly mode
      */
-    public function readonly(bool $readonly=true): void
+    public function readonly(bool $readonly = true): void
     {
         $this->__readonly = $readonly;
     }
@@ -876,7 +876,7 @@ class Model
      * @param bool       $validate         True if the validators should be run
      * @param bool       $guard_attributes Set to true to guard protected/non-accessible attributes
      */
-    public static function create(array $attributes, bool $validate=true, bool $guard_attributes=true): static
+    public static function create(array $attributes, bool $validate = true, bool $guard_attributes = true): static
     {
         $class_name = get_called_class();
         $model = new $class_name($attributes, $guard_attributes);
@@ -898,7 +898,7 @@ class Model
      *
      * @return bool True if the model was saved to the database otherwise false
      */
-    public function save($validate=true)
+    public function save($validate = true)
     {
         $this->verify_not_readonly('save');
 
@@ -914,7 +914,7 @@ class Model
      *
      * @return bool True if the model was saved to the database otherwise false
      */
-    private function insert($validate=true)
+    private function insert($validate = true)
     {
         $this->verify_not_readonly('insert');
 
@@ -970,7 +970,7 @@ class Model
      *
      * @return bool True if the model was saved to the database otherwise false
      */
-    private function update($validate=true)
+    private function update($validate = true)
     {
         $this->verify_not_readonly('update');
 
@@ -1052,7 +1052,7 @@ class Model
      * @param QueryOptions $options
      *                              return integer Number of rows affected
      */
-    public static function delete_all(array $options=[]): int
+    public static function delete_all(array $options = []): int
     {
         $table = static::table();
         $conn = static::connection();
@@ -1103,7 +1103,7 @@ class Model
      *
      * @return int Number of rows affected
      */
-    public static function update_all(array $options=[]): int
+    public static function update_all(array $options = []): int
     {
         $table = static::table();
         $conn = static::connection();
@@ -1376,7 +1376,7 @@ class Model
      *
      * @internal This should <strong>only</strong> be used by eager load
      */
-    public function set_relationship_from_eager_load(Model $model=null, string $name): void
+    public function set_relationship_from_eager_load(Model $model = null, string $name): void
     {
         $table = static::table();
 
@@ -1770,7 +1770,7 @@ class Model
                 $args = $args[0];
             }
 
-            if (is_array($args) && array_values($args)==$args) {
+            if (is_array($args) && array_values($args) == $args) {
                 $single = false;
             }
         }
@@ -1799,7 +1799,7 @@ class Model
         $table = static::table();
 
         foreach ($pks as $pk) {
-            $options =['conditions' => static::pk_conditions($pk)];
+            $options = ['conditions' => static::pk_conditions($pk)];
             $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
                 $res = $table->find($options);
 
@@ -1825,7 +1825,7 @@ class Model
     public static function find_by_pk(array|string|int|null $values, array $options, bool $forceArray = false): Model|array
     {
         $single = !is_array($values) && !$forceArray;
-        if (null===$values) {
+        if (null === $values) {
             throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
         }
 
@@ -1869,7 +1869,7 @@ class Model
      *
      * @return array<Model> An array of models
      */
-    public static function find_by_sql(string $sql, array $values=null): array
+    public static function find_by_sql(string $sql, array $values = null): array
     {
         return static::table()->find_by_sql($sql, $values, true);
     }
@@ -1880,7 +1880,7 @@ class Model
      * @param string       $sql    SQL to execute
      * @param array<mixed> $values Bind values, if any, for the query
      */
-    public static function query(string $sql, array $values=[]): \PDOStatement
+    public static function query(string $sql, array $values = []): \PDOStatement
     {
         return static::connection()->query($sql, $values);
     }
@@ -1893,7 +1893,7 @@ class Model
      *
      * @throws ActiveRecordException if the array contained any invalid options
      */
-    public static function is_options_hash(mixed $options, bool $throw=true): bool
+    public static function is_options_hash(mixed $options, bool $throw = true): bool
     {
         if (is_hash($options)) {
             $keys = array_keys($options);
@@ -1940,7 +1940,7 @@ class Model
     {
         $res = [];
         if ($options) {
-            $last = &$options[count($options)-1];
+            $last = &$options[count($options) - 1];
 
             try {
                 if (self::is_options_hash($last)) {
@@ -1965,7 +1965,7 @@ class Model
      *
      * @return string JSON representation of the model
      */
-    public function to_json(array $options=[])
+    public function to_json(array $options = [])
     {
         return $this->serialize('Json', $options);
     }
@@ -1979,7 +1979,7 @@ class Model
      *
      * @return string XML representation of the model
      */
-    public function to_xml(array $options=[])
+    public function to_xml(array $options = [])
     {
         return $this->serialize('Xml', $options);
     }
@@ -2004,7 +2004,7 @@ class Model
      *
      * @return string CSV representation of the model
      */
-    public function to_csv(array $options=[]): string
+    public function to_csv(array $options = []): string
     {
         return $this->serialize('Csv', $options);
     }
@@ -2018,7 +2018,7 @@ class Model
      *
      * @return Attributes|array<class-string|Attributes> Array representation of the model
      */
-    public function to_array(array $options=[]): array
+    public function to_array(array $options = []): array
     {
         $serializer = new JsonSerializer($this, $options);
 
@@ -2049,7 +2049,7 @@ class Model
      *
      * @return bool True if invoked or null if not
      */
-    private function invoke_callback($method_name, $must_exist=true)
+    private function invoke_callback($method_name, $must_exist = true)
     {
         return static::table()->callback->invoke($this, $method_name, $must_exist);
     }
