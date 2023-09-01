@@ -32,17 +32,17 @@ class CacheModelTest extends DatabaseTestCase
         Cache::initialize();
     }
 
-    public function testDefaultExpire()
+    public function test_default_expire()
     {
         $this->assertEquals(30, Author::table()->cache_model_expire);
     }
 
-    public function testExplicitExpire()
+    public function test_explicit_expire()
     {
         $this->assertEquals(2592000, Publisher::table()->cache_model_expire);
     }
 
-    public function testCacheKey()
+    public function test_cache_key()
     {
         $method = $this->set_method_public(Author::class, 'cache_key');
         $author = Author::first();
@@ -50,7 +50,7 @@ class CacheModelTest extends DatabaseTestCase
         $this->assertEquals('test\models\Author-1', $method->invokeArgs($author, []));
     }
 
-    public function testModelCacheFindByPk()
+    public function test_model_cache_find_by_pk()
     {
         $publisher = Publisher::find(1);
         $method = $this->set_method_public(Publisher::class, 'cache_key');
@@ -60,7 +60,7 @@ class CacheModelTest extends DatabaseTestCase
         $this->assertEquals($publisher->name, $publisherDirectlyFromCache->name);
     }
 
-    public function testModelCacheNew()
+    public function test_model_cache_new()
     {
         $publisher = new Publisher([
            'name'=>'HarperCollins'
@@ -76,7 +76,7 @@ class CacheModelTest extends DatabaseTestCase
         $this->assertEquals($publisher->name, $publisherDirectlyFromCache->name);
     }
 
-    public function testModelCacheFind()
+    public function test_model_cache_find()
     {
         $method = $this->set_method_public(Publisher::class, 'cache_key');
         $publishers = Publisher::all();
@@ -89,7 +89,7 @@ class CacheModelTest extends DatabaseTestCase
         }
     }
 
-    public function testRegularModelsNotCached()
+    public function test_regular_models_not_cached()
     {
         $method = $this->set_method_public(Author::class, 'cache_key');
         $author = Author::first();
@@ -97,7 +97,7 @@ class CacheModelTest extends DatabaseTestCase
         $this->assertFalse(Cache::$adapter->read($cache_key));
     }
 
-    public function testModelDeleteFromCache()
+    public function test_model_delete_from_cache()
     {
         $method = $this->set_method_public(Publisher::class, 'cache_key');
         $publisher = Publisher::find(1);
@@ -109,7 +109,7 @@ class CacheModelTest extends DatabaseTestCase
         $this->assertFalse(Cache::$adapter->read($cache_key));
     }
 
-    public function testModelUpdateCache()
+    public function test_model_update_cache()
     {
         $method = $this->set_method_public(Publisher::class, 'cache_key');
 

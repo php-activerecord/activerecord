@@ -1,5 +1,7 @@
 <?php
 
+use ActiveRecord\Exception\ConnectionException;
+use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use PHPUnit\Framework\TestCase;
 
@@ -21,6 +23,7 @@ abstract class DatabaseTestCase extends TestCase
         $connection_name ??= $config->get_default_connection();
 
         $this->original_date_class = $config->get_date_class();
+
 
         if ('sqlite' == $connection_name || 'sqlite' == $config->get_default_connection()) {
             // need to create the db. the adapter specifically does not create it for us.

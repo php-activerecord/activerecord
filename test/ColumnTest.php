@@ -9,7 +9,7 @@ class ColumnTest extends TestCase
 {
     private $column;
     private $conn;
-
+    
     public function setUp($connection_name = null): void
     {
         $this->column = new Column();
@@ -38,13 +38,13 @@ class ColumnTest extends TestCase
         }
     }
 
-    public function testMapRawTypeDates()
+    public function test_map_raw_type_dates()
     {
         $this->assert_mapped_type(Column::DATETIME, 'datetime');
         $this->assert_mapped_type(Column::DATE, 'date');
     }
 
-    public function testMapRawTypeIntegers()
+    public function test_map_raw_type_integers()
     {
         $this->assert_mapped_type(Column::INTEGER, 'integer');
         $this->assert_mapped_type(Column::INTEGER, 'int');
@@ -54,7 +54,7 @@ class ColumnTest extends TestCase
         $this->assert_mapped_type(Column::INTEGER, 'bigint');
     }
 
-    public function testMapRawTypeDecimals()
+    public function test_map_raw_type_decimals()
     {
         $this->assert_mapped_type(Column::DECIMAL, 'float');
         $this->assert_mapped_type(Column::DECIMAL, 'double');
@@ -62,26 +62,26 @@ class ColumnTest extends TestCase
         $this->assert_mapped_type(Column::DECIMAL, 'dec');
     }
 
-    public function testMapRawTypeStrings()
+    public function test_map_raw_type_strings()
     {
         $this->assert_mapped_type(Column::STRING, 'string');
         $this->assert_mapped_type(Column::STRING, 'varchar');
         $this->assert_mapped_type(Column::STRING, 'text');
     }
 
-    public function testMapRawTypeDefaultToString()
+    public function test_map_raw_type_default_to_string()
     {
         $this->assert_mapped_type(Column::STRING, 'bajdslfjasklfjlksfd');
     }
 
-    public function testMapRawTypeChangesIntegerToInt()
+    public function test_map_raw_type_changes_integer_to_int()
     {
         $this->column->raw_type = 'integer';
         $this->column->map_raw_type();
         $this->assertEquals('int', $this->column->raw_type);
     }
 
-    public function testCast()
+    public function test_cast()
     {
         $datetime = new DateTime('2001-01-01');
         $this->assert_cast(Column::INTEGER, 1, '1');
@@ -96,15 +96,15 @@ class ColumnTest extends TestCase
 
         // 32 bit
         if (PHP_INT_SIZE === 4) {
-            $this->assert_cast(Column::INTEGER, '2147483648', ((float) PHP_INT_MAX) + 1);
+            $this->assert_cast(Column::INTEGER, '2147483648', (((float) PHP_INT_MAX) + 1));
         }
         // 64 bit
         elseif (PHP_INT_SIZE === 8) {
-            $this->assert_cast(Column::INTEGER, '9223372036854775808', ((float) PHP_INT_MAX) + 1);
+            $this->assert_cast(Column::INTEGER, '9223372036854775808', (((float) PHP_INT_MAX) + 1));
         }
     }
 
-    public function testCastLeaveNullAlone()
+    public function test_cast_leave_null_alone()
     {
         $types = [
             Column::STRING,
@@ -118,7 +118,7 @@ class ColumnTest extends TestCase
         }
     }
 
-    public function testEmptyAndNullDateStringsShouldReturnNull()
+    public function test_empty_and_null_date_strings_should_return_null()
     {
         $column = new Column();
         $column->type = Column::DATE;
@@ -126,7 +126,7 @@ class ColumnTest extends TestCase
         $this->assertEquals(null, $column->cast('', $this->conn));
     }
 
-    public function testEmptyAndNullDatetimeStringsShouldReturnNull()
+    public function test_empty_and_null_datetime_strings_should_return_null()
     {
         $column = new Column();
         $column->type = Column::DATETIME;
@@ -134,7 +134,7 @@ class ColumnTest extends TestCase
         $this->assertEquals(null, $column->cast('', $this->conn));
     }
 
-    public function testNativeDateTimeAttributeCopiesExactTz()
+    public function test_native_date_time_attribute_copies_exact_tz()
     {
         $dt = new \DateTime('', new \DateTimeZone('America/New_York'));
 
@@ -148,7 +148,7 @@ class ColumnTest extends TestCase
         $this->assertEquals($dt->getTimeZone()->getName(), $dt2->getTimeZone()->getName());
     }
 
-    public function testArDateTimeAttributeCopiesExactTz()
+    public function test_ar_date_time_attribute_copies_exact_tz()
     {
         $dt = new DateTime('', new \DateTimeZone('America/New_York'));
 

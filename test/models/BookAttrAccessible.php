@@ -1,9 +1,7 @@
 <?php
-
 namespace test\models;
 
 use ActiveRecord\Model;
-
 class BookAttrAccessible extends Model
 {
     public static string $pk = 'book_id';

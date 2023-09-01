@@ -8,14 +8,14 @@ use ActiveRecord\Exception\UndefinedPropertyException;
 use test\models\Author;
 use test\models\AuthorAttrAccessible;
 use test\models\AwesomePerson;
-use test\models\Book;
 use test\models\Employee;
 use test\models\Event;
 use test\models\Host;
 use test\models\JoinBook;
 use test\models\Position;
-use test\models\Property;
 use test\models\Venue;
+use test\models\Book;
+use test\models\Property;
 
 class NotModel
 {
@@ -95,12 +95,12 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNotNull($employee->id, $employee->$association_name->title);
     }
 
-    public function testHasManyBasic()
+    public function test_has_many_basic()
     {
         $this->assert_default_has_many($this->get_relationship());
     }
 
-    public function testGh256EagerLoadingThreeLevelsDeep()
+    public function test_gh_256_eager_loading_three_levels_deep()
     {
         /* Before fix Undefined offset: 0 */
         $conditions['include'] = ['events'=>['host'=>['events']]];
@@ -119,50 +119,50 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals('Yeah Yeah Yeahs', $bill_events[0]->title);
     }
 
-    public function testJoinsOnModelViaUndeclaredAssociation()
+    public function test_joins_on_model_via_undeclared_association()
     {
         $this->expectException(RelationshipException::class);
         JoinBook::first(['joins' => ['undeclared']]);
     }
 
-    public function testJoinsOnlyLoadsGivenModelAttributes()
+    public function test_joins_only_loads_given_model_attributes()
     {
         $x = Event::first(['joins' => ['venue']]);
         $this->assert_sql_has('SELECT events.*', Event::table()->last_sql);
         $this->assertFalse(array_key_exists('city', $x->attributes()));
     }
 
-    public function testJoinsCombinedWithSelectLoadsAllAttributes()
+    public function test_joins_combined_with_select_loads_all_attributes()
     {
         $x = Event::first(['select' => 'events.*, venues.city as venue_city', 'joins' => ['venue']]);
         $this->assert_sql_has('SELECT events.*, venues.city as venue_city', Event::table()->last_sql);
         $this->assertTrue(array_key_exists('venue_city', $x->attributes()));
     }
 
-    public function testBelongsToBasic()
+    public function test_belongs_to_basic()
     {
         $this->assert_default_belongs_to($this->get_relationship());
     }
 
-    public function testBelongsToReturnsNullWhenNoRecord()
+    public function test_belongs_to_returns_null_when_no_record()
     {
         $event = Event::find(6);
         $this->assertNull($event->venue);
     }
 
-    public function testBelongsToReturnsNullWhenForeignKeyIsNull()
+    public function test_belongs_to_returns_null_when_foreign_key_is_null()
     {
         $event = Event::create(['title' => 'venueless event', 'host_id'=>1]);
         $this->assertNull($event->venue);
     }
 
-    public function testBelongsToWithExplicitClassName()
+    public function test_belongs_to_with_explicit_class_name()
     {
         Event::$belongs_to = [['explicit_class_name', 'class_name' => 'Venue']];
         $this->assert_default_belongs_to($this->get_relationship(), 'explicit_class_name');
     }
 
-    public function testBelongsToWithExplicitForeignKey()
+    public function test_belongs_to_with_explicit_foreign_key()
     {
         $old = Book::$belongs_to;
         Book::$belongs_to = [['explicit_author', 'class_name' => 'Author', 'foreign_key' => 'secondary_author_id']];
@@ -174,7 +174,7 @@ class RelationshipTest extends DatabaseTestCase
         Book::$belongs_to = $old;
     }
 
-    public function testBelongsToWithSelect()
+    public function test_belongs_to_with_select()
     {
         Event::$belongs_to[0]['select'] = 'id, city';
         $event = $this->get_relationship();
@@ -188,7 +188,7 @@ class RelationshipTest extends DatabaseTestCase
         }
     }
 
-    public function testBelongsToWithReadonly()
+    public function test_belongs_to_with_readonly()
     {
         Event::$belongs_to[0]['readonly'] = true;
         $event = $this->get_relationship();
@@ -204,13 +204,13 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals($event->venue->name, 'new name');
     }
 
-    public function testBelongsToWithPluralAttributeName()
+    public function test_belongs_to_with_plural_attribute_name()
     {
         Event::$belongs_to = [['venues', 'class_name' => 'Venue']];
         $this->assert_default_belongs_to($this->get_relationship(), 'venues');
     }
 
-    public function testBelongsToWithConditionsAndNonQualifyingRecord()
+    public function test_belongs_to_with_conditions_and_non_qualifying_record()
     {
         Event::$belongs_to[0]['conditions'] = "state = 'NY'";
         $event = $this->get_relationship();
@@ -218,13 +218,13 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNull($event->venue);
     }
 
-    public function testBelongsToWithConditionsAndQualifyingRecord()
+    public function test_belongs_to_with_conditions_and_qualifying_record()
     {
         Event::$belongs_to[0]['conditions'] = "state = 'PA'";
         $this->assert_default_belongs_to($this->get_relationship());
     }
 
-    public function testBelongsToBuildAssociation()
+    public function test_belongs_to_build_association()
     {
         $event = $this->get_relationship();
         $values = ['city' => 'Richmond', 'state' => 'VA'];
@@ -232,14 +232,14 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals($values, array_intersect_key($values, $venue->attributes()));
     }
 
-    public function testHasManyBuildAssociation()
+    public function test_has_many_build_association()
     {
         $author = Author::first();
         $this->assertEquals($author->id, $author->build_books()->author_id);
         $this->assertEquals($author->id, $author->build_book()->author_id);
     }
 
-    public function testBelongsToCreateAssociation()
+    public function test_belongs_to_create_association()
     {
         $event = $this->get_relationship();
         $values = ['city' => 'Richmond', 'state' => 'VA', 'name' => 'Club 54', 'address' => '123 street'];
@@ -247,7 +247,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNotNull($venue->id);
     }
 
-    public function testBuildAssociationOverwritesGuardedForeignKeys()
+    public function test_build_association_overwrites_guarded_foreign_keys()
     {
         $author = new AuthorAttrAccessible();
         $author->save();
@@ -257,7 +257,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNotNull($book->author_id);
     }
 
-    public function testBelongsToCanBeSelfReferential()
+    public function test_belongs_to_can_be_self_referential()
     {
         Author::$belongs_to = [['parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id']];
         $author = Author::find(1);
@@ -265,20 +265,20 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals(3, $author->parent_author->id);
     }
 
-    public function testBelongsToWithAnInvalidOption()
+    public function test_belongs_to_with_an_invalid_option()
     {
         Event::$belongs_to[0]['joins'] = 'venue';
         $event = Event::first()->venue;
         $this->assert_sql_doesnt_has('INNER JOIN venues ON(events.venue_id = venues.id)', Event::table()->last_sql);
     }
 
-    public function testHasManyWithExplicitClassName()
+    public function test_has_many_with_explicit_class_name()
     {
         Venue::$has_many = [['explicit_class_name', 'class_name' => 'Event', 'order' => 'id asc']];
         $this->assert_default_has_many($this->get_relationship(), 'explicit_class_name');
     }
 
-    public function testHasManyWithSelect()
+    public function test_has_many_with_select()
     {
         Venue::$has_many[0]['select'] = 'title, type';
         $venue = $this->get_relationship();
@@ -292,7 +292,7 @@ class RelationshipTest extends DatabaseTestCase
         }
     }
 
-    public function testHasManyWithReadonly()
+    public function test_has_many_with_readonly()
     {
         Venue::$has_many[0]['readonly'] = true;
         $venue = $this->get_relationship();
@@ -308,13 +308,13 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals($venue->events[0]->description, 'new desc');
     }
 
-    public function testHasManyWithSingularAttributeName()
+    public function test_has_many_with_singular_attribute_name()
     {
         Venue::$has_many = [['event', 'class_name' => 'Event', 'order' => 'id asc']];
         $this->assert_default_has_many($this->get_relationship(), 'event');
     }
 
-    public function testHasManyWithConditionsAndNonQualifyingRecord()
+    public function test_has_many_with_conditions_and_non_qualifying_record()
     {
         Venue::$has_many[0]['conditions'] = "title = 'pr0n @ railsconf'";
         $venue = $this->get_relationship();
@@ -322,7 +322,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertTrue(empty($venue->events), is_array($venue->events));
     }
 
-    public function testHasManyWithConditionsAndQualifyingRecord()
+    public function test_has_many_with_conditions_and_qualifying_record()
     {
         Venue::$has_many[0]['conditions'] = "title = 'Yeah Yeah Yeahs'";
         $venue = $this->get_relationship();
@@ -330,7 +330,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals($venue->events[0]->title, 'Yeah Yeah Yeahs');
     }
 
-    public function testHasManyWithSqlClauseOptions()
+    public function test_has_many_with_sql_clause_options()
     {
         Venue::$has_many[0] = ['events',
             'select' => 'type',
@@ -341,14 +341,14 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has($this->connection->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
     }
 
-    public function testHasManyThrough()
+    public function test_has_many_through()
     {
         $hosts = Venue::find(2)->hosts;
         $this->assertEquals(2, $hosts[0]->id);
         $this->assertEquals(3, $hosts[1]->id);
     }
 
-    public function testGh27HasManyThroughWithExplicitKeys()
+    public function test_gh27_has_many_through_with_explicit_keys()
     {
         $property = Property::first();
 
@@ -356,7 +356,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals(2, $property->amenities[1]->amenity_id);
     }
 
-    public function testGh16HasManyThroughInsideALoopShouldNotCauseAnException()
+    public function test_gh16_has_many_through_inside_a_loop_should_not_cause_an_exception()
     {
         $count = 0;
 
@@ -367,7 +367,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertTrue($count >= 5);
     }
 
-    public function testHasManyThroughNoAssociation()
+    public function test_has_many_through_no_association()
     {
         $this->expectException(HasManyThroughAssociationException::class);
         Event::$belongs_to = [['host']];
@@ -378,7 +378,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertTrue(count($n) > 0);
     }
 
-    public function testHasManyThroughWithSelect()
+    public function test_has_many_through_with_select()
     {
         Event::$belongs_to = [['host']];
         Venue::$has_many[1] = ['hosts', 'through' => 'events', 'select' => 'hosts.*, events.*'];
@@ -388,7 +388,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNotNull($venue->hosts[0]->title);
     }
 
-    public function testHasManyThroughWithConditions()
+    public function test_has_many_through_with_conditions()
     {
         Event::$belongs_to = [['host']];
         Venue::$has_many[1] = ['hosts', 'through' => 'events', 'conditions' => ['events.title != ?', 'Love Overboard']];
@@ -398,7 +398,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('events.title !=', ActiveRecord\Table::load(Host::class)->last_sql);
     }
 
-    public function testHasManyThroughUsingSource()
+    public function test_has_many_through_using_source()
     {
         Event::$belongs_to = [['host']];
         Venue::$has_many[1] = ['hostess', 'through' => 'events', 'source' => 'host'];
@@ -407,7 +407,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertTrue(count($venue->hostess) > 0);
     }
 
-    public function testHasManyThroughWithInvalidClassName()
+    public function test_has_many_through_with_invalid_class_name()
     {
         $this->expectException(\ReflectionException::class);
         Event::$belongs_to = [['host']];
@@ -417,13 +417,13 @@ class RelationshipTest extends DatabaseTestCase
         $this->get_relationship()->hosts;
     }
 
-    public function testHasManyWithJoins()
+    public function test_has_many_with_joins()
     {
         $x = Venue::first(['joins' => ['events']]);
         $this->assert_sql_has('INNER JOIN events ON(venues.id = events.venue_id)', Venue::table()->last_sql);
     }
 
-    public function testHasManyWithExplicitKeys()
+    public function test_has_many_with_explicit_keys()
     {
         $old = Author::$has_many;
         Author::$has_many = [['explicit_books', 'class_name' => 'Book', 'primary_key' => 'parent_author_id', 'foreign_key' => 'secondary_author_id']];
@@ -437,18 +437,18 @@ class RelationshipTest extends DatabaseTestCase
         Author::$has_many = $old;
     }
 
-    public function testHasOneBasic()
+    public function test_has_one_basic()
     {
         $this->assert_default_has_one($this->get_relationship());
     }
 
-    public function testHasOneWithExplicitClassName()
+    public function test_has_one_with_explicit_class_name()
     {
         Employee::$has_one = [['explicit_class_name', 'class_name' => 'Position']];
         $this->assert_default_has_one($this->get_relationship(), 'explicit_class_name');
     }
 
-    public function testHasOneWithSelect()
+    public function test_has_one_with_select()
     {
         Employee::$has_one[0]['select'] = 'title';
         $employee = $this->get_relationship();
@@ -462,7 +462,7 @@ class RelationshipTest extends DatabaseTestCase
         }
     }
 
-    public function testHasOneWithOrder()
+    public function test_has_one_with_order()
     {
         Employee::$has_one[0]['order'] = 'title';
         $employee = $this->get_relationship();
@@ -470,7 +470,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('ORDER BY title', Position::table()->last_sql);
     }
 
-    public function testHasOneWithConditionsAndNonQualifyingRecord()
+    public function test_has_one_with_conditions_and_non_qualifying_record()
     {
         Employee::$has_one[0]['conditions'] = "title = 'programmer'";
         $employee = $this->get_relationship();
@@ -478,13 +478,13 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNull($employee->position);
     }
 
-    public function testHasOneWithConditionsAndQualifyingRecord()
+    public function test_has_one_with_conditions_and_qualifying_record()
     {
         Employee::$has_one[0]['conditions'] = "title = 'physicist'";
         $this->assert_default_has_one($this->get_relationship());
     }
 
-    public function testHasOneWithReadonly()
+    public function test_has_one_with_readonly()
     {
         Employee::$has_one[0]['readonly'] = true;
         $employee = $this->get_relationship();
@@ -500,7 +500,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals($employee->position->title, 'new title');
     }
 
-    public function testHasOneCanBeSelfReferential()
+    public function test_has_one_can_be_self_referential()
     {
         Author::$has_one[1] = ['parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id'];
         $author = Author::find(1);
@@ -508,13 +508,13 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals(3, $author->parent_author->id);
     }
 
-    public function testHasOneWithJoins()
+    public function test_has_one_with_joins()
     {
         $x = Employee::first(['joins' => ['position']]);
         $this->assert_sql_has('INNER JOIN positions ON(employees.id = positions.employee_id)', Employee::table()->last_sql);
     }
 
-    public function testHasOneWithExplicitKeys()
+    public function test_has_one_with_explicit_keys()
     {
         Book::$has_one = [['explicit_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id', 'primary_key' => 'secondary_author_id']];
 
@@ -523,32 +523,32 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertTrue(false !== strpos(ActiveRecord\Table::load(Author::class)->last_sql, 'parent_author_id'));
     }
 
-    public function testDontAttemptToLoadIfAllForeignKeysAreNull()
+    public function test_dont_attempt_to_load_if_all_foreign_keys_are_null()
     {
         $event = new Event();
         $event->venue;
         $this->assert_sql_doesnt_has($this->connection->last_query, 'is IS NULL');
     }
 
-    public function testRelationshipOnTableWithUnderscores()
+    public function test_relationship_on_table_with_underscores()
     {
         $this->assertEquals(1, Author::find(1)->awesome_person->is_awesome);
     }
 
-    public function testHasOneThrough()
+    public function test_has_one_through()
     {
         Venue::$has_many = [['events'], ['hosts', 'through' => 'events']];
         $venue = Venue::first();
         $this->assertTrue(count($venue->hosts) > 0);
     }
 
-    public function testThrowErrorIfRelationshipIsNotAModel()
+    public function test_throw_error_if_relationship_is_not_a_model()
     {
         $this->expectException(RelationshipException::class);
         AuthorWithNonModelRelationship::first()->books;
     }
 
-    public function testGh93AndGh100EagerLoadingRespectsAssociationOptions()
+    public function test_gh93_and_gh100_eager_loading_respects_association_options()
     {
         Venue::$has_many = [['events', 'class_name' => 'Event', 'order' => 'id asc', 'conditions' => ['length(title) = ?', 14]]];
         $venues = Venue::find([2, 6], ['include' => 'events']);
@@ -557,7 +557,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals(1, count($venues[0]->events));
     }
 
-    public function testEagerLoadingHasManyX()
+    public function test_eager_loading_has_many_x()
     {
         $venues = Venue::find([2, 6], ['include' => 'events']);
         $this->assert_sql_has('WHERE venue_id IN(?,?)', ActiveRecord\Table::load(Event::class)->last_sql);
@@ -569,7 +569,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals(2, count($venues[0]->events));
     }
 
-    public function testEagerLoadingHasManyWithNoRelatedRows()
+    public function test_eager_loading_has_many_with_no_related_rows()
     {
         $venues = Venue::find([7, 8], ['include' => 'events']);
 
@@ -581,7 +581,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('WHERE venue_id IN(?,?)', ActiveRecord\Table::load(Event::class)->last_sql);
     }
 
-    public function testEagerLoadingHasManyArrayOfIncludes()
+    public function test_eager_loading_has_many_array_of_includes()
     {
         Author::$has_many = [['books'], ['awesome_people']];
         $authors = Author::find([1, 2], ['include' => ['books', 'awesome_people']]);
@@ -605,7 +605,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('WHERE author_id IN(?,?)', ActiveRecord\Table::load(AwesomePerson::class)->last_sql);
     }
 
-    public function testEagerLoadingHasManyNested()
+    public function test_eager_loading_has_many_nested()
     {
         $venues = Venue::find([1, 2], ['include' => ['events' => ['host']]]);
 
@@ -625,7 +625,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('WHERE id IN(?,?,?)', ActiveRecord\Table::load(Host::class)->last_sql);
     }
 
-    public function testEagerLoadingBelongsTo()
+    public function test_eager_loading_belongs_to()
     {
         $events = Event::find([1, 2, 3, 5, 7], ['include' => 'venue']);
 
@@ -636,7 +636,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('WHERE id IN(?,?,?,?,?)', ActiveRecord\Table::load(Venue::class)->last_sql);
     }
 
-    public function testEagerLoadingBelongsToArrayOfIncludes()
+    public function test_eager_loading_belongs_to_array_of_includes()
     {
         $events = Event::find([1, 2, 3, 5, 7], ['include' => ['venue', 'host']]);
 
@@ -650,7 +650,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('WHERE id IN(?,?,?,?,?)', ActiveRecord\Table::load(Venue::class)->last_sql);
     }
 
-    public function testEagerLoadingBelongsToNested()
+    public function test_eager_loading_belongs_to_nested()
     {
         Author::$has_many = [['awesome_people']];
 
@@ -666,7 +666,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('WHERE author_id IN(?,?)', ActiveRecord\Table::load(AwesomePerson::class)->last_sql);
     }
 
-    public function testEagerLoadingBelongsToWithNoRelatedRows()
+    public function test_eager_loading_belongs_to_with_no_related_rows()
     {
         $e1 = Event::create(['venue_id' => 200, 'host_id' => 200, 'title' => 'blah', 'type' => 'Music']);
         $e2 = Event::create(['venue_id' => 200, 'host_id' => 200, 'title' => 'blah2', 'type' => 'Music']);
@@ -681,7 +681,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_sql_has('WHERE id IN(?,?)', ActiveRecord\Table::load(Venue::class)->last_sql);
     }
 
-    public function testEagerLoadingClonesRelatedObjects()
+    public function test_eager_loading_clones_related_objects()
     {
         $events = Event::find([2, 3], ['include' => ['venue']]);
 
@@ -693,7 +693,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNotEquals(spl_object_hash($venue), spl_object_hash($events[1]->venue));
     }
 
-    public function testEagerLoadingClonesNestedRelatedObjects()
+    public function test_eager_loading_clones_nested_related_objects()
     {
         $venues = Venue::find([1, 2, 6, 9], ['include' => ['events' => ['host']]]);
 
@@ -706,7 +706,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNotEquals(spl_object_hash($changed_host), spl_object_hash($unchanged_host));
     }
 
-    public function testGh23RelationshipsWithJoinsToSameTableShouldAliasTableName()
+    public function test_gh_23_relationships_with_joins_to_same_table_should_alias_table_name()
     {
         $old = Book::$belongs_to;
         Book::$belongs_to = [
@@ -727,14 +727,14 @@ class RelationshipTest extends DatabaseTestCase
         Book::$belongs_to = $old;
     }
 
-    public function testGh40RelationshipsWithJoinsAliasesTableNameInConditions()
+    public function test_gh_40_relationships_with_joins_aliases_table_name_in_conditions()
     {
         $event = Event::find(1, ['joins' => ['venue']]);
 
         $this->assertEquals($event->id, $event->venue->id);
     }
 
-    public function testDontAttemptEagerLoadWhenRecordDoesNotExist()
+    public function test_dont_attempt_eager_load_when_record_does_not_exist()
     {
         $this->expectException(RecordNotFound::class);
         Author::find(999999, ['include' => ['books']]);

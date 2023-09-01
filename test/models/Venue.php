@@ -1,9 +1,7 @@
 <?php
-
 namespace test\models;
 
 use ActiveRecord\Model;
-
 class Venue extends Model
 {
     public static bool $use_custom_get_state_getter = false;

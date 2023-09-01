@@ -20,43 +20,43 @@ class AuthorPresence extends ActiveRecord\Model
 
 class ValidatesPresenceOfTest extends DatabaseTestCase
 {
-    public function testPresence()
+    public function test_presence()
     {
         $book = new BookPresence(['name' => 'blah']);
         $this->assertFalse($book->is_invalid());
     }
 
-    public function testPresenceOnDateFieldIsValid()
+    public function test_presence_on_date_field_is_valid()
     {
         $author = new AuthorPresence(['some_date' => '2010-01-01']);
         $this->assertTrue($author->is_valid());
     }
 
-    public function testPresenceOnDateFieldIsNotValid()
+    public function test_presence_on_date_field_is_not_valid()
     {
         $author = new AuthorPresence();
         $this->assertFalse($author->is_valid());
     }
 
-    public function testInvalidNull()
+    public function test_invalid_null()
     {
         $book = new BookPresence(['name' => null]);
         $this->assertTrue($book->is_invalid());
     }
 
-    public function testInvalidBlank()
+    public function test_invalid_blank()
     {
         $book = new BookPresence(['name' => '']);
         $this->assertTrue($book->is_invalid());
     }
 
-    public function testValidWhiteSpace()
+    public function test_valid_white_space()
     {
         $book = new BookPresence(['name' => ' ']);
         $this->assertFalse($book->is_invalid());
     }
 
-    public function testCustomMessage()
+    public function test_custom_message()
     {
         BookPresence::$validates_presence_of = [
             'name' => ['message' => 'is using a custom message.']
@@ -67,7 +67,7 @@ class ValidatesPresenceOfTest extends DatabaseTestCase
         $this->assertEquals('is using a custom message.', $book->errors->first('name'));
     }
 
-    public function testValidZero()
+    public function test_valid_zero()
     {
         $book = new BookPresence(['name' => 0]);
         $this->assertTrue($book->is_valid());

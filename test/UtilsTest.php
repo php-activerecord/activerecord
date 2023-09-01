@@ -23,27 +23,27 @@ class UtilsTest extends TestCase
             ['a' => '1a', 'b' => '1b']];
     }
 
-    public function testCollectWithArrayOfObjectsUsingClosure()
+    public function test_collect_with_array_of_objects_using_closure()
     {
         $this->assertEquals(['0a', '1a'], AR\collect($this->object_array, function ($obj) { return $obj->a; }));
     }
 
-    public function testCollectWithArrayOfObjectsUsingString()
+    public function test_collect_with_array_of_objects_using_string()
     {
         $this->assertEquals(['0a', '1a'], AR\collect($this->object_array, 'a'));
     }
 
-    public function testCollectWithArrayHashUsingClosure()
+    public function test_collect_with_array_hash_using_closure()
     {
         $this->assertEquals(['0a', '1a'], AR\collect($this->array_hash, function ($item) { return $item['a']; }));
     }
 
-    public function testCollectWithArrayHashUsingString()
+    public function test_collect_with_array_hash_using_string()
     {
         $this->assertEquals(['0a', '1a'], AR\collect($this->array_hash, 'a'));
     }
 
-    public function testArrayFlatten()
+    public function test_array_flatten()
     {
         $this->assertEquals([], AR\array_flatten([]));
         $this->assertEquals([1], AR\array_flatten([1]));
@@ -56,7 +56,7 @@ class UtilsTest extends TestCase
         $this->assertEquals([1, 2, 3, 4, 5, 6], AR\array_flatten([1, [2, 3], 4, [5, 6]]));
     }
 
-    public function testAll()
+    public function test_all()
     {
         $this->assertTrue(AR\all(null, [null, null]));
         $this->assertTrue(AR\all(1, [1, 1]));
@@ -64,7 +64,7 @@ class UtilsTest extends TestCase
         $this->assertFalse(AR\all(null, ['', null]));
     }
 
-    public function testClassify()
+    public function test_classify()
     {
         $bad_class_names = ['ubuntu_rox', 'stop_the_Snake_Case', 'CamelCased', 'camelCased'];
         $good_class_names = ['UbuntuRox', 'StopTheSnakeCase', 'CamelCased', 'CamelCased'];
@@ -77,7 +77,7 @@ class UtilsTest extends TestCase
         $this->assertEquals($class_names, $good_class_names);
     }
 
-    public function testClassifySingularize()
+    public function test_classify_singularize()
     {
         $bad_class_names = ['events', 'stop_the_Snake_Cases', 'angry_boxes', 'Mad_Sheep_herders', 'happy_People'];
         $good_class_names = ['Event', 'StopTheSnakeCase', 'AngryBox', 'MadSheepHerder', 'HappyPerson'];
@@ -90,7 +90,7 @@ class UtilsTest extends TestCase
         $this->assertEquals($class_names, $good_class_names);
     }
 
-    public function testSingularize()
+    public function test_singularize()
     {
         $this->assertEquals('order_status', AR\Utils::singularize('order_status'));
         $this->assertEquals('order_status', AR\Utils::singularize('order_statuses'));
@@ -101,7 +101,7 @@ class UtilsTest extends TestCase
         $this->assertEquals('pass', AR\Utils::singularize('passes'));
     }
 
-    public function testWrapStringsInArrays()
+    public function test_wrap_strings_in_arrays()
     {
         $x = ['1', ['2']];
         $this->assertEquals([['1'], ['2']], ActiveRecord\wrap_values_in_arrays($x));

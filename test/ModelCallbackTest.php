@@ -61,60 +61,47 @@ class ModelCallbackTest extends DatabaseTestCase
         $this->assertEquals($only_fire, $intersect);
     }
 
-    public function testAfterConstructFiresByDefault()
+    public function test_after_construct_fires_by_default()
     {
         $this->assert_fires('after_construct', function ($model) { new Venue(); });
     }
 
-    public function testFireValidationCallbacksOnInsert()
+    public function test_fire_validation_callbacks_on_insert()
     {
         $this->assert_fires(['before_validation', 'after_validation', 'before_validation_on_create', 'after_validation_on_create'],
-            function ($model) {
-                $model = new Venue();
-                $model->save();
-            });
+            function ($model) { $model = new Venue(); $model->save(); });
     }
 
-    public function testFireValidationCallbacksOnUpdate()
+    public function test_fire_validation_callbacks_on_update()
     {
         $this->assert_fires(['before_validation', 'after_validation', 'before_validation_on_update', 'after_validation_on_update'],
-            function ($model) {
-                $model = Venue::first();
-                $model->save();
-            });
+            function ($model) { $model = Venue::first(); $model->save(); });
     }
 
-    public function testValidationCallBacksNotFiredDueToBypassingValidations()
+    public function test_validation_call_backs_not_fired_due_to_bypassing_validations()
     {
         $this->assert_does_not_fire('before_validation', function ($model) { $model->save(false); });
     }
 
-    public function testBeforeValidationReturningFalseCancelsCallbacks()
+    public function test_before_validation_returning_false_cancels_callbacks()
     {
         $this->assert_fires_returns_false(['before_validation', 'after_validation'], 'before_validation',
             function ($model) { $model->save(); });
     }
 
-    public function testFiresBeforeSaveAndBeforeUpdateWhenUpdating()
+    public function test_fires_before_save_and_before_update_when_updating()
     {
         $this->assert_fires(['before_save', 'before_update'],
-            function ($model) {
-                $model = Venue::first();
-                $model->name = 'something new';
-                $model->save();
-            });
+            function ($model) { $model = Venue::first(); $model->name = 'something new'; $model->save(); });
     }
 
-    public function testBeforeSaveReturningFalseCancelsCallbacks()
+    public function test_before_save_returning_false_cancels_callbacks()
     {
         $this->assert_fires_returns_false(['before_save', 'before_create'], 'before_save',
-            function ($model) {
-                $model = new Venue();
-                $model->save();
-            });
+            function ($model) { $model = new Venue(); $model->save(); });
     }
 
-    public function testDestroy()
+    public function test_destroy()
     {
         $this->assert_fires(['before_destroy', 'after_destroy'],
             function ($model) { $model->delete(); });

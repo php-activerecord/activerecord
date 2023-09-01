@@ -1,9 +1,7 @@
 <?php
-
 namespace test\models;
 
 use ActiveRecord\Model;
-
 class Publisher extends Model
 {
     public static bool $cache = true;

@@ -1,5 +1,4 @@
 <?php
-
 namespace test\models;
 
 use ActiveRecord\Model;
