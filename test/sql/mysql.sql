@@ -22,6 +22,7 @@ CREATE TABLE books(
 	Author_Id INT,
 	secondary_author_id INT,
 	name VARCHAR(50),
+	publisher VARCHAR(50),
 	numeric_test VARCHAR(10) DEFAULT '0',
 	special NUMERIC(10,2) DEFAULT 0
 );
