@@ -1,5 +1,6 @@
 <?php
 
+use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,7 @@ abstract class DatabaseTestCase extends TestCase
         try {
             $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
             $this->connection_name = $connection_name;
-        } catch (DatabaseException $e) {
+        } catch (Exception $e) {
             $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
 

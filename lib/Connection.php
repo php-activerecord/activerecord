@@ -8,6 +8,7 @@ namespace ActiveRecord;
 
 require_once 'Column.php';
 
+use ActiveRecord\Adapter\SqliteAdapter;
 use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use Closure;
@@ -281,12 +282,12 @@ abstract class Connection
             $dsn = "$info->protocol:$host;dbname=$info->db";
             $this->connection = new PDO($dsn, $info->user, $info->pass, static::$PDO_OPTIONS);
         } catch (PDOException $e) {
-            throw new Exception\PdoException($e);
+            throw new Exception\ConnectionException($e);
         }
     }
 
     /**
-     * Retrieves column meta data for the specified table.
+     * Retrieves column metadata for the specified table.
      *
      * @param string $table Name of a table
      *
@@ -350,10 +351,13 @@ abstract class Connection
 
         try {
             if (!($sth = $this->connection->prepare($sql))) {
-                throw new DatabaseException($this);
+                throw new DatabaseException();
             }
         } catch (PDOException $e) {
-            throw new ConnectionException($this);
+            if($this instanceof SqliteAdapter && $e->getCode() === "HY000") {
+                throw new DatabaseException($e);
+            }
+            throw new ConnectionException($e);
         }
 
         $sth->setFetchMode(PDO::FETCH_ASSOC);

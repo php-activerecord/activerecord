@@ -8,6 +8,7 @@ namespace ActiveRecord\Adapter;
 use ActiveRecord\Column;
 use ActiveRecord\Connection;
 use ActiveRecord\Exception\ActiveRecordException;
+use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Inflector;
 use ActiveRecord\Utils;
@@ -25,7 +26,7 @@ class SqliteAdapter extends Connection
     protected function __construct(\stdClass $info)
     {
         if (!file_exists($info->host)) {
-            throw new DatabaseException("Could not find sqlite db: $info->host");
+            throw new ConnectionException("Could not find sqlite db: $info->host");
         }
         $this->connection = new PDO("sqlite:$info->host", null, null, static::$PDO_OPTIONS);
     }

@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Connection;
+use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 
 class SqliteAdapterTest extends AdapterTestCase
@@ -27,7 +28,7 @@ class SqliteAdapterTest extends AdapterTestCase
         try {
             Connection::instance('sqlite://' . self::InvalidDb);
             $this->assertFalse(true);
-        } catch (DatabaseException $e) {
+        } catch (ConnectionException $e) {
             $this->assertFalse(file_exists(__DIR__ . '/' . self::InvalidDb));
         }
     }

@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Column;
+use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Adapter\SqliteAdapter;
 
@@ -67,13 +68,13 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_connection_failed()
     {
-        $this->expectException(\ActiveRecord\Exception\PdoException::class);
+        $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://baduser:badpass@127.0.0.1/db");
     }
 
     public function test_connect_failed()
     {
-        $this->expectException(DatabaseException::class);
+        $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://zzz:zzz@127.0.0.1/test");
     }
 
@@ -100,7 +101,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function test_connect_to_invalid_database()
     {
-        $this->expectException(DatabaseException::class);
+        $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://test:test@127.0.0.1/" . self::InvalidDb);
     }
 
