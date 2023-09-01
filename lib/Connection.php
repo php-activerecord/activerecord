@@ -35,13 +35,13 @@ abstract class Connection
     /**
      * The PDO connection object.
      */
-    public $connection;
+    public Connection $connection;
     /**
      * The last query run.
      *
      * @var string
      */
-    public $last_query;
+    public string $last_query;
     /**
      * Switch for logging.
      *
@@ -112,7 +112,7 @@ abstract class Connection
      *
      * @see parse_connection_url
      */
-    public static function instance(string $connection_string_or_connection_name=null)
+    public static function instance(string $connection_string_or_connection_name = null)
     {
         $config = Config::instance();
 
@@ -318,7 +318,7 @@ abstract class Connection
      *
      * @return int
      */
-    public function insert_id($sequence=null)
+    public function insert_id($sequence = null)
     {
         return $this->connection->lastInsertId($sequence);
     }
@@ -331,7 +331,7 @@ abstract class Connection
      *
      * @return mixed A result set object
      */
-    public function query(string $sql, array &$values=[])
+    public function query(string $sql, array &$values = [])
     {
         if ($this->logging) {
             $this->logger->info($sql);
@@ -374,7 +374,7 @@ abstract class Connection
      * @param string       $sql     raw SQL string to execute
      * @param array<mixed> &$values Optional array of values to bind to the query
      */
-    public function query_and_fetch_one(string $sql, array &$values=[]): int
+    public function query_and_fetch_one(string $sql, array &$values = []): int
     {
         $sth = $this->query($sql, $values);
         $row = $sth->fetch(\PDO::FETCH_NUM);

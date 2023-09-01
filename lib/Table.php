@@ -97,7 +97,7 @@ class Table
         return self::$cache[$model_class_name];
     }
 
-    public static function clear_cache(string $model_class_name=null): void
+    public static function clear_cache(string $model_class_name = null): void
     {
         if ($model_class_name && array_key_exists($model_class_name, self::$cache)) {
             unset(self::$cache[$model_class_name]);
@@ -123,7 +123,7 @@ class Table
         $this->callback->register('after_save', function (Model $model) { $model->reset_dirty(); }, ['prepend' => true]);
     }
 
-    public function reestablish_connection(bool $close=true): Connection
+    public function reestablish_connection(bool $close = true): Connection
     {
         // if connection name property is null the connection manager will use the default connection
         $connection = $this->class->getStaticPropertyValue('connection', null);
@@ -281,7 +281,7 @@ class Table
      *
      * @return array<Model>
      */
-    public function find_by_sql(string $sql, array $values = null, bool $readonly=false, string|array $includes=null): array
+    public function find_by_sql(string $sql, array $values = null, bool $readonly = false, string|array $includes = null): array
     {
         $this->last_sql = $sql;
 
@@ -359,7 +359,7 @@ class Table
         return null;
     }
 
-    public function get_fully_qualified_table_name(bool $quote_name=true): string
+    public function get_fully_qualified_table_name(bool $quote_name = true): string
     {
         $table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
 
@@ -376,7 +376,7 @@ class Table
      *
      * @throws RelationshipException
      */
-    public function get_relationship(string $name, bool $strict=false): ?AbstractRelationship
+    public function get_relationship(string $name, bool $strict = false): ?AbstractRelationship
     {
         if ($this->has_relationship($name)) {
             return $this->relationships[$name];
@@ -405,7 +405,7 @@ class Table
      *
      * @throws Exception\ActiveRecordException
      */
-    public function insert(array &$data, string|int $pk=null, string $sequence_name=null): \PDOStatement
+    public function insert(array &$data, string|int $pk = null, string $sequence_name = null): \PDOStatement
     {
         $data = $this->process_data($data);
 
@@ -541,7 +541,7 @@ class Table
 
             // strip namespaces from the table name if any
             $parts = explode('\\', $this->table);
-            $this->table = $parts[count($parts)-1];
+            $this->table = $parts[count($parts) - 1];
         }
 
         if (($db = $this->class->getStaticPropertyValue('db', null)) || ($db = $this->class->getStaticPropertyValue('db_name', null))) {

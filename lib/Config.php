@@ -257,7 +257,7 @@ class Config extends Singleton
      * @param string       $url     url to your cache server
      * @param CacheOptions $options Array of options
      */
-    public function set_cache(string $url, array $options=[]): void
+    public function set_cache(string $url, array $options = []): void
     {
         Cache::initialize($url, $options);
     }

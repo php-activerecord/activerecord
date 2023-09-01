@@ -182,7 +182,7 @@ class SQLBuilder
      *
      * @return $this
      */
-    public function insert(array $hash, mixed $pk=null, string $sequence_name=null): static
+    public function insert(array $hash, mixed $pk = null, string $sequence_name = null): static
     {
         if (!is_hash($hash)) {
             throw new ActiveRecordException('Inserting requires a hash.');
@@ -236,7 +236,7 @@ class SQLBuilder
 
         $parts = explode(',', $order);
 
-        for ($i=0, $n=count($parts); $i<$n; ++$i) {
+        for ($i = 0, $n = count($parts); $i < $n; ++$i) {
             $v = strtolower($parts[$i]);
 
             if (false !== strpos($v, ' asc')) {
@@ -261,7 +261,7 @@ class SQLBuilder
      *
      * @return array<mixed>
      */
-    public static function create_conditions_from_underscored_string(Connection $connection, ?string $name, array $values=[], array $map=[]): ?array
+    public static function create_conditions_from_underscored_string(Connection $connection, ?string $name, array $values = [], array $map = []): ?array
     {
         if (!$name) {
             return null;
@@ -271,9 +271,9 @@ class SQLBuilder
         $num_values = count((array) $values);
         $conditions = [''];
 
-        for ($i=0, $j=0, $n=count($parts); $i<$n; $i+=2, ++$j) {
+        for ($i = 0, $j = 0, $n = count($parts); $i < $n; $i += 2, ++$j) {
             if ($i >= 2) {
-                $res = preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i-1]);
+                $res = preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i - 1]);
                 assert(is_string($res));
                 $conditions[0] .= $res;
             }
@@ -307,13 +307,13 @@ class SQLBuilder
      *
      * @return array<string,mixed> A hash of array(name => value, ...)
      */
-    public static function create_hash_from_underscored_string(string $name, array $values=[], array &$map=[])
+    public static function create_hash_from_underscored_string(string $name, array $values = [], array &$map = [])
     {
         $parts = preg_split('/(_and_|_or_)/i', $name);
         assert(is_array($parts));
         $hash = [];
 
-        for ($i=0, $n=count($parts); $i<$n; ++$i) {
+        for ($i = 0, $n = count($parts); $i < $n; ++$i) {
             // map to correct name if $map was supplied
             $name = $map[$parts[$i]] ?? $parts[$i];
             assert(is_string($name));
@@ -331,7 +331,7 @@ class SQLBuilder
      *
      * @return array<string,string> $new
      */
-    private function prepend_table_name_to_fields(array $hash=[])
+    private function prepend_table_name_to_fields(array $hash = [])
     {
         $new = [];
         $table = $this->connection->quote_name($this->table);

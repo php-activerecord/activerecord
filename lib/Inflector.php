@@ -34,8 +34,8 @@ abstract class Inflector
 
         $camelized = '';
 
-        for ($i=0, $n=strlen($s); $i<$n; ++$i) {
-            if ('_' == $s[$i] && $i+1 < $n) {
+        for ($i = 0, $n = strlen($s); $i < $n; ++$i) {
+            if ('_' == $s[$i] && $i + 1 < $n) {
                 $camelized .= strtoupper($s[++$i]);
             } else {
                 $camelized .= $s[$i];
@@ -70,7 +70,7 @@ abstract class Inflector
     {
         $normalized = '';
 
-        for ($i=0, $n=strlen($s); $i<$n; ++$i) {
+        for ($i = 0, $n = strlen($s); $i < $n; ++$i) {
             if (ctype_alpha($s[$i]) && self::is_upper($s[$i])) {
                 $normalized .= '_' . strtolower($s[$i]);
             } else {

@@ -92,7 +92,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
      *
      * @return string formatted date and time string
      */
-    public function format(string $format=''): string
+    public function format(string $format = ''): string
     {
         return parent::format(self::get_format($format));
     }
@@ -109,7 +109,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
      *
      * @return string a format string
      */
-    public static function get_format(string $format=null): string
+    public static function get_format(string $format = null): string
     {
         // use default format if no format specified
         if (!$format) {

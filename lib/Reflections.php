@@ -29,7 +29,7 @@ class Reflections extends Singleton
      *
      * @return Reflections $this so you can chain calls like Reflections::instance()->add('class')->get()
      */
-    public function add(string $class=null): Reflections
+    public function add(string $class = null): Reflections
     {
         $class = $this->get_class($class);
 
@@ -79,7 +79,7 @@ class Reflections extends Singleton
      *
      * @return string
      */
-    private function get_class(string|object $class=null)
+    private function get_class(string|object $class = null)
     {
         if (is_object($class)) {
             return get_class($class);

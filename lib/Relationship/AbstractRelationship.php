@@ -2,20 +2,21 @@
 
 namespace ActiveRecord\Relationship;
 
+use ActiveRecord\Exception\RelationshipException;
+use ActiveRecord\Inflector;
+use ActiveRecord\Model;
+
+use ActiveRecord\Reflections;
+
+use ActiveRecord\SQLBuilder;
+
+use ActiveRecord\Table;
+use ActiveRecord\Utils;
+
 use function ActiveRecord\all;
 use function ActiveRecord\classify;
 use function ActiveRecord\denamespace;
-
-use ActiveRecord\Exception\RelationshipException;
-
 use function ActiveRecord\has_absolute_namespace;
-
-use ActiveRecord\Inflector;
-use ActiveRecord\Model;
-use ActiveRecord\Reflections;
-use ActiveRecord\SQLBuilder;
-use ActiveRecord\Table;
-use ActiveRecord\Utils;
 
 /**
  * Abstract class that all relationships must extend from.
@@ -251,7 +252,7 @@ abstract class AbstractRelationship
 
     protected function append_record_to_associate(Model $associate, Model $record): Model
     {
-        $association =&$associate->{$this->attribute_name};
+        $association = &$associate->{$this->attribute_name};
 
         if ($this->poly_relationship) {
             $association[] = $record;

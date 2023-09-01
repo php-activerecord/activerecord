@@ -200,7 +200,7 @@ class Column
     /**
      * Sets the $type member variable.
      */
-    public function map_raw_type()
+    public function map_raw_type(): void
     {
         if ('integer' == $this->raw_type) {
             $this->raw_type = 'int';
@@ -211,7 +211,5 @@ class Column
         } else {
             $this->type = self::STRING;
         }
-
-        return $this->type;
     }
 }
