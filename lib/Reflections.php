@@ -18,7 +18,7 @@ class Reflections extends Singleton
     /**
      * Current reflections.
      *
-     * @var array<string, ReflectionClass<Model>>
+     * @var array<string, \ReflectionClass<Model>>
      */
     private $reflections = [];
 
@@ -34,7 +34,7 @@ class Reflections extends Singleton
         $class = $this->get_class($class);
 
         if (!isset($this->reflections[$class])) {
-            $this->reflections[$class] = new ReflectionClass($class);
+            $this->reflections[$class] = new \ReflectionClass($class);
         }
 
         return $this;

@@ -70,7 +70,7 @@ class ValidationErrors implements \IteratorAggregate
      * Add an error message.
      *
      * @param string $attribute Name of an attribute on the model
-     * @param string $msg The error message
+     * @param string $msg       The error message
      */
     public function add(string $attribute, string $msg): void
     {
@@ -82,9 +82,8 @@ class ValidationErrors implements \IteratorAggregate
      * Adds an error message only if the attribute value is {@link http://www.php.net/empty empty}.
      *
      * @param string $attribute Name of an attribute on the model
-     * @param string $msg|null The error message
      */
-    public function add_on_empty(string $attribute, string|null $msg = null): void
+    public function add_on_empty(string $attribute, string $msg = null): void
     {
         if (empty($this->model->$attribute)) {
             $this->add($attribute, $msg ?? self::$DEFAULT_ERROR_MESSAGES['empty']);
@@ -95,7 +94,7 @@ class ValidationErrors implements \IteratorAggregate
      * Adds the error message only if the attribute value was null or an empty string.
      *
      * @param string $attribute Name of an attribute on the model
-     * @param string $msg The error message
+     * @param string $msg       The error message
      */
     public function add_on_blank(string $attribute, ?string $msg): void
     {
@@ -151,6 +150,7 @@ class ValidationErrors implements \IteratorAggregate
      * #  "state" => array("is the wrong length (should be 2 chars)",
      * # )
      * ```
+     *
      * @return array<string, array<string>>
      */
     public function get_raw_errors(): array
@@ -257,7 +257,6 @@ class ValidationErrors implements \IteratorAggregate
 
     /**
      * Returns the number of error messages there are.
-     *
      */
     public function size(): int
     {

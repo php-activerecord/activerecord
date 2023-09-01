@@ -47,7 +47,7 @@ class Cache
      *
      * (Note: expiring needs to be implemented in your cache store.)
      *
-     * @param string $url     URL to your cache server
+     * @param string       $url     URL to your cache server
      * @param CacheOptions $options Specify additional options
      */
     public static function initialize(string $url = '', array $options = []): void
@@ -74,13 +74,9 @@ class Cache
      * Attempt to retrieve a value from cache using a key. If the value is not found, then the closure method
      * will be invoked, and the result will be stored in cache using that key.
      *
-     * @param string $key
-     * @param Closure $closure
      * @param int $expire in seconds
-     *
-     * @return mixed
      */
-    public static function get(string $key, Closure $closure, int $expire=null): mixed
+    public static function get(string $key, \Closure $closure, int $expire=null): mixed
     {
         if (!static::$adapter) {
             return $closure();
@@ -89,7 +85,7 @@ class Cache
         $key = static::get_namespace() . $key;
 
         if (!($value = static::$adapter->read($key))) {
-            static::$adapter->write($key, ($value = $closure()), $expire ?? static::$options['expire']);
+            static::$adapter->write($key, $value = $closure(), $expire ?? static::$options['expire']);
         }
 
         return $value;

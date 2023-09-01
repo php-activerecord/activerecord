@@ -24,12 +24,12 @@ abstract class Singleton
 
     /**
      * Static method for instantiating a singleton object.
-     *
      */
     final public static function instance(): static
     {
         $class_name = get_called_class();
-        /**
+
+        /*
          * TODO: the proper way to prepare this for static checking
          * with PHPStan is to write a custom extension.
          *

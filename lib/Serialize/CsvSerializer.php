@@ -4,7 +4,6 @@ namespace ActiveRecord\Serialize;
 
 /**
  * CSV serializer.
- *
  */
 class CsvSerializer extends Serialization
 {
@@ -32,7 +31,6 @@ class CsvSerializer extends Serialization
 
     /**
      * @param array<mixed> $arr
-     * @return string
      */
     private function to_csv(array $arr): string
     {

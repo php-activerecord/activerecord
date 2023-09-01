@@ -13,12 +13,12 @@ namespace ActiveRecord;
 class Column
 {
     // types for $type
-    const STRING    = 1;
-    const INTEGER    = 2;
-    const DECIMAL    = 3;
-    const DATETIME    = 4;
-    const DATE        = 5;
-    const TIME        = 6;
+    public const STRING    = 1;
+    public const INTEGER    = 2;
+    public const DECIMAL    = 3;
+    public const DATETIME    = 4;
+    public const DATE        = 5;
+    public const TIME        = 6;
 
     /**
      * Map type to column type.
@@ -45,8 +45,6 @@ class Column
 
     /**
      * The true name of this column.
-     *
-     * @var string
      */
     public string $name = '';
 
@@ -73,7 +71,6 @@ class Column
 
     /**
      * The maximum length of this column.
-     *
      */
     public int|null $length = null;
 
@@ -93,8 +90,6 @@ class Column
 
     /**
      * The default value of the column.
-     *
-     * @var mixed
      */
     public $default;
 
@@ -143,7 +138,7 @@ class Column
 
         // If adding 0 to a string causes a float conversion,
         // we have a number over PHP_INT_MAX
-        elseif (is_string($value) && bccomp($value, (string) PHP_INT_MAX) === 1) {
+        elseif (is_string($value) && 1 === bccomp($value, (string) PHP_INT_MAX)) {
             return $value;
         }
 
@@ -178,7 +173,7 @@ class Column
             case self::DECIMAL:    return (float) $value;
             case self::DATETIME:
             case self::DATE:
-                if ($value === '') {
+                if ('' === $value) {
                     return null;
                 }
 
@@ -204,8 +199,6 @@ class Column
 
     /**
      * Sets the $type member variable.
-     *
-     * @return mixed
      */
     public function map_raw_type()
     {

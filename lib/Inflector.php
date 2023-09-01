@@ -65,7 +65,6 @@ abstract class Inflector
 
     /**
      * Convert a camelized string to a lowercase, underscored string.
-     *
      */
     public function uncamelize(string $s): string
     {
@@ -84,12 +83,12 @@ abstract class Inflector
 
     /**
      * Convert a string with space into a underscored equivalent.
-     *
      */
     public function underscorify(string $s): string
     {
         $res = preg_replace(['/[_\- ]+/', '/([a-z])([A-Z])/'], ['_', '\\1_\\2'], trim($s));
         assert(is_string($res));
+
         return $res;
     }
 

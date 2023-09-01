@@ -20,7 +20,8 @@ class MysqlAdapter extends Connection
 
     public function limit(string $sql, int $offset = 0, int $limit = 0): string
     {
-        $offset = $offset == 0 ? '' : $offset . ',';
+        $offset = 0 == $offset ? '' : $offset . ',';
+
         return "$sql LIMIT {$offset}$limit";
     }
 
@@ -36,7 +37,6 @@ class MysqlAdapter extends Connection
 
     /**
      * @param array<string, string|null> $column
-     * @return Column
      */
     public function create_column(array $column): Column
     {

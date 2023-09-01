@@ -110,7 +110,6 @@ class CallBack
      * Creates a CallBack.
      *
      * @param class-string $model_class_name The name of a {@link Model} class
-     *
      */
     public function __construct(string $model_class_name)
     {
@@ -118,7 +117,7 @@ class CallBack
 
         foreach (static::$VALID_CALLBACKS as $name) {
             // look for explicitly defined static callback
-            if (($definition = $this->klass->getStaticPropertyValue($name, null))) {
+            if ($definition = $this->klass->getStaticPropertyValue($name, null)) {
                 if (!is_array($definition)) {
                     $definition = [$definition];
                 }
@@ -192,7 +191,7 @@ class CallBack
 
         if ($registry) {
             foreach ($registry as $method) {
-                $ret = ($method instanceof Closure ? $method($model) : $model->$method());
+                $ret = ($method instanceof \Closure ? $method($model) : $model->$method());
 
                 if (false === $ret && 'before' === $first) {
                     return false;
@@ -211,20 +210,20 @@ class CallBack
      * <li><b>prepend:</b> Add this callback at the beginning of the existing callbacks (true) or at the end (false, default)</li>
      * </ul>
      *
-     * @param string $name                   Name of callback type (see {@link VALID_CALLBACKS $VALID_CALLBACKS})
-     * @param Closure|string $closure_or_method_name Either a closure or the name of a method on the {@link Model}
+     * @param string          $name                   Name of callback type (see {@link VALID_CALLBACKS $VALID_CALLBACKS})
+     * @param \Closure|string $closure_or_method_name Either a closure or the name of a method on the {@link Model}
      * @param CallbackOptions $options                Options array
      *
      * @throws ActiveRecordException if invalid callback type or callback method was not found
      */
-    public function register(string $name, Closure|string $closure_or_method_name=null, array $options=[]): void
+    public function register(string $name, \Closure|string $closure_or_method_name=null, array $options=[]): void
     {
         $closure_or_method_name ??= $name;
 
         if (!in_array($name, self::$VALID_CALLBACKS)) {
             throw new ActiveRecordException("Invalid callback: $name");
         }
-        if (!($closure_or_method_name instanceof Closure)) {
+        if (!($closure_or_method_name instanceof \Closure)) {
             if (!isset($this->publicMethods)) {
                 $this->publicMethods = get_class_methods($this->klass->getName());
             }
@@ -232,14 +231,11 @@ class CallBack
             if (!in_array($closure_or_method_name, $this->publicMethods)) {
                 if ($this->klass->hasMethod($closure_or_method_name)) {
                     // Method is private or protected
-                    throw new ActiveRecordException('Callback methods need to be public (or anonymous closures). ' .
-                        'Please change the visibility of ' . $this->klass->getName() . '->' . $closure_or_method_name . '()');
+                    throw new ActiveRecordException('Callback methods need to be public (or anonymous closures). Please change the visibility of ' . $this->klass->getName() . '->' . $closure_or_method_name . '()');
                 }
 
                 // i'm a dirty ruby programmer
-                throw new ActiveRecordException(
-                    "Unknown method for callback: $name" . ": #$closure_or_method_name"
-                );
+                throw new ActiveRecordException("Unknown method for callback: $name: #$closure_or_method_name");
             }
         }
 

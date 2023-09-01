@@ -13,7 +13,6 @@ use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use Closure;
 use PDO;
-use PDOException;
 
 /**
  * The base class for database connection adapters.
@@ -31,12 +30,10 @@ abstract class Connection
      *
      * @var string
      */
-    const DATETIME_TRANSLATE_FORMAT = 'Y-m-d\TH:i:s';
+    public const DATETIME_TRANSLATE_FORMAT = 'Y-m-d\TH:i:s';
 
     /**
      * The PDO connection object.
-     *
-     * @var mixed
      */
     public $connection;
     /**
@@ -81,29 +78,24 @@ abstract class Connection
      * @var array<mixed>
      */
     public static array $PDO_OPTIONS = [
-        PDO::ATTR_CASE => PDO::CASE_LOWER,
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-        PDO::ATTR_STRINGIFY_FETCHES => false
+        \PDO::ATTR_CASE => \PDO::CASE_LOWER,
+        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+        \PDO::ATTR_ORACLE_NULLS => \PDO::NULL_NATURAL,
+        \PDO::ATTR_STRINGIFY_FETCHES => false
     ];
 
     /**
      * The quote character for stuff like column and field names.
-     *
-     * @var string
      */
     public static string $QUOTE_CHARACTER = '`';
 
     /**
      * Default port.
-     *
-     * @var int
      */
     public static int $DEFAULT_PORT = 0;
 
     /**
      * @param array<string, string|null> $column
-     * @return Column
      */
     abstract public function create_column(array $column): Column;
 
@@ -111,10 +103,10 @@ abstract class Connection
      * Retrieve a database connection.
      *
      * @param string|null $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
-     *                                                     Everything after the protocol:// part is specific to the connection adapter.
-     *                                                     OR
-     *                                                     A connection name that is set in ActiveRecord\Config
-     *                                                     If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
+     *                                                          Everything after the protocol:// part is specific to the connection adapter.
+     *                                                          OR
+     *                                                          A connection name that is set in ActiveRecord\Config
+     *                                                          If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
      *
      * @return Connection
      *
@@ -147,7 +139,7 @@ abstract class Connection
             if (isset($info->charset)) {
                 $connection->set_encoding($info->charset);
             }
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             throw new DatabaseException($e);
         }
 
@@ -265,7 +257,6 @@ abstract class Connection
 
     /**
      * Class Connection is a singleton. Access it via instance().
-     *
      */
     protected function __construct(\stdClass $info)
     {
@@ -282,8 +273,8 @@ abstract class Connection
             }
 
             $dsn = "$info->protocol:$host;dbname=$info->db";
-            $this->connection = new PDO($dsn, $info->user, $info->pass, static::$PDO_OPTIONS);
-        } catch (PDOException $e) {
+            $this->connection = new \PDO($dsn, $info->user, $info->pass, static::$PDO_OPTIONS);
+        } catch (\PDOException $e) {
             throw new Exception\ConnectionException($e);
         }
     }
@@ -300,7 +291,7 @@ abstract class Connection
         $columns = [];
         $sth = $this->query_column_info($table);
 
-        while (($row = $sth->fetch())) {
+        while ($row = $sth->fetch()) {
             $c = $this->create_column($row);
             $columns[$c->name] = $c;
         }
@@ -335,8 +326,8 @@ abstract class Connection
     /**
      * Execute a raw SQL query on the database.
      *
-     * @param string $sql     raw SQL string to execute
-     * @param array<mixed>  &$values Optional array of bind values
+     * @param string       $sql     raw SQL string to execute
+     * @param array<mixed> &$values Optional array of bind values
      *
      * @return mixed A result set object
      */
@@ -355,23 +346,23 @@ abstract class Connection
             if (!($sth = $this->connection->prepare($sql))) {
                 throw new DatabaseException();
             }
-        } catch (PDOException $e) {
-            if($this instanceof SqliteAdapter && $e->getCode() === "HY000") {
+        } catch (\PDOException $e) {
+            if ($this instanceof SqliteAdapter && 'HY000' === $e->getCode()) {
                 throw new DatabaseException($e);
             }
             throw new ConnectionException($e);
         }
 
-        $sth->setFetchMode(PDO::FETCH_ASSOC);
+        $sth->setFetchMode(\PDO::FETCH_ASSOC);
 
-        $msg = "couldn't execute query on " . get_class($this) . ". ";
-        $msg .= "user: " .getenv('USER');
+        $msg = "couldn't execute query on " . get_class($this) . '. ';
+        $msg .= 'user: ' . getenv('USER');
         try {
             if (!$sth->execute($values)) {
                 throw new DatabaseException($msg);
             }
-        } catch (PDOException $e) {
-            throw new DatabaseException($msg . ": " . $e->getMessage());
+        } catch (\PDOException $e) {
+            throw new DatabaseException($msg . ': ' . $e->getMessage());
         }
 
         return $sth;
@@ -380,14 +371,13 @@ abstract class Connection
     /**
      * Execute a query that returns maximum of one row with one field and return it.
      *
-     * @param string $sql     raw SQL string to execute
-     * @param array<mixed>  &$values Optional array of values to bind to the query
-     *
+     * @param string       $sql     raw SQL string to execute
+     * @param array<mixed> &$values Optional array of values to bind to the query
      */
     public function query_and_fetch_one(string $sql, array &$values=[]): int
     {
         $sth = $this->query($sql, $values);
-        $row = $sth->fetch(PDO::FETCH_NUM);
+        $row = $sth->fetch(\PDO::FETCH_NUM);
 
         return $row[0];
     }
@@ -395,14 +385,14 @@ abstract class Connection
     /**
      * Execute a raw SQL query and fetch the results.
      *
-     * @param string  $sql     raw SQL string to execute
-     * @param Closure $handler closure that will be passed the fetched results
+     * @param string   $sql     raw SQL string to execute
+     * @param \Closure $handler closure that will be passed the fetched results
      */
-    public function query_and_fetch(string $sql, Closure $handler): void
+    public function query_and_fetch(string $sql, \Closure $handler): void
     {
         $sth = $this->query($sql);
 
-        while (($row = $sth->fetch(PDO::FETCH_ASSOC))) {
+        while ($row = $sth->fetch(\PDO::FETCH_ASSOC)) {
             $handler($row);
         }
     }
@@ -417,7 +407,7 @@ abstract class Connection
         $tables = [];
         $sth = $this->query_for_tables();
 
-        while (($row = $sth->fetch(PDO::FETCH_NUM))) {
+        while ($row = $sth->fetch(\PDO::FETCH_NUM)) {
             $tables[] = $row[0];
         }
 
@@ -458,7 +448,6 @@ abstract class Connection
 
     /**
      * Tells you if this adapter supports sequences or not.
-     *
      */
     public function supports_sequences(): bool
     {
@@ -480,7 +469,6 @@ abstract class Connection
 
     /**
      * Return SQL for getting the next value in a sequence.
-     *
      */
     public function next_sequence_value(string $sequence_name): ?string
     {
@@ -553,8 +541,8 @@ abstract class Connection
      * Adds a limit clause to the SQL query.
      *
      * @param string $sql    the SQL statement
-     * @param int $offset row offset to start at
-     * @param int $limit  maximum number of rows to return
+     * @param int    $offset row offset to start at
+     * @param int    $limit  maximum number of rows to return
      *
      * @return string The SQL query that will limit results to specified parameters
      */
@@ -562,15 +550,12 @@ abstract class Connection
 
     /**
      * Query for column meta info and return statement handle.
-     *
      */
     abstract public function query_column_info(string $table): \PDOStatement;
 
     /**
      * Query for all tables in the current database. The result must only
      * contain one column which has the name of the table.
-     *
-     * @return \PDOStatement
      */
     abstract public function query_for_tables(): \PDOStatement;
 
@@ -592,6 +577,7 @@ abstract class Connection
      * Specifies whether adapter can use LIMIT/ORDER clauses with DELETE & UPDATE operations
      *
      * @internal
+     *
      * @returns boolean (FALSE by default)
      */
     public function accepts_limit_and_order_for_update_and_delete(): bool

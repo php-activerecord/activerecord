@@ -45,7 +45,9 @@ use ActiveRecord\Table;
  *     ];
  * }
  * ```
+ *
  * @phpstan-import-type Attributes from Model
+ *
  * @phpstan-type HasManyOptions array{
  *  limit?: int,
  *  offset?: int,
@@ -89,7 +91,6 @@ class HasMany extends AbstractRelationship
      * Constructs a {@link HasMany} relationship.
      *
      * @param HasManyOptions $options Options for the association
-     *
      */
     public function __construct(array $options = [])
     {
@@ -114,7 +115,7 @@ class HasMany extends AbstractRelationship
 
     protected function set_keys(string $model_class_name, bool $override = false): void
     {
-        //infer from class_name
+        // infer from class_name
         if (!$this->foreign_key || $override) {
             $this->foreign_key = [Inflector::instance()->keyify($model_class_name)];
         }
@@ -125,10 +126,10 @@ class HasMany extends AbstractRelationship
     }
 
     /**
-     * @param Model $model
-     * @return null|Model|array<Model>
      * @throws HasManyThroughAssociationException
      * @throws \ActiveRecord\Exception\RelationshipException
+     *
+     * @return Model|array<Model>|null
      */
     public function load(Model $model): mixed
     {
@@ -174,13 +175,12 @@ class HasMany extends AbstractRelationship
         $options['conditions'] = $conditions;
 
         $res = $class_name::find($this->poly_relationship ? 'all' : 'first', $options);
+
         return $res;
     }
 
     /**
      * Get an array containing the key and value of the foreign key for the association
-     *
-     * @param Model $model
      *
      * @return array<string, mixed>
      */
@@ -189,7 +189,7 @@ class HasMany extends AbstractRelationship
         $this->set_keys(get_class($model));
         $primary_key = Inflector::instance()->variablize($this->foreign_key[0]);
 
-        /**
+        /*
          * TODO: set up model property reflection stanning
          *
          * @phpstan-ignore-next-line
@@ -198,9 +198,8 @@ class HasMany extends AbstractRelationship
     }
 
     /**
-     * @param Model $model
      * @param Attributes $attributes
-     * @param bool $guard_attributes
+     * @param bool       $guard_attributes
      */
     public function build_association(Model $model, array $attributes = [], $guard_attributes = true): Model
     {

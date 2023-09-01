@@ -7,7 +7,7 @@ ActiveRecord\Config::initialize(function ($cfg) {
     $cfg->set_connections(['development' => 'mysql://test:test@127.0.0.1/orders_test']);
 
     // you can change the default connection with the below
-    //$cfg->set_default_connection('production');
+    // $cfg->set_default_connection('production');
 });
 
 // create some people

@@ -19,7 +19,7 @@ use ActiveRecord\Exception\ExpressionsException;
  */
 class Expressions
 {
-    const ParameterMarker = '?';
+    public const ParameterMarker = '?';
 
     private string $expressions;
 
@@ -30,7 +30,6 @@ class Expressions
     private Connection|null $connection;
 
     /**
-     * @param $connection
      * @param string|array<mixed>|null $expressions
      */
     public function __construct(Connection|null $connection, string|array $expressions=null)
@@ -103,11 +102,10 @@ class Expressions
     }
 
     /**
-     * @param bool $substitute
      * @param array{
      *   values?: array<mixed>
      * } $options
-     * @return string
+     *
      * @throws ExpressionsException
      */
     public function to_s(bool $substitute=false, array $options=[]): string
@@ -139,7 +137,6 @@ class Expressions
 
     /**
      * @param Attributes $hash
-     * @param string $glue
      *
      * @return array<mixed>
      */
@@ -168,9 +165,7 @@ class Expressions
 
     /**
      * @param array<mixed> $values
-     * @param bool $substitute
-     * @param int $pos
-     * @param int $parameter_index
+     *
      * @return mixed|string
      */
     private function substitute(array $values, bool $substitute, int $pos, int $parameter_index)

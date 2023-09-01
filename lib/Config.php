@@ -6,7 +6,6 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\ConfigException;
-use ActiveRecord\Serialize\Serialization;
 use Closure;
 use Psr\Log\LoggerInterface;
 
@@ -21,6 +20,7 @@ use Psr\Log\LoggerInterface;
  *     'production' => 'mysql://user:pass@production.com/awesome_production'));
  * });
  * ```
+ *
  * @phpstan-import-type CacheOptions from Cache
  */
 class Config extends Singleton
@@ -41,8 +41,6 @@ class Config extends Singleton
      * ```
      * $config = ActiveRecord\Config::instance();
      * ```
-     *
-     * @var string
      */
     private string $default_connection = 'development';
 
@@ -55,13 +53,11 @@ class Config extends Singleton
 
     /**
      * Switch for logging.
-     *
      */
     private bool $logging = false;
 
     /**
      * Contains a Logger object that must impelement a log() method.
-     *
      */
     private LoggerInterface $logger;
 
@@ -93,9 +89,9 @@ class Config extends Singleton
      *   'mysql://username:password@localhost/database_name'));
      * ```
      *
-     * @param Closure $initializer A closure
+     * @param \Closure $initializer A closure
      */
-    public static function initialize(Closure $initializer): void
+    public static function initialize(\Closure $initializer): void
     {
         $initializer(parent::instance());
     }
@@ -109,8 +105,8 @@ class Config extends Singleton
      * ]);
      * ```
      *
-     * @param array<string,string>  $connections        Array of connections
-     * @param string $default_connection Optionally specify the default_connection
+     * @param array<string,string> $connections        Array of connections
+     * @param string               $default_connection Optionally specify the default_connection
      *
      * @throws ConfigException
      */
@@ -182,8 +178,6 @@ class Config extends Singleton
 
     /**
      * Turn on/off logging
-     *
-     * @param bool $bool
      */
     public function set_logging(bool $bool): void
     {
@@ -202,7 +196,6 @@ class Config extends Singleton
 
     /**
      * Return whether logging is on
-     *
      */
     public function get_logging(): bool
     {
@@ -211,7 +204,6 @@ class Config extends Singleton
 
     /**
      * Returns the logger
-     *
      */
     public function get_logger(): LoggerInterface
     {
@@ -220,6 +212,7 @@ class Config extends Singleton
 
     /**
      * @param class-string $date_class
+     *
      * @throws ConfigException
      * @throws Exception\ActiveRecordException
      */
@@ -261,7 +254,7 @@ class Config extends Singleton
      * $config->set_cache("memcached://localhost",array("expire" => 60));
      * ```
      *
-     * @param string $url     url to your cache server
+     * @param string       $url     url to your cache server
      * @param CacheOptions $options Array of options
      */
     public function set_cache(string $url, array $options=[]): void

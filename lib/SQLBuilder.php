@@ -67,8 +67,6 @@ class SQLBuilder
 
     /**
      * Returns the SQL string.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -79,8 +77,6 @@ class SQLBuilder
      * Returns the SQL string.
      *
      * @see __toString
-     *
-     * @return string
      */
     public function to_s(): string
     {
@@ -169,6 +165,7 @@ class SQLBuilder
 
     /**
      * @param string|array<string> $joins
+     *
      * @return $this
      */
     public function joins(string|array $joins): static
@@ -180,10 +177,10 @@ class SQLBuilder
 
     /**
      * @param Attributes $hash
-     * @param mixed $pk
-     * @param string|null $sequence_name
-     * @return $this
+     *
      * @throws ActiveRecordException
+     *
+     * @return $this
      */
     public function insert(array $hash, mixed $pk=null, string $sequence_name=null): static
     {
@@ -202,6 +199,7 @@ class SQLBuilder
 
     /**
      * @param array<string,string>|string $mixed
+     *
      * @throws ActiveRecordException
      */
     public function update(array|string $mixed): static
@@ -256,11 +254,10 @@ class SQLBuilder
     /**
      * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...).
      *
-     * @param Connection $connection
-     * @param string $name Underscored string
-     * @param array<mixed> $values Array of values for the field names. This is used
-     *   to determine what kind of bind marker to use: =?, IN(?), IS NULL
-     * @param array<string,string> $map A hash of "mapped_column_name" => "real_column_name"
+     * @param string               $name   Underscored string
+     * @param array<mixed>         $values Array of values for the field names. This is used
+     *                                     to determine what kind of bind marker to use: =?, IN(?), IS NULL
+     * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
      *
      * @return array<mixed>
      */
@@ -304,9 +301,9 @@ class SQLBuilder
     /**
      * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
      *
-     * @param string $name   A string containing attribute names connected with _and_ or _or_
-     * @param array<mixed>  $values Array of values for each attribute in $name
-     * @param array<string,string> $map A hash of "mapped_column_name" => "real_column_name"
+     * @param string               $name   A string containing attribute names connected with _and_ or _or_
+     * @param array<mixed>         $values Array of values for each attribute in $name
+     * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
      *
      * @return array<string,mixed> A hash of array(name => value, ...)
      */
@@ -349,6 +346,7 @@ class SQLBuilder
 
     /**
      * @param array<string|array<string,mixed>> $args
+     *
      * @throws Exception\ExpressionsException
      */
     private function apply_where_conditions(array $args): void

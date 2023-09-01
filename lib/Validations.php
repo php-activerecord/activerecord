@@ -60,7 +60,6 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *  allow_blank: bool,
  *  allow_null:bool,
  * }
- *
  * @phpstan-type ValidateLengthOptions array{
  *  is?: int,
  *  in?: int,
@@ -71,27 +70,23 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *  allow_blank?: bool,
  *  allow_null?: bool
  * }
- *
  * @phpstan-type ValidateUniquenessOptions array{
  *  message?: string|null,
  *  allow_blank?: bool,
  *  allow_null?: bool,
  *  scope?: array<string>
  * }
- *
  * @phpstan-type ValidateInclusionOptions array{
  *  message?: string|null,
  *  in?: array<string>,
  *  within?: array<string>
  * }
- *
  * @phpstan-type ValidateFormatOptions array{
  *  with: string,
  *  message?: string|null,
  *  allow_blank?:bool,
  *  allow_null?: bool
  * }
- *
  */
 class Validations
 {
@@ -163,6 +158,7 @@ class Validations
 
     /**
      * Returns validator data.
+     *
      * @return array<string, array<mixed>>
      */
     public function rules(): array
@@ -178,6 +174,7 @@ class Validations
                 array_push($data[$field], $attr);
             }
         }
+
         return $data;
     }
 
@@ -191,30 +188,30 @@ class Validations
         foreach ($this->validators as $validate) {
             $values = $this->klass->getStaticPropertyValue($validate);
             $definition = wrap_values_in_arrays($values);
-            switch($validate) {
-                case "validates_presence_of":
+            switch ($validate) {
+                case 'validates_presence_of':
                     $this->validates_presence_of($definition);
                     break;
-                case "validates_uniqueness_of":
+                case 'validates_uniqueness_of':
                     $this->validates_uniqueness_of($definition);
                     break;
-                case "validates_length_of":
+                case 'validates_length_of':
                     $this->validates_length_of($definition);
                     break;
-                case "validates_inclusion_of":
+                case 'validates_inclusion_of':
                     $this->validates_inclusion_of($definition);
                     break;
-                case "validates_exclusion_of":
+                case 'validates_exclusion_of':
                     $this->validates_exclusion_of($definition);
                     break;
-                case "validates_format_of":
+                case 'validates_format_of':
                     $this->validates_format_of($definition);
                     break;
-                case "validates_numericality_of":
+                case 'validates_numericality_of':
                     $this->validates_numericality_of($definition);
                     break;
                 default:
-                    throw new \Exception("Unknown validator");
+                    throw new \Exception('Unknown validator');
             }
         }
 
@@ -248,7 +245,7 @@ class Validations
         foreach ($attrs as $attr => $options) {
             $this->errors->add_on_blank(
                 $attr,
-           $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['blank']
+                $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['blank']
             );
         }
     }
@@ -309,7 +306,7 @@ class Validations
      * @see validates_inclusion_of
      * @see validates_exclusion_of
      *
-     * @param string $type Either inclusion or exclusion
+     * @param string                                  $type  Either inclusion or exclusion
      * @param array<string, ValidateInclusionOptions> $attrs Validation definition
      */
     public function validates_inclusion_or_exclusion_of(string $type, array $attrs): void
@@ -345,6 +342,7 @@ class Validations
      *      ];
      *  ]
      * ```
+     *
      * @param array<string, ValidateNumericOptions> $attrs Validation definition
      */
     public function validates_numericality_of(array $attrs): void
@@ -362,7 +360,7 @@ class Validations
             $not_a_number_message = $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['not_a_number'];
 
             if (($options['only_integer'] ?? false) && !is_integer($var)) {
-                if (!preg_match('/\A[+-]?\d+\Z/', (string) ($var))) {
+                if (!preg_match('/\A[+-]?\d+\Z/', (string) $var)) {
                     $this->errors->add($attribute, $not_a_number_message);
                     continue;
                 }
@@ -439,8 +437,8 @@ class Validations
 
     public static function is_range(mixed $var): bool
     {
-        if(!is_array($var) || !is_int($var[0]) || !is_int($var[1])){
-            throw new ValidationsArgumentError("Range must be an array of two ints.");
+        if (!is_array($var) || !is_int($var[0]) || !is_int($var[1])) {
+            throw new ValidationsArgumentError('Range must be an array of two ints.');
         }
 
         if (is_array($var) && (int) $var[0] < (int) $var[1]) {
@@ -482,7 +480,7 @@ class Validations
                     break;
 
                 default:
-                    throw new  ValidationsArgumentError('Too many range options specified.  Choose only one.');
+                    throw new ValidationsArgumentError('Too many range options specified.  Choose only one.');
             }
 
             $var = $this->model->$attribute;
@@ -492,8 +490,8 @@ class Validations
             if ('within' == $range_options[0] || 'in' == $range_options[0]) {
                 $range = $options[$range_options[0]];
 
-                if (!($this->is_range($range))) {
-                    throw new  ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
+                if (!$this->is_range($range)) {
+                    throw new ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
                 }
                 $range_options = ['minimum', 'maximum'];
                 $options['minimum'] = $range[0];
@@ -503,7 +501,7 @@ class Validations
                 $value = $options[$range_option];
 
                 if ((int) $value <= 0) {
-                    throw new  ValidationsArgumentError("$range_option value cannot use a signed integer.");
+                    throw new ValidationsArgumentError("$range_option value cannot use a signed integer.");
                 }
 
                 if (!('maximum' == $range_option && is_null($this->model->$attribute))) {
@@ -554,8 +552,8 @@ class Validations
         $connection = $this->klass->getMethod('connection')->invoke(null);
 
         foreach ($attrs as $attr => $options) {
-            if(is_bool($options)) {
-                if(!$options) {
+            if (is_bool($options)) {
+                if (!$options) {
                     continue;
                 }
                 $options = [];
@@ -564,7 +562,7 @@ class Validations
             $pk_value = $this->model->{$pk[0]};
 
             $fields = array_merge([$attr], $options['scope'] ?? []);
-            $add_record = join("_and_", $fields);
+            $add_record = join('_and_', $fields);
 
             $conditions = [''];
             $pk_quoted = $connection->quote_name($pk[0]);
@@ -591,7 +589,6 @@ class Validations
     }
 
     /**
-     * @param mixed $var
      * @param ValidationOptions $options
      */
     private function is_null_with_option(mixed $var, array &$options): bool
@@ -600,7 +597,6 @@ class Validations
     }
 
     /**
-     * @param mixed $var
      * @param ValidationOptions $options
      */
     private function is_blank_with_option(mixed $var, array &$options): bool
