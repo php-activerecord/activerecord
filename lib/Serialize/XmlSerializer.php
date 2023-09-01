@@ -2,13 +2,15 @@
 
 namespace ActiveRecord\Serialize;
 
-use ActiveRecord\Model;
 use function ActiveRecord\denamespace;
+
+use ActiveRecord\Model;
 
 /**
  * XML serializer.
  *
  * @phpstan-import-type SerializeOptions from Serialization
+ *
  * @package ActiveRecord
  */
 class XmlSerializer extends Serialization
@@ -16,7 +18,6 @@ class XmlSerializer extends Serialization
     private \XMLWriter $writer;
 
     /**
-     * @param Model $model
      * @param SerializeOptions $options
      */
     public function __construct(Model $model, array $options)
@@ -29,6 +30,7 @@ class XmlSerializer extends Serialization
     {
         $res = $this->xml_encode();
         assert(is_string($res));
+
         return $res;
     }
 
@@ -37,7 +39,7 @@ class XmlSerializer extends Serialization
         $this->writer = new \XMLWriter();
         $this->writer->openMemory();
         $this->writer->startDocument('1.0', 'UTF-8');
-        $this->writer->startElement(strtolower(denamespace((get_class($this->model)))));
+        $this->writer->startElement(strtolower(denamespace(get_class($this->model))));
         $this->write($this->to_a());
         $this->writer->endElement();
         $this->writer->endDocument();
@@ -52,7 +54,6 @@ class XmlSerializer extends Serialization
 
     /**
      * @param array<string,mixed> $data
-     * @param $tag
      */
     private function write(array $data, string $tag = null): void
     {
@@ -61,7 +62,7 @@ class XmlSerializer extends Serialization
 
             if (is_array($value) || is_object($value)) {
                 if (!is_int(key($value))) {
-                    $this->writer->startElement( denamespace($attr));
+                    $this->writer->startElement(denamespace($attr));
                     $this->write($value);
                     $this->writer->endElement();
                 } else {

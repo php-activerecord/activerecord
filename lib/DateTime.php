@@ -5,9 +5,6 @@
 
 namespace ActiveRecord;
 
-use DateTimeZone;
-use DateInterval;
-
 /**
  * An extension of PHP's DateTime class to provide dirty flagging and easier formatting options.
  *
@@ -35,7 +32,9 @@ use DateInterval;
  * ```
  *
  * @package ActiveRecord
+ *
  * @phpstan-consistent-constructor
+ *
  * @see http://php.net/manual/en/class.datetime.php
  */
 final class DateTime extends \DateTime implements DateTimeInterface
@@ -93,7 +92,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
      *
      * @return string formatted date and time string
      */
-    public function format(string $format=''): string
+    public function format(string $format = ''): string
     {
         return parent::format(self::get_format($format));
     }
@@ -110,7 +109,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
      *
      * @return string a format string
      */
-    public static function get_format(string $format=null): string
+    public static function get_format(string $format = null): string
     {
         // use default format if no format specified
         if (!$format) {
@@ -130,7 +129,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
      * This needs to be overridden so it returns an instance of this class instead of PHP's \DateTime.
      * See http://php.net/manual/en/datetime.createfromformat.php
      */
-    public static function createFromFormat(string $format, string $time, ?DateTimeZone $timezone = null): static
+    public static function createFromFormat(string $format, string $time, \DateTimeZone $timezone = null): static
     {
         $phpDate = parent::createFromFormat($format, $time, $timezone);
         assert($phpDate);
@@ -192,7 +191,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
         return parent::setTimestamp($timestamp);
     }
 
-    public function setTimezone(DateTimeZone $timezone): DateTime
+    public function setTimezone(\DateTimeZone $timezone): DateTime
     {
         $this->flag_dirty();
 
@@ -206,14 +205,14 @@ final class DateTime extends \DateTime implements DateTimeInterface
         return parent::modify($modify);
     }
 
-    public function add(DateInterval $interval): DateTime
+    public function add(\DateInterval $interval): DateTime
     {
         $this->flag_dirty();
 
         return parent::add($interval);
     }
 
-    public function sub(DateInterval $interval): DateTime
+    public function sub(\DateInterval $interval): DateTime
     {
         $this->flag_dirty();
 

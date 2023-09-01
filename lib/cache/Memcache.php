@@ -12,7 +12,7 @@ use ActiveRecord\Exception\CacheException;
  */
 class Memcache
 {
-    const DEFAULT_PORT = 11211;
+    public const DEFAULT_PORT = 11211;
 
     private \Memcache $memcache;
 

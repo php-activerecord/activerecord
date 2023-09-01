@@ -64,6 +64,9 @@ jobs:
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
 
+      - name: Run PHP-CS-Fixer
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff --format checkstyle | cs2pr
+
       - name: Create and set permissions on SQLite Database
         run: |
           touch test.db

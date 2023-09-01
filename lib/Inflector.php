@@ -34,8 +34,8 @@ abstract class Inflector
 
         $camelized = '';
 
-        for ($i=0, $n=strlen($s); $i<$n; ++$i) {
-            if ('_' == $s[$i] && $i+1 < $n) {
+        for ($i = 0, $n = strlen($s); $i < $n; ++$i) {
+            if ('_' == $s[$i] && $i + 1 < $n) {
                 $camelized .= strtoupper($s[++$i]);
             } else {
                 $camelized .= $s[$i];
@@ -65,13 +65,12 @@ abstract class Inflector
 
     /**
      * Convert a camelized string to a lowercase, underscored string.
-     *
      */
     public function uncamelize(string $s): string
     {
         $normalized = '';
 
-        for ($i=0, $n=strlen($s); $i<$n; ++$i) {
+        for ($i = 0, $n = strlen($s); $i < $n; ++$i) {
             if (ctype_alpha($s[$i]) && self::is_upper($s[$i])) {
                 $normalized .= '_' . strtolower($s[$i]);
             } else {
@@ -84,12 +83,12 @@ abstract class Inflector
 
     /**
      * Convert a string with space into a underscored equivalent.
-     *
      */
     public function underscorify(string $s): string
     {
         $res = preg_replace(['/[_\- ]+/', '/([a-z])([A-Z])/'], ['_', '\\1_\\2'], trim($s));
         assert(is_string($res));
+
         return $res;
     }
 

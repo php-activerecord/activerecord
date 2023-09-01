@@ -2,23 +2,26 @@
 
 namespace ActiveRecord\Relationship;
 
+use function ActiveRecord\all;
+use function ActiveRecord\classify;
+use function ActiveRecord\denamespace;
+
 use ActiveRecord\Exception\RelationshipException;
+
+use function ActiveRecord\has_absolute_namespace;
+
 use ActiveRecord\Inflector;
-use ActiveRecord\InterfaceRelationship;
 use ActiveRecord\Model;
 use ActiveRecord\Reflections;
 use ActiveRecord\SQLBuilder;
 use ActiveRecord\Table;
 use ActiveRecord\Utils;
-use function ActiveRecord\all;
-use function ActiveRecord\classify;
-use function ActiveRecord\denamespace;
-use function ActiveRecord\has_absolute_namespace;
 
 /**
  * Abstract class that all relationships must extend from.
  *
  * @phpstan-import-type Attributes from Model
+ *
  * @see http://www.phpactiverecord.org/guides/associations
  */
 abstract class AbstractRelationship
@@ -53,7 +56,6 @@ abstract class AbstractRelationship
 
     /**
      * Is the relationship single or multi.
-     *
      */
     protected bool $poly_relationship = false;
 
@@ -68,8 +70,6 @@ abstract class AbstractRelationship
      * Constructs a relationship.
      *
      * @param array<mixed> $options Options for the relationship (see {@link valid_association_options})
-     *
-     * @return mixed
      */
     public function __construct($options = [])
     {
@@ -105,15 +105,14 @@ abstract class AbstractRelationship
     }
 
     /**
-     * @param array<Model> $models of model objects
+     * @param array<Model>      $models     of model objects
      * @param array<Attributes> $attributes of attributes from $models
-     * @param array<mixed> $includes of eager load directives
+     * @param array<mixed>      $includes   of eager load directives
      */
     abstract public function load_eagerly(array $models, array $attributes, array $includes, Table $table): void;
 
     /**
      * What is this relationship's cardinality?
-     *
      */
     public function is_poly(): bool
     {
@@ -127,12 +126,11 @@ abstract class AbstractRelationship
      * the related table by PK/FK and attaches the array of returned relationships to the appropriately named relationship on
      * $models.
      *
-     * @param Table $table
-     * @param array<Model> $models of model objects
-     * @param array<Attributes> $attributes of attributes from $models
-     * @param array<mixed> $includes of eager load directives
-     * @param array<string> $query_keys -> key(s) to be queried for on included/related table
-     * @param array<string> $model_values_keys -> key(s)/value(s) to be used in query from model which is including
+     * @param array<Model>      $models            of model objects
+     * @param array<Attributes> $attributes        of attributes from $models
+     * @param array<mixed>      $includes          of eager load directives
+     * @param array<string>     $query_keys        -> key(s) to be queried for on included/related table
+     * @param array<string>     $model_values_keys -> key(s)/value(s) to be used in query from model which is including
      */
     protected function query_and_attach_related_models_eagerly(Table $table, array $models, array $attributes, array $includes = [], array $query_keys = [], array $model_values_keys = []): void
     {
@@ -225,11 +223,9 @@ abstract class AbstractRelationship
     /**
      * Creates a new instance of specified {@link Model} with the attributes pre-loaded.
      *
-     * @param Model $model The model which holds this association
-     * @param Attributes $attributes Hash containing attributes to initialize the model with
-     * @param bool $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
-     *
-     * @return Model
+     * @param Model      $model            The model which holds this association
+     * @param Attributes $attributes       Hash containing attributes to initialize the model with
+     * @param bool       $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
      */
     public function build_association(Model $model, array $attributes = [], bool $guard_attributes = true): Model
     {
@@ -241,11 +237,9 @@ abstract class AbstractRelationship
     /**
      * Creates a new instance of {@link Model} and invokes save.
      *
-     * @param Model $model The model which holds this association
-     * @param Attributes $attributes Hash containing attributes to initialize the model with
-     * @param bool $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
-     *
-     * @return Model
+     * @param Model      $model            The model which holds this association
+     * @param Attributes $attributes       Hash containing attributes to initialize the model with
+     * @param bool       $guard_attributes Set to true to guard protected/non-accessible attributes on the new instance
      */
     public function create_association(Model $model, array $attributes = [], bool $guard_attributes = true): Model
     {
@@ -257,7 +251,7 @@ abstract class AbstractRelationship
 
     protected function append_record_to_associate(Model $associate, Model $record): Model
     {
-        $association =& $associate->{$this->attribute_name};
+        $association = &$associate->{$this->attribute_name};
 
         if ($this->poly_relationship) {
             $association[] = $record;
@@ -270,6 +264,7 @@ abstract class AbstractRelationship
 
     /**
      * @param array<string,mixed> $options
+     *
      * @return array<string,mixed>
      */
     protected function merge_association_options(array $options): array
@@ -286,6 +281,7 @@ abstract class AbstractRelationship
 
     /**
      * @param array<string,mixed> $options
+     *
      * @return array<string,mixed>
      */
     protected function unset_non_finder_options(array $options): array
@@ -327,7 +323,6 @@ abstract class AbstractRelationship
     }
 
     /**
-     * @param Model $model
      * @param array<string> $condition_keys
      * @param array<string> $value_keys
      *
@@ -358,9 +353,9 @@ abstract class AbstractRelationship
     /**
      * Creates INNER JOIN SQL for associations.
      *
-     * @param Table $from_table the table used for the FROM SQL statement
-     * @param bool $using_through is this a THROUGH relationship?
-     * @param string $alias a table alias for when a table is being joined twice
+     * @param Table  $from_table    the table used for the FROM SQL statement
+     * @param bool   $using_through is this a THROUGH relationship?
+     * @param string $alias         a table alias for when a table is being joined twice
      *
      * @return string SQL INNER JOIN fragment
      */
@@ -377,7 +372,7 @@ abstract class AbstractRelationship
         }
 
         // need to flip the logic when the key is on the other table
-        /** @phpstan-ignore-next-line */
+        /* @phpstan-ignore-next-line */
         if (($this instanceof HasMany) || ($this instanceof HasOne)) {
             $this->set_keys($from_table->class->getName());
 
@@ -388,7 +383,7 @@ abstract class AbstractRelationship
                 $join_primary_key = $this->foreign_key[0];
                 $foreign_key = $this->primary_key[0];
             }
-        } else if ($this instanceof BelongsTo) {
+        } elseif ($this instanceof BelongsTo) {
             $foreign_key = $this->foreign_key[0];
             $join_primary_key = $this->primary_key()[0];
         }
@@ -400,8 +395,8 @@ abstract class AbstractRelationship
             $aliased_join_table_name = $join_table_name;
         }
 
-        assert(isset($foreign_key), "foreign key must be set");
-        assert(isset($join_primary_key), "join primary key must be set");
+        assert(isset($foreign_key), 'foreign key must be set');
+        assert(isset($join_primary_key), 'join primary key must be set');
 
         return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
     }
@@ -411,7 +406,7 @@ abstract class AbstractRelationship
      *
      * @param Model $model The model this relationship belongs to
      *
-     * @return null|Model|array<Model>
+     * @return Model|array<Model>|null
      */
     abstract public function load(Model $model): mixed;
 }

@@ -31,7 +31,8 @@ class HasAndBelongsToMany extends AbstractRelationship
         throw new \Exception("HasAndBelongsToMany doesn't need to load anything.");
     }
 
-    public function load_eagerly($models, $attributes, $includes, Table $table): void {
-        throw new \Exception("load_eagerly undefined for " . __CLASS__);
+    public function load_eagerly($models, $attributes, $includes, Table $table): void
+    {
+        throw new \Exception('load_eagerly undefined for ' . __CLASS__);
     }
 }

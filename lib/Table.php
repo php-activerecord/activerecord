@@ -97,7 +97,7 @@ class Table
         return self::$cache[$model_class_name];
     }
 
-    public static function clear_cache(string $model_class_name=null): void
+    public static function clear_cache(string $model_class_name = null): void
     {
         if ($model_class_name && array_key_exists($model_class_name, self::$cache)) {
             unset(self::$cache[$model_class_name]);
@@ -123,7 +123,7 @@ class Table
         $this->callback->register('after_save', function (Model $model) { $model->reset_dirty(); }, ['prepend' => true]);
     }
 
-    public function reestablish_connection(bool $close=true): Connection
+    public function reestablish_connection(bool $close = true): Connection
     {
         // if connection name property is null the connection manager will use the default connection
         $connection = $this->class->getStaticPropertyValue('connection', null);
@@ -138,7 +138,7 @@ class Table
 
     /**
      * @param array<string>|string $joins
-     * @return string
+     *
      * @throws RelationshipException
      */
     public function create_joins(array|string $joins): string
@@ -182,6 +182,7 @@ class Table
 
     /**
      * @param array<string, mixed> $options
+     *
      * @throws Exception\ActiveRecordException
      * @throws RelationshipException
      */
@@ -245,9 +246,11 @@ class Table
 
     /**
      * @param array<string, array<string,mixed>> $options
-     * @return array<Model>
+     *
      * @throws Exception\ActiveRecordException
      * @throws RelationshipException
+     *
+     * @return array<Model>
      */
     public function find(array $options): array
     {
@@ -271,14 +274,14 @@ class Table
     }
 
     /**
-     * @param string $sql
-     * @param array<string,mixed>|null $values
-     * @param bool $readonly
+     * @param array<string,mixed>|null  $values
      * @param string|array<string>|null $includes
-     * @return array<Model>
+     *
      * @throws RelationshipException
+     *
+     * @return array<Model>
      */
-    public function find_by_sql(string $sql, array $values = null, bool $readonly=false, string|array $includes=null): array
+    public function find_by_sql(string $sql, array $values = null, bool $readonly = false, string|array $includes = null): array
     {
         $this->last_sql = $sql;
 
@@ -288,7 +291,7 @@ class Table
         $sth = $this->conn->query($sql, $processedData);
 
         $self = $this;
-        while (($row = $sth->fetch())) {
+        while ($row = $sth->fetch()) {
             $cb = function () use ($row, $self) {
                 return new $self->class->name($row, false, true, false);
             };
@@ -320,9 +323,10 @@ class Table
     /**
      * Executes an eager load of a given named relationship for this table.
      *
-     * @param array<Model> $models
-     * @param array<array<string,mixed>> $attrs
+     * @param array<Model>                       $models
+     * @param array<array<string,mixed>>         $attrs
      * @param array<string|array<string>>|string $includes
+     *
      * @throws RelationshipException
      */
     private function execute_eager_load(array $models, array $attrs, array|string $includes): void
@@ -355,7 +359,7 @@ class Table
         return null;
     }
 
-    public function get_fully_qualified_table_name(bool $quote_name=true): string
+    public function get_fully_qualified_table_name(bool $quote_name = true): string
     {
         $table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
 
@@ -371,9 +375,8 @@ class Table
      * if the relationship name does not exist.
      *
      * @throws RelationshipException
-     *
      */
-    public function get_relationship(string $name, bool $strict=false): ?AbstractRelationship
+    public function get_relationship(string $name, bool $strict = false): ?AbstractRelationship
     {
         if ($this->has_relationship($name)) {
             return $this->relationships[$name];
@@ -390,7 +393,6 @@ class Table
      * Does a given relationship exist?
      *
      * @param string $name name of Relationship
-     *
      */
     public function has_relationship(string $name): bool
     {
@@ -399,11 +401,11 @@ class Table
 
     /**
      * @param array<string,mixed> $data
-     * @param (string|int)|null $pk
-     * @param string|null $sequence_name
+     * @param (string|int)|null   $pk
+     *
      * @throws Exception\ActiveRecordException
      */
-    public function insert(array &$data, string|int|null $pk=null, string $sequence_name=null): \PDOStatement
+    public function insert(array &$data, string|int $pk = null, string $sequence_name = null): \PDOStatement
     {
         $data = $this->process_data($data);
 
@@ -412,13 +414,13 @@ class Table
 
         $values = array_values($data);
 
-        return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
+        return $this->conn->query($this->last_sql = $sql->to_s(), $values);
     }
 
     /**
-     * @param array<string,mixed> $data
+     * @param array<string,mixed>  $data
      * @param array<string, mixed> $where
-     * @return \PDOStatement
+     *
      * @throws Exception\ActiveRecordException
      */
     public function update(array &$data, array $where): \PDOStatement
@@ -430,11 +432,12 @@ class Table
 
         $values = $sql->bind_values();
 
-        return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
+        return $this->conn->query($this->last_sql = $sql->to_s(), $values);
     }
 
     /**
      * @param array<string,mixed> $data
+     *
      * @throws Exception\ActiveRecordException
      */
     public function delete(array $data): \PDOStatement
@@ -446,7 +449,7 @@ class Table
 
         $values = $sql->bind_values();
 
-        return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
+        return $this->conn->query($this->last_sql = $sql->to_s(), $values);
     }
 
     private function add_relationship(AbstractRelationship $relationship): void
@@ -469,11 +472,10 @@ class Table
      * Replaces any aliases used in a hash based condition.
      *
      * @param array<string, string> $hash A hash
-     * @param array<string, string> $map Hash of used_name => real_name
+     * @param array<string, string> $map  Hash of used_name => real_name
      *
      * @return array<string, string> Array with any aliases replaced with their read field name
      */
-
     private function map_names(array &$hash, array &$map): array
     {
         $ret = [];
@@ -491,6 +493,7 @@ class Table
 
     /**
      * @param array<string,mixed> $hash
+     *
      * @return array<string,mixed> $hash
      */
     private function process_data(array|null $hash): array|null
@@ -538,7 +541,7 @@ class Table
 
             // strip namespaces from the table name if any
             $parts = explode('\\', $this->table);
-            $this->table = $parts[count($parts)-1];
+            $this->table = $parts[count($parts) - 1];
         }
 
         if (($db = $this->class->getStaticPropertyValue('db', null)) || ($db = $this->class->getStaticPropertyValue('db_name', null))) {
