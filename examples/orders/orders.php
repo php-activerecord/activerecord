@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../ActiveRecord.php';
 
 // initialize ActiveRecord
 ActiveRecord\Config::initialize(function ($cfg) {
-    $cfg->set_model_directory(__DIR__ . '/models');
     $cfg->set_connections(['development' => 'mysql://test:test@127.0.0.1/orders_test']);
 
     // you can change the default connection with the below

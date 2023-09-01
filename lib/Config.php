@@ -21,8 +21,7 @@ use Psr\Log\LoggerInterface;
  *     'production' => 'mysql://user:pass@production.com/awesome_production'));
  * });
  * ```
- *
- * @package ActiveRecord
+ * @phpstan-import-type CacheOptions from Cache
  */
 class Config extends Singleton
 {
@@ -31,7 +30,6 @@ class Config extends Singleton
      *
      * ```
      * ActiveRecord\Config::initialize(function($cfg) {
-     *   $cfg->set_model_directory('/your/app/models');
      *   $cfg->set_connections(array(
      *     'development' => 'mysql://user:pass@development.com/awesome_development',
      *     'production' => 'mysql://user:pass@production.com/awesome_production'));
@@ -46,52 +44,34 @@ class Config extends Singleton
      *
      * @var string
      */
-    private $default_connection = 'development';
+    private string $default_connection = 'development';
 
     /**
      * Contains the list of database connection strings.
      *
-     * @var array
+     * @var array<string>
      */
-    private $connections = [];
-
-    /**
-     * Directory for the auto_loading of model classes.
-     *
-     * @see activerecord_autoload
-     *
-     * @var string
-     */
-    private $model_directory;
+    private array $connections = [];
 
     /**
      * Switch for logging.
      *
-     * @var bool
      */
-    private $logging = false;
+    private bool $logging = false;
 
     /**
      * Contains a Logger object that must impelement a log() method.
      *
-     * @var object
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * Contains the class name for the Date class to use. Must have a public format() method and a
      * public static createFromFormat($format, $time) method
      *
-     * @var string
+     * @var class-string
      */
-    private $date_class = 'ActiveRecord\\DateTime';
-
-    /**
-     * The format to serialize DateTime values into.
-     *
-     * @var string
-     */
-    private $date_format = \DateTime::ISO8601;
+    private string $date_class = 'ActiveRecord\\DateTime';
 
     /**
      * Allows config initialization using a closure.
@@ -100,7 +80,6 @@ class Config extends Singleton
      *
      * ```
      * ActiveRecord\Config::initialize(function($cfg) {
-     *   $cfg->set_model_directory('/path/to/your/model_directory');
      *   $cfg->set_connections(array(
      *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
      * });
@@ -110,14 +89,13 @@ class Config extends Singleton
      *
      * ```
      * $cfg = ActiveRecord\Config::instance();
-     * $cfg->set_model_directory('/path/to/your/model_directory');
      * $cfg->set_connections(array('development' =>
      *   'mysql://username:password@localhost/database_name'));
      * ```
      *
      * @param Closure $initializer A closure
      */
-    public static function initialize(Closure $initializer)
+    public static function initialize(Closure $initializer): void
     {
         $initializer(parent::instance());
     }
@@ -126,20 +104,18 @@ class Config extends Singleton
      * Sets the list of database connection strings.
      *
      * ```
-     * $config->set_connections(array(
-     *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
+     * $config->set_connections([
+     *     'development' => 'mysql://username:password@127.0.0.1/database_name'
+     * ]);
      * ```
      *
-     * @param array  $connections        Array of connections
+     * @param array<string,string>  $connections        Array of connections
      * @param string $default_connection Optionally specify the default_connection
      *
      * @throws ConfigException
      */
-    public function set_connections($connections, $default_connection=null)
+    public function set_connections(array $connections, string $default_connection = ''): void
     {
-        if (!is_array($connections)) {
-            throw new ConfigException('Connections must be an array');
-        }
         if ($default_connection) {
             $this->set_default_connection($default_connection);
         }
@@ -150,9 +126,9 @@ class Config extends Singleton
     /**
      * Returns the connection strings array.
      *
-     * @return array
+     * @return array<string,string>
      */
-    public function get_connections()
+    public function get_connections(): array
     {
         return $this->connections;
     }
@@ -162,9 +138,9 @@ class Config extends Singleton
      *
      * @param string $name Name of connection to retrieve
      *
-     * @return string connection info for specified connection name
+     * @return ?string connection info for specified connection name
      */
-    public function get_connection($name)
+    public function get_connection(string $name): ?string
     {
         if (array_key_exists($name, $this->connections)) {
             return $this->connections[$name];
@@ -199,35 +175,9 @@ class Config extends Singleton
      *
      * @param string $name Name of a connection in the connections array
      */
-    public function set_default_connection($name)
+    public function set_default_connection(string $name): void
     {
         $this->default_connection = $name;
-    }
-
-    /**
-     * Sets the directory where models are located.
-     *
-     * @param string $dir Directory path containing your models
-     */
-    public function set_model_directory($dir)
-    {
-        $this->model_directory = $dir;
-    }
-
-    /**
-     * Returns the model directory.
-     *
-     * @throws ConfigException if specified directory was not found
-     *
-     * @return string
-     */
-    public function get_model_directory()
-    {
-        if ($this->model_directory && !file_exists($this->model_directory)) {
-            throw new ConfigException('Invalid or non-existent directory: ' . $this->model_directory);
-        }
-
-        return $this->model_directory;
     }
 
     /**
@@ -235,7 +185,7 @@ class Config extends Singleton
      *
      * @param bool $bool
      */
-    public function set_logging($bool)
+    public function set_logging(bool $bool): void
     {
         $this->logging = (bool) $bool;
     }
@@ -243,26 +193,18 @@ class Config extends Singleton
     /**
      * Sets the logger object for future SQL logging
      *
-     * @param object $logger
-     *
      * @throws ConfigException if Logger object does not implement public log()
      */
-    public function set_logger(LoggerInterface $logger)
+    public function set_logger(LoggerInterface $logger): void
     {
-        $klass = Reflections::instance()->add($logger)->get($logger);
-
-        if (!$klass->getMethod('log') || !$klass->getMethod('log')->isPublic()) {
-            throw new ConfigException('Logger object must implement a public log method');
-        }
         $this->logger = $logger;
     }
 
     /**
-     * Return whether or not logging is on
+     * Return whether logging is on
      *
-     * @return bool
      */
-    public function get_logging()
+    public function get_logging(): bool
     {
         return $this->logging;
     }
@@ -270,14 +212,18 @@ class Config extends Singleton
     /**
      * Returns the logger
      *
-     * @return object
      */
-    public function get_logger()
+    public function get_logger(): LoggerInterface
     {
         return $this->logger;
     }
 
-    public function set_date_class($date_class)
+    /**
+     * @param class-string $date_class
+     * @throws ConfigException
+     * @throws Exception\ActiveRecordException
+     */
+    public function set_date_class(string $date_class): void
     {
         try {
             $klass = Reflections::instance()->add($date_class)->get($date_class);
@@ -294,28 +240,12 @@ class Config extends Singleton
         $this->date_class = $date_class;
     }
 
-    public function get_date_class()
+    /**
+     * @return class-string
+     */
+    public function get_date_class(): string
     {
         return $this->date_class;
-    }
-
-    /**
-     * @deprecated
-     */
-    public function get_date_format()
-    {
-        trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT. Config::get_date_format() has been deprecated.', E_USER_DEPRECATED);
-
-        return Serialization::$DATETIME_FORMAT;
-    }
-
-    /**
-     * @deprecated
-     */
-    public function set_date_format($format)
-    {
-        trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT. Config::set_date_format() has been deprecated.', E_USER_DEPRECATED);
-        Serialization::$DATETIME_FORMAT = $format;
     }
 
     /**
@@ -332,9 +262,9 @@ class Config extends Singleton
      * ```
      *
      * @param string $url     url to your cache server
-     * @param array  $options Array of options
+     * @param CacheOptions $options Array of options
      */
-    public function set_cache($url, $options=[])
+    public function set_cache(string $url, array $options=[]): void
     {
         Cache::initialize($url, $options);
     }

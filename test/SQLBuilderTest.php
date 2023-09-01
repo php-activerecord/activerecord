@@ -20,12 +20,12 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->table = Table::load($this->class_name);
     }
 
-    protected function cond_from_s($name, $values=null, $map=null)
+    protected function cond_from_s($name, $values=[], $map=[])
     {
         return SQLBuilder::create_conditions_from_underscored_string($this->table->conn, $name, $values, $map);
     }
 
-    public function assert_conditions($expected_sql, $values, $underscored_string, $map=null)
+    public function assert_conditions($expected_sql, $values, $underscored_string, $map=[])
     {
         $cond = SQLBuilder::create_conditions_from_underscored_string($this->table->conn, $underscored_string, $values, $map);
         $this->assert_sql_has($expected_sql, array_shift($cond));
@@ -35,12 +35,6 @@ class SQLBuilderTest extends DatabaseTestCase
         } else {
             $this->assertEquals([], $cond);
         }
-    }
-
-    public function test_no_connection()
-    {
-        $this->expectException(ActiveRecordException::class);
-        new SQLBuilder(null, 'authors');
     }
 
     public function test_nothing()
@@ -220,7 +214,6 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assertEquals('id DESC', SQLBuilder::reverse_order('id'));
         $this->assertEquals('', SQLBuilder::reverse_order(''));
         $this->assertEquals(' ', SQLBuilder::reverse_order(' '));
-        $this->assertEquals(null, SQLBuilder::reverse_order(null));
     }
 
     public function test_create_conditions_from_underscored_string()
@@ -238,7 +231,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function test_create_conditions_from_underscored_string_with_missing_args()
     {
         $this->assert_conditions('id=? AND name IS NULL OR z IS NULL', [1, null], 'id_and_name_or_z');
-        $this->assert_conditions('id IS NULL', null, 'id');
+        $this->assert_conditions('id IS NULL', [], 'id');
     }
 
     public function test_create_conditions_from_underscored_string_with_blank()

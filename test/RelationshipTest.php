@@ -23,9 +23,9 @@ class NotModel
 
 class AuthorWithNonModelRelationship extends ActiveRecord\Model
 {
-    public static $pk = 'id';
-    public static $table_name = 'authors';
-    public static $has_many = [['books', 'class_name' => 'NotModel']];
+    public static string $pk = 'id';
+    public static string $table_name = 'authors';
+    public static array $has_many = [['books', 'class_name' => 'NotModel']];
 }
 
 class RelationshipTest extends DatabaseTestCase

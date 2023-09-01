@@ -46,10 +46,10 @@ class ExpressionsTest extends TestCase
         $this->assertEquals('name IN(?,?) and id=?', $c->to_s());
     }
 
-    public function test_to_string_with_null_options()
+    public function test_to_string_with_empty_options()
     {
         $c = new Expressions(null, 'name=? and book=?', 'Tito', 'Sharks');
-        $x = null;
+        $x = [];
         $this->assertEquals('name=? and book=?', $c->to_s(false, $x));
     }
 
@@ -170,7 +170,7 @@ class ExpressionsTest extends TestCase
         $a->bind(0, 99);
     }
 
-    public function test_subsitute_using_alternate_values()
+    public function test_substitute_using_alternate_values()
     {
         $a = new Expressions(null, 'name=?', 'Tito');
         $this->assertEquals("name='Tito'", $a->to_s(true));

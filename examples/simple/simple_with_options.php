@@ -5,16 +5,16 @@ require_once __DIR__ . '/../../ActiveRecord.php';
 class Book extends ActiveRecord\Model
 {
     // explicit table name since our table is not "books"
-    public static $table_name = 'simple_book';
+    public static string $table_name = 'simple_book';
 
     // explicit pk since our pk is not "id"
-    public static $primary_key = 'book_id';
+    public static string $primary_key = 'book_id';
 
     // explicit connection name since we always want production with this model
-    public static $connection = 'production';
+    public static string $connection = 'production';
 
     // explicit database name will generate sql like so => db.table_name
-    public static $db = 'test';
+    public static string $db = 'test';
 }
 
 $connections = [
@@ -24,7 +24,6 @@ $connections = [
 
 // initialize ActiveRecord
 ActiveRecord\Config::initialize(function ($cfg) use ($connections) {
-    $cfg->set_model_directory('.');
     $cfg->set_connections($connections);
 });
 

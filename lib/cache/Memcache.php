@@ -4,25 +4,24 @@ namespace ActiveRecord;
 
 use ActiveRecord\Exception\CacheException;
 
+/**
+ * @phpstan-type MemcacheOptions array{
+ *      host?: string,
+ *      port?: string
+ *  }
+ */
 class Memcache
 {
     const DEFAULT_PORT = 11211;
 
-    private $memcache;
+    private \Memcache $memcache;
 
     /**
      * Creates a Memcache instance.
      *
-     * Takes an $options array w/ the following parameters:
-     *
-     * <ul>
-     * <li><b>host:</b> host for the memcache server </li>
-     * <li><b>port:</b> port for the memcache server </li>
-     * </ul>
-     *
-     * @param array $options
+     * @param MemcacheOptions $options
      */
-    public function __construct($options)
+    public function __construct(array $options)
     {
         $this->memcache = new \Memcache();
         $options['port'] = $options['port'] ?? self::DEFAULT_PORT;
@@ -37,23 +36,26 @@ class Memcache
         }
     }
 
-    public function flush()
+    public function flush(): void
     {
         $this->memcache->flush();
     }
 
-    public function read($key)
+    /**
+     * @param array<string>|string $key
+     */
+    public function read(array|string $key): mixed
     {
         return $this->memcache->get($key);
     }
 
-    public function write($key, $value, $expire)
+    public function write(string $key, mixed $value, int $expire = 0): bool
     {
-        $this->memcache->set($key, $value, 0, $expire);
+        return $this->memcache->set($key, $value, 0, $expire);
     }
 
-    public function delete($key)
+    public function delete(string $key): bool
     {
-        $this->memcache->delete($key);
+        return $this->memcache->delete($key);
     }
 }

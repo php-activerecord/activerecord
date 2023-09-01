@@ -73,7 +73,6 @@ Example:
 
 ```php
 $cfg = ActiveRecord\Config::instance();
-$cfg->set_model_directory('/path/to/your/model_directory');
 $cfg->set_connections([
     'development' => 'mysql://username:password@localhost/development_database_name',
     'test' => 'mysql://username:password@localhost/test_database_name',

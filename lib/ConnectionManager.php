@@ -15,9 +15,9 @@ class ConnectionManager extends Singleton
     /**
      * Array of {@link Connection} objects.
      *
-     * @var array
+     * @var array<Connection>
      */
-    private static $connections = [];
+    private static array $connections = [];
 
     /**
      * If $name is null then the default connection will be returned.
@@ -46,7 +46,7 @@ class ConnectionManager extends Singleton
      *
      * @param string $name Name of the connection to forget about
      */
-    public static function drop_connection($name=null)
+    public static function drop_connection(string $name): void
     {
         if (isset(self::$connections[$name])) {
             unset(self::$connections[$name]);

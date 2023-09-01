@@ -4,17 +4,17 @@ namespace test\models;
 use ActiveRecord\Model;
 class Venue extends Model
 {
-    public static $use_custom_get_state_getter = false;
-    public static $use_custom_set_state_setter = false;
+    public static bool $use_custom_get_state_getter = false;
+    public static bool $use_custom_set_state_setter = false;
 
-    public static $has_many = [
+    public static array $has_many = [
         'events',
         ['hosts', 'through' => 'events']
     ];
 
-    public static $has_one;
+    public static array $has_one;
 
-    public static $alias_attribute = [
+    public static array $alias_attribute = [
         'marquee' => 'name',
         'mycity' => 'city'
     ];

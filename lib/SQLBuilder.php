@@ -10,29 +10,44 @@ use ActiveRecord\Exception\ActiveRecordException;
 /**
  * Helper class for building sql statements progmatically.
  *
+ * @phpstan-import-type Attributes from Model
+ *
  * @package ActiveRecord
  */
 class SQLBuilder
 {
-    private $connection;
-    private $operation = 'SELECT';
-    private $table;
-    private $select = '*';
-    private $joins;
-    private $order;
-    private $limit;
-    private $offset;
-    private $group;
-    private $having;
-    private $update;
+    private Connection $connection;
+    private string $operation = 'SELECT';
+    private string $table;
+    private string $select = '*';
+
+    private string $joins = '';
+    private string $order = '';
+    private int $limit = 0;
+    private int $offset = 0;
+    private string $group = '';
+    private string $having = '';
+    private string $update = '';
 
     // for where
-    private $where;
-    private $where_values = [];
+    private string $where = '';
 
-    // for insert/update
-    private $data;
-    private $sequence;
+    /**
+     * @var array<mixed>
+     */
+    private array $where_values = [];
+
+    /**
+     * for insert/update
+     *
+     * @var Attributes
+     */
+    private array $data = [];
+
+    /**
+     * @var array<string>
+     */
+    private array $sequence = [];
 
     /**
      * Constructor.
@@ -44,11 +59,8 @@ class SQLBuilder
      *
      * @return SQLBuilder
      */
-    public function __construct($connection, $table)
+    public function __construct(Connection $connection, string $table)
     {
-        if (!$connection) {
-            throw new ActiveRecordException('A valid database connection is required.');
-        }
         $this->connection    = $connection;
         $this->table        = $table;
     }
@@ -58,7 +70,7 @@ class SQLBuilder
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->to_s();
     }
@@ -70,7 +82,7 @@ class SQLBuilder
      *
      * @return string
      */
-    public function to_s()
+    public function to_s(): string
     {
         $func = 'build_' . strtolower($this->operation);
 
@@ -80,9 +92,9 @@ class SQLBuilder
     /**
      * Returns the bind values.
      *
-     * @return array
+     * @return array<mixed>
      */
-    public function bind_values()
+    public function bind_values(): array
     {
         $ret = [];
 
@@ -97,54 +109,57 @@ class SQLBuilder
         return array_flatten($ret);
     }
 
-    public function get_where_values()
+    /**
+     * @return array<mixed>
+     */
+    public function get_where_values(): array
     {
         return $this->where_values;
     }
 
-    public function where(/* (conditions, values) || (hash) */)
+    public function where(/* (conditions, values) || (hash) */): static
     {
         $this->apply_where_conditions(func_get_args());
 
         return $this;
     }
 
-    public function order($order)
+    public function order(string $order): static
     {
         $this->order = $order;
 
         return $this;
     }
 
-    public function group($group)
+    public function group(string $group): static
     {
         $this->group = $group;
 
         return $this;
     }
 
-    public function having($having)
+    public function having(string $having): static
     {
         $this->having = $having;
 
         return $this;
     }
 
-    public function limit($limit)
+    public function limit(int $limit): static
     {
-        $this->limit = intval($limit);
+        $this->limit = $limit;
 
         return $this;
     }
 
-    public function offset($offset)
+    public function offset(int $offset): static
     {
-        $this->offset = intval($offset);
+        $this->offset = $offset;
 
         return $this;
     }
 
-    public function select($select)
+    public function select(string $select): static
     {
         $this->operation = 'SELECT';
         $this->select = $select;
@@ -152,14 +167,25 @@ class SQLBuilder
         return $this;
     }
 
-    public function joins($joins)
+    /**
+     * @param string|array<string> $joins
+     * @return $this
+     */
+    public function joins(string|array $joins): static
     {
         $this->joins = $joins;
 
         return $this;
     }
 
-    public function insert($hash, $pk=null, $sequence_name=null)
+    /**
+     * @param Attributes $hash
+     * @param mixed $pk
+     * @param string|null $sequence_name
+     * @return $this
+     * @throws ActiveRecordException
+     */
+    public function insert(array $hash, mixed $pk=null, string $sequence_name=null): static
     {
         if (!is_hash($hash)) {
             throw new ActiveRecordException('Inserting requires a hash.');
@@ -174,7 +200,11 @@ class SQLBuilder
         return $this;
     }
 
-    public function update($mixed)
+    /**
+     * @param array<string,string>|string $mixed
+     * @throws ActiveRecordException
+     */
+    public function update(array|string $mixed): static
     {
         $this->operation = 'UPDATE';
 
@@ -189,7 +219,7 @@ class SQLBuilder
         return $this;
     }
 
-    public function delete()
+    public function delete(): static
     {
         $this->operation = 'DELETE';
         $this->apply_where_conditions(func_get_args());
@@ -200,9 +230,9 @@ class SQLBuilder
     /**
      * Reverses an order clause.
      */
-    public static function reverse_order($order = '')
+    public static function reverse_order(string $order = ''): string
     {
-        if (!trim($order ?? '')) {
+        if (!trim($order)) {
             return $order;
         }
 
@@ -227,14 +257,14 @@ class SQLBuilder
      * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...).
      *
      * @param Connection $connection
-     * @param $name Underscored string
-     * @param $values Array of values for the field names. This is used
+     * @param string $name Underscored string
+     * @param array<mixed> $values Array of values for the field names. This is used
      *   to determine what kind of bind marker to use: =?, IN(?), IS NULL
-     * @param $map A hash of "mapped_column_name" => "real_column_name"
+     * @param array<string,string> $map A hash of "mapped_column_name" => "real_column_name"
      *
-     * @return A conditions array in the form array(sql_string, value1, value2,...)
+     * @return array<mixed>
      */
-    public static function create_conditions_from_underscored_string(Connection $connection, $name, &$values=[], &$map=null)
+    public static function create_conditions_from_underscored_string(Connection $connection, ?string $name, array $values=[], array $map=[]): ?array
     {
         if (!$name) {
             return null;
@@ -246,7 +276,9 @@ class SQLBuilder
 
         for ($i=0, $j=0, $n=count($parts); $i<$n; $i+=2, ++$j) {
             if ($i >= 2) {
-                $conditions[0] .= preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i-1]);
+                $res = preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i-1]);
+                assert(is_string($res));
+                $conditions[0] .= $res;
             }
 
             if ($j < $num_values) {
@@ -273,19 +305,21 @@ class SQLBuilder
      * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
      *
      * @param string $name   A string containing attribute names connected with _and_ or _or_
-     * @param array  $values Array of values for each attribute in $name
-     * @param $map A hash of "mapped_column_name" => "real_column_name"
+     * @param array<mixed>  $values Array of values for each attribute in $name
+     * @param array<string,string> $map A hash of "mapped_column_name" => "real_column_name"
      *
-     * @return array A hash of array(name => value, ...)
+     * @return array<string,mixed> A hash of array(name => value, ...)
      */
-    public static function create_hash_from_underscored_string($name, &$values=[], &$map=null)
+    public static function create_hash_from_underscored_string(string $name, array $values=[], array &$map=[])
     {
         $parts = preg_split('/(_and_|_or_)/i', $name);
+        assert(is_array($parts));
         $hash = [];
 
         for ($i=0, $n=count($parts); $i<$n; ++$i) {
             // map to correct name if $map was supplied
-            $name = $map && isset($map[$parts[$i]]) ? $map[$parts[$i]] : $parts[$i];
+            $name = $map[$parts[$i]] ?? $parts[$i];
+            assert(is_string($name));
             $hash[$name] = $values[$i];
         }
 
@@ -293,14 +327,14 @@ class SQLBuilder
     }
 
     /**
-     * prepends table name to hash of field names to get around ambiguous fields when SQL builder
+     * Prepends table name to hash of field names to get around ambiguous fields when SQL builder
      * has joins
      *
-     * @param array $hash
+     * @param array<string,string> $hash
      *
-     * @return array $new
+     * @return array<string,string> $new
      */
-    private function prepend_table_name_to_fields($hash=[])
+    private function prepend_table_name_to_fields(array $hash=[])
     {
         $new = [];
         $table = $this->connection->quote_name($this->table);
@@ -313,13 +347,16 @@ class SQLBuilder
         return $new;
     }
 
-    private function apply_where_conditions($args)
+    /**
+     * @param array<string|array<string,mixed>> $args
+     * @throws Exception\ExpressionsException
+     */
+    private function apply_where_conditions(array $args): void
     {
-        require_once 'Expressions.php';
         $num_args = count($args);
 
         if (1 == $num_args && is_hash($args[0])) {
-            $hash = is_null($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
+            $hash = empty($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
             $e = new Expressions($this->connection, $hash);
             $this->where = $e->to_s();
             $this->where_values = array_flatten($e->values());
@@ -339,12 +376,12 @@ class SQLBuilder
             }
 
             // no nested array so nothing special to do
-            $this->where = $args[0];
+            $this->where = $args[0] ?? '';
             $this->where_values = &$values;
         }
     }
 
-    private function build_delete()
+    private function build_delete(): string
     {
         $sql = "DELETE FROM $this->table";
 
@@ -358,14 +395,14 @@ class SQLBuilder
             }
 
             if ($this->limit) {
-                $sql = $this->connection->limit($sql, null, $this->limit);
+                $sql = $this->connection->limit($sql, 0, $this->limit);
             }
         }
 
         return $sql;
     }
 
-    private function build_insert()
+    private function build_insert(): string
     {
         require_once 'Expressions.php';
         $keys = join(',', $this->quoted_key_names());
@@ -383,11 +420,11 @@ class SQLBuilder
         return $e->to_s();
     }
 
-    private function build_select()
+    private function build_select(): string
     {
         $sql = "SELECT $this->select FROM $this->table";
 
-        if ($this->joins) {
+        if (!empty($this->joins)) {
             $sql .= ' ' . $this->joins;
         }
 
@@ -414,7 +451,7 @@ class SQLBuilder
         return $sql;
     }
 
-    private function build_update()
+    private function build_update(): string
     {
         if (strlen($this->update ?? '') > 0) {
             $set = $this->update;
@@ -434,14 +471,17 @@ class SQLBuilder
             }
 
             if ($this->limit) {
-                $sql = $this->connection->limit($sql, null, $this->limit);
+                $sql = $this->connection->limit($sql, 0, $this->limit);
             }
         }
 
         return $sql;
     }
 
-    private function quoted_key_names()
+    /**
+     * @return array<string>
+     */
+    private function quoted_key_names(): array
     {
         $keys = [];
 

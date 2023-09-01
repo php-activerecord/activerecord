@@ -7,7 +7,7 @@ use test\models\VenueCB;
 class CallBackTest extends DatabaseTestCase
 {
     private $callback;
-    
+
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
@@ -129,7 +129,7 @@ class CallBackTest extends DatabaseTestCase
     {
         $this->expectException(ActiveRecordException::class);
         $class_name = 'Venues_' . md5(uniqid());
-        eval("class $class_name extends ActiveRecord\\Model { static \$table_name = 'venues'; static \$after_save = 'method_that_does_not_exist'; };");
+        eval("class $class_name extends ActiveRecord\\Model { static string \$table_name = 'venues'; static \$after_save = 'method_that_does_not_exist'; };");
         new $class_name();
         new ActiveRecord\CallBack($class_name);
     }
@@ -154,9 +154,9 @@ class CallBackTest extends DatabaseTestCase
         $this->assertTrue(is_array($this->callback->get_callbacks('after_construct')));
     }
 
-    public function test_get_callbacks_returns_null()
+    public function test_get_callbacks_returns_empty()
     {
-        $this->assertNull($this->callback->get_callbacks('this_callback_name_should_never_exist'));
+        $this->assertEquals([], $this->callback->get_callbacks('this_callback_name_should_never_exist'));
     }
 
     public function test_invoke_runs_all_callbacks()
@@ -190,7 +190,7 @@ class CallBackTest extends DatabaseTestCase
     public function test_invoke_unregistered_callback()
     {
         $this->expectException(ActiveRecordException::class);
-        $mock = $this->getMockBuilder('VenueCB', ['columns']);
+        $mock = $this->createMock(VenueCB::class, ['columns']);
         $this->callback->invoke($mock, 'before_validation_on_create');
     }
 

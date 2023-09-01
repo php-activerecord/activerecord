@@ -4,7 +4,7 @@ namespace test\models;
 use ActiveRecord\Model;
 class VenueCB extends Model
 {
-    public static $table_name = 'venues';
+    public static string $table_name = 'venues';
     public static $before_save;
     public static $before_update;
     public static $before_create;

@@ -21,13 +21,11 @@ class Column
     const TIME        = 6;
 
     /**
-     * Map a type to an column type.
+     * Map type to column type.
      *
-     * @static
-     *
-     * @var array
+     * @var array<string, int>
      */
-    public static $TYPE_MAPPING = [
+    public static array $TYPE_MAPPING = [
         'datetime'    => self::DATETIME,
         'timestamp'    => self::DATETIME,
         'date'        => self::DATE,
@@ -50,7 +48,7 @@ class Column
      *
      * @var string
      */
-    public $name;
+    public string $name = '';
 
     /**
      * The inflected name of this columns .. hyphens/spaces will be => _.
@@ -76,9 +74,8 @@ class Column
     /**
      * The maximum length of this column.
      *
-     * @var int
      */
-    public $length;
+    public int|null $length = null;
 
     /**
      * True if this column allows null.
@@ -111,7 +108,7 @@ class Column
     /**
      * Name of the sequence to use for this column if any.
      *
-     * @var bool
+     * @var string
      */
     public $sequence;
 
@@ -133,24 +130,24 @@ class Column
      *
      * @return int|string type-casted value
      */
-    public static function castIntegerSafely($value)
+    public static function castIntegerSafely($value): string|int
     {
         if (is_int($value)) {
             return $value;
         }
 
-        // Its just a decimal number
+        // It's just a decimal number
         elseif (is_numeric($value) && floor($value) != $value) {
             return (int) $value;
         }
 
         // If adding 0 to a string causes a float conversion,
         // we have a number over PHP_INT_MAX
-        elseif (is_string($value) && is_float($value + 0)) {
-            return (string) $value;
+        elseif (is_string($value) && bccomp($value, (string) PHP_INT_MAX) === 1) {
+            return $value;
         }
 
-        // If a float was passed and its greater than PHP_INT_MAX
+        // If a float was passed and is greater than PHP_INT_MAX
         // (which could be wrong due to floating point precision)
         // We'll also check for equal to (>=) in case the precision
         // loss creates an overflow on casting
@@ -169,7 +166,7 @@ class Column
      *
      * @return mixed type-casted value
      */
-    public function cast($value, $connection)
+    public function cast($value, $connection): mixed
     {
         if (null === $value) {
             return null;
@@ -181,7 +178,7 @@ class Column
             case self::DECIMAL:    return (float) $value;
             case self::DATETIME:
             case self::DATE:
-                if (!$value) {
+                if ($value === '') {
                     return null;
                 }
 

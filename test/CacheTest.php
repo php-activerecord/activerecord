@@ -34,7 +34,7 @@ class CacheTest extends TestCase
 
     public function test_initialize_with_null()
     {
-        Cache::initialize(null);
+        Cache::initialize();
         $this->assertNull(Cache::$adapter);
     }
 

@@ -2,19 +2,19 @@
 
 class BookPresence extends ActiveRecord\Model
 {
-    public static $table_name = 'books';
+    public static string $table_name = 'books';
 
-    public static $validates_presence_of = [
-        ['name']
+    public static array $validates_presence_of = [
+        'name' => true
     ];
 }
 
 class AuthorPresence extends ActiveRecord\Model
 {
-    public static $table_name = 'authors';
+    public static string $table_name = 'authors';
 
-    public static $validates_presence_of = [
-        ['some_date']
+    public static array $validates_presence_of = [
+        'some_date' => true
     ];
 }
 
@@ -58,11 +58,13 @@ class ValidatesPresenceOfTest extends DatabaseTestCase
 
     public function test_custom_message()
     {
-        BookPresence::$validates_presence_of[0]['message'] = 'is using a custom message.';
+        BookPresence::$validates_presence_of = [
+            'name' => ['message' => 'is using a custom message.']
+        ];
 
         $book = new BookPresence(['name' => null]);
         $book->is_valid();
-        $this->assertEquals('is using a custom message.', $book->errors->on('name'));
+        $this->assertEquals('is using a custom message.', $book->errors->first('name'));
     }
 
     public function test_valid_zero()

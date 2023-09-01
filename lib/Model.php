@@ -10,7 +10,10 @@ namespace ActiveRecord;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Relationship\AbstractRelationship;
+use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
 
@@ -36,7 +39,7 @@ use ActiveRecord\Serialize\Serialization;
  *
  * ```php
  * class Person extends ActiveRecord\Model {
- *   static $belongs_to = array(
+ *   static array $belongs_to = array(
  *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
  *   );
  *
@@ -45,23 +48,23 @@ use ActiveRecord\Serialize\Serialization;
  *     array('orders')
  *   );
  *
- *   static $validates_length_of = array(
- *     array('first_name', 'within' => array(1,50)),
- *     array('last_name', 'within' => array(1,50))
+ *   static $validates_length_of = [
+ *     'first_name' => ['within' => [1,50]],
+ *     'last_name' => [1,50]
  *   );
  * }
  *
  * class Order extends ActiveRecord\Model {
- *   static $belongs_to = array(
- *     array('person')
+ *   static array $belongs_to = [
+ *     'person'
+ *   ];
+ *
+ *   static $validates_numericality_of = [
+ *     'cost' => ['greater_than' => 0],
+ *     'total' => ['greater_than' => 0]
  *   );
  *
- *   static $validates_numericality_of = array(
- *     array('cost', 'greater_than' => 0),
- *     array('total', 'greater_than' => 0)
- *   );
- *
- *   static $before_save = array('calculate_total_with_tax');
+ *   static $before_save = ['calculate_total_with_tax'];
  *
  *   public function calculate_total_with_tax() {
  *     $this->total = $this->cost * 0.045;
@@ -72,7 +75,19 @@ use ActiveRecord\Serialize\Serialization;
  * For a more in-depth look at defining models, relationships, callbacks and many other things
  * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
  *
+ * @phpstan-import-type SerializeOptions from Serialize\Serialization
+ * @phpstan-import-type ValidationOptions from Validations
+ * @phpstan-import-type ValidateInclusionOptions from Validations
+ * @phpstan-import-type ValidateLengthOptions from Validations
+ * @phpstan-import-type ValidateFormatOptions from Validations
+ * @phpstan-import-type ValidateUniquenessOptions from Validations
+ * @phpstan-import-type ValidateNumericOptions from Validations
  * @package ActiveRecord
+ *
+ * @phpstan-import-type Attributes from Types
+ * @phpstan-import-type PrimaryKey from Types
+ * @phpstan-import-type QueryOptions from Types
+ * @phpstan-import-type DelegateOptions from Types
  *
  * @see BelongsTo
  * @see CallBack
@@ -84,25 +99,25 @@ use ActiveRecord\Serialize\Serialization;
 class Model
 {
     /**
-     * An instance of {@link Errors} and will be instantiated once a write method is called.
+     * An instance of {@link ValidationErrors} and will be instantiated once a write method is called.
      *
-     * @var Errors
+     * @var ValidationErrors
      */
     public $errors;
 
     /**
      * Contains model values as column_name => value
      *
-     * @var array
+     * @var Attributes
      */
     private $attributes = [];
 
     /**
-     * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified
+     * Flag whether this model's attributes have been modified since it will either be null or an array of column_names that have been modified
      *
-     * @var array
+     * @var array<string, bool>
      */
-    private $__dirty = null;
+    private array $__dirty = [];
 
     /**
      * Flag that determines of this model can have a writer method invoked such as: save/update/insert/delete
@@ -114,30 +129,30 @@ class Model
     /**
      * Array of relationship objects as model_attribute_name => relationship
      *
-     * @var array
+     * @var array<class-string,Model>
      */
-    private $__relationships = [];
+    private array $__relationships = [];
 
     /**
      * Flag that determines if a call to save() should issue an insert or an update sql statement
      *
      * @var bool
      */
-    private $__new_record = true;
+    private bool $__new_record = true;
 
     /**
      * Set to the name of the connection this {@link Model} should use.
      *
      * @var string
      */
-    public static $connection;
+    public static string $connection;
 
     /**
      * Set to the name of the database this Model's table is in.
      *
      * @var string
      */
-    public static $db;
+    public static string $db;
 
     /**
      * Set this to explicitly specify the model's table name if different from inferred name.
@@ -145,28 +160,25 @@ class Model
      * If your table doesn't follow our table name convention you can set this to the
      * name of your table to explicitly tell ActiveRecord what your table is called.
      *
-     * @var string
      */
-    public static $table_name;
+    public static string $table_name;
 
     /**
      * Set this to override the default primary key name if different from default name of "id".
-     *
-     * @var string
      */
-    public static $primary_key;
+    public static string $primary_key;
 
     /**
      * Set this to explicitly specify the sequence name for the table.
      *
      * @var string
      */
-    public static $sequence;
+    public static string $sequence;
 
     /**
      * Set this to true in your subclass to use caching for this model. Note that you must also configure a cache object.
      */
-    public static $cache = false;
+    public static bool $cache = false;
 
     /**
      * Set this to specify an expiration period for this model. If not set, the expire value you set in your cache options will be used.
@@ -174,6 +186,41 @@ class Model
      * @var number
      */
     public static $cache_expire;
+
+    /**
+     * @var ValidationOptions
+     */
+    public static array $validates_presence_of;
+
+    /**
+     * @var ValidateFormatOptions
+     */
+    public static array $validates_format_of;
+
+    /**
+     * @var ValidateInclusionOptions
+     */
+    public static array $validates_inclusion_of;
+
+    /**
+     * @var ValidateInclusionOptions
+     */
+    public static array $validates_exclusion_of;
+
+    /**
+     * @var ValidateUniquenessOptions
+     */
+    public static array $validates_uniqueness_of;
+
+    /**
+     * @var ValidateNumericOptions
+     */
+    public static array $validates_numericality_of;
+
+    /**
+     * @var ValidateLengthOptions
+     */
+    public static array $validates_length_of;
 
     /**
      * Allows you to create aliases for attributes.
@@ -190,9 +237,9 @@ class Model
      * echo $person->alias_first_name;
      * ```
      *
-     * @var array
+     * @var array<string,string>
      */
-    public static $alias_attribute = [];
+    public static array $alias_attribute = [];
 
     /**
      * Whitelist of attributes that are checked from mass-assignment calls such as constructing a model or using update_attributes.
@@ -212,9 +259,9 @@ class Model
      * echo $person->id; # => null
      * ```
      *
-     * @var array
+     * @var array<string>
      */
-    public static $attr_accessible = [];
+    public static array $attr_accessible = [];
 
     /**
      * Blacklist of attributes that cannot be mass-assigned.
@@ -224,16 +271,16 @@ class Model
      *
      * If the attribute is both accessible and protected, it is treated as protected.
      *
-     * @var array
+     * @var array<string>
      */
-    public static $attr_protected = [];
+    public static array $attr_protected = [];
 
     /**
      * Delegates calls to a relationship.
      *
      * ```
      * class Person extends ActiveRecord\Model {
-     *   static $belongs_to = array(array('venue'),array('host'));
+     *   static array $belongs_to = array(array('venue'),array('host'));
      *   static $delegate = array(
      *     array('name', 'state', 'to' => 'venue'),
      *     array('name', 'to' => 'host', 'prefix' => 'woot'));
@@ -248,9 +295,9 @@ class Model
      * $person->woot_name // same as calling $person->host->name
      * ```
      *
-     * @var array
+     * @var array<DelegateOptions>
      */
-    public static $delegate = [];
+    public static array $delegate = [];
 
     /**
      * Constructs a model.
@@ -263,14 +310,13 @@ class Model
      * new Person(array('first_name' => 'Tito', 'last_name' => 'the Grief'));
      * ```
      *
-     * @param array $attributes             Hash containing names and values to mass assign to the model
+     * @param Attributes $attributes             Hash containing names and values to mass assign to the model
      * @param bool  $guard_attributes       Set to true to guard protected/non-accessible attributes
      * @param bool  $instantiating_via_find Set to true if this model is being created from a find call
      * @param bool  $new_record             Set to true if this should be considered a new record
      *
-     * @return Model
      */
-    public function __construct(array $attributes=[], $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
+    public function __construct(array $attributes=[], bool $guard_attributes=true, bool $instantiating_via_find=false, bool $new_record=true)
     {
         $this->__new_record = $new_record;
 
@@ -351,9 +397,8 @@ class Model
         // check for getter
         if (method_exists($this, "get_$name")) {
             $name = "get_$name";
-            $value = $this->$name();
-
-            return $value;
+            $res = call_user_func([$this, $name]);
+            return $res;
         }
 
         return $this->read_attribute($name);
@@ -436,34 +481,37 @@ class Model
      * echo $user->name; # => BOB
      * ```
      *
-     * @param string $name  Name of attribute, relationship or other to set
-     * @param mixed  $value The value
+     * @param $name  string Name of attribute, relationship or other to set
+     * @param $value mixed The value
      *
-     * @throws {@link UndefinedPropertyException} if $name does not exist
+     * @throws UndefinedPropertyException if $name does not exist
      *
-     * @return mixed The value
      */
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
         if (array_key_exists($name, static::$alias_attribute)) {
             $name = static::$alias_attribute[$name];
         } elseif (method_exists($this, "set_$name")) {
             $name = "set_$name";
 
-            return $this->$name($value);
+            $this->$name($value);
+            return;
         }
 
         if (array_key_exists($name, $this->attributes)) {
-            return $this->assign_attribute($name, $value);
+            $this->assign_attribute($name, $value);
+            return;
         }
 
         if ('id' == $name) {
-            return $this->assign_attribute($this->get_primary_key(true), $value);
+            $this->assign_attribute($this->get_primary_key(true), $value);
+            return;
         }
 
-        foreach (static::$delegate as &$item) {
+        foreach (static::$delegate as $item) {
             if (($delegated_name = $this->is_delegated($name, $item))) {
-                return $this->{$item['to']}->$delegated_name = $value;
+                $this->{$item['to']}->$delegated_name = $value;
+                return;
             }
         }
 
@@ -483,7 +531,7 @@ class Model
      * Assign a value to an attribute.
      *
      * @param string $name   Name of the attribute
-     * @param mixed  &$value Value of the attribute
+     * @param mixed $value Value of the attribute
      *
      * @return mixed the attribute value
      */
@@ -530,13 +578,13 @@ class Model
      * accessed is 'id' then it will return the model's primary key no matter what the actual attribute name is
      * for the primary key.
      *
-     * @param string $name Name of an attribute
+     * @param $name Name of an attribute
      *
-     * @throws {@link UndefinedPropertyException} if name could not be resolved to an attribute, relationship, ...
+     * @throws UndefinedPropertyException if name could not be resolved to an attribute, relationship, ...
      *
      * @return mixed The value of the attribute
      */
-    public function &read_attribute($name)
+    public function &read_attribute(string $name)
     {
         // check for aliased attribute
         if (array_key_exists($name, static::$alias_attribute)) {
@@ -556,9 +604,9 @@ class Model
         $table = static::table();
 
         // this may be first access to the relationship so check Table
-        if (($relationship = $table->get_relationship($name))) {
-            $this->__relationships[$name] = $relationship->load($this);
-            return $this->__relationships[$name];
+        if ($table->get_relationship($name)) {
+            $res = $this->initRelationships($name);
+            return $res;
         }
 
         if ('id' == $name) {
@@ -571,7 +619,10 @@ class Model
         //do not remove - have to return null by reference in strict mode
         $null = null;
 
-        foreach (static::$delegate as &$item) {
+        foreach (static::$delegate as $delegateName => $item) {
+            if($delegateName == 'processed') {
+                continue;
+            }
             if (($delegated_name = $this->is_delegated($name, $item))) {
                 $to = $item['to'];
                 if ($this->$to) {
@@ -588,33 +639,38 @@ class Model
     }
 
     /**
-     * Flags an attribute as dirty.
-     *
-     * @param string $name Attribute name
+     * @param string $name
+     * @return Model|AbstractRelationship|null
+     * @throws RelationshipException
      */
-    public function flag_dirty($name)
-    {
-        if (!$this->__dirty) {
-            $this->__dirty = [];
+    protected function initRelationships(string $name): mixed {
+        $table = static::table();
+        if (($relationship = $table->get_relationship($name))) {
+            $this->__relationships[$name] = $relationship->load($this);
+            return $this->__relationships[$name];
         }
+        return null;
+    }
 
-        $this->__dirty[$name] = true;
+    /**
+     * Flags an attribute as dirty.
+     */
+    public function flag_dirty(string $attribute): void
+    {
+        $this->__dirty[$attribute] = true;
     }
 
     /**
      * Returns hash of attributes that have been modified since loading the model.
-     *
-     * @return mixed null if no dirty attributes otherwise returns array of dirty attributes
+     * @return Attributes
      */
-    public function dirty_attributes()
+    public function dirty_attributes(): array
     {
-        if (!$this->__dirty) {
-            return null;
+        if (count($this->__dirty) <= 0) {
+            return [];
         }
 
-        $dirty = array_intersect_key($this->attributes, $this->__dirty);
-
-        return !empty($dirty) ? $dirty : null;
+        return array_intersect_key($this->attributes, $this->__dirty);
     }
 
     /**
@@ -632,35 +688,28 @@ class Model
     /**
      * Returns a copy of the model's attributes hash.
      *
-     * @return array A copy of the model's attribute data
+     * @return Attributes A copy of the model's attribute data
      */
-    public function attributes()
+    public function attributes(): array
     {
         return $this->attributes;
     }
 
     /**
-     * Retrieve the primary key name.
-     *
-     * @param bool Set to true to return the first value in the pk array only
-     *
-     * @return string The primary key for the model
+     * @param bool $first
+     * @return array<string>|string
      */
-    public function get_primary_key($first=false)
+    public function get_primary_key(bool $first=false): array|string
     {
         $pk = static::table()->pk;
-
         return $first ? $pk[0] : $pk;
     }
 
     /**
      * Returns the actual attribute name if $name is aliased.
      *
-     * @param string $name An attribute name
-     *
-     * @return string
      */
-    public function get_real_attribute_name($name)
+    public function get_real_attribute_name(string $name): ?string
     {
         if (array_key_exists($name, $this->attributes)) {
             return $name;
@@ -680,21 +729,19 @@ class Model
      *
      * ```
      * array(
-     *   'name' => array(
+     *   'name' => [
      *     array('validator' => 'validates_presence_of'),
      *     array('validator' => 'validates_inclusion_of', 'in' => array('Bob','Joe','John')),
      *   'password' => array(
      *     array('validator' => 'validates_length_of', 'minimum' => 6))
      *   )
-     * );
+     * ];
      * ```
      *
-     * @return array an array containing validator data for this model
+     * @return array<string, array<mixed>> an array containing validator data for this model
      */
-    public function get_validation_rules()
+    public function get_validation_rules(): array
     {
-        require_once 'Validations.php';
-
         $validator = new Validations($this);
 
         return $validator->rules();
@@ -703,11 +750,11 @@ class Model
     /**
      * Returns an associative array containing values for all the attributes in $attributes
      *
-     * @param array $attributes Array containing attribute names
+     * @param array<string> $attributes Array containing attribute names
      *
-     * @return array A hash containing $name => $value
+     * @return Attributes A hash containing $name => $value
      */
-    public function get_values_for($attributes)
+    public function get_values_for(array $attributes): array
     {
         $ret = [];
 
@@ -735,11 +782,10 @@ class Model
      * delegated or null if not delegated.
      *
      * @param string $name     Name of an attribute
-     * @param array  $delegate An array containing delegate data
+     * @param DelegateOptions  $delegate An array containing delegate data
      *
-     * @return delegated attribute name or null
      */
-    private function is_delegated($name, &$delegate)
+    private function is_delegated(string $name, $delegate): string|null
     {
         if (is_array($delegate)) {
             if ('' != $delegate['prefix']) {
@@ -757,9 +803,8 @@ class Model
     /**
      * Determine if the model is in read-only mode.
      *
-     * @return bool
      */
-    public function is_readonly()
+    public function is_readonly(): bool
     {
         return $this->__readonly;
     }
@@ -767,9 +812,8 @@ class Model
     /**
      * Determine if the model is a new record.
      *
-     * @return bool
      */
-    public function is_new_record()
+    public function is_new_record(): bool
     {
         return $this->__new_record;
     }
@@ -781,7 +825,7 @@ class Model
      *
      * @throws ReadOnlyException
      */
-    private function verify_not_readonly($method_name)
+    private function verify_not_readonly(string $method_name): void
     {
         if ($this->is_readonly()) {
             throw new ReadOnlyException(get_class($this), $method_name);
@@ -793,7 +837,7 @@ class Model
      *
      * @param bool $readonly Set to true to put the model into readonly mode
      */
-    public function readonly($readonly=true)
+    public function readonly(bool $readonly=true): void
     {
         $this->__readonly = $readonly;
     }
@@ -833,18 +877,17 @@ class Model
     /**
      * Creates a model and saves it to the database.
      *
-     * @param array $attributes       Array of the models attributes
+     * @param Attributes $attributes       Array of the models attributes
      * @param bool  $validate         True if the validators should be run
      * @param bool  $guard_attributes Set to true to guard protected/non-accessible attributes
      *
      * @return static
      */
-    public static function create($attributes, $validate=true, $guard_attributes=true)
+    public static function create(array $attributes, bool $validate=true, bool $guard_attributes=true): static
     {
         $class_name = get_called_class();
         $model = new $class_name($attributes, $guard_attributes);
         $model->save($validate);
-
         return $model;
     }
 
@@ -894,21 +937,14 @@ class Model
         $pk = $this->get_primary_key(true);
         $use_sequence = false;
 
-        if ($table->sequence && !isset($attributes[$pk])) {
-            if (($conn = static::connection()) instanceof OciAdapter) {
-                // terrible oracle makes us select the nextval first
-                $attributes[$pk] = $conn->get_next_sequence_value($table->sequence);
-                $table->insert($attributes);
-                $this->attributes[$pk] = $attributes[$pk];
-            } else {
-                // unset pk that was set to null
-                if (array_key_exists($pk, $attributes)) {
-                    unset($attributes[$pk]);
-                }
-
-                $table->insert($attributes, $pk, $table->sequence);
-                $use_sequence = true;
+        if (!empty($table->sequence) && !isset($attributes[$pk])) {
+            // unset pk that was set to null
+            if (array_key_exists($pk, $attributes)) {
+                unset($attributes[$pk]);
             }
+
+            $table->insert($attributes, $pk, $table->sequence);
+            $use_sequence = true;
         } else {
             $table->insert($attributes);
         }
@@ -920,7 +956,7 @@ class Model
         $column = $table->get_column_by_inflected_name($pk);
 
         if ($column->auto_increment || $use_sequence) {
-            $this->attributes[$pk] = $column->cast(static::connection()->insert_id($table->sequence), static::connection());
+            $this->attributes[$pk] = $column->cast(static::connection()->insert_id($table->sequence ?? null), static::connection());
         }
 
         $this->__new_record = false;
@@ -972,10 +1008,10 @@ class Model
      *
      * @protected
      */
-    protected function update_cache()
+    protected function update_cache(): void
     {
         $table = static::table();
-        if ($table->cache_individual_model) {
+        if (!empty($table->cache_individual_model)) {
             Cache::set($this->cache_key(), $this, $table->cache_model_expire);
         }
     }
@@ -1019,22 +1055,16 @@ class Model
      *
      * An options array takes the following parameters:
      *
-     * <ul>
-     * <li><b>conditions:</b> Conditions using a string/hash/array</li>
-     * <li><b>limit:</b> Limit number of records to delete (MySQL & Sqlite only)</li>
-     * <li><b>order:</b> A SQL fragment for ordering such as: 'name asc', 'id desc, name asc' (MySQL & Sqlite only)</li>
-     * </ul>
-     *
-     * @param array $options
+     * @param QueryOptions $options
      *                       return integer Number of rows affected
      */
-    public static function delete_all($options=[])
+    public static function delete_all(array $options=[]): int
     {
         $table = static::table();
         $conn = static::connection();
         $sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
 
-        $conditions = is_array($options) ? $options['conditions'] : $options;
+        $conditions = $options['conditions'] ?? $options;
 
         if (is_array($conditions) && !is_hash($conditions)) {
             call_user_func_array([$sql, 'delete'], $conditions);
@@ -1075,17 +1105,10 @@ class Model
      *
      * An options array takes the following parameters:
      *
-     * <ul>
-     * <li><b>set:</b> String/hash of field names and their values to be updated with
-     * <li><b>conditions:</b> Conditions using a string/hash/array</li>
-     * <li><b>limit:</b> Limit number of records to update (MySQL & Sqlite only)</li>
-     * <li><b>order:</b> A SQL fragment for ordering such as: 'name asc', 'id desc, name asc' (MySQL & Sqlite only)</li>
-     * </ul>
-     *
-     * @param array $options
-     *                       return integer Number of rows affected
+     * @param QueryOptions $options
+     * @return integer Number of rows affected
      */
-    public static function update_all($options=[])
+    public static function update_all(array $options=[]): int
     {
         $table = static::table();
         $conn = static::connection();
@@ -1143,7 +1166,7 @@ class Model
     /**
      * Removes this individual from cache.
      */
-    public function remove_from_cache()
+    public function remove_from_cache(): void
     {
         $table = static::table();
         if ($table->cache_individual_model) {
@@ -1154,9 +1177,9 @@ class Model
     /**
      * Helper that creates an array of values for the primary key(s).
      *
-     * @return array An array in the form array(key_name => value, ...)
+     * @return Attributes
      */
-    public function values_for_pk()
+    public function values_for_pk(): array
     {
         return $this->values_for(static::table()->pk);
     }
@@ -1164,11 +1187,11 @@ class Model
     /**
      * Helper to return a hash of values for the specified attributes.
      *
-     * @param array $attribute_names Array of attribute names
+     * @param array<string> $attribute_names Array of attribute names
      *
-     * @return array An array in the form array(name => value, ...)
+     * @return Attributes An array in the form array(name => value, ...)
      */
-    public function values_for($attribute_names)
+    public function values_for(array $attribute_names): array
     {
         $filter = [];
 
@@ -1182,9 +1205,8 @@ class Model
     /**
      * Validates the model.
      *
-     * @return bool True if passed validators otherwise false
      */
-    private function _validate()
+    private function _validate(): bool
     {
         require_once 'Validations.php';
 
@@ -1198,7 +1220,7 @@ class Model
         }
 
         // need to store reference b4 validating so that custom validators have access to add errors
-        $this->errors = $validator->get_record();
+        $this->errors = $validator->get_errors();
         $validator->validate();
 
         foreach (['after_validation', "after_$validation_on"] as $callback) {
@@ -1215,21 +1237,19 @@ class Model
     /**
      * Returns true if the model has been modified.
      *
-     * @return bool true if modified
      */
-    public function is_dirty()
+    public function is_dirty(): bool
     {
-        return empty($this->__dirty) ? false : true;
+        return !empty($this->__dirty);
     }
 
     /**
-     * Run validations on model and returns whether or not model passed validation.
+     * Run validations on model and returns whether model passed validation.
      *
      * @see is_invalid
      *
-     * @return bool
      */
-    public function is_valid()
+    public function is_valid(): bool
     {
         return $this->_validate();
     }
@@ -1239,9 +1259,8 @@ class Model
      *
      * @see is_valid
      *
-     * @return bool
      */
-    public function is_invalid()
+    public function is_invalid(): bool
     {
         return !$this->_validate();
     }
@@ -1249,7 +1268,7 @@ class Model
     /**
      * Updates a model's timestamps.
      */
-    public function set_timestamps()
+    public function set_timestamps(): void
     {
         $now = date('Y-m-d H:i:s');
 
@@ -1265,11 +1284,11 @@ class Model
     /**
      * Mass update the model with an array of attribute data and saves to the database.
      *
-     * @param array $attributes An attribute data array in the form array(name => value, ...)
+     * @param Attributes $attributes An attribute data array in the form array(name => value, ...)
      *
      * @return bool True if successfully updated and saved otherwise false
      */
-    public function update_attributes($attributes)
+    public function update_attributes(array $attributes): bool
     {
         $this->set_attributes($attributes);
 
@@ -1294,14 +1313,14 @@ class Model
     /**
      * Mass update the model with data from an attributes hash.
      *
-     * Unlike update_attributes() this method only updates the model's data
+     * Unlike update_attributes() this method only stores the model's data in memory
      * but DOES NOT save it to the database.
      *
      * @see update_attributes
      *
-     * @param array $attributes An array containing data to update in the form array(name => value, ...)
+     * @param Attributes $attributes An array containing data to update in the form array(name => value, ...)
      */
-    public function set_attributes(array $attributes)
+    public function set_attributes(array $attributes): void
     {
         $this->set_attributes_via_mass_assignment($attributes, true);
     }
@@ -1309,12 +1328,12 @@ class Model
     /**
      * Passing $guard_attributes as true will throw an exception if an attribute does not exist.
      *
-     * @param array $attributes       An array in the form array(name => value, ...)
-     * @param bool  $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
+     * @param Attributes $attributes       An array in the form array(name => value, ...)
+     * @param bool  $guard_attributes      Whether protected/non-accessible attributes should be guarded
      *
      * @throws UndefinedPropertyException
      */
-    private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
+    private function set_attributes_via_mass_assignment(array &$attributes, bool $guard_attributes): void
     {
         //access uninflected columns since that is what we would have in result set
         $table = static::table();
@@ -1366,24 +1385,25 @@ class Model
      *
      * @internal This should <strong>only</strong> be used by eager load
      *
-     * @param Model $model
-     * @param $name of relationship for this table
      */
-    public function set_relationship_from_eager_load(Model $model=null, $name)
+    public function set_relationship_from_eager_load(Model $model=null, string $name): void
     {
         $table = static::table();
 
         if (($rel = $table->get_relationship($name))) {
             if ($rel->is_poly()) {
-                // if the related model is null and it is a poly then we should have an empty array
+                // if the related model is null and a poly then we should have an empty array
                 if (is_null($model)) {
-                    return $this->__relationships[$name] = [];
+                    $this->__relationships[$name] = [];
+                    return;
                 }
 
-                return $this->__relationships[$name][] = $model;
+                $this->__relationships[$name][] = $model;
+                return;
             }
 
-            return $this->__relationships[$name] = $model;
+            $this->__relationships[$name] = $model;
+            return;
         }
 
         throw new RelationshipException("Relationship named $name has not been declared for class: {$table->class->getName()}");
@@ -1410,14 +1430,11 @@ class Model
     /**
      * Magic Method. Called when cloning a model.
      *
-     * @return Model}
      */
-    public function __clone()
+    public function __clone(): void
     {
         $this->__relationships = [];
         $this->reset_dirty();
-
-        return $this;
     }
 
     /**
@@ -1425,17 +1442,29 @@ class Model
      *
      * @see dirty_attributes
      */
-    public function reset_dirty()
+    public function reset_dirty(): void
     {
-        $this->__dirty = null;
+        $this->__dirty = [];
     }
 
     /**
      * A list of valid finder options.
      *
-     * @var array
+     * @var array<string>
      */
-    public static $VALID_OPTIONS = ['conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having'];
+    public static array $VALID_OPTIONS = [
+        'conditions',
+        'limit',
+        'offset',
+        'order',
+        'select',
+        'joins',
+        'include',
+        'readonly',
+        'group',
+        'from',
+        'having'
+    ];
 
     /**
      * Enables the use of dynamic finders.
@@ -1470,16 +1499,16 @@ class Model
      * Person::find_or_create_by_name_and_id(array('name' => 'Tito', 'id' => 1));
      * ```
      *
-     * @param string $method Name of method
-     * @param mixed  $args   Method args
+     * @param $method Name of method
+     * @param $args   Method args
      *
-     * @throws {@link ActiveRecordException} if invalid query
+     * @throws ActiveRecordException
      *
-     * @return Model
+     * @return Model|null|int|Model[]
      *
      * @see find
      */
-    public static function __callStatic($method, $args)
+    public static function __callStatic(string $method, mixed $args)
     {
         $options = static::extract_and_validate_options($args);
         $create = false;
@@ -1541,8 +1570,7 @@ class Model
                 ($association = $table->get_relationship(($association_name = Utils::pluralize($association_name))))) {
                 // access association to ensure that the relationship has been loaded
                 // so that we do not double-up on records if we append a newly created
-                $this->$association_name;
-
+                $this->initRelationships($association_name);
                 return $association->$method($this, $args);
             }
         }
@@ -1591,7 +1619,8 @@ class Model
         $sql = $table->options_to_sql($options);
         $values = $sql->get_where_values();
 
-        return static::connection()->query_and_fetch_one($sql->to_s(), $values);
+        $res = static::connection()->query_and_fetch_one($sql->to_s(), $values);
+        return $res;
     }
 
     /**
@@ -1684,7 +1713,7 @@ class Model
      * <li><b>group:</b> A SQL group by fragment</li>
      * </ul>
      *
-     * @throws {@link RecordNotFound} if no options are passed or finding by pk and no records matched
+     * @throws RecordNotFound if no options are passed or finding by pk and no records matched
      *
      * @return static|static[]|null
      *
@@ -1766,11 +1795,11 @@ class Model
     /**
      * Will look up a list of primary keys from cache
      *
-     * @param array $pks An array of primary keys
+     * @param array<PrimaryKey> $pks An array of primary keys
      *
-     * @return array
+     * @return array<Model>
      */
-    protected static function get_models_from_cache(array $pks)
+    protected static function get_models_from_cache(array $pks): ?array
     {
         $models = [];
         $table = static::table();
@@ -1792,14 +1821,14 @@ class Model
      *
      * @see find
      *
-     * @param array $values  An array containing values for the pk
-     * @param array $options An options array
+     * @param PrimaryKey $values  An array containing values for the pk
+     * @param array<mixed> $options An options array
      *
-     * @throws {@link RecordNotFound} if a record could not be found
+     * @throws RecordNotFound if a record could not be found
      *
-     * @return static|static[]
+     * @return Model|Model[]
      */
-    public static function find_by_pk($values, $options, $forceArray = false)
+    public static function find_by_pk(array|string|int|null $values, array $options, bool $forceArray = false): Model|array
     {
         $single = !is_array($values) && !$forceArray;
         if (null===$values) {
@@ -1808,7 +1837,7 @@ class Model
 
         $table = static::table();
 
-        if ($table->cache_individual_model) {
+        if ($table->cache_individual_model ?? false) {
             $pks = is_array($values) ? $values : [$values];
             $list = static::get_models_from_cache($pks);
         } else {
@@ -1842,11 +1871,11 @@ class Model
      * ```
      *
      * @param string $sql    The raw SELECT query
-     * @param array  $values An array of values for any parameters that needs to be bound
+     * @param array<mixed>  $values An array of values for any parameters that needs to be bound
      *
-     * @return static[] An array of models
+     * @return array<Model> An array of models
      */
-    public static function find_by_sql($sql, $values=null)
+    public static function find_by_sql(string $sql, array $values=null): array
     {
         return static::table()->find_by_sql($sql, $values, true);
     }
@@ -1855,11 +1884,10 @@ class Model
      * Helper method to run arbitrary queries against the model's database connection.
      *
      * @param string $sql    SQL to execute
-     * @param array  $values Bind values, if any, for the query
+     * @param array<mixed>  $values Bind values, if any, for the query
      *
-     * @return object A PDOStatement object
      */
-    public static function query($sql, $values=null)
+    public static function query(string $sql, array $values=[]): \PDOStatement
     {
         return static::connection()->query($sql, $values);
     }
@@ -1867,17 +1895,16 @@ class Model
     /**
      * Determines if the specified array is a valid ActiveRecord options array.
      *
-     * @param array $array An options array
+     * @param mixed $options An options array
      * @param bool  $throw True to throw an exception if not valid
      *
-     * @throws {@link ActiveRecordException} if the array contained any invalid options
+     * @throws ActiveRecordException if the array contained any invalid options
      *
-     * @return bool True if valid otherwise valse
      */
-    public static function is_options_hash($array, $throw=true)
+    public static function is_options_hash(mixed $options, bool $throw=true): bool
     {
-        if (is_hash($array)) {
-            $keys = array_keys($array);
+        if (is_hash($options)) {
+            $keys = array_keys($options);
             $diff = array_diff($keys, self::$VALID_OPTIONS);
 
             if (!empty($diff) && $throw) {
@@ -1896,13 +1923,11 @@ class Model
     /**
      * Returns a hash containing the names => values of the primary key.
      *
-     * @internal this needs to eventually support composite keys
+     * @param int|array<number|string> $args Primary key value(s)
      *
-     * @param mixed $args Primary key value(s)
-     *
-     * @return array An array in the form array(name => value, ...)
+     * @return array<string, mixed>
      */
-    public static function pk_conditions($args)
+    public static function pk_conditions(int|array $args): array
     {
         $table = static::table();
         $ret = [$table->pk[0] => $args];
@@ -1913,41 +1938,38 @@ class Model
     /**
      * Pulls out the options hash from $array if any.
      *
-     * @internal dO NOT remove the reference on $array
+     * @param array<mixed> &$options An array
      *
-     * @param array &$array An array
+     * @return array<string,mixed> A valid options array
      *
-     * @return array A valid options array
+     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
      */
-    public static function extract_and_validate_options(array &$array)
+    public static function extract_and_validate_options(array &$options): array
     {
-        $options = [];
-
-        if ($array) {
-            $last = &$array[count($array)-1];
+        $res = [];
+        if ($options) {
+            $last = &$options[count($options)-1];
 
             try {
                 if (self::is_options_hash($last)) {
-                    array_pop($array);
-                    $options = $last;
+                    array_pop($options);
+                    $res = $last;
                 }
             } catch (ActiveRecordException $e) {
                 if (!is_hash($last)) {
                     throw $e;
                 }
-                $options = ['conditions' => $last];
+                $res = ['conditions' => $last];
             }
         }
 
-        return $options;
+        return $res;
     }
 
     /**
      * Returns a JSON representation of this model.
      *
-     * @see Serialization
-     *
-     * @param array $options An array containing options for json serialization (see {@link Serialization} for valid options)
+     * @param SerializeOptions $options
      *
      * @return string JSON representation of the model
      */
@@ -1961,7 +1983,7 @@ class Model
      *
      * @see Serialization
      *
-     * @param array $options An array containing options for xml serialization (see {@link Serialization} for valid options)
+     * @param SerializeOptions $options An array containing options for xml serialization (see {@link Serialization} for valid options)
      *
      * @return string XML representation of the model
      */
@@ -1979,20 +2001,18 @@ class Model
      * ```
      * ActiveRecord\CsvSerializer::$delimiter=';';
      * ActiveRecord\CsvSerializer::$enclosure='';
-     * YourModel::find('first')->to_csv(array('only'=>array('name','level')));
+     * YourModel::find('first')->to_csv(['only'=>['name','level']]);
      * returns: Joe,2
      *
-     * YourModel::find('first')->to_csv(array('only_header'=>true,'only'=>array('name','level')));
+     * YourModel::find('first')->to_csv(['only_header'=>true,'only' => ['name','level']]);
      * returns: name,level
      * ```
      *
-     * @see Serialization
-     *
-     * @param array $options An array containing options for csv serialization (see {@link Serialization} for valid options)
+     * @param SerializeOptions $options An array containing options for csv serialization.
      *
      * @return string CSV representation of the model
      */
-    public function to_csv(array $options=[])
+    public function to_csv(array $options=[]): string
     {
         return $this->serialize('Csv', $options);
     }
@@ -2002,11 +2022,11 @@ class Model
      *
      * @see Serialization
      *
-     * @param array $options An array containing options for json serialization (see {@link Serialization} for valid options)
+     * @param SerializeOptions $options
      *
-     * @return array Array representation of the model
+     * @return Attributes|array<class-string|Attributes> Array representation of the model
      */
-    public function to_array(array $options=[])
+    public function to_array(array $options=[]): array
     {
         $serializer = new JsonSerializer($this, $options);
         return !empty($options['include_root']) ? array(strtolower(get_class($this)) => $serializer->to_a()) : $serializer->to_a();
@@ -2015,22 +2035,11 @@ class Model
     /**
      * Creates a serializer based on pre-defined to_serializer()
      *
-     * An options array can take the following parameters:
-     *
-     * <ul>
-     * <li><b>only:</b> a string or array of attributes to be included.</li>
-     * <li><b>excluded:</b> a string or array of attributes to be excluded.</li>
-     * <li><b>methods:</b> a string or array of methods to invoke. The method's name will be used as a key for the final attributes array
-     * along with the method's returned value</li>
-     * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
-     * </ul>
-     *
      * @param string $type    Either Xml, Json, Csv or Array
-     * @param array  $options Options array for the serializer
+     * @param SerializeOptions $options Options array for the serializer
      *
-     * @return string Serialized representation of the model
      */
-    private function serialize($type, $options)
+    private function serialize(string $type, array $options): string
     {
         $class = "ActiveRecord\\Serialize\\" . $type . "Serializer";
         $serializer = new $class($this, $options);

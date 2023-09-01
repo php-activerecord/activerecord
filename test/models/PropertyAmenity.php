@@ -4,10 +4,10 @@ namespace test\models;
 use ActiveRecord\Model;
 class PropertyAmenity extends Model
 {
-    public static $table_name = 'property_amenities';
-    public static $primary_key = 'id';
+    public static string $table_name = 'property_amenities';
+    public static string $primary_key = 'id';
 
-    public static $belongs_to = [
+    public static array $belongs_to = [
         'amenity',
         'property'
     ];
