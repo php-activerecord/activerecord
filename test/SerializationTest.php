@@ -68,7 +68,7 @@ class SerializationTest extends DatabaseTestCase
         $this->assertEquals('ANCIENT ART OF MAIN TANKING', $a['upper_name']);
     }
 
-    // methods added last should we shuld have value of the method in our json
+    // methods added last should have value of the method in our json
     // rather than the regular attribute value
     public function test_methods_method_same_as_attribute()
     {
@@ -173,13 +173,13 @@ class SerializationTest extends DatabaseTestCase
     public function test_to_csv()
     {
         $book = Book::find(1);
-        $this->assertEquals('1,1,2,"Ancient Art of Main Tanking",0,0', $book->to_csv());
+        $this->assertEquals('1,1,2,"Ancient Art of Main Tanking","Random House",0,0', $book->to_csv());
     }
 
     public function test_to_csv_only_header()
     {
         $book = Book::find(1);
-        $this->assertEquals('book_id,author_id,secondary_author_id,name,numeric_test,special',
+        $this->assertEquals('book_id,author_id,secondary_author_id,name,publisher,numeric_test,special',
                          $book->to_csv(['only_header'=>true])
                          );
     }
@@ -205,7 +205,7 @@ class SerializationTest extends DatabaseTestCase
     {
         $book = Book::find(1);
         CsvSerializer::$delimiter=';';
-        $this->assertEquals('1;1;2;"Ancient Art of Main Tanking";0;0', $book->to_csv());
+        $this->assertEquals('1;1;2;"Ancient Art of Main Tanking";"Random House";0;0', $book->to_csv());
     }
 
     public function test_to_csv_with_custom_enclosure()
@@ -213,6 +213,6 @@ class SerializationTest extends DatabaseTestCase
         $book = Book::find(1);
         CsvSerializer::$delimiter=',';
         CsvSerializer::$enclosure="'";
-        $this->assertEquals("1,1,2,'Ancient Art of Main Tanking',0,0", $book->to_csv());
+        $this->assertEquals("1,1,2,'Ancient Art of Main Tanking','Random House',0,0", $book->to_csv());
     }
 }
