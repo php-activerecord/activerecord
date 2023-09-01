@@ -9,10 +9,8 @@ use ActiveRecord\Column;
 use ActiveRecord\Connection;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ConnectionException;
-use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Inflector;
 use ActiveRecord\Utils;
-use PDO;
 
 /**
  * Adapter for SQLite.
@@ -28,12 +26,13 @@ class SqliteAdapter extends Connection
         if (!file_exists($info->host)) {
             throw new ConnectionException("Could not find sqlite db: $info->host");
         }
-        $this->connection = new PDO("sqlite:$info->host", null, null, static::$PDO_OPTIONS);
+        $this->connection = new \PDO("sqlite:$info->host", null, null, static::$PDO_OPTIONS);
     }
 
     public function limit(string $sql, int $offset = 0, int $limit = 0)
     {
-        $offset = $offset == 0 ? '' : $offset . ',';
+        $offset = 0 == $offset ? '' : $offset . ',';
+
         return "$sql LIMIT {$offset}$limit";
     }
 
@@ -55,16 +54,16 @@ class SqliteAdapter extends Connection
         $c->nullable        = $column['notnull'] ? false : true;
         $c->pk              = $column['pk'] ? true : false;
         $c->auto_increment  = in_array(
-                strtoupper($column['type']),
-                ['INT', 'INTEGER']
-            ) && $c->pk;
+            strtoupper($column['type']),
+            ['INT', 'INTEGER']
+        ) && $c->pk;
 
         $column['type'] = preg_replace('/ +/', ' ', $column['type']);
         $column['type'] = str_replace(['(', ')'], ' ', $column['type']);
         $column['type'] = Utils::squeeze(' ', $column['type']);
         $matches = explode(' ', $column['type']);
 
-        /** @phpstan-ignore-next-line */
+        /* @phpstan-ignore-next-line */
         if (count($matches) > 0) {
             $c->raw_type = strtolower($matches[0]);
 

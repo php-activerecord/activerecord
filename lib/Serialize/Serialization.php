@@ -41,6 +41,7 @@ use ActiveRecord\Types;
  * ```
  *
  * @phpstan-import-type Attributes from Types
+ *
  * @see http://www.phpactiverecord.org/guides/utilities#topic-serialization
  */
 abstract class Serialization
@@ -93,15 +94,13 @@ abstract class Serialization
      *   )
      * );
      * ```
-     *
-     * @var bool
      */
     protected bool $includes_with_class_name_element = false;
 
     /**
      * Constructs a {@link Serialization} object.
      *
-     * @param Model $model    The model to serialize
+     * @param Model            $model   The model to serialize
      * @param SerializeOptions $options Options for serialization
      */
     public function __construct(Model $model, $options)
@@ -199,7 +198,7 @@ abstract class Serialization
                         $this->attributes[$association] = $includes;
                     }
                 } catch (UndefinedPropertyException $e) {
-                    //move along
+                    // move along
                 }
             }
         }
@@ -233,8 +232,6 @@ abstract class Serialization
      * Returns the serialized object as a string.
      *
      * @see to_s
-     *
-     * @return string
      */
     final public function __toString(): string
     {
@@ -243,7 +240,6 @@ abstract class Serialization
 
     /**
      * Performs the serialization.
-     *
      */
     abstract public function to_s(): string;
 }

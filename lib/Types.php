@@ -1,6 +1,7 @@
 <?php
 
 namespace ActiveRecord;
+
 /**
  * @phpstan-type Attributes array<string,mixed>
  * @phpstan-type PrimaryKey array<int|string>|string|int|null
@@ -16,6 +17,6 @@ namespace ActiveRecord;
  *  delegate?: array<string>
  * }
  */
-abstract class Types {
-
+abstract class Types
+{
 }

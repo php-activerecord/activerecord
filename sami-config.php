@@ -2,14 +2,14 @@
 
 use Sami\Sami;
 
-//use Sami\Version\GitVersionCollection;
+// use Sami\Version\GitVersionCollection;
 
-//$versions = GitVersionCollection::create('lib')
+// $versions = GitVersionCollection::create('lib')
 //    ->addFromTags('v1.0')
 //    ->add('master', 'master branch')
-//;
+// ;
 
-//return new Sami('lib', [
+// return new Sami('lib', [
 //    'title' => 'php-activerecord API',
 //    'theme' => 'php-ar',
 //    'versions' => $versions,
@@ -18,7 +18,7 @@ use Sami\Sami;
 //    'template_dirs' => [
 //        'docs/sami/themes'
 //    ]
-//]);
+// ]);
 
 // for local dev
 

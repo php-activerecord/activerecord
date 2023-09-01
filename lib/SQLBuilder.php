@@ -67,8 +67,6 @@ class SQLBuilder
 
     /**
      * Returns the SQL string.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -79,8 +77,6 @@ class SQLBuilder
      * Returns the SQL string.
      *
      * @see __toString
-     *
-     * @return string
      */
     public function to_s(): string
     {
@@ -169,6 +165,7 @@ class SQLBuilder
 
     /**
      * @param string|array<string> $joins
+     *
      * @return $this
      */
     public function joins(string|array $joins): static
@@ -180,12 +177,12 @@ class SQLBuilder
 
     /**
      * @param Attributes $hash
-     * @param mixed $pk
-     * @param string|null $sequence_name
-     * @return $this
+     *
      * @throws ActiveRecordException
+     *
+     * @return $this
      */
-    public function insert(array $hash, mixed $pk=null, string $sequence_name=null): static
+    public function insert(array $hash, mixed $pk = null, string $sequence_name = null): static
     {
         if (!is_hash($hash)) {
             throw new ActiveRecordException('Inserting requires a hash.');
@@ -202,6 +199,7 @@ class SQLBuilder
 
     /**
      * @param array<string,string>|string $mixed
+     *
      * @throws ActiveRecordException
      */
     public function update(array|string $mixed): static
@@ -238,7 +236,7 @@ class SQLBuilder
 
         $parts = explode(',', $order);
 
-        for ($i=0, $n=count($parts); $i<$n; ++$i) {
+        for ($i = 0, $n = count($parts); $i < $n; ++$i) {
             $v = strtolower($parts[$i]);
 
             if (false !== strpos($v, ' asc')) {
@@ -256,15 +254,14 @@ class SQLBuilder
     /**
      * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...).
      *
-     * @param Connection $connection
-     * @param string $name Underscored string
-     * @param array<mixed> $values Array of values for the field names. This is used
-     *   to determine what kind of bind marker to use: =?, IN(?), IS NULL
-     * @param array<string,string> $map A hash of "mapped_column_name" => "real_column_name"
+     * @param string               $name   Underscored string
+     * @param array<mixed>         $values Array of values for the field names. This is used
+     *                                     to determine what kind of bind marker to use: =?, IN(?), IS NULL
+     * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
      *
      * @return array<mixed>
      */
-    public static function create_conditions_from_underscored_string(Connection $connection, ?string $name, array $values=[], array $map=[]): ?array
+    public static function create_conditions_from_underscored_string(Connection $connection, ?string $name, array $values = [], array $map = []): ?array
     {
         if (!$name) {
             return null;
@@ -274,9 +271,9 @@ class SQLBuilder
         $num_values = count((array) $values);
         $conditions = [''];
 
-        for ($i=0, $j=0, $n=count($parts); $i<$n; $i+=2, ++$j) {
+        for ($i = 0, $j = 0, $n = count($parts); $i < $n; $i += 2, ++$j) {
             if ($i >= 2) {
-                $res = preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i-1]);
+                $res = preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i - 1]);
                 assert(is_string($res));
                 $conditions[0] .= $res;
             }
@@ -304,19 +301,19 @@ class SQLBuilder
     /**
      * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
      *
-     * @param string $name   A string containing attribute names connected with _and_ or _or_
-     * @param array<mixed>  $values Array of values for each attribute in $name
-     * @param array<string,string> $map A hash of "mapped_column_name" => "real_column_name"
+     * @param string               $name   A string containing attribute names connected with _and_ or _or_
+     * @param array<mixed>         $values Array of values for each attribute in $name
+     * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
      *
      * @return array<string,mixed> A hash of array(name => value, ...)
      */
-    public static function create_hash_from_underscored_string(string $name, array $values=[], array &$map=[])
+    public static function create_hash_from_underscored_string(string $name, array $values = [], array &$map = [])
     {
         $parts = preg_split('/(_and_|_or_)/i', $name);
         assert(is_array($parts));
         $hash = [];
 
-        for ($i=0, $n=count($parts); $i<$n; ++$i) {
+        for ($i = 0, $n = count($parts); $i < $n; ++$i) {
             // map to correct name if $map was supplied
             $name = $map[$parts[$i]] ?? $parts[$i];
             assert(is_string($name));
@@ -334,7 +331,7 @@ class SQLBuilder
      *
      * @return array<string,string> $new
      */
-    private function prepend_table_name_to_fields(array $hash=[])
+    private function prepend_table_name_to_fields(array $hash = [])
     {
         $new = [];
         $table = $this->connection->quote_name($this->table);
@@ -349,6 +346,7 @@ class SQLBuilder
 
     /**
      * @param array<string|array<string,mixed>> $args
+     *
      * @throws Exception\ExpressionsException
      */
     private function apply_where_conditions(array $args): void

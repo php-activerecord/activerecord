@@ -30,7 +30,9 @@ use ActiveRecord\Table;
  *   );
  * }
  * ```
+ *
  * @phpstan-import-type Attributes from Model
+ *
  * @see valid_association_options
  * @see http://www.phpactiverecord.org/guides/associations
  */
@@ -46,8 +48,10 @@ class BelongsTo extends AbstractRelationship
     /**
      * @return array<string>
      */
-    public function primary_key(): array {
+    public function primary_key(): array
+    {
         $this->primary_key ??= [Table::load($this->class_name)->pk[0]];
+
         return $this->primary_key;
     }
 
@@ -59,7 +63,7 @@ class BelongsTo extends AbstractRelationship
             $this->set_inferred_class_name();
         }
 
-        //infer from class_name
+        // infer from class_name
         if (!$this->foreign_key) {
             $this->foreign_key = [Inflector::instance()->keyify($this->class_name)];
         }
@@ -86,11 +90,9 @@ class BelongsTo extends AbstractRelationship
     }
 
     /**
-     * @param array<Model> $models
+     * @param array<Model>      $models
      * @param array<Attributes> $attributes
-     * @param array<mixed> $includes
-     * @param Table $table
-     * @return void
+     * @param array<mixed>      $includes
      */
     public function load_eagerly(array $models, array $attributes, array $includes, Table $table): void
     {

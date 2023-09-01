@@ -34,9 +34,6 @@
 
 namespace ActiveRecord;
 
-use ActiveRecord\Exception\ValidationsArgumentError;
-use Closure;
-
 function classify(string $class_name, bool $singular = false): string
 {
     if ($singular) {
@@ -50,6 +47,7 @@ function classify(string $class_name, bool $singular = false): string
 
 /**
  * @param array<mixed> $array
+ *
  * @return array<mixed>
  *
  * http://snippets.dzone.com/posts/show/4660
@@ -79,7 +77,6 @@ function is_hash(mixed &$array): bool
 
 /**
  * Strips a class name of any namespaces and namespace operator.
- *
  */
 function denamespace(string $class_name): string
 {
@@ -92,14 +89,14 @@ function denamespace(string $class_name): string
     return $class_name;
 }
 
-//function get_namespaces($class_name)
-//{
+// function get_namespaces($class_name)
+// {
 //    if (has_namespace($class_name)) {
 //        return explode('\\', $class_name);
 //    }
 //
 //    return null;
-//}
+// }
 
 function has_namespace(string $class_name): bool
 {
@@ -114,9 +111,7 @@ function has_absolute_namespace(string $class_name): bool
 /**
  * Returns true if all values in $haystack === $needle
  *
- * @param mixed $needle
  * @param array<mixed> $haystack
- *
  */
 function all(mixed $needle, array $haystack): bool
 {
@@ -131,16 +126,16 @@ function all(mixed $needle, array $haystack): bool
 
 /**
  * @param array<mixed> $enumerable
- * @param string|Closure $name_or_closure
+ *
  * @return array<mixed>
  */
-function collect(array &$enumerable, string|Closure $name_or_closure): array
+function collect(array &$enumerable, string|\Closure $name_or_closure): array
 {
     $ret = [];
     foreach ($enumerable as $value) {
         if (is_string($name_or_closure)) {
             $ret[] = is_array($value) ? $value[$name_or_closure] : $value->$name_or_closure;
-        } elseif ($name_or_closure instanceof Closure) {
+        } elseif ($name_or_closure instanceof \Closure) {
             $ret[] = $name_or_closure($value);
         }
     }
@@ -178,9 +173,9 @@ function wrap_values_in_arrays(mixed &$strings): array
 class Utils
 {
     /**
-     * @param array<string> $conditions
+     * @param array<string>       $conditions
      * @param string|array<mixed> $condition
-     * @param string $conjuction
+     *
      * @return array<mixed>
      */
     public static function add_condition(array &$conditions, string|array $condition, string $conjuction = 'AND'): array
@@ -210,7 +205,7 @@ class Utils
 
     public static function is_odd(int|float $number): bool
     {
-        return !!((int)$number & 1);
+        return (bool) ((int) $number & 1);
     }
 
     public static function is_blank(string|null $var): bool
@@ -233,7 +228,7 @@ class Utils
         '/(shea|lea|loa|thie)f$/i' => '$1ves',
         '/sis$/i'                  => 'ses',
         '/([ti])um$/i'             => '$1a',
-        '/(tomat|potat|ech|her|vet)o$/i'=> '$1oes',
+        '/(tomat|potat|ech|her|vet)o$/i' => '$1oes',
         '/(bu)s$/i'                => '$1ses',
         '/(alias)$/i'              => '$1es',
         '/(octop)us$/i'            => '$1i',
@@ -266,7 +261,7 @@ class Utils
         '/(tive)s$/i'               => '$1',
         '/(hive)s$/i'               => '$1',
         '/(li|wi|kni)ves$/i'        => '$1fe',
-        '/(shea|loa|lea|thie)ves$/i'=> '$1f',
+        '/(shea|loa|lea|thie)ves$/i' => '$1f',
         '/(^analy)ses$/i'           => '$1sis',
         '/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$/i'  => '$1$2sis',
         '/([ti])a$/i'               => '$1um',
@@ -321,6 +316,7 @@ class Utils
             if (preg_match($pattern, $string)) {
                 $res = preg_replace($pattern, $result, $string);
                 assert(is_string($res));
+
                 return $res;
             }
         }
@@ -330,6 +326,7 @@ class Utils
             if (preg_match($pattern, $string)) {
                 $res = preg_replace($pattern, $result, $string);
                 assert(is_string($res));
+
                 return $res;
             }
         }
@@ -351,6 +348,7 @@ class Utils
             if (preg_match($pattern, $string)) {
                 $res = preg_replace($pattern, $result, $string);
                 assert(is_string($res));
+
                 return $res;
             }
         }
@@ -360,6 +358,7 @@ class Utils
             if (preg_match($pattern, $string)) {
                 $res = preg_replace($pattern, $result, $string);
                 assert(is_string($res));
+
                 return $res;
             }
         }
@@ -368,9 +367,7 @@ class Utils
     }
 
     /**
-     * @param string $char
-     * @param string $string
-     * @return null|string|string[]
+     * @return string|string[]|null
      */
     public static function squeeze(string $char, string $string): mixed
     {

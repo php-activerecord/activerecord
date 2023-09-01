@@ -19,7 +19,7 @@ use ActiveRecord\Exception\ExpressionsException;
  */
 class Expressions
 {
-    const ParameterMarker = '?';
+    public const ParameterMarker = '?';
 
     private string $expressions;
 
@@ -30,10 +30,9 @@ class Expressions
     private Connection|null $connection;
 
     /**
-     * @param $connection
      * @param string|array<mixed>|null $expressions
      */
-    public function __construct(Connection|null $connection, string|array $expressions=null)
+    public function __construct(Connection|null $connection, string|array $expressions = null)
     {
         $values = null;
         $this->connection = $connection;
@@ -62,7 +61,7 @@ class Expressions
         if ($parameter_number <= 0) {
             throw new ExpressionsException("Invalid parameter index: $parameter_number");
         }
-        $this->values[$parameter_number-1] = $value;
+        $this->values[$parameter_number - 1] = $value;
     }
 
     /**
@@ -103,31 +102,30 @@ class Expressions
     }
 
     /**
-     * @param bool $substitute
      * @param array{
      *   values?: array<mixed>
      * } $options
-     * @return string
+     *
      * @throws ExpressionsException
      */
-    public function to_s(bool $substitute=false, array $options=[]): string
+    public function to_s(bool $substitute = false, array $options = []): string
     {
         $values = $options['values'] ?? $this->values;
         $ret = '';
         $num_values = count($values);
         $quotes = 0;
 
-        for ($i=0, $n=strlen($this->expressions), $j=0; $i<$n; ++$i) {
+        for ($i = 0, $n = strlen($this->expressions), $j = 0; $i < $n; ++$i) {
             $ch = $this->expressions[$i];
 
             if (self::ParameterMarker == $ch) {
                 if (0 == $quotes % 2) {
-                    if ($j > $num_values-1) {
+                    if ($j > $num_values - 1) {
                         throw new ExpressionsException("No bound parameter for index $j");
                     }
                     $ch = $this->substitute($values, $substitute, $i, $j++);
                 }
-            } elseif ('\'' == $ch && $i > 0 && '\\' != $this->expressions[$i-1]) {
+            } elseif ('\'' == $ch && $i > 0 && '\\' != $this->expressions[$i - 1]) {
                 ++$quotes;
             }
 
@@ -139,7 +137,6 @@ class Expressions
 
     /**
      * @param Attributes $hash
-     * @param string $glue
      *
      * @return array<mixed>
      */
@@ -168,9 +165,7 @@ class Expressions
 
     /**
      * @param array<mixed> $values
-     * @param bool $substitute
-     * @param int $pos
-     * @param int $parameter_index
+     *
      * @return mixed|string
      */
     private function substitute(array $values, bool $substitute, int $pos, int $parameter_index)
@@ -191,7 +186,7 @@ class Expressions
             if ($substitute) {
                 $ret = '';
 
-                for ($i=0, $n=$value_count; $i<$n; ++$i) {
+                for ($i = 0, $n = $value_count; $i < $n; ++$i) {
                     $ret .= ($i > 0 ? ',' : '') . $this->stringify_value($value[$i]);
                 }
 

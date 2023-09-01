@@ -18,7 +18,7 @@ class Reflections extends Singleton
     /**
      * Current reflections.
      *
-     * @var array<string, ReflectionClass<Model>>
+     * @var array<string, \ReflectionClass<Model>>
      */
     private $reflections = [];
 
@@ -29,12 +29,12 @@ class Reflections extends Singleton
      *
      * @return Reflections $this so you can chain calls like Reflections::instance()->add('class')->get()
      */
-    public function add(string $class=null): Reflections
+    public function add(string $class = null): Reflections
     {
         $class = $this->get_class($class);
 
         if (!isset($this->reflections[$class])) {
-            $this->reflections[$class] = new ReflectionClass($class);
+            $this->reflections[$class] = new \ReflectionClass($class);
         }
 
         return $this;
@@ -79,7 +79,7 @@ class Reflections extends Singleton
      *
      * @return string
      */
-    private function get_class(string|object $class=null)
+    private function get_class(string|object $class = null)
     {
         if (is_object($class)) {
             return get_class($class);

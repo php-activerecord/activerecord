@@ -1,28 +1,28 @@
 <?php
+
 $finder = new PhpCsFixer\Finder();
 $config = new PhpCsFixer\Config('json-schema', 'json-schema style guide');
-$finder->in(__DIR__);
-/* Based on ^2.1 of php-cs-fixer */
+$finder->in(__DIR__ . '/lib');
+
 $config
-    ->setRules(array(
+    ->setRules([
         // default
         '@PSR2' => true,
         '@Symfony' => true,
         // additionally
-        'array_syntax' => array('syntax' => 'short'),
+        'array_syntax' => ['syntax' => 'short'],
         'binary_operator_spaces' => false,
-        'concat_space' => array('spacing' => 'one'),
-        'no_unused_imports' => false,
+        'concat_space' => ['spacing' => 'one'],
+        'no_unused_imports' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
         'ordered_imports' => true,
         'phpdoc_no_package' => false,
         'phpdoc_order' => true,
         'phpdoc_summary' => false,
-        'pre_increment' => false,
-        'trailing_comma_in_multiline_array' => false,
+        'trailing_comma_in_multiline' => false,
         'simplified_null_return' => false,
-    ))
-    ->setFinder($finder)
-;
+    ])
+    ->setFinder($finder);
+
 return $config;

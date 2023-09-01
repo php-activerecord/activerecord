@@ -33,7 +33,7 @@ class ConnectionManager extends Singleton
         $config = Config::instance();
         $name = $name ?? $config->get_default_connection();
 
-        if (!isset(self::$connections[$name]) || !self::$connections[$name]->connection) {
+        if (!isset(self::$connections[$name]->connection)) {
             self::$connections[$name] = Connection::instance($config->get_connection($name));
         }
 
