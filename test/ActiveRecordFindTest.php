@@ -5,16 +5,10 @@ use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Model;
-use ActiveRecord\PhpStan\FindDynamicMethodReturnTypeReflection;
-use PHPStan\Command\AnalyseCommand;
-use shmax\Environment;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
 use test\models\Author;
 use test\models\HonestLawyer;
 use test\models\JoinBook;
 use test\models\Venue;
-use function PHPStan\dumpType;
 
 class ActiveRecordFindTest extends DatabaseTestCase
 {
@@ -22,43 +16,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
     {
         $this->expectException(RecordNotFound::class);
         Author::find();
-    }
-
-    public function test_phpstan()
-    {
-        $res = dumpType(1);
-//        $version = "Version unknown";
-//        try {
-//            $version = \Jean85\PrettyVersions::getVersion(
-//                "phpstan/phpstan"
-//            )->getPrettyVersion();
-//        } catch (\OutOfBoundsException $e) {
-//        }
-//
-//        $application = new _PHPStan_a4fa95a42\Symfony\Component\Console\Application(
-//            "PHPStan - PHP Static Analysis Tool",
-//            $version
-//        );
-//        $application->setAutoExit(false);
-//        $application->add(new AnalyseCommand([]));
-//        //				$application->add(new DumpDependenciesCommand());
-//        try {
-//            $res = $application->run(
-//                new \_PHPStan_a4fa95a42\Symfony\Component\Console\Input\ArgvInput(
-//                    [
-//                        "vendor/phpstan/phpstan/bin/phpstan",
-//                        "analyse",
-//                        "--xdebug",
-//                        "--debug",
-//                        "-c",
-//                        "d:/repos/shmax/activerecord/phpstan.neon.dist",
-//                        "d:/repos/shmax/activerecord/test/phpstan/PhpStanReflectionTests.php",
-//                    ]
-//                )
-//            );
-//        } catch (\Throwable $e) {
-//            xdebug_break();
-//        }
     }
 
     public function test_find_returns_single_model() {
