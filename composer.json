@@ -29,7 +29,10 @@
 	"scripts": {
 		"style-check" : "php vendor/bin/php-cs-fixer fix --dry-run --verbose --diff",
 		"style-fix" : "php vendor/bin/php-cs-fixer fix --verbose",
-		"test": "phpunit",
+    "test": [
+      "Composer\\Config::disableProcessTimeout",
+      "phpunit"
+    ],
     "stan": "phpstan analyse --ansi --memory-limit 256M"
   }
 }
