@@ -1497,11 +1497,9 @@ class Model
      *
      * @throws ActiveRecordException
      *
-     * @return Model|int|Model[]|null
-     *
      * @see find
      */
-    public static function __callStatic(string $method, mixed $args)
+    public static function __callStatic(string $method, mixed $args): mixed
     {
         $options = static::extract_and_validate_options($args);
         $create = false;
@@ -1679,18 +1677,18 @@ class Model
      * Finding by using a conditions array:
      *
      * ```
-     * YourModel::find('first', array('conditions' => array('name=?','Tito'),
-     *   'order' => 'name asc'))
-     * YourModel::find('all', array('conditions' => 'amount > 3.14159265'));
-     * YourModel::find('all', array('conditions' => array('id in(?)', array(1,2,3))));
+     * YourModel::find('first', ['conditions' => ['name=?','Tito']],
+     *   'order' => 'name asc'])
+     * YourModel::find('all', ['conditions' => 'amount > 3.14159265']);
+     * YourModel::find('all', ['conditions' => ['id in(?)', [1,2,3]]]);
      * ```
      *
      * Finding by using a hash:
      *
      * ```
-     * YourModel::find(array('name' => 'Tito', 'id' => 1));
-     * YourModel::find('first',array('name' => 'Tito', 'id' => 1));
-     * YourModel::find('all',array('name' => 'Tito', 'id' => 1));
+     * YourModel::find(['name' => 'Tito', 'id' => 1]);
+     * YourModel::find('first',['name' => 'Tito', 'id' => 1]);
+     * YourModel::find('all',['name' => 'Tito', 'id' => 1]);
      * ```
      *
      * An options array can take the following parameters:
