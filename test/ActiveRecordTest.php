@@ -399,8 +399,8 @@ class ActiveRecordTest extends DatabaseTestCase
     public function test_delegate_set_attribute()
     {
         $event = Event::first();
-        $event->state = 'Mexico';
-        $this->assertEquals('Mexico', $event->venue->state);
+        $event->state = 'MEXICO';
+        $this->assertEquals('MEXICO', $event->venue->state);
     }
 
     public function test_delegate_getter_gh_98()
@@ -408,8 +408,8 @@ class ActiveRecordTest extends DatabaseTestCase
         Venue::$use_custom_get_state_getter = true;
 
         $event = Event::first();
-        $this->assertEquals('NY', $event->venue->state);
-        $this->assertEquals('NY', $event->state);
+        $this->assertEquals('ny', $event->venue->state);
+        $this->assertEquals('ny', $event->state);
 
         Venue::$use_custom_get_state_getter = false;
     }
@@ -419,8 +419,8 @@ class ActiveRecordTest extends DatabaseTestCase
         Venue::$use_custom_set_state_setter = true;
 
         $event = Event::first();
-        $event->state = 'Mexico';
-        $this->assertEquals('Mexico#', $event->venue->state);
+        $event->state = 'MEXICO';
+        $this->assertEquals('MEXICO#', $event->venue->state);
 
         Venue::$use_custom_set_state_setter = false;
     }
@@ -460,7 +460,7 @@ class ActiveRecordTest extends DatabaseTestCase
     {
         $author = new Author();
         $author->name = 'bob';
-        $this->assertEquals('bob', $author->name);
+        $this->assertEquals('BOB', $author->name);
     }
 
     public function test_getter()
