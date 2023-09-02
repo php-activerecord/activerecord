@@ -4,7 +4,9 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Model;
 use test\models\Author;
+use test\models\HonestLawyer;
 use test\models\JoinBook;
 use test\models\Venue;
 
@@ -14,6 +16,97 @@ class ActiveRecordFindTest extends DatabaseTestCase
     {
         $this->expectException(RecordNotFound::class);
         Author::find();
+    }
+
+    public function test_find_returns_single_model() {
+        $author = Author::find(3);
+        $this->assertInstanceOf(Model::class, $author );
+
+        $author = Author::find('3');
+        $this->assertInstanceOf(Model::class, $author );
+
+        $author = Author::find(["name"=>"Bill Clinton"]);
+        $this->assertInstanceOf(Model::class, $author );
+
+        $author = Author::find(["name"=>"Bill Clinton"]);
+        $this->assertInstanceOf(Model::class, $author );
+
+        $author = Author::find_by_name("Bill Clinton");
+        $this->assertInstanceOf(Model::class, $author );
+
+        $author = Author::first();
+        $this->assertInstanceOf(Model::class, $author );
+
+        $author = Author::find("first", ["name"=>"Bill Clinton"]);
+        $this->assertInstanceOf(Model::class, $author );
+
+        $author = Author::last();
+        $this->assertInstanceOf(Model::class, $author );
+
+        $author = Author::find("last", ["name"=>"Bill Clinton"]);
+        $this->assertInstanceOf(Model::class, $author );
+    }
+
+    public function test_find_returns_array_of_models()
+    {
+        $authors = Author::all();
+        $this->assertIsArray($authors);
+
+        $authors = Author::find("all");
+        $this->assertIsArray($authors);
+
+        $authors = Author::find("all", ["name" => "Bill Clinton"]);
+        $this->assertIsArray($authors);
+
+        $authors = Author::find_all_by_name("Bill Clinton");
+        $this->assertIsArray($authors);
+
+        $authors = Author::find(1,2,3);
+        $this->assertIsArray($authors);
+
+        $authors = Author::find([1,2,3]);
+        $this->assertIsArray($authors);
+
+        $authors = Author::find(["conditions"=> ["name" => "Bill Clinton"]]);
+        $this->assertIsArray($authors);
+
+        $authors = Author::find(['conditions'=>["author_id = ?", 3]]);
+        $this->assertIsArray($authors);
+    }
+
+    public function test_find_returns_null() {
+        $lawyer = HonestLawyer::first();
+        $this->assertNull($lawyer);
+
+        $lawyer = HonestLawyer::last();
+        $this->assertNull($lawyer);
+
+        $lawyer = HonestLawyer::find("first", ["name"=>"Abe"]);
+        $this->assertNull($lawyer);
+
+        $lawyer = HonestLawyer::find("last", ["name"=>"Abe"]);
+        $this->assertNull($lawyer);
+    }
+
+    static public function noReturnValues(): array
+    {
+        return [
+            [
+                -1,
+                null,
+                ["first", ["name"=>"Abe"]],
+                ["last", ["name"=>"Abe"]],
+                ["conditions"=> ["name" => "Bill Clinton"]]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider noReturnValues
+     */
+    public function test_find_doesnt_return($badValue) {
+        $this->expectException(RecordNotFound::class);
+        Author::find($badValue);
     }
 
     public function test_find_by_pk()

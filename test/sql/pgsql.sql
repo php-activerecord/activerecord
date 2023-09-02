@@ -11,11 +11,17 @@ CREATE TABLE authors(
 	"mixedCaseField" varchar(50)
 );
 
+CREATE TABLE honest_lawyers (
+  author_id SERIAL PRIMARY KEY,
+  name VARCHAR(25) NOT NULL DEFAULT 'default_name'
+);
+
 CREATE TABLE books(
 	book_id SERIAL PRIMARY KEY,
 	author_id INT,
 	secondary_author_id INT,
 	name VARCHAR(50),
+	publisher VARCHAR(50),
 	numeric_test VARCHAR(10) DEFAULT '0',
 	special NUMERIC(10,2) DEFAULT 0.0
 );

@@ -25,10 +25,6 @@ class DatabaseLoader
     public function reset_table_data()
     {
         foreach ($this->get_fixture_tables() as $table) {
-            if ('oci' == $this->db->protocol && 'rm-bldg' == $table) {
-                continue;
-            }
-
             $this->db->query('DELETE FROM ' . $this->quote_name($table));
             $this->load_fixture_data($table);
         }
@@ -46,24 +42,8 @@ class DatabaseLoader
         $tables = $this->db->tables();
 
         foreach ($this->get_fixture_tables() as $table) {
-            if ('oci' == $this->db->protocol) {
-                $table = strtoupper($table);
-
-                if ('RM-BLDG' == $table) {
-                    continue;
-                }
-            }
-
             if (in_array($table, $tables)) {
                 $this->db->query('DROP TABLE ' . $this->quote_name($table));
-            }
-
-            if ('oci' == $this->db->protocol) {
-                try {
-                    $this->db->query("DROP SEQUENCE {$table}_seq");
-                } catch (DatabaseException $e) {
-                    // ignore
-                }
             }
         }
     }

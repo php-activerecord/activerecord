@@ -453,16 +453,14 @@ class ActiveRecordTest extends DatabaseTestCase
     public function test_getter()
     {
         $book = Book::first();
-        $this->assertEquals($book->name, $book->get_name());
+        $this->assertEquals("ANCIENT ART OF MAIN TANKING", $book->upper_name);
     }
 
     public function test_getter_with_same_name_as_an_attribute()
     {
-        Book::$use_custom_get_name_getter = true;
         $book = new Book();
-        $book->name = 'bob';
-        $this->assertEquals('bob', $book->name);
-        Book::$use_custom_get_name_getter = false;
+        $book->publisher = 'Random House';
+        $this->assertEquals('RANDOM HOUSE', $book->publisher);
     }
 
     public function test_setting_invalid_date_should_set_date_to_null()

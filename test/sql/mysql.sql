@@ -12,11 +12,17 @@ CREATE TABLE authors(
 	mixedCaseField varchar(50)
 ) ENGINE=InnoDB;
 
+CREATE TABLE honest_lawyers (
+    lawyer_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(25) NOT NULL DEFAULT 'default_name'
+) ENGINE=InnoDB;
+
 CREATE TABLE books(
 	book_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	Author_Id INT,
 	secondary_author_id INT,
 	name VARCHAR(50),
+	publisher VARCHAR(50),
 	numeric_test VARCHAR(10) DEFAULT '0',
 	special NUMERIC(10,2) DEFAULT 0
 );
