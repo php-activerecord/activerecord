@@ -28,19 +28,19 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $author = Author::find(["name"=>"Bill Clinton"]);
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find(["firstName"=>"Bill"]);
+        $author = Author::find(["mixedCaseField"=>"Bill"]);
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find(["FIRSTNAME"=>"Bill"]);
+        $author = Author::find(["MIXEDCASEFIELD"=>"Bill"]);
         $this->assertInstanceOf(Model::class, $author );
 
         $author = Author::find_by_name("Bill Clinton");
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find_by_firstName("Bill");
+        $author = Author::find_by_mixedCaseField("Bill");
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find_by_FIRSTNAME("Bill");
+        $author = Author::find_by_MIXEDCASEFIELD("Bill");
         $this->assertInstanceOf(Model::class, $author );
 
         $author = Author::first();
@@ -49,10 +49,10 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $author = Author::find("first", ["name"=>"Bill Clinton"]);
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find("first", ["firstName"=>"Bill"]);
+        $author = Author::find("first", ["mixedCaseField"=>"Bill"]);
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find("first", ["FIRSTNAME"=>"Bill"]);
+        $author = Author::find("first", ["MIXEDCASEFIELD"=>"Bill"]);
         $this->assertInstanceOf(Model::class, $author );
 
         $author = Author::last();
@@ -61,10 +61,10 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $author = Author::find("last", ["name"=>"Bill Clinton"]);
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find("last", ["firstName"=>"Bill"]);
+        $author = Author::find("last", ["mixedCaseField"=>"Bill"]);
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find("last", ["FIRSTNAME"=>"Bill"]);
+        $author = Author::find("last", ["MIXEDCASEFIELD"=>"Bill"]);
         $this->assertInstanceOf(Model::class, $author );
     }
 
@@ -79,19 +79,19 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $authors = Author::find("all", ["name" => "Bill Clinton"]);
         $this->assertIsArray($authors);
 
-        $authors = Author::find("all", ["firstName" => "Bill"]);
+        $authors = Author::find("all", ["mixedCaseField" => "Bill"]);
         $this->assertIsArray($authors);
 
-        $authors = Author::find("all", ["FIRSTNAME" => "Bill"]);
+        $authors = Author::find("all", ["MIXEDCASEFIELD" => "Bill"]);
         $this->assertIsArray($authors);
 
         $authors = Author::find_all_by_name("Bill Clinton");
         $this->assertIsArray($authors);
 
-        $authors = Author::find_all_by_firstName("Bill");
+        $authors = Author::find_all_by_mixedCaseField("Bill");
         $this->assertIsArray($authors);
 
-        $authors = Author::find_all_by_FIRSTNAME("Bill");
+        $authors = Author::find_all_by_MIXEDCASEFIELD("Bill");
         $this->assertIsArray($authors);
 
         $authors = Author::find(1,2,3);
@@ -103,10 +103,10 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $authors = Author::find(["conditions"=> ["name" => "Bill Clinton"]]);
         $this->assertIsArray($authors);
 
-        $authors = Author::find(["conditions"=> ["firstName" => "Bill"]]);
+        $authors = Author::find(["conditions"=> ["mixedCaseField" => "Bill"]]);
         $this->assertIsArray($authors);
 
-        $authors = Author::find(["conditions"=> ["FIRSTNAME" => "Bill"]]);
+        $authors = Author::find(["conditions"=> ["MIXEDCASEFIELD" => "Bill"]]);
         $this->assertIsArray($authors);
 
         $authors = Author::find(['conditions'=>["author_id = ?", 3]]);

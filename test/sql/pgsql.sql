@@ -2,14 +2,13 @@ CREATE TABLE authors(
 	author_id SERIAL PRIMARY KEY,
 	parent_author_id INT,
 	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
-	firstName VARCHAR(25) NOT NULL DEFAULT 'default_name',
+	"mixedCaseField" varchar(50),
 	updated_at timestamp,
 	created_at timestamp,
 	"some_Date" date,
 	some_time time,
 	some_text text,
-	encrypted_password varchar(50),
-	"mixedCaseField" varchar(50)
+	encrypted_password varchar(50)
 );
 
 CREATE TABLE honest_lawyers (

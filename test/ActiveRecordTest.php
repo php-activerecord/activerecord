@@ -446,14 +446,14 @@ class ActiveRecordTest extends DatabaseTestCase
     public function test_case_insensitivity()
     {
         $author = new Author();
-        $author->firstName = 'Peter';
-        $this->assertEquals('Peter', $author->firstname);
+        $author->mixedCaseField = 'Peter';
+        $this->assertEquals('Peter', $author->mixedcasefield);
 
-        $author->FIRSTNAME = 'Paul';
-        $this->assertEquals('Paul', $author->firstName);
+        $author->MIXEDCASEFIELD = 'Paul';
+        $this->assertEquals('Paul', $author->mixedCaseFIELD);
 
-        $author->FiRsTNAmE = 'Simon';
-        $this->assertEquals('Simon', $author->firstNAME);
+        $author->mixedcasefield = 'Simon';
+        $this->assertEquals('Simon', $author->MIXEDCASEFIELD);
     }
 
     public function test_setter_with_same_name_as_an_attribute()
