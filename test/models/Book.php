@@ -9,22 +9,22 @@ class Book extends Model
     public static $has_one = [];
     public function upper_name()
     {
-        return strtoupper($this->name); // keep?
+        return strtoupper($this->name);
     }
 
     public function name()
     {
-        return strtolower($this->name); // keep
+        return strtolower($this->name);
     }
 
     public function get_publisher()
     {
-        return strtoupper($this->read_attribute('publisher')); // keep
+        return strtoupper($this->read_attribute('publisher'));
     }
 
     public function get_upper_name()
     {
-        return strtoupper($this->name); // keep
+        return strtoupper($this->name);
     }
 
     public function get_lower_name()

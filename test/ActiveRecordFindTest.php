@@ -28,8 +28,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $author = Author::find(["name"=>"Bill Clinton"]);
         $this->assertInstanceOf(Model::class, $author );
 
-        $author = Author::find(["name"=>"Bill Clinton"]);
-        $this->assertInstanceOf(Model::class, $author );
 
         $author = Author::find_by_name("Bill Clinton");
         $this->assertInstanceOf(Model::class, $author );

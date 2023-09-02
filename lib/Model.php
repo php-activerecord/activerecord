@@ -385,6 +385,7 @@ class Model
     public function &__get($name)
     {
         // check for getter
+        $name = strtolower($name);
         if (method_exists($this, "get_$name")) {
             $name = "get_$name";
             $res = call_user_func([$this, $name]);
@@ -479,11 +480,11 @@ class Model
      */
     public function __set(string $name, mixed $value): void
     {
+        $name = strtolower($name);
         if (array_key_exists($name, static::$alias_attribute)) {
             $name = static::$alias_attribute[$name];
         } elseif (method_exists($this, "set_$name")) {
             $name = "set_$name";
-
             $this->$name($value);
 
             return;
@@ -946,7 +947,7 @@ class Model
         // if we've got an autoincrementing/sequenced pk set it
         // don't need this check until the day comes that we decide to support composite pks
         // if (count($pk) == 1)
-
+        $pk = strtolower($pk);
         $column = $table->get_column_by_inflected_name($pk);
 
         if ($column->auto_increment || $use_sequence) {

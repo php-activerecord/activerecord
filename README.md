@@ -44,22 +44,21 @@ Of course, there are some differences which will be obvious to the user if they 
 ## Supported Databases ##
 
 - MySQL
-- SQLite
 - PostgreSQL
+- SQLite
 
 ## Features ##
 
-- Finder methods
-- Dynamic finder methods
-- Writer methods
-- Relationships
-- Validations
 - Callbacks
+- Model Caching
+- Database adapter plugins
+- Finder methods, static and dynamic
+- Relationships
 - Serializations (json/xml)
 - Transactions
-- Support for multiple adapters
+- Validations
+- Writer methods
 - Miscellaneous options such as: aliased/protected/accessible attributes
-- Model Caching
 
 ## Installation ##
 
@@ -150,4 +149,4 @@ echo $post->title; # 'New real title'
 
 ## Contributing ##
 
-Please refer to [CONTRIBUTING.md](https://github.com/jpfuentes2/php-activerecord/blob/master/CONTRIBUTING.md) for information on how to contribute to PHP ActiveRecord.
+Please refer to [CONTRIBUTING.md](https://github.com/php-activerecord/activerecord/blob/master/CONTRIBUTING.md) for information on how to contribute to PHP ActiveRecord.

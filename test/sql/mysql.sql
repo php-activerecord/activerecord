@@ -2,14 +2,14 @@ CREATE TABLE authors(
 	author_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	parent_author_id INT,
 	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
+	mixedCaseField varchar(50),
 	updated_at datetime,
 	created_at datetime,
 	some_Date date,
 	some_time time,
 	some_text text,
 	some_enum enum('a','b','c'),
-	encrypted_password varchar(50),
-	mixedCaseField varchar(50)
+	encrypted_password varchar(50)
 ) ENGINE=InnoDB;
 
 CREATE TABLE honest_lawyers (
