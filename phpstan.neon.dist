@@ -3,9 +3,16 @@ parameters:
     tmpDir: .stan-cache
     paths:
         - %currentWorkingDirectory%/lib
+        - %currentWorkingDirectory%/test/phpstan
 
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
+
+services:
+    -
+        class: ActiveRecord\PhpStan\FindDynamicMethodReturnTypeReflection
+        tags:
+          - phpstan.broker.dynamicStaticMethodReturnTypeExtension
 
 includes:
 	- vendor/phpstan/phpstan-phpunit/extension.neon
