@@ -1496,11 +1496,9 @@ class Model
      *
      * @throws ActiveRecordException
      *
-     * @return mixed
-     *
      * @see find
      */
-    public static function __callStatic(string $method, mixed $args)
+    public static function __callStatic(string $method, mixed $args): mixed
     {
         $options = static::extract_and_validate_options($args);
         $create = false;
