@@ -12,6 +12,7 @@ use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Relationship\HasOne;
+use function PHPStan\dumpType;
 
 /**
  * Manages reading and writing to a database table.
@@ -25,7 +26,7 @@ use ActiveRecord\Relationship\HasOne;
 class Table
 {
     /**
-     * @var array<string, Model>
+     * @var array<string, Table>
      */
     private static array $cache = [];
 
@@ -85,6 +86,9 @@ class Table
      */
     private array $relationships = [];
 
+    /**
+     * @param class-string $model_class_name
+     */
     public static function load(string $model_class_name): Table
     {
         if (!isset(self::$cache[$model_class_name])) {
@@ -106,6 +110,10 @@ class Table
         }
     }
 
+    /**
+     * @param class-string $class_name
+     * @throws Exception\ActiveRecordException
+     */
     public function __construct(string $class_name)
     {
         $this->class = Reflections::instance()->add($class_name)->get($class_name);
@@ -502,7 +510,7 @@ class Table
             $date_class = Config::instance()->get_date_class();
             foreach ($hash as $name => $value) {
                 if ($value instanceof $date_class || $value instanceof \DateTime) {
-                    if (isset($this->columns[$name]) && Column::DATE == $this->columns[$name]->type) {
+                    if (Column::DATE == $this->columns[$name]->type ?? null) {
                         $hash[$name] = $this->conn->date_to_string($value);
                     } else {
                         $hash[$name] = $this->conn->datetime_to_string($value);
@@ -557,6 +565,7 @@ class Table
 
         $model_class_name = $this->class->name;
         $this->cache_individual_model = $model_class_name::$cache;
+
         $this->cache_model_expire = $model_class_name::$cache_expire ?? Cache::$options['expire'];
     }
 

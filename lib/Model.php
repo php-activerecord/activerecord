@@ -175,7 +175,7 @@ class Model
     /**
      * Set this to specify an expiration period for this model. If not set, the expire value you set in your cache options will be used.
      *
-     * @var number
+     * @var int
      */
     public static $cache_expire;
 
