@@ -13,7 +13,7 @@ abstract class Inflector
     /**
      * Turn a string into its camelized version.
      */
-    static public function camelize(string $s): string
+    public static function camelize(string $s): string
     {
         $s = preg_replace('/[_-]+/', '_', trim($s));
         $s = str_replace(' ', '_', $s);
@@ -40,7 +40,7 @@ abstract class Inflector
     /**
      * Determines if a string contains all uppercase characters.
      */
-    static public function is_upper(string $s): bool
+    public static function is_upper(string $s): bool
     {
         return strtoupper($s) === $s;
     }
@@ -48,7 +48,7 @@ abstract class Inflector
     /**
      * Convert a camelized string to a lowercase, underscored string.
      */
-    static public function uncamelize(string $s): string
+    public static function uncamelize(string $s): string
     {
         $normalized = '';
 
@@ -66,7 +66,7 @@ abstract class Inflector
     /**
      * Convert a string with space into a underscored equivalent.
      */
-    static public function underscorify(string $s): string
+    public static function underscorify(string $s): string
     {
         $res = preg_replace(['/[_\- ]+/', '/([a-z])([A-Z])/'], ['_', '\\1_\\2'], trim($s));
         assert(is_string($res));
@@ -74,20 +74,18 @@ abstract class Inflector
         return $res;
     }
 
-    static public function keyify(string $class_name): string
+    public static function keyify(string $class_name): string
     {
         return strtolower(static::underscorify(denamespace($class_name))) . '_id';
     }
 
-    static public function tableize(string $s): string
+    public static function tableize(string $s): string
     {
         return Utils::pluralize(strtolower(static::underscorify($s)));
     }
 
-    static public function variablize(string $s): string
+    public static function variablize(string $s): string
     {
         return str_replace(['-', ' '], ['_', '_'], strtolower(trim($s)));
     }
 }
-
-
