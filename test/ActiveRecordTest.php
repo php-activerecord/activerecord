@@ -443,6 +443,19 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals(md5('plaintext'), $author->encrypted_password);
     }
 
+    public function test_case_insensitivity()
+    {
+        $author = new Author();
+        $author->firstName = 'Peter';
+        $this->assertEquals('Peter', $author->firstname);
+
+        $author->FIRSTNAME = 'Paul';
+        $this->assertEquals('Paul', $author->firstName);
+
+        $author->FiRsTNAmE = 'Simon';
+        $this->assertEquals('Simon', $author->firstNAME);
+    }
+
     public function test_setter_with_same_name_as_an_attribute()
     {
         $author = new Author();

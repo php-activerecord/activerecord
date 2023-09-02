@@ -1,5 +1,5 @@
-author_id,parent_author_id,name
-1,3,"Tito"
-2,2,"George W. Bush"
-3,1,"Bill Clinton"
-4,2,"Uncle Bob"
+author_id,parent_author_id,name,firstName
+1,3,"Tito","Tito"
+2,2,"George W. Bush","George W."
+3,1,"Bill Clinton","Bill"
+4,2,"Uncle Bob","Uncle Bob"
