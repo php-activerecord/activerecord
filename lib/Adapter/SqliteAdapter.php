@@ -49,10 +49,10 @@ class SqliteAdapter extends Connection
     public function create_column(array $column): Column
     {
         $c = new Column();
-        $c->inflected_name  = Inflector::instance()->variablize($column['name']);
+        $c->inflected_name  = Inflector::variablize($column['name']);
         $c->name            = $column['name'];
         $c->nullable        = $column['notnull'] ? false : true;
-        $c->pk              = $column['pk'] ? true : false;
+        $c->pk              = $column['pk'] ?? false;
         $c->auto_increment  = in_array(
             strtoupper($column['type']),
             ['INT', 'INTEGER']

@@ -113,11 +113,14 @@ class HasMany extends AbstractRelationship
         }
     }
 
+    /**
+     * @param class-string $model_class_name
+     */
     protected function set_keys(string $model_class_name, bool $override = false): void
     {
         // infer from class_name
         if (!$this->foreign_key || $override) {
-            $this->foreign_key = [Inflector::instance()->keyify($model_class_name)];
+            $this->foreign_key = [Inflector::keyify($model_class_name)];
         }
 
         if (!isset($this->primary_key) || $override) {
@@ -187,7 +190,7 @@ class HasMany extends AbstractRelationship
     private function get_foreign_key_for_new_association(Model $model): array
     {
         $this->set_keys(get_class($model));
-        $primary_key = Inflector::instance()->variablize($this->foreign_key[0]);
+        $primary_key = Inflector::variablize($this->foreign_key[0]);
 
         /*
          * TODO: set up model property reflection stanning

@@ -41,7 +41,7 @@ class MysqlAdapter extends Connection
     public function create_column(array $column): Column
     {
         $c = new Column();
-        $c->inflected_name    = Inflector::instance()->variablize($column['field']);
+        $c->inflected_name    = Inflector::variablize($column['field']);
         $c->name            = $column['field'];
         $c->nullable        = ('YES' === $column['null'] ? true : false);
         $c->pk                = ('PRI' === $column['key'] ? true : false);

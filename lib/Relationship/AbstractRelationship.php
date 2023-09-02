@@ -92,7 +92,7 @@ abstract class AbstractRelationship
             $this->set_class_name($this->options['class_name']);
         }
 
-        $this->attribute_name = strtolower(Inflector::instance()->variablize($this->attribute_name));
+        $this->attribute_name = strtolower(Inflector::variablize($this->attribute_name));
 
         if (!$this->foreign_key && isset($this->options['foreign_key'])) {
             $this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : [$this->options['foreign_key']];
@@ -136,12 +136,11 @@ abstract class AbstractRelationship
     {
         $values = [];
         $options = $this->options;
-        $inflector = Inflector::instance();
         $query_key = $query_keys[0];
         $model_values_key = $model_values_keys[0];
 
         foreach ($attributes as $column => $value) {
-            $values[] = $value[$inflector->variablize($model_values_key)];
+            $values[] = $value[Inflector::variablize($model_values_key)];
         }
 
         $values = [$values];
@@ -192,8 +191,8 @@ abstract class AbstractRelationship
         $related_models = $class::find('all', $options);
         $used_models_map = [];
         $related_models_map = [];
-        $model_values_key = $inflector->variablize($model_values_key);
-        $query_key = $inflector->variablize($query_key);
+        $model_values_key = Inflector::variablize($model_values_key);
+        $query_key = Inflector::variablize($query_key);
 
         foreach ($related_models as $related) {
             $related_models_map[$related->$query_key][] = $related;

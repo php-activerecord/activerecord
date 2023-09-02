@@ -11,6 +11,7 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\ValidationsArgumentError;
+use function PHPStan\dumpType;
 
 /**
  * Manages validations for a {@link Model}.
@@ -116,16 +117,6 @@ class Validations
     ];
 
     /**
-     * @var ValidationOptions
-     */
-    private static array $DEFAULT_VALIDATION_OPTIONS = [
-        'on' => 'save',
-        'allow_null' => false,
-        'allow_blank' => false,
-        'message' => null,
-    ];
-
-    /**
      * @var array<string>
      */
     private static array $ALL_RANGE_OPTIONS = [
@@ -148,7 +139,16 @@ class Validations
         $this->model = $model;
         $this->errors = new ValidationErrors($this->model);
         $this->klass = Reflections::instance()->get(get_class($this->model));
-        $this->validators = array_intersect(array_keys($this->klass->getStaticProperties()), self::$VALIDATION_FUNCTIONS);
+        /** @var array<string,string> $validators */
+        $validators = array_intersect(
+            array_keys($this->klass->getStaticProperties()),
+            self::$VALIDATION_FUNCTIONS
+        );
+        $this->validators = $validators;
+
+        if(!empty($this->validators)) {
+            xdebug_break();
+        }
     }
 
     public function get_errors(): ValidationErrors
@@ -314,9 +314,7 @@ class Validations
         foreach ($attrs as $attribute => $options) {
             $var = $this->model->$attribute;
 
-            $enum = $options['in'] ?? $options['within'];
-            assert(isset($enum));
-
+            $enum = $options['in'] ?? $options['within'] ?? throw new \Exception("Must provide 'in' or 'within'");
             $message = str_replace('%s', $var ?? '', $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES[$type]);
 
             if ($this->is_null_with_option($var, $options) || $this->is_blank_with_option($var, $options)) {
@@ -593,7 +591,7 @@ class Validations
      */
     private function is_null_with_option(mixed $var, array &$options): bool
     {
-        return is_null($var) && ($options['allow_null'] ?? self::$DEFAULT_VALIDATION_OPTIONS['allow_null']);
+        return is_null($var) && ($options['allow_null'] ?? false);
     }
 
     /**
@@ -601,6 +599,6 @@ class Validations
      */
     private function is_blank_with_option(mixed $var, array &$options): bool
     {
-        return Utils::is_blank($var) && ($options['allow_blank'] ?? self::$DEFAULT_VALIDATION_OPTIONS['allow_blank']);
+        return Utils::is_blank($var) && ($options['allow_blank'] ?? false);
     }
 }

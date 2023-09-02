@@ -65,17 +65,15 @@ class BelongsTo extends AbstractRelationship
 
         // infer from class_name
         if (!$this->foreign_key) {
-            $this->foreign_key = [Inflector::instance()->keyify($this->class_name)];
+            $this->foreign_key = [Inflector::keyify($this->class_name)];
         }
     }
 
     public function load(Model $model): ?Model
     {
         $keys = [];
-        $inflector = Inflector::instance();
-
         foreach ($this->foreign_key as $key) {
-            $keys[] = $inflector->variablize($key);
+            $keys[] = Inflector::variablize($key);
         }
 
         if (!($conditions = $this->create_conditions_from_keys($model, $this->primary_key(), $keys))) {

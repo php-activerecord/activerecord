@@ -6,8 +6,8 @@ use ActiveRecord\Exception\CacheException;
 
 /**
  * @phpstan-type MemcacheOptions array{
- *      host?: string,
- *      port?: string
+ *      host: string,
+ *      port?: int
  *  }
  */
 class Memcache
@@ -24,13 +24,12 @@ class Memcache
     public function __construct(array $options)
     {
         $this->memcache = new \Memcache();
-        $options['port'] = $options['port'] ?? self::DEFAULT_PORT;
-
-        if (!@$this->memcache->connect($options['host'], $options['port'])) {
+        $port = $options['port'] ?? self::DEFAULT_PORT;
+        if (!@$this->memcache->connect($options['host'], $port )) {
             if ($error = error_get_last()) {
                 $message = $error['message'];
             } else {
-                $message = sprintf('Could not connect to %s:%s', $options['host'], $options['port']);
+                $message = sprintf('Could not connect to %s:%s', $options['host'], $port);
             }
             throw new CacheException($message);
         }

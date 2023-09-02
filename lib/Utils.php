@@ -34,13 +34,16 @@
 
 namespace ActiveRecord;
 
+/**
+ * @param class-string $class_name
+ */
 function classify(string $class_name, bool $singular = false): string
 {
     if ($singular) {
         $class_name = Utils::singularize($class_name);
     }
 
-    $class_name = Inflector::instance()->camelize($class_name);
+    $class_name = Inflector::camelize($class_name);
 
     return ucfirst($class_name);
 }
@@ -196,9 +199,8 @@ class Utils
 
     public static function human_attribute(string $attr): string
     {
-        $inflector = Inflector::instance();
-        $inflected = $inflector->variablize($attr);
-        $normal = $inflector->uncamelize($inflected);
+        $inflected = Inflector::variablize($attr);
+        $normal = Inflector::uncamelize($inflected);
 
         return ucfirst(str_replace('_', ' ', $normal));
     }
