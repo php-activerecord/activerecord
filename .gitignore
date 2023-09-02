@@ -19,3 +19,4 @@
 composer.lock
 package-lock.json
 phpunit.xml
+.docs

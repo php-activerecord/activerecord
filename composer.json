@@ -45,6 +45,7 @@
     "style-check": "Dry run of composer style-fix",
     "style-fix": "Fixes style errors to conform to project standards",
     "stan": "Runs phpstan static analysis",
-    "test": "Runs PHPUnit. Usage: composer test [fileName [filter]]"
+    "test": "Runs PHPUnit. Usage: composer test [fileName [filter]]",
+    "docs": "tools/phpDocumentor run -d lib -t .docs"
   }
 }
