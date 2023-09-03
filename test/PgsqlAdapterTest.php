@@ -7,33 +7,33 @@ class PgsqlAdapterTest extends AdapterTestCase
         parent::setUp('pgsql');
     }
 
-    public function test_insert_id()
+    public function testInsertId()
     {
         $this->connection->query("INSERT INTO authors(author_id,name) VALUES(nextval('authors_author_id_seq'),'name')");
         $this->assertTrue($this->connection->insert_id('authors_author_id_seq') > 0);
     }
 
-    public function test_insert_id_with_params()
+    public function testInsertIdWithParams()
     {
         $x = ['name'];
         $this->connection->query("INSERT INTO authors(author_id,name) VALUES(nextval('authors_author_id_seq'),?)", $x);
         $this->assertTrue($this->connection->insert_id('authors_author_id_seq') > 0);
     }
 
-    public function test_insert_id_should_return_explicitly_inserted_id()
+    public function testInsertIdShouldReturnExplicitlyInsertedId()
     {
         $this->connection->query('INSERT INTO authors(author_id,name) VALUES(99,\'name\')');
         $this->assertTrue($this->connection->insert_id('authors_author_id_seq') > 0);
     }
 
-    public function test_set_charset()
+    public function testSetCharset()
     {
         $connection_string = ActiveRecord\Config::instance()->get_connection($this->connection_name);
         $conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
         $this->assertEquals("SET NAMES 'utf8'", $conn->last_query);
     }
 
-    public function test_gh96_columns_not_duplicated_by_index()
+    public function testGh96ColumnsNotDuplicatedByIndex()
     {
         $this->assertEquals(3, $this->connection->query_column_info('user_newsletters')->rowCount());
     }

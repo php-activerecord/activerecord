@@ -1,7 +1,5 @@
 <?php
 
-use ActiveRecord\Exception\DatabaseException;
-
 class DatabaseLoader
 {
     private $db;
@@ -95,7 +93,7 @@ class DatabaseLoader
 
             $fields = join(',', $fields);
 
-            while (($values = fgetcsv($fp))) {
+            while ($values = fgetcsv($fp)) {
                 $this->db->query("INSERT INTO $table($fields) VALUES($markers)", $values);
             }
         }

@@ -1,7 +1,9 @@
 <?php
+
 namespace test\models;
 
 use ActiveRecord\Model;
+
 class Event extends Model
 {
     public static array $belongs_to = [

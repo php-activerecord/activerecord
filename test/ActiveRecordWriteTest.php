@@ -6,8 +6,8 @@ use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use test\models\Author;
-use test\models\Venue;
 use test\models\Book;
+use test\models\Venue;
 
 class DirtyAuthor extends ActiveRecord\Model
 {
@@ -46,21 +46,21 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         return $book;
     }
 
-    public function test_save()
+    public function testSave()
     {
         $this->expectNotToPerformAssertions();
         $venue = new Venue(['name' => 'Tito']);
         $venue->save();
     }
 
-    public function test_insert()
+    public function testInsert()
     {
         $author = new Author(['name' => 'Blah Blah']);
         $author->save();
         $this->assertNotNull(Author::find($author->id));
     }
 
-    public function test_insert_with_no_sequence_defined()
+    public function testInsertWithNoSequenceDefined()
     {
         $this->expectException(DatabaseException::class);
         if (!$this->connection->supports_sequences()) {
@@ -69,21 +69,21 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         AuthorWithoutSequence::create(['name' => 'Bob!']);
     }
 
-    public function test_insert_should_quote_keys()
+    public function testInsertShouldQuoteKeys()
     {
         $author = new Author(['name' => 'Blah Blah']);
         $author->save();
         $this->assertTrue(false !== strpos($author->connection()->last_query, $author->connection()->quote_name('updated_at')));
     }
 
-    public function test_save_auto_increment_id()
+    public function testSaveAutoIncrementId()
     {
         $venue = new Venue(['name' => 'Bob']);
         $venue->save();
         $this->assertTrue($venue->id > 0);
     }
 
-    public function test_sequence_was_set()
+    public function testSequenceWasSet()
     {
         if ($this->connection->supports_sequences()) {
             $this->assertEquals($this->connection->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
@@ -92,7 +92,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         }
     }
 
-    public function test_sequence_was_explicitly_set()
+    public function testSequenceWasExplicitlySet()
     {
         if ($this->connection->supports_sequences()) {
             $this->assertEquals(AuthorExplicitSequence::$sequence, AuthorExplicitSequence::table()->sequence);
@@ -101,7 +101,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         }
     }
 
-    public function test_delete()
+    public function testDelete()
     {
         $author = Author::find(1);
         $author->delete();
@@ -109,7 +109,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertFalse(Author::exists(1));
     }
 
-    public function test_delete_by_find_all()
+    public function testDeleteByFindAll()
     {
         $books = Book::all();
 
@@ -121,7 +121,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertEquals(0, count($res));
     }
 
-    public function test_update()
+    public function testUpdate()
     {
         $book = Book::find(1);
         $new_name = 'new name';
@@ -132,7 +132,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertSame($new_name, $book->name, Book::find(1)->name);
     }
 
-    public function test_update_should_quote_keys()
+    public function testUpdateShouldQuoteKeys()
     {
         $book = Book::find(1);
         $book->name = 'new name';
@@ -140,7 +140,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertTrue(false !== strpos($book->connection()->last_query, $book->connection()->quote_name('name')));
     }
 
-    public function test_update_attributes()
+    public function testUpdateAttributes()
     {
         $book = Book::find(1);
         $new_name = 'How to lose friends and alienate people'; // jax i'm worried about you
@@ -151,14 +151,14 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertSame($new_name, $book->name, Book::find(1)->name);
     }
 
-    public function test_update_attributes_undefined_property()
+    public function testUpdateAttributesUndefinedProperty()
     {
         $this->expectException(UndefinedPropertyException::class);
         $book = Book::find(1);
         $book->update_attributes(['name' => 'new name', 'invalid_attribute' => true, 'another_invalid_attribute' => 'blah']);
     }
 
-    public function test_update_attribute()
+    public function testUpdateAttribute()
     {
         $book = Book::find(1);
         $new_name = 'some stupid self-help book';
@@ -168,14 +168,14 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertSame($new_name, $book->name, Book::find(1)->name);
     }
 
-    public function test_update_attribute_undefined_property()
+    public function testUpdateAttributeUndefinedProperty()
     {
         $this->expectException(UndefinedPropertyException::class);
         $book = Book::find(1);
         $book->update_attribute('invalid_attribute', true);
     }
 
-    public function test_save_null_value()
+    public function testSaveNullValue()
     {
         $book = Book::first();
         $book->name = null;
@@ -183,7 +183,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertSame(null, Book::find($book->id)->name);
     }
 
-    public function test_save_blank_value()
+    public function testSaveBlankValue()
     {
         $book = Book::find(1);
         $book->name = '';
@@ -191,13 +191,13 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertSame('', Book::find(1)->name);
     }
 
-    public function test_dirty_attributes()
+    public function testDirtyAttributes()
     {
         $book = $this->make_new_book_and(false);
         $this->assertEquals(['name', 'special'], array_keys($book->dirty_attributes()));
     }
 
-    public function test_id_type()
+    public function testIdType()
     {
         $book = new Book();
         $book->save();
@@ -208,7 +208,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertSame($book->id, $bookFromFind->id);
     }
 
-    public function test_dirty_attributes_cleared_after_saving()
+    public function testDirtyAttributesClearedAfterSaving()
     {
         $book = $this->make_new_book_and();
         $this->assertTrue(false !== strpos($book->table()->last_sql, 'name'));
@@ -216,13 +216,13 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertEquals([], $book->dirty_attributes());
     }
 
-    public function test_dirty_attributes_cleared_after_inserting()
+    public function testDirtyAttributesClearedAfterInserting()
     {
         $book = $this->make_new_book_and();
         $this->assertEquals([], $book->dirty_attributes());
     }
 
-    public function test_no_dirty_attributes_but_still_insert_record()
+    public function testNoDirtyAttributesButStillInsertRecord()
     {
         $book = new Book();
         $this->assertEquals([], $book->dirty_attributes());
@@ -231,7 +231,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertNotNull($book->id);
     }
 
-    public function test_dirty_attributes_cleared_after_updating()
+    public function testDirtyAttributesClearedAfterUpdating()
     {
         $book = Book::first();
         $book->name = 'rivers cuomo';
@@ -239,7 +239,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertEquals([], $book->dirty_attributes());
     }
 
-    public function test_dirty_attributes_after_reloading()
+    public function testDirtyAttributesAfterReloading()
     {
         $book = Book::first();
         $book->name = 'rivers cuomo';
@@ -247,14 +247,14 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertEquals([], $book->dirty_attributes());
     }
 
-    public function test_dirty_attributes_with_mass_assignment()
+    public function testDirtyAttributesWithMassAssignment()
     {
         $book = Book::first();
         $book->set_attributes(['name' => 'rivers cuomo']);
         $this->assertEquals(['name'], array_keys($book->dirty_attributes()));
     }
 
-    public function test_timestamps_set_before_save()
+    public function testTimestampsSetBeforeSave()
     {
         $author = new Author();
         $author->save();
@@ -264,7 +264,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertNotNull($author->created_at, $author->updated_at);
     }
 
-    public function test_timestamps_updated_at_only_set_before_update()
+    public function testTimestampsUpdatedAtOnlySetBeforeUpdate()
     {
         $author = new Author();
         $author->save();
@@ -280,19 +280,19 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertNotEquals($updated_at, $author->updated_at);
     }
 
-    public function test_create()
+    public function testCreate()
     {
         $author = Author::create(['name' => 'Blah Blah']);
         $this->assertNotNull(Author::find($author->id));
     }
 
-    public function test_create_should_set_created_at()
+    public function testCreateShouldSetCreatedAt()
     {
         $author = Author::create(['name' => 'Blah Blah']);
         $this->assertNotNull($author->created_at);
     }
 
-    public function test_update_with_no_primary_key_defined()
+    public function testUpdateWithNoPrimaryKeyDefined()
     {
         $this->expectException(ActiveRecordException::class);
         Author::table()->pk = [];
@@ -301,7 +301,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $author->save();
     }
 
-    public function test_delete_with_no_primary_key_defined()
+    public function testDeleteWithNoPrimaryKeyDefined()
     {
         $this->expectException(ActiveRecordException::class);
         Author::table()->pk = [];
@@ -309,20 +309,20 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $author->delete();
     }
 
-    public function test_inserting_with_explicit_pk()
+    public function testInsertingWithExplicitPk()
     {
         $author = Author::create(['author_id' => 9999, 'name' => 'blah']);
         $this->assertEquals(9999, $author->author_id);
     }
 
-    public function test_readonly()
+    public function testReadonly()
     {
         $this->expectException(ReadOnlyException::class);
         $author = Author::first(['readonly' => true]);
         $author->save();
     }
 
-    public function test_modified_attributes_in_before_handlers_get_saved()
+    public function testModifiedAttributesInBeforeHandlersGetSaved()
     {
         $author = DirtyAuthor::first();
         $author->encrypted_password = 'coco';
@@ -331,7 +331,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertEquals('coco', DirtyAuthor::find($author->id)->encrypted_password);
     }
 
-    public function test_is_dirty()
+    public function testIsDirty()
     {
         $author = Author::first();
         $this->assertEquals(false, $author->is_dirty());
@@ -340,7 +340,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertEquals(true, $author->is_dirty());
     }
 
-    public function test_set_date_flags_dirty()
+    public function testSetDateFlagsDirty()
     {
         $author = Author::create(['some_date' => new DateTime()]);
         $author = Author::find($author->id);
@@ -348,7 +348,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertArrayHasKey('some_date', $author->dirty_attributes());
     }
 
-    public function test_set_date_flags_dirty_with_php_datetime()
+    public function testSetDateFlagsDirtyWithPhpDatetime()
     {
         $author = Author::create(['some_date' => new \DateTime()]);
         $author = Author::find($author->id);
@@ -356,25 +356,25 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertArrayHasKey('some_date', $author->dirty_attributes());
     }
 
-    public function test_delete_all_with_conditions_as_string()
+    public function testDeleteAllWithConditionsAsString()
     {
         $num_affected = Author::delete_all(['conditions' => 'parent_author_id = 2']);
         $this->assertEquals(2, $num_affected);
     }
 
-    public function test_delete_all_with_conditions_as_hash()
+    public function testDeleteAllWithConditionsAsHash()
     {
         $num_affected = Author::delete_all(['conditions' => ['parent_author_id' => 2]]);
         $this->assertEquals(2, $num_affected);
     }
 
-    public function test_delete_all_with_conditions_as_array()
+    public function testDeleteAllWithConditionsAsArray()
     {
         $num_affected = Author::delete_all(['conditions' => ['parent_author_id = ?', 2]]);
         $this->assertEquals(2, $num_affected);
     }
 
-    public function test_delete_all_with_limit_and_order()
+    public function testDeleteAllWithLimitAndOrder()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
@@ -385,14 +385,14 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
     }
 
-    public function test_update_all_with_set_as_string()
+    public function testUpdateAllWithSetAsString()
     {
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2']);
         $this->assertEquals(2, $num_affected);
         $this->assertEquals(4, Author::count_by_parent_author_id(2));
     }
 
-    public function test_update_all_with_set_as_hash()
+    public function testUpdateAllWithSetAsHash()
     {
         $num_affected = Author::update_all(['set' => ['parent_author_id' => 2]]);
         $this->assertEquals(2, $num_affected);
@@ -401,25 +401,25 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     /**
      * TODO: not implemented
      */
-    public function test_update_all_with_conditions_as_string()
+    public function testUpdateAllWithConditionsAsString()
     {
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => 'name = "Tito"']);
         $this->assertEquals(1, $num_affected);
     }
 
-    public function test_update_all_with_conditions_as_hash()
+    public function testUpdateAllWithConditionsAsHash()
     {
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => ['name' => 'Tito']]);
         $this->assertEquals(1, $num_affected);
     }
 
-    public function test_update_all_with_conditions_as_array()
+    public function testUpdateAllWithConditionsAsArray()
     {
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => ['name = ?', 'Tito']]);
         $this->assertEquals(1, $num_affected);
     }
 
-    public function test_update_all_with_limit_and_order()
+    public function testUpdateAllWithLimitAndOrder()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
@@ -430,7 +430,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
     }
 
-    public function test_update_native_datetime()
+    public function testUpdateNativeDatetime()
     {
         $author = Author::create(['name' => 'Blah Blah']);
         $native_datetime = new \DateTime('1983-12-05');
@@ -438,7 +438,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertFalse($native_datetime === $author->some_date);
     }
 
-    public function test_update_our_datetime()
+    public function testUpdateOurDatetime()
     {
         $author = Author::create(['name' => 'Blah Blah']);
         $our_datetime = new DateTime('1983-12-05');
