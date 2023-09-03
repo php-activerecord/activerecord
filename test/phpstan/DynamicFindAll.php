@@ -9,6 +9,10 @@
  */
 
 use test\models\Book;
+use function PHPStan\dumpType;
 
 $book = Book::find_all_by_name("Foo");
+assert(is_array($book));
+
+$book = Book::find_all_by_name_and_publisher("Foo", "Penguin");
 assert(is_array($book));
