@@ -13,7 +13,6 @@ use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\IntegerType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
-use PHPStan\Type\UnionType;
 
 class FindAllDynamicMethodReturnTypeReflection implements DynamicStaticMethodReturnTypeExtension
 {
@@ -25,13 +24,15 @@ class FindAllDynamicMethodReturnTypeReflection implements DynamicStaticMethodRet
     public function isStaticMethodSupported(MethodReflection $methodReflection): bool
     {
         $name = $methodReflection->getName();
-        $pos = strpos($name, "find_all");
-        return $pos === 0;
+        $pos = strpos($name, 'find_all');
+
+        return 0 === $pos;
     }
 
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type
     {
         $class = $methodReflection->getDeclaringClass();
+
         return new ArrayType(
             new IntegerType(),
             new ObjectType($class->getName())

@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace ActiveRecord\PhpStan;
 
-use PHPStan\Reflection\PassedByReference;
 use PHPStan\Reflection\ParameterReflection;
+use PHPStan\Reflection\PassedByReference;
 use PHPStan\Type\MixedType;
-use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 
 class ModelParameterReflection implements ParameterReflection
@@ -22,7 +21,7 @@ class ModelParameterReflection implements ParameterReflection
         return false;
     }
 
-    public function getDefaultValue(): ?\PHPStan\Type\Type
+    public function getDefaultValue(): ?Type
     {
         return null;
     }

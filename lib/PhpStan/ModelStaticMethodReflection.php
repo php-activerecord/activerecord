@@ -6,8 +6,8 @@ namespace ActiveRecord\PhpStan;
 
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\FunctionVariant;
+use PHPStan\Reflection\MethodReflection;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeMap;
 use PHPStan\Type\ObjectType;
@@ -24,13 +24,13 @@ class ModelStaticMethodReflection implements MethodReflection
         $this->name = $name;
     }
 
-    public function isFinal(): \PHPStan\TrinaryLogic
+    public function isFinal(): TrinaryLogic
     {
         // TODO: Implement isFinal() method.
         return TrinaryLogic::createNo();
     }
 
-    public function isInternal(): \PHPStan\TrinaryLogic
+    public function isInternal(): TrinaryLogic
     {
         // TODO: Implement isInternal() method.
         return TrinaryLogic::createNo();
@@ -42,13 +42,13 @@ class ModelStaticMethodReflection implements MethodReflection
         return null;
     }
 
-    public function isDeprecated(): \PHPStan\TrinaryLogic
+    public function isDeprecated(): TrinaryLogic
     {
         // TODO: Implement isDeprecated() method.
         return TrinaryLogic::createNo();
     }
 
-    public function hasSideEffects(): \PHPStan\TrinaryLogic
+    public function hasSideEffects(): TrinaryLogic
     {
         // TODO: Implement hasSideEffects() method.
         return TrinaryLogic::createMaybe();
@@ -106,7 +106,7 @@ class ModelStaticMethodReflection implements MethodReflection
      */
     public function getVariants(): array
     {
-        if (preg_match("/find_(all_)?by_/", $this->name)) {
+        if (preg_match('/find_(all_)?by_/', $this->name)) {
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),
@@ -116,7 +116,7 @@ class ModelStaticMethodReflection implements MethodReflection
                     new ObjectType($this->classReflection->getDisplayName())
                 )
             ];
-        } elseif (preg_match("/_set$/", $this->name)) {
+        } elseif (preg_match('/_set$/', $this->name)) {
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),
@@ -126,7 +126,7 @@ class ModelStaticMethodReflection implements MethodReflection
                     new ObjectType($this->classReflection->getDisplayName())
                 )
             ];
-        } elseif (preg_match("/_refresh/", $this->name)) {
+        } elseif (preg_match('/_refresh/', $this->name)) {
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),
@@ -136,7 +136,7 @@ class ModelStaticMethodReflection implements MethodReflection
                     new VoidType()
                 )
             ];
-        } elseif (preg_match("/_dirty/", $this->name)) {
+        } elseif (preg_match('/_dirty/', $this->name)) {
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),

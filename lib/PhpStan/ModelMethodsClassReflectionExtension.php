@@ -12,11 +12,11 @@ class ModelMethodsClassReflectionExtension implements MethodsClassReflectionExte
     public function hasMethod(ClassReflection $classReflection, string $methodName): bool
     {
         if ($classReflection->isSubclassOf(Model::class)) {
-            if (preg_match("/find_(all_)?by_/", $methodName)) {
+            if (preg_match('/find_(all_)?by_/', $methodName)) {
                 return true;
             }
 
-            if (str_ends_with($methodName, "_set")) {
+            if (str_ends_with($methodName, '_set')) {
                 return true;
             }
         }
