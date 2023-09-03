@@ -25,7 +25,7 @@ class Memcache
     {
         $this->memcache = new \Memcache();
         $port = $options['port'] ?? self::DEFAULT_PORT;
-        if (!@$this->memcache->connect($options['host'], $port )) {
+        if (!@$this->memcache->connect($options['host'], $port)) {
             if ($error = error_get_last()) {
                 $message = $error['message'];
             } else {

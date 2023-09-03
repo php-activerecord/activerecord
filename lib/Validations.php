@@ -11,7 +11,6 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\ValidationsArgumentError;
-use function PHPStan\dumpType;
 
 /**
  * Manages validations for a {@link Model}.

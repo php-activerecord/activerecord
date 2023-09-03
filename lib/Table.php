@@ -12,7 +12,6 @@ use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Relationship\HasOne;
-use function PHPStan\dumpType;
 
 /**
  * Manages reading and writing to a database table.
@@ -112,6 +111,7 @@ class Table
 
     /**
      * @param class-string $class_name
+     *
      * @throws Exception\ActiveRecordException
      */
     public function __construct(string $class_name)
