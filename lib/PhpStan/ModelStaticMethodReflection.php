@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace ActiveRecord\PhpStan;
 
+use ActiveRecord\SQLBuilder;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\FunctionVariant;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\UnionType;
 use PHPStan\Type\VoidType;
 
 class ModelStaticMethodReflection implements MethodReflection
@@ -106,14 +109,18 @@ class ModelStaticMethodReflection implements MethodReflection
      */
     public function getVariants(): array
     {
-        if (preg_match('/find_(all_)?by_/', $this->name)) {
+        if (str_starts_with($this->name, "find_by")) {
+            $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 8), 0);
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),
                     TemplateTypeMap::createEmpty(),
-                    [new ModelParameterReflection()],
+                    array_fill(0, count($parts), new ModelParameterReflection()),
                     false,
-                    new ObjectType($this->classReflection->getDisplayName())
+                    new UnionType([
+                        new ObjectType($this->classReflection->getDisplayName()),
+                        new NullType()
+                    ])
                 )
             ];
         } elseif (preg_match('/_set$/', $this->name)) {

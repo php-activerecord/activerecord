@@ -8,7 +8,16 @@
  * see lib/PhpStan/FindDynamicByMethodReturnTypeReflection.php
  */
 
+use ActiveRecord\Exception\ConnectionException;
+use ActiveRecord\Exception\RecordNotFound;
 use test\models\Book;
+use function PHPStan\dumpType;
 
-$book = Book::find_by_name("Foo");
+$book = Book::find_by_name("Walden");
 assert($book instanceof Book);
+
+$book = Book::find_by_name_and_publisher("Walden", "Random House");
+assert(is_null($book));
+
+
+
