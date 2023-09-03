@@ -509,11 +509,11 @@ class Table
         if ($hash) {
             $date_class = Config::instance()->get_date_class();
             foreach ($hash as $name => $value) {
-                if ($value instanceof $date_class || $value instanceof \DateTime) {
-                    if (Column::DATE == $this->columns[$name]->type ?? null) {
-                        $hash[$name] = $this->conn->date_to_string($value);
+                if ($value instanceof \DateTime) {
+                    if (Column::DATE == $this->columns[$name]->type) {
+                        $hash[$name] = $this->conn->date_string($value);
                     } else {
-                        $hash[$name] = $this->conn->datetime_to_string($value);
+                        $hash[$name] = $this->conn->datetime_string($value);
                     }
                 } else {
                     $hash[$name] = $value;
@@ -566,7 +566,7 @@ class Table
         $model_class_name = $this->class->name;
         $this->cache_individual_model = $model_class_name::$cache;
 
-        $this->cache_model_expire = $model_class_name::$cache_expire ?? Cache::$options['expire'];
+        $this->cache_model_expire = $model_class_name::$cache_expire ?? Cache::$options['expire'] ?? 0;
     }
 
     private function set_sequence_name(): void

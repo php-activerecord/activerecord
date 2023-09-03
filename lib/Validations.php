@@ -145,10 +145,6 @@ class Validations
             self::$VALIDATION_FUNCTIONS
         );
         $this->validators = $validators;
-
-        if(!empty($this->validators)) {
-            xdebug_break();
-        }
     }
 
     public function get_errors(): ValidationErrors

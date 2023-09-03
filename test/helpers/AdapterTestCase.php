@@ -396,12 +396,12 @@ abstract class AdapterTestCase extends DatabaseTestCase
     public function test_datetime_to_string()
     {
         $datetime = '2009-01-01 01:01:01';
-        $this->assertEquals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
+        $this->assertEquals($datetime, $this->connection->datetime_string(date_create($datetime)));
     }
 
     public function test_date_to_string()
     {
         $datetime = '2009-01-01';
-        $this->assertEquals($datetime, $this->connection->date_to_string(date_create($datetime)));
+        $this->assertEquals($datetime, $this->connection->date_string(date_create($datetime)));
     }
 }

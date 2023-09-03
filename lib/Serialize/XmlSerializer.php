@@ -43,9 +43,9 @@ class XmlSerializer extends Serialization
         $this->write($this->to_a());
         $this->writer->endElement();
         $this->writer->endDocument();
-        $xml = $this->writer->outputMemory(true);
+        $xml = $this->writer->outputMemory();
 
-        if (true == @$this->options['skip_instruct']) {
+        if ($this->options['skip_instruct'] ?? false) {
             $xml = preg_replace('/<\?xml version.*?\?>/', '', $xml);
         }
 

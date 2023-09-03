@@ -484,26 +484,15 @@ abstract class Connection
             $string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
     }
 
-    /**
-     * Return a date time formatted into the database's date format.
-     *
-     * @param DateTime $datetime The DateTime object
-     *
-     * @return string
-     */
-    public function date_to_string($datetime)
+    public function date_string(\DateTimeInterface $datetime): string
     {
         return $datetime->format(static::$date_format);
     }
 
     /**
      * Return a date time formatted into the database's datetime format.
-     *
-     * @param DateTime $datetime The DateTime object
-     *
-     * @return string
      */
-    public function datetime_to_string(\DateTime $datetime)
+    public function datetime_string(\DateTimeInterface $datetime): string
     {
         return $datetime->format(static::$datetime_format);
     }
