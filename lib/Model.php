@@ -1729,7 +1729,7 @@ class Model
         $class = get_called_class();
 
         $args = func_get_args();
-        if (count($args) === 0) {
+        if (0 === count($args)) {
             throw new RecordNotFound("Couldn't find $class without an ID");
         }
         $options = static::extract_and_validate_options($args);
