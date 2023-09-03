@@ -11,6 +11,7 @@
 .project
 .settings
 .stan-cache
+/.vscode
 /docs/api
 /node_modules/*
 /output/*
