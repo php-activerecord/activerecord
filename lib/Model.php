@@ -1722,7 +1722,6 @@ class Model
      *  "all"										static[]			User::find("all", ["name"=>"Stephen"]
      *  ...int|string								static[]			User::find(1, 3, 5, 8);
      *  array<int,int|string>						static[]			User::find([1,3,5,8]);
-     * 	array<"conditions", array<string, string>>	static[]			User::find(["conditions"=>["name"=>"Kurt"]]);
      */
     public static function find(/* $type, $options */): static|array|null
     {
