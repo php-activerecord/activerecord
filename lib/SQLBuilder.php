@@ -251,6 +251,9 @@ class SQLBuilder
         return join(',', $parts);
     }
 
+    /**
+     * @return array<mixed>
+     */
     public static function underscored_string_to_parts(string $string, int $flags=PREG_SPLIT_DELIM_CAPTURE): array {
         return preg_split('/(_and_|_or_)/i', $string, -1, $flags);
     }
