@@ -13,6 +13,14 @@ services:
         class: ActiveRecord\PhpStan\FindDynamicMethodReturnTypeReflection
         tags:
           - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+    -
+        class: ActiveRecord\PhpStan\FindAllDynamicMethodReturnTypeReflection
+        tags:
+          - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+    -
+        class: ActiveRecord\PhpStan\ModelMethodsClassReflectionExtension
+        tags:
+          - phpstan.broker.methodsClassReflectionExtension
 
 includes:
 	- vendor/phpstan/phpstan-phpunit/extension.neon

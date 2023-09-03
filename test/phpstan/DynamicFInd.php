@@ -45,3 +45,5 @@ assert(0==count($books));
 
 $books = Book::find(['conditions'=> ['name' => 'Kurt']]);
 assert(0==count($books));
+
+
