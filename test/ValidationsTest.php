@@ -1,6 +1,5 @@
 <?php
 
-use ActiveRecord as AR;
 use test\models\Book;
 
 class BookValidations extends ActiveRecord\Model
@@ -32,12 +31,12 @@ class ValidationsTest extends DatabaseTestCase
     {
         parent::setUp($connection_name);
 
-        BookValidations::$validates_presence_of = ['name' => true ];
+        BookValidations::$validates_presence_of = ['name' => true];
         BookValidations::$validates_uniqueness_of =  ['name' => true];
         ValuestoreValidations::$validates_uniqueness_of = ['key' => true];
     }
 
-    public function test_is_valid_invokes_validations()
+    public function testIsValidInvokesValidations()
     {
         $book = new Book();
         $this->assertTrue(empty($book->errors));
@@ -45,31 +44,31 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertFalse(empty($book->errors));
     }
 
-    public function test_is_valid_returns_true_if_no_validations_exist()
+    public function testIsValidReturnsTrueIfNoValidationsExist()
     {
         $book = new Book();
         $this->assertTrue($book->is_valid());
     }
 
-    public function test_is_valid_returns_false_if_failed_validations()
+    public function testIsValidReturnsFalseIfFailedValidations()
     {
         $book = new BookValidations();
         $this->assertFalse($book->is_valid());
     }
 
-    public function test_is_invalid()
+    public function testIsInvalid()
     {
         $book = new Book();
         $this->assertFalse($book->is_invalid());
     }
 
-    public function test_is_invalid_is_true()
+    public function testIsInvalidIsTrue()
     {
         $book = new BookValidations();
         $this->assertTrue($book->is_invalid());
     }
 
-    public function test_is_iterable()
+    public function testIsIterable()
     {
         $book = new BookValidations();
         $book->is_valid();
@@ -79,7 +78,7 @@ class ValidationsTest extends DatabaseTestCase
         }
     }
 
-    public function test_full_messages()
+    public function testFullMessages()
     {
         $book = new BookValidations();
         $book->is_valid();
@@ -87,7 +86,7 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertEquals(["Name can't be blank"], array_values($book->errors->full_messages(['hash' => true])));
     }
 
-    public function test_to_array()
+    public function testToArray()
     {
         $book = new BookValidations();
         $book->is_valid();
@@ -95,7 +94,7 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertEquals(['name' => ["Name can't be blank"]], $book->errors->to_array());
     }
 
-    public function test_toString()
+    public function testToString()
     {
         $book = new BookValidations();
         $book->is_valid();
@@ -104,7 +103,7 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertEquals("Name can't be blank\nSecondary author id is invalid", (string) $book->errors);
     }
 
-    public function test_validates_uniqueness_of()
+    public function testValidatesUniquenessOf()
     {
         BookValidations::create(['name' => 'bob']);
         $book = BookValidations::create(['name' => 'bob']);
@@ -113,13 +112,13 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertEquals(1, BookValidations::count(['conditions' => "name='bob'"]));
     }
 
-    public function test_validates_uniqueness_of_excludes_self()
+    public function testValidatesUniquenessOfExcludesSelf()
     {
         $book = BookValidations::first();
         $this->assertEquals(true, $book->is_valid());
     }
 
-    public function test_validates_uniqueness_of_with_multiple_fields()
+    public function testValidatesUniquenessOfWithMultipleFields()
     {
         BookValidations::$validates_uniqueness_of  = [
             'name' => [
@@ -131,7 +130,7 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertTrue($book2->is_valid());
     }
 
-    public function test_validates_uniqueness_of_with_multiple_fields_is_not_unique()
+    public function testValidatesUniquenessOfWithMultipleFieldsIsNotUnique()
     {
         BookValidations::$validates_uniqueness_of  = [
             'name' => [
@@ -144,7 +143,7 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertEquals(['Name and special must be unique'], $book2->errors->full_messages());
     }
 
-    public function test_validates_uniqueness_of_works_with_alias_attribute()
+    public function testValidatesUniquenessOfWorksWithAliasAttribute()
     {
         BookValidations::$validates_uniqueness_of = ['name_alias'=> ['scope'=>['x']]];
         $book = BookValidations::create(['name_alias' => 'Another Book', 'x' => 2]);
@@ -152,7 +151,7 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertEquals(['Name alias and x must be unique'], $book->errors->full_messages());
     }
 
-    public function test_validates_uniqueness_of_works_with_mysql_reserved_word_as_column_name()
+    public function testValidatesUniquenessOfWorksWithMysqlReservedWordAsColumnName()
     {
         ValuestoreValidations::create(['key' => 'GA_KEY', 'value' => 'UA-1234567-1']);
         $valuestore = ValuestoreValidations::create(['key' => 'GA_KEY', 'value' => 'UA-1234567-2']);
@@ -161,20 +160,20 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertEquals(1, ValuestoreValidations::count(['conditions' => "`key`='GA_KEY'"]));
     }
 
-    public function test_get_validation_rules()
+    public function testGetValidationRules()
     {
         $validators = BookValidations::first()->get_validation_rules();
         $this->assertTrue(in_array(['validator' => 'validates_presence_of'], $validators['name']));
     }
 
-    public function test_model_is_nulled_out_to_prevent_memory_leak()
+    public function testModelIsNulledOutToPreventMemoryLeak()
     {
         $book = new BookValidations();
         $book->is_valid();
         $this->assertTrue(false !== strpos(serialize($book->errors), 'model";N;'));
     }
 
-    public function test_validations_takes_strings()
+    public function testValidationsTakesStrings()
     {
         BookValidations::$validates_presence_of = [
             'numeric_test' => true,
@@ -185,7 +184,7 @@ class ValidationsTest extends DatabaseTestCase
         $this->assertFalse($book->is_valid());
     }
 
-    public function test_gh131_custom_validation()
+    public function testGh131CustomValidation()
     {
         $book = new BookValidations(['name' => 'test_custom_validation']);
         $book->save();

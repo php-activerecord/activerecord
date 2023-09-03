@@ -9,7 +9,7 @@ class MysqlAdapterTest extends AdapterTestCase
         parent::setUp('mysql');
     }
 
-    public function test_enum()
+    public function testEnum()
     {
         $author_columns = $this->connection->columns('authors');
         $this->assertEquals('enum', $author_columns['some_enum']->raw_type);
@@ -17,14 +17,14 @@ class MysqlAdapterTest extends AdapterTestCase
         $this->assertSame(null, $author_columns['some_enum']->length);
     }
 
-    public function test_set_charset()
+    public function testSetCharset()
     {
         $connection_string = ActiveRecord\Config::instance()->get_connection($this->connection_name);
         $conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
         $this->assertEquals('SET NAMES ?', $conn->last_query);
     }
 
-    public function test_limit_with_null_offset_does_not_contain_offset()
+    public function testLimitWithNullOffsetDoesNotContainOffset()
     {
         $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';

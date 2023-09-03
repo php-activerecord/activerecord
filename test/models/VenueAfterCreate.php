@@ -1,7 +1,9 @@
 <?php
+
 namespace test\models;
 
 use ActiveRecord\Model;
+
 class VenueAfterCreate extends Model
 {
     public static string $table_name = 'venues';

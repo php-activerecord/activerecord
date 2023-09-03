@@ -2,7 +2,16 @@
 
 $finder = new PhpCsFixer\Finder();
 $config = new PhpCsFixer\Config('json-schema', 'json-schema style guide');
-$finder->in(__DIR__ . '/lib');
+$finder->in(__DIR__)
+    ->exclude('.github')
+    ->exclude('.phpunit.cache')
+    ->exclude('.stan.cache')
+    ->exclude('.vscode')
+    ->exclude('assets')
+    ->exclude('docs')
+    ->exclude('node_modules')
+    ->exclude('output')
+    ->exclude('vendor');
 
 $config
     ->setRules([
