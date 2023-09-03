@@ -510,7 +510,7 @@ class Table
             $date_class = Config::instance()->get_date_class();
             foreach ($hash as $name => $value) {
                 if ($value instanceof \DateTime) {
-                    if (Column::DATE == $this->columns[$name]->type) {
+                    if (Column::DATE == ($this->columns[$name]?->type ?? null)) {
                         $hash[$name] = $this->conn->date_string($value);
                     } else {
                         $hash[$name] = $this->conn->datetime_string($value);
