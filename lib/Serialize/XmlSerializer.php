@@ -5,6 +5,7 @@ namespace ActiveRecord\Serialize;
 use function ActiveRecord\denamespace;
 
 use ActiveRecord\Model;
+use function PHPStan\dumpType;
 
 /**
  * XML serializer.
