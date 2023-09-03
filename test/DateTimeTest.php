@@ -1,7 +1,7 @@
 <?php
 
 use ActiveRecord\DatabaseException;
-use ActiveRecord\DateTime as DateTime;
+use ActiveRecord\DateTime;
 use PHPUnit\Framework\TestCase;
 use test\models\Author;
 
@@ -32,7 +32,7 @@ class DateTimeTest extends TestCase
         return $model;
     }
 
-    private function assert_dirtifies($method /*, method params, ...*/)
+    private function assert_dirtifies($method /* , method params, ... */)
     {
         $model = $this->get_model();
         $datetime = new DateTime();
@@ -45,7 +45,7 @@ class DateTimeTest extends TestCase
         $this->assertArrayHasKey('some_date', $model->dirty_attributes());
     }
 
-    public function test_should_flag_the_attribute_dirty()
+    public function testShouldFlagTheAttributeDirty()
     {
         $interval = new DateInterval('PT1S');
         $timezone = new DateTimeZone('America/New_York');
@@ -59,7 +59,7 @@ class DateTimeTest extends TestCase
         $this->assert_dirtifies('sub', $interval);
     }
 
-    public function test_set_iso_date()
+    public function testSetIsoDate()
     {
         $a = new \DateTime();
         $a->setISODate(2001, 1);
@@ -70,7 +70,7 @@ class DateTimeTest extends TestCase
         $this->assertEquals($a->format(DateTime::ATOM), $b->format(DateTime::ATOM));
     }
 
-    public function test_set_time()
+    public function testSetTime()
     {
         $a = new \DateTime();
         $a->setTime(1, 1);
@@ -81,82 +81,82 @@ class DateTimeTest extends TestCase
         $this->assertEquals($a->format(DateTime::ATOM), $b->format(DateTime::ATOM));
     }
 
-    public function test_get_format_with_friendly()
+    public function testGetFormatWithFriendly()
     {
         $this->assertEquals('Y-m-d H:i:s', DateTime::get_format('db'));
     }
 
-    public function test_get_format_with_format()
+    public function testGetFormatWithFormat()
     {
         $this->assertEquals('Y-m-d', DateTime::get_format('Y-m-d'));
     }
 
-    public function test_get_format_with_null()
+    public function testGetFormatWithNull()
     {
         $this->assertEquals(\DateTime::RFC2822, DateTime::get_format());
     }
 
-    public function test_format()
+    public function testFormat()
     {
         $this->assertTrue(is_string($this->date->format()));
         $this->assertTrue(is_string($this->date->format('Y-m-d')));
     }
 
-    public function test_format_by_friendly_name()
+    public function testFormatByFriendlyName()
     {
         $d = date(DateTime::get_format('db'));
         $this->assertEquals($d, $this->date->format('db'));
     }
 
-    public function test_format_by_custom_format()
+    public function testFormatByCustomFormat()
     {
         $format = 'Y/m/d';
         $this->assertEquals(date($format), $this->date->format($format));
     }
 
-    public function test_format_uses_default()
+    public function testFormatUsesDefault()
     {
         $d = date(DateTime::$FORMATS[DateTime::$DEFAULT_FORMAT]);
         $this->assertEquals($d, $this->date->format());
     }
 
-    public function test_all_formats()
+    public function testAllFormats()
     {
         foreach (DateTime::$FORMATS as $name => $format) {
             $this->assertEquals(date($format), $this->date->format($name));
         }
     }
 
-    public function test_change_default_format_to_format_string()
+    public function testChangeDefaultFormatToFormatString()
     {
         DateTime::$DEFAULT_FORMAT = 'H:i:s';
         $this->assertEquals(date(DateTime::$DEFAULT_FORMAT), $this->date->format());
     }
 
-    public function test_change_default_format_to_friently()
+    public function testChangeDefaultFormatToFriently()
     {
         DateTime::$DEFAULT_FORMAT = 'short';
         $this->assertEquals(date(DateTime::$FORMATS['short']), $this->date->format());
     }
 
-    public function test_to_string()
+    public function testToString()
     {
         $this->assertEquals(date(DateTime::get_format()), '' . $this->date);
     }
 
-    public function test_create_from_format_error_handling()
+    public function testCreateFromFormatErrorHandling()
     {
         $this->expectException(AssertionError::class);
         DateTime::createFromFormat('H:i:s Y-d-m', '!!!');
     }
 
-    public function test_create_from_format_without_tz()
+    public function testCreateFromFormatWithoutTz()
     {
         $d = DateTime::createFromFormat('H:i:s Y-d-m', '03:04:05 2000-02-01');
         $this->assertEquals(new DateTime('2000-01-02 03:04:05'), $d);
     }
 
-    public function test_create_from_format_with_tz()
+    public function testCreateFromFormatWithTz()
     {
         $d = DateTime::createFromFormat('Y-m-d H:i:s', '2000-02-01 03:04:05', new \DateTimeZone('Etc/GMT-10'));
         $d2 = new DateTime('2000-01-31 17:04:05');
@@ -164,7 +164,7 @@ class DateTimeTest extends TestCase
         $this->assertEquals($d2->getTimestamp(), $d->getTimestamp());
     }
 
-    public function test_native_date_time_attribute_copies_exact_tz()
+    public function testNativeDateTimeAttributeCopiesExactTz()
     {
         $dt = new \DateTime('', new \DateTimeZone('America/New_York'));
         $model = $this->get_model();
@@ -178,7 +178,7 @@ class DateTimeTest extends TestCase
         $this->assertEquals($dt->getTimeZone()->getName(), $dt2->getTimeZone()->getName());
     }
 
-    public function test_ar_date_time_attribute_copies_exact_tz()
+    public function testArDateTimeAttributeCopiesExactTz()
     {
         $dt = new DateTime('', new \DateTimeZone('America/New_York'));
         $model = $this->get_model();
@@ -192,7 +192,7 @@ class DateTimeTest extends TestCase
         $this->assertEquals($dt->getTimeZone()->getName(), $dt2->getTimeZone()->getName());
     }
 
-    public function test_clone()
+    public function testClone()
     {
         $model = $this->get_model();
         $model_attribute = 'some_date';

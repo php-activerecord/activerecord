@@ -8,7 +8,7 @@ use test\models\Venue;
 
 class HasManyThroughTest extends DatabaseTestCase
 {
-    public function test_gh101_has_many_through()
+    public function testGh101HasManyThrough()
     {
         $user = User::find(1);
         $newsletter = Newsletter::find(1);
@@ -25,7 +25,7 @@ class HasManyThroughTest extends DatabaseTestCase
         );
     }
 
-    public function test_gh101_has_many_through_include()
+    public function testGh101HasManyThroughInclude()
     {
         $user = User::find(1, [
             'include' => [
@@ -37,7 +37,7 @@ class HasManyThroughTest extends DatabaseTestCase
         $this->assertEquals(1, $user->user_newsletters[0]->id);
     }
 
-    public function test_gh107_has_many_through_include_eager()
+    public function testGh107HasManyThroughIncludeEager()
     {
         $venue = Venue::find(1, ['include' => ['events']]);
         $this->assertEquals(1, $venue->events[0]->id);
@@ -46,7 +46,7 @@ class HasManyThroughTest extends DatabaseTestCase
         $this->assertEquals(1, $venue->hosts[0]->id);
     }
 
-    public function test_gh107_has_many_though_include_eager_with_namespace()
+    public function testGh107HasManyThoughIncludeEagerWithNamespace()
     {
         $user = User::find(1, [
             'include' => [

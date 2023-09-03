@@ -21,7 +21,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->options = ['conditions' => 'blah', 'order' => 'blah'];
     }
 
-    public function test_options_is_not()
+    public function testOptionsIsNot()
     {
         $this->assertFalse(Author::is_options_hash(null));
         $this->assertFalse(Author::is_options_hash(''));
@@ -30,58 +30,58 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertFalse(Author::is_options_hash([1, 2, 3]));
     }
 
-    public function test_options_hash_with_unknown_keys()
+    public function testOptionsHashWithUnknownKeys()
     {
         $this->expectException(ActiveRecordException::class);
         $this->assertFalse(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
     }
 
-    public function test_options_is_hash()
+    public function testOptionsIsHash()
     {
         $this->assertTrue(Author::is_options_hash($this->options));
     }
 
-    public function test_extract_and_validate_options()
+    public function testExtractAndValidateOptions()
     {
         $args = ['first', $this->options];
         $this->assertEquals($this->options, Author::extract_and_validate_options($args));
         $this->assertEquals(['first'], $args);
     }
 
-    public function test_extract_and_validate_options_with_array_in_args()
+    public function testExtractAndValidateOptionsWithArrayInArgs()
     {
         $args = ['first', [1, 2], $this->options];
         $this->assertEquals($this->options, Author::extract_and_validate_options($args));
     }
 
-    public function test_extract_and_validate_options_removes_options_hash()
+    public function testExtractAndValidateOptionsRemovesOptionsHash()
     {
         $args = ['first', $this->options];
         Author::extract_and_validate_options($args);
         $this->assertEquals(['first'], $args);
     }
 
-    public function test_extract_and_validate_options_nope()
+    public function testExtractAndValidateOptionsNope()
     {
         $args = ['first'];
         $this->assertEquals([], Author::extract_and_validate_options($args));
         $this->assertEquals(['first'], $args);
     }
 
-    public function test_extract_and_validate_options_nope_because_wasnt_at_end()
+    public function testExtractAndValidateOptionsNopeBecauseWasntAtEnd()
     {
         $args = ['first', $this->options, [1, 2]];
         $this->assertEquals([], Author::extract_and_validate_options($args));
     }
 
-    public function test_invalid_attribute()
+    public function testInvalidAttribute()
     {
         $this->expectException(UndefinedPropertyException::class);
         $author = Author::find('first', ['conditions' => 'author_id=1']);
         $author->some_invalid_field_name;
     }
 
-    public function test_invalid_attributes()
+    public function testInvalidAttributes()
     {
         $book = Book::find(1);
         try {
@@ -94,7 +94,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals(1, substr_count($exceptions[1], 'another_invalid_attribute'));
     }
 
-    public function test_getter_undefined_property_exception_includes_model_name()
+    public function testGetterUndefinedPropertyExceptionIncludesModelName()
     {
         $this->assert_exception_message_contains('Author->this_better_not_exist', function () {
             $author = new Author();
@@ -102,14 +102,14 @@ class ActiveRecordTest extends DatabaseTestCase
         });
     }
 
-    public function test_mass_assignment_undefined_property_exception_includes_model_name()
+    public function testMassAssignmentUndefinedPropertyExceptionIncludesModelName()
     {
         $this->assert_exception_message_contains('Author->this_better_not_exist', function () {
             new Author(['this_better_not_exist' => 'hi']);
         });
     }
 
-    public function test_setter_undefined_property_exception_includes_model_name()
+    public function testSetterUndefinedPropertyExceptionIncludesModelName()
     {
         $this->assert_exception_message_contains('Author->this_better_not_exist', function () {
             $author = new Author();
@@ -117,7 +117,7 @@ class ActiveRecordTest extends DatabaseTestCase
         });
     }
 
-    public function test_get_values_for()
+    public function testGetValuesFor()
     {
         $books = Book::find_by_name('Ancient Art of Main Tanking');
         $ret = $books->get_values_for(['book_id', 'author_id']);
@@ -125,25 +125,25 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals([1, 1], array_values($ret));
     }
 
-    public function test_hyphenated_column_names_to_underscore()
+    public function testHyphenatedColumnNamesToUnderscore()
     {
         $keys = array_keys(RmBldg::first()->attributes());
         $this->assertTrue(in_array('rm_name', $keys));
     }
 
-    public function test_column_names_with_spaces()
+    public function testColumnNamesWithSpaces()
     {
         $keys = array_keys(RmBldg::first()->attributes());
         $this->assertTrue(in_array('space_out', $keys));
     }
 
-    public function test_mixed_case_column_name()
+    public function testMixedCaseColumnName()
     {
         $keys = array_keys(Author::first()->attributes());
         $this->assertTrue(in_array('mixedcasefield', $keys));
     }
 
-    public function test_mixed_case_primary_key_save()
+    public function testMixedCasePrimaryKeySave()
     {
         $venue = Venue::find(1);
         $venue->name = 'should not throw exception';
@@ -151,7 +151,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals($venue->name, Venue::find(1)->name);
     }
 
-    public function test_reload()
+    public function testReload()
     {
         $venue = Venue::find(1);
         $this->assertEquals('NY', $venue->state);
@@ -161,7 +161,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals('NY', $venue->state);
     }
 
-    public function test_reload_protected_attribute()
+    public function testReloadProtectedAttribute()
     {
         $book = BookAttrAccessible::find(1);
 
@@ -170,13 +170,13 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertNotEquals('Should not stay', $book->name);
     }
 
-    public function test_namespace_gets_stripped_from_table_name()
+    public function testNamespaceGetsStrippedFromTableName()
     {
         $model = new \test\models\namespacetest\Book();
         $this->assertEquals('books', $model->table()->table);
     }
 
-    public function test_namespace_gets_stripped_from_inferred_foreign_key()
+    public function testNamespaceGetsStrippedFromInferredForeignKey()
     {
         $model = new \test\models\namespacetest\Book();
         $table = ActiveRecord\Table::load(get_class($model));
@@ -186,7 +186,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals($table->get_relationship('parent_book_3')->foreign_key[0], 'book_id');
     }
 
-    public function test_namespaced_relationship_associates_correctly()
+    public function testNamespacedRelationshipAssociatesCorrectly()
     {
         $model = new \test\models\namespacetest\Book();
         $table = ActiveRecord\Table::load(get_class($model));
@@ -220,26 +220,26 @@ class ActiveRecordTest extends DatabaseTestCase
         );
     }
 
-    public function test_should_have_all_column_attributes_when_initializing_with_array()
+    public function testShouldHaveAllColumnAttributesWhenInitializingWithArray()
     {
         $author = new Author(['name' => 'Tito']);
         $this->assertTrue(count(array_keys($author->attributes())) >= 9);
     }
 
-    public function test_defaults()
+    public function testDefaults()
     {
         $author = new Author();
         $this->assertEquals('default_name', $author->name);
     }
 
-    public function test_alias_attribute_getter()
+    public function testAliasAttributeGetter()
     {
         $venue = Venue::find(1);
         $this->assertEquals($venue->marquee, $venue->name);
         $this->assertEquals($venue->mycity, $venue->city);
     }
 
-    public function test_alias_attribute_setter()
+    public function testAliasAttributeSetter()
     {
         $venue = Venue::find(1);
         $venue->marquee = 'new name';
@@ -251,19 +251,19 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals($venue->marquee, $venue->name);
     }
 
-    public function test_alias_from_mass_attributes()
+    public function testAliasFromMassAttributes()
     {
         $venue = new Venue(['marquee' => 'meme', 'id' => 123]);
         $this->assertEquals('meme', $venue->name);
         $this->assertEquals($venue->marquee, $venue->name);
     }
 
-    public function test_gh18_isset_on_aliased_attribute()
+    public function testGh18IssetOnAliasedAttribute()
     {
         $this->assertTrue(isset(Venue::first()->marquee));
     }
 
-    public function test_attr_accessible()
+    public function testAttrAccessible()
     {
         $book = new BookAttrAccessible(['name' => 'should not be set', 'author_id' => 1]);
         $this->assertNull($book->name);
@@ -272,7 +272,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals('test', $book->name);
     }
 
-    public function test_attr_protected()
+    public function testAttrProtected()
     {
         $book = new BookAttrAccessible(['book_id' => 999]);
         $this->assertNull($book->book_id);
@@ -280,7 +280,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals(999, $book->book_id);
     }
 
-    public function test_isset()
+    public function testIsset()
     {
         $book = new Book();
         $this->assertTrue(isset($book->name));
@@ -290,7 +290,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertTrue(isset($author->awesome_person));
     }
 
-    public function test_readonly_only_halt_on_write_method()
+    public function testReadonlyOnlyHaltOnWriteMethod()
     {
         $book = Book::first(['readonly' => true]);
         $this->assertTrue($book->is_readonly());
@@ -305,27 +305,27 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals($book->name, 'some new name');
     }
 
-    public function test_cast_when_using_setter()
+    public function testCastWhenUsingSetter()
     {
         $book = new Book();
         $book->book_id = '1';
         $this->assertSame(1, $book->book_id);
     }
 
-    public function test_cast_when_loading()
+    public function testCastWhenLoading()
     {
         $book = \test\models\Book::find(1);
         $this->assertSame(1, $book->book_id);
         $this->assertSame('Ancient Art of Main Tanking', $book->name);
     }
 
-    public function test_cast_defaults()
+    public function testCastDefaults()
     {
         $book = new Book();
         $this->assertSame(0.0, $book->special);
     }
 
-    public function test_transaction_committed()
+    public function testTransactionCommitted()
     {
         $original = Author::count();
         $ret = Author::transaction(function () { Author::create(['name' => 'blah']); });
@@ -333,7 +333,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertTrue($ret);
     }
 
-    public function test_transaction_committed_when_returning_true()
+    public function testTransactionCommittedWhenReturningTrue()
     {
         $original = Author::count();
         $ret = Author::transaction(function () {
@@ -345,7 +345,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertTrue($ret);
     }
 
-    public function test_transaction_rolledback_by_returning_false()
+    public function testTransactionRolledbackByReturningFalse()
     {
         $original = Author::count();
 
@@ -359,7 +359,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertFalse($ret);
     }
 
-    public function test_transaction_rolledback_by_throwing_exception()
+    public function testTransactionRolledbackByThrowingException()
     {
         $original = Author::count();
         $exception = null;
@@ -377,33 +377,33 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals($original, Author::count());
     }
 
-    public function test_delegate()
+    public function testDelegate()
     {
         $event = Event::first();
         $this->assertEquals($event->venue->state, $event->state);
         $this->assertEquals($event->venue->address, $event->address);
     }
 
-    public function test_delegate_prefix()
+    public function testDelegatePrefix()
     {
         $event = Event::first();
         $this->assertEquals($event->host->name, $event->woot_name);
     }
 
-    public function test_delegate_returns_null_if_relationship_does_not_exist()
+    public function testDelegateReturnsNullIfRelationshipDoesNotExist()
     {
         $event = new Event();
         $this->assertNull($event->state);
     }
 
-    public function test_delegate_set_attribute()
+    public function testDelegateSetAttribute()
     {
         $event = Event::first();
         $event->state = 'MEXICO';
         $this->assertEquals('MEXICO', $event->venue->state);
     }
 
-    public function test_delegate_getter_gh_98()
+    public function testDelegateGetterGh98()
     {
         Venue::$use_custom_get_state_getter = true;
 
@@ -414,7 +414,7 @@ class ActiveRecordTest extends DatabaseTestCase
         Venue::$use_custom_get_state_getter = false;
     }
 
-    public function test_delegate_setter_gh_98()
+    public function testDelegateSetterGh98()
     {
         Venue::$use_custom_set_state_setter = true;
 
@@ -425,25 +425,25 @@ class ActiveRecordTest extends DatabaseTestCase
         Venue::$use_custom_set_state_setter = false;
     }
 
-    public function test_table_name_with_underscores()
+    public function testTableNameWithUnderscores()
     {
         $this->assertNotNull(AwesomePerson::first());
     }
 
-    public function test_model_should_default_as_new_record()
+    public function testModelShouldDefaultAsNewRecord()
     {
         $author = new Author();
         $this->assertTrue($author->is_new_record());
     }
 
-    public function test_setter()
+    public function testSetter()
     {
         $author = new Author();
         $author->password = 'plaintext';
         $this->assertEquals(md5('plaintext'), $author->encrypted_password);
     }
 
-    public function test_case_insensitivity()
+    public function testCaseInsensitivity()
     {
         $author = new Author();
         $author->mixedCaseField = 'Peter';
@@ -456,45 +456,45 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals('Simon', $author->MIXEDCASEFIELD);
     }
 
-    public function test_setter_with_same_name_as_an_attribute()
+    public function testSetterWithSameNameAsAnAttribute()
     {
         $author = new Author();
         $author->name = 'bob';
         $this->assertEquals('BOB', $author->name);
     }
 
-    public function test_getter()
+    public function testGetter()
     {
         $book = Book::first();
-        $this->assertEquals("ANCIENT ART OF MAIN TANKING", $book->upper_name);
+        $this->assertEquals('ANCIENT ART OF MAIN TANKING', $book->upper_name);
     }
 
-    public function test_getter_with_same_name_as_an_attribute()
+    public function testGetterWithSameNameAsAnAttribute()
     {
         $book = new Book();
         $book->publisher = 'Random House';
         $this->assertEquals('RANDOM HOUSE', $book->publisher);
     }
 
-    public function test_setting_invalid_date_should_set_date_to_null()
+    public function testSettingInvalidDateShouldSetDateToNull()
     {
         $author = new Author();
         $author->created_at = 'CURRENT_TIMESTAMP';
         $this->assertNull($author->created_at);
     }
 
-    public function test_table_name()
+    public function testTableName()
     {
         $this->assertEquals('authors', Author::table_name());
     }
 
-    public function test_undefined_instance_method()
+    public function testUndefinedInstanceMethod()
     {
         $this->expectException(ActiveRecordException::class);
         Author::first()->find_by_name('sdf');
     }
 
-    public function test_clear_cache_for_specific_class()
+    public function testClearCacheForSpecificClass()
     {
         $book_table1 = ActiveRecord\Table::load(Book::class);
         $book_table2 = ActiveRecord\Table::load(Book::class);
@@ -505,7 +505,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertTrue($book_table1 !== $book_table3);
     }
 
-    public function test_flag_dirty()
+    public function testFlagDirty()
     {
         $author = new Author();
         $author->flag_dirty('some_date');
@@ -515,22 +515,22 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertFalse($author->attribute_is_dirty('some_date'));
     }
 
-    public function test_flag_dirty_attribute_which_does_not_exit()
+    public function testFlagDirtyAttributeWhichDoesNotExit()
     {
         $author = new Author();
         $author->flag_dirty('some_inexistant_property');
-        $this->assertEquals([],$author->dirty_attributes());
+        $this->assertEquals([], $author->dirty_attributes());
         $this->assertFalse($author->attribute_is_dirty('some_inexistant_property'));
     }
 
-    public function test_gh245_dirty_attribute_should_not_raise_php_notice_if_not_dirty()
+    public function testGh245DirtyAttributeShouldNotRaisePhpNoticeIfNotDirty()
     {
         $event = new Event(['title' => 'Fun']);
         $this->assertFalse($event->attribute_is_dirty('description'));
         $this->assertTrue($event->attribute_is_dirty('title'));
     }
 
-    public function test_assigning_php_datetime_gets_converted_to_date_class_with_defaults()
+    public function testAssigningPhpDatetimeGetsConvertedToDateClassWithDefaults()
     {
         $author = new Author();
         $author->created_at = $now = new \DateTime();
@@ -538,7 +538,7 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals($now->format(DateTime::ATOM), $author->created_at->format(DateTime::ATOM));
     }
 
-    public function test_assigning_php_datetime_gets_converted_to_date_class_with_custom_date_class()
+    public function testAssigningPhpDatetimeGetsConvertedToDateClassWithCustomDateClass()
     {
         ActiveRecord\Config::instance()->set_date_class('\\DateTime'); // use PHP built-in DateTime
         $author = new Author();
@@ -547,13 +547,13 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals($now->format(DateTime::ATOM), $author->created_at->format(DateTime::ATOM));
     }
 
-    public function test_assigning_from_mass_assignment_php_datetime_gets_converted_to_ar_datetime()
+    public function testAssigningFromMassAssignmentPhpDatetimeGetsConvertedToArDatetime()
     {
         $author = new Author(['created_at' => new \DateTime()]);
         $this->assertInstanceOf('ActiveRecord\\DateTime', $author->created_at);
     }
 
-    public function test_get_real_attribute_name()
+    public function testGetRealAttributeName()
     {
         $venue = new Venue();
         $this->assertEquals('name', $venue->get_real_attribute_name('name'));
@@ -561,13 +561,13 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals(null, $venue->get_real_attribute_name('invalid_field'));
     }
 
-    public function test_id_setter_works_with_table_without_pk_named_attribute()
+    public function testIdSetterWorksWithTableWithoutPkNamedAttribute()
     {
         $author = new Author(['id' => 123]);
         $this->assertEquals(123, $author->author_id);
     }
 
-    public function test_query()
+    public function testQuery()
     {
         $row = Author::query('SELECT COUNT(*) AS n FROM authors')->fetch();
         $this->assertTrue($row['n'] > 1);

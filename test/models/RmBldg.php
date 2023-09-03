@@ -1,7 +1,9 @@
 <?php
+
 namespace test\models;
 
 use ActiveRecord\Model;
+
 class RmBldg extends Model
 {
     public static $table = 'rm-bldg';
