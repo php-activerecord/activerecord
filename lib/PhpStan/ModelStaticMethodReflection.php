@@ -111,8 +111,9 @@ class ModelStaticMethodReflection implements MethodReflection
      */
     public function getVariants(): array
     {
-        if (str_starts_with($this->name, "find_by")) {
+        if (str_starts_with($this->name, 'find_by')) {
             $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 8), 0);
+
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),
@@ -125,9 +126,9 @@ class ModelStaticMethodReflection implements MethodReflection
                     ])
                 )
             ];
-        }
-        elseif (str_starts_with($this->name, "find_all")) {
+        } elseif (str_starts_with($this->name, 'find_all')) {
             $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 8), 0);
+
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),
@@ -140,8 +141,7 @@ class ModelStaticMethodReflection implements MethodReflection
                     )
                 )
             ];
-        }
-        elseif (preg_match('/_set$/', $this->name)) {
+        } elseif (preg_match('/_set$/', $this->name)) {
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),
