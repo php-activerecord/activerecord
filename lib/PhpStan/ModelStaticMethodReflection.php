@@ -127,7 +127,7 @@ class ModelStaticMethodReflection implements MethodReflection
                 )
             ];
         } elseif (str_starts_with($this->name, 'find_all')) {
-            $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 8), 0);
+            $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 9), 0);
 
             return [
                 new FunctionVariant(
