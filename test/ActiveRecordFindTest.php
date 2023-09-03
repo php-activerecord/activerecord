@@ -19,30 +19,29 @@ class ActiveRecordFindTest extends DatabaseTestCase
     }
 
     public function test_find_returns_single_model() {
-        $author = Author::find(3);
-        $this->assertInstanceOf(Model::class, $author );
+        $author = Author::find(3, ['select' => 'author_id']);
+        $this->assertInstanceOf(Model::class, $author);
 
         $author = Author::find('3');
-        $this->assertInstanceOf(Model::class, $author );
+        $this->assertInstanceOf(Model::class, $author);
 
         $author = Author::find(["name"=>"Bill Clinton"]);
-        $this->assertInstanceOf(Model::class, $author );
-
+        $this->assertInstanceOf(Model::class, $author);
 
         $author = Author::find_by_name("Bill Clinton");
-        $this->assertInstanceOf(Model::class, $author );
+        $this->assertInstanceOf(Model::class, $author);
 
         $author = Author::first();
-        $this->assertInstanceOf(Model::class, $author );
+        $this->assertInstanceOf(Model::class, $author);
 
         $author = Author::find("first", ["name"=>"Bill Clinton"]);
-        $this->assertInstanceOf(Model::class, $author );
+        $this->assertInstanceOf(Model::class, $author);
 
         $author = Author::last();
-        $this->assertInstanceOf(Model::class, $author );
+        $this->assertInstanceOf(Model::class, $author);
 
         $author = Author::find("last", ["name"=>"Bill Clinton"]);
-        $this->assertInstanceOf(Model::class, $author );
+        $this->assertInstanceOf(Model::class, $author);
     }
 
     public function test_find_returns_array_of_models()
@@ -50,7 +49,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $authors = Author::all();
         $this->assertIsArray($authors);
 
-        $authors = Author::find("all");
+        $authors = Author::find("all", ['limit' => 1]);
         $this->assertIsArray($authors);
 
         $authors = Author::find("all", ["name" => "Bill Clinton"]);

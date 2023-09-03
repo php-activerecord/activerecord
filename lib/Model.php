@@ -1671,7 +1671,7 @@ class Model
      * YourModel::find(1,2,3);
      *
      * # finding by pk accepts an options array
-     * YourModel::find(123,array('order' => 'name desc'));
+     * YourModel::find(123, ['order' => 'name desc']);
      * ```
      *
      * Finding by using a conditions array:
@@ -1708,30 +1708,30 @@ class Model
      *
      * @throws RecordNotFound if no options are passed or finding by pk and no records matched
      *
-     * @return static|static[]|null
+     * @return Model|Model[]|null
      *
      * The rules for what gets returned are complex, but predictable:
      *
      * /-------------------------------------------------------------------------------------------
      * 	First Argument								Return Type			Example
      * --------------------------------------------------------------------------------------------
-     *	int|string									static				User::find(3);
-     * 	array<string, int|string>					static				User::find(["name"=>"Philip"]);
-     * 	"first"										static|null			User::find("first", ["name"=>"Waldo"]);
-     * 	"last"										static|null			User::find("last", ["name"=>"William"]);
-     *  "all"										static[]			User::find("all", ["name" => "Stephen"]
-     *  ...int|string								static[]			User::find(1, 3, 5, 8);
-     *  array<int,int|string>						static[]			User::find([1,3,5,8]);
-     * 	array<"conditions", array<string,string>>	static[]			User::find(["conditions"=> ["name" => "Kurt"]]);
+     *	int|string									Model				User::find(3);
+     * 	array<string, int|string>					Model				User::find(["name"=>"Philip"]);
+     * 	"first"										Model|null			User::find("first", ["name"=>"Waldo"]);
+     * 	"last"										Model|null			User::find("last", ["name"=>"William"]);
+     *  "all"										Model[]				User::find("all", ["name"=>"Stephen"]
+     *  ...int|string								Model[]				User::find(1, 3, 5, 8);
+     *  array<int,int|string>						Model[]				User::find([1,3,5,8]);
+     * 	array<"conditions", array<string, string>>	Model[]				User::find(["conditions"=>["name"=>"Kurt"]]);
      */
-    public static function find(/* $type, $options */)
+    public static function find(/* $type, $options */): Model|array|null
     {
         $class = get_called_class();
 
-        if (func_num_args() <= 0) {
+        $args = func_get_args();
+        if (count($args) === 0) {
             throw new RecordNotFound("Couldn't find $class without an ID");
         }
-        $args = func_get_args();
         $options = static::extract_and_validate_options($args);
 
         $num_args = count($args);
@@ -1765,7 +1765,7 @@ class Model
 
         // find by pk
         else {
-            if (1 === count($args) && 1 == $num_args) {
+            if (1 == $num_args) {
                 $args = $args[0];
             }
 
