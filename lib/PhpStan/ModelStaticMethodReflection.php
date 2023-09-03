@@ -112,7 +112,7 @@ class ModelStaticMethodReflection implements MethodReflection
     public function getVariants(): array
     {
         if (str_starts_with($this->name, 'count_by')) {
-            $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 8), 0);
+            $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 9), 0);
 
             return [
                 new FunctionVariant(
