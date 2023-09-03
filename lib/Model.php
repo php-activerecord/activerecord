@@ -1515,7 +1515,7 @@ class Model
             $method = 'find_by' . substr($method, 17);
         }
 
-        if ('find_by' === substr($method, 0, 7)) {
+        if (str_starts_with($method, 'find_by')) {
             $attributes = substr($method, 8);
             $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
 
@@ -1524,7 +1524,7 @@ class Model
             }
 
             return $ret;
-        } elseif ('find_all_by' === substr($method, 0, 11)) {
+        } elseif (str_starts_with($method, 'find_all_by')) {
             $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
 
             return static::find('all', $options);
