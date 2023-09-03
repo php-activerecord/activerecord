@@ -27,7 +27,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         ];
     }
 
-    public function test_within()
+    public function testWithin()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 5];
         $book = new BookLength();
@@ -36,7 +36,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_within_error_message()
+    public function testWithinErrorMessage()
     {
         BookLength::$validates_length_of['name']['within'] = [2, 5];
         $book = new BookLength();
@@ -49,7 +49,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals(['Name is too long (maximum is 5 characters)'], $book->errors->full_messages());
     }
 
-    public function test_within_custom_error_message()
+    public function testWithinCustomErrorMessage()
     {
         BookLength::$validates_length_of['name']['within'] = [2, 5];
         BookLength::$validates_length_of['name']['too_short'] = 'is too short';
@@ -64,7 +64,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals(['Name is not between 2 and 5 characters'], $book->errors->full_messages());
     }
 
-    public function test_valid_in()
+    public function testValidIn()
     {
         BookLength::$validates_length_of['name']['in'] = [1, 5];
         $book = new BookLength();
@@ -73,7 +73,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_aliased_size_of()
+    public function testAliasedSizeOf()
     {
         BookSize::$validates_size_of = BookLength::$validates_length_of;
         BookSize::$validates_size_of['name']['within'] = [1, 5];
@@ -83,7 +83,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_within_and_in()
+    public function testInvalidWithinAndIn()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 3];
         $book = new BookLength();
@@ -99,7 +99,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertTrue($book->errors->is_invalid('name'));
     }
 
-    public function test_valid_null()
+    public function testValidNull()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 3];
         BookLength::$validates_length_of['name']['allow_null'] = true;
@@ -110,7 +110,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_valid_blank()
+    public function testValidBlank()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 3];
         BookLength::$validates_length_of['name']['allow_blank'] = true;
@@ -121,7 +121,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_blank()
+    public function testInvalidBlank()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 3];
 
@@ -132,7 +132,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->first('name'));
     }
 
-    public function test_invalid_null_within()
+    public function testInvalidNullWithin()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 3];
 
@@ -143,7 +143,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->first('name'));
     }
 
-    public function test_invalid_null_minimum()
+    public function testInvalidNullMinimum()
     {
         BookLength::$validates_length_of['name']['minimum'] = 1;
 
@@ -154,7 +154,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals('is too short (minimum is 1 characters)', $book->errors->first('name'));
     }
 
-    public function test_valid_null_maximum()
+    public function testValidNullMaximum()
     {
         BookLength::$validates_length_of['name']['maximum'] = 1;
 
@@ -164,7 +164,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_float_as_impossible_range_option()
+    public function testFloatAsImpossibleRangeOption()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 3.6];
         $book = new BookLength();
@@ -176,7 +176,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         }
     }
 
-    public function test_signed_integer_as_impossible_within_option()
+    public function testSignedIntegerAsImpossibleWithinOption()
     {
         BookLength::$validates_length_of['name']['within'] = [-1, 3];
 
@@ -193,7 +193,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->fail('An expected exception has not be raised.');
     }
 
-    public function test_signed_integer_as_impossible_is_option()
+    public function testSignedIntegerAsImpossibleIsOption()
     {
         BookLength::$validates_length_of['name']['is'] = -8;
 
@@ -210,7 +210,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->fail('An expected exception has not be raised.');
     }
 
-    public function test_lack_of_option()
+    public function testLackOfOption()
     {
         try {
             $book = new BookLength();
@@ -225,7 +225,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->fail('An expected exception has not be raised.');
     }
 
-    public function test_too_many_options()
+    public function testTooManyOptions()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 3];
         BookLength::$validates_length_of['name']['in'] = [1, 3];
@@ -243,7 +243,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->fail('An expected exception has not be raised.');
     }
 
-    public function test_too_many_options_with_different_option_types()
+    public function testTooManyOptionsWithDifferentOptionTypes()
     {
         BookLength::$validates_length_of['name']['within'] = [1, 3];
         BookLength::$validates_length_of['name']['is'] = 3;
@@ -261,7 +261,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->fail('An expected exception has not be raised.');
     }
 
-    public function test_with_option_as_non_numeric()
+    public function testWithOptionAsNonNumeric()
     {
         $this->expectException(ValidationsArgumentError::class);
         BookLength::$validates_length_of = [
@@ -273,7 +273,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->save();
     }
 
-    public function test_with_option_as_non_numeric_non_array()
+    public function testWithOptionAsNonNumericNonArray()
     {
         $this->expectException(ValidationsArgumentError::class);
 
@@ -286,7 +286,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $book->save();
     }
 
-    public function test_validates_length_of_maximum()
+    public function testValidatesLengthOfMaximum()
     {
         BookLength::$validates_length_of = [
             'name' => ['maximum' => 10]
@@ -296,7 +296,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals(['Name is too long (maximum is 10 characters)'], $book->errors->full_messages());
     }
 
-    public function test_validates_length_of_minimum()
+    public function testValidatesLengthOfMinimum()
     {
         BookLength::$validates_length_of['name'] = ['minimum' => 2];
         $book = new BookLength(['name' => '1']);
@@ -304,7 +304,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals(['Name is too short (minimum is 2 characters)'], $book->errors->full_messages());
     }
 
-    public function test_validates_length_of_min_max_custom_message()
+    public function testValidatesLengthOfMinMaxCustomMessage()
     {
         BookLength::$validates_length_of['name'] = ['maximum' => 10, 'message' => 'is far too long'];
         $book = new BookLength([
@@ -322,7 +322,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals(['Name is far too short'], $book->errors->full_messages());
     }
 
-    public function test_validates_length_of_min_max_custom_message_overridden()
+    public function testValidatesLengthOfMinMaxCustomMessageOverridden()
     {
         BookLength::$validates_length_of['name'] = [
             'minimum' => 10,
@@ -334,7 +334,7 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertEquals(['Name is custom message'], $book->errors->full_messages());
     }
 
-    public function test_validates_length_of_is()
+    public function testValidatesLengthOfIs()
     {
         BookLength::$validates_length_of['name'] = ['is' => 2];
         $book = new BookLength(['name' => '123']);

@@ -33,7 +33,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         ];
     }
 
-    public function test_inclusion()
+    public function testInclusion()
     {
         $book = new BookInclusion();
         $book->name = 'blah';
@@ -41,7 +41,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_exclusion()
+    public function testExclusion()
     {
         $book = new BookExclusion();
         $book->name = 'blahh';
@@ -49,7 +49,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_inclusion()
+    public function testInvalidInclusion()
     {
         $book = new BookInclusion();
         $book->name = 'thanker';
@@ -60,7 +60,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertTrue($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_exclusion()
+    public function testInvalidExclusion()
     {
         $book = new BookExclusion();
         $book->name = 'alpha';
@@ -73,7 +73,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertTrue($book->errors->is_invalid('name'));
     }
 
-    public function test_inclusion_with_numeric()
+    public function testInclusionWithNumeric()
     {
         BookInclusion::$validates_inclusion_of['name']['in'] = [0, 1, 2];
         $book = new BookInclusion();
@@ -82,7 +82,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_inclusion_with_boolean()
+    public function testInclusionWithBoolean()
     {
         BookInclusion::$validates_inclusion_of['name']['in'] = [true];
         $book = new BookInclusion();
@@ -91,7 +91,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_inclusion_with_null()
+    public function testInclusionWithNull()
     {
         BookInclusion::$validates_inclusion_of['name']['in']= [null];
         $book = new BookInclusion();
@@ -100,7 +100,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_inclusion_with_numeric()
+    public function testInvalidInclusionWithNumeric()
     {
         BookInclusion::$validates_inclusion_of['name']['in']= [0, 1, 2];
         $book = new BookInclusion();
@@ -120,7 +120,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_inclusion_scalar_value(): void
+    public function testInclusionScalarValue(): void
     {
         BookInclusion::$validates_inclusion_of['name'] = [
             'within' => ['okay']
@@ -131,7 +131,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_valid_null()
+    public function testValidNull()
     {
         BookInclusion::$validates_inclusion_of['name']['allow_null'] = true;
         $book = new BookInclusion();
@@ -140,7 +140,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_valid_blank()
+    public function testValidBlank()
     {
         BookInclusion::$validates_inclusion_of['name']['allow_blank'] = true;
         $book = new BookInclusion();
@@ -149,7 +149,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_custom_message()
+    public function testCustomMessage()
     {
         $msg = 'is using a custom message.';
         BookInclusion::$validates_inclusion_of['name']['message'] = $msg;

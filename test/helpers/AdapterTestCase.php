@@ -1,28 +1,29 @@
 <?php
 
+use ActiveRecord\Adapter\SqliteAdapter;
 use ActiveRecord\Column;
 use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
-use ActiveRecord\Adapter\SqliteAdapter;
 
 abstract class AdapterTestCase extends DatabaseTestCase
 {
-    const InvalidDb = '__1337__invalid_db__';
+    public const InvalidDb = '__1337__invalid_db__';
 
     public function setUp(string $connection_name=null): void
     {
-        if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
-            'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
+        if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers()))
+            || 'skip' == ActiveRecord\Config::instance()->get_connection($connection_name)) {
             $this->markTestSkipped($connection_name . ' drivers are not present');
         }
 
         parent::setUp($connection_name);
     }
 
-    public function test_i_has_a_default_port_unless_im_sqlite()
+    public function testIHasADefaultPortUnlessImSqlite()
     {
         if ($this->connection instanceof SqliteAdapter) {
             $this->expectNotToPerformAssertions();
+
             return;
         }
 
@@ -30,25 +31,25 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertTrue($c::$DEFAULT_PORT > 0);
     }
 
-    public function test_should_set_adapter_variables()
+    public function testShouldSetAdapterVariables()
     {
         $this->assertNotNull($this->connection->protocol);
     }
 
-    public function test_null_connection_string_uses_default_connection()
+    public function testNullConnectionStringUsesDefaultConnection()
     {
         $this->assertNotNull(ActiveRecord\Connection::instance(null));
         $this->assertNotNull(ActiveRecord\Connection::instance(''));
         $this->assertNotNull(ActiveRecord\Connection::instance());
     }
 
-    public function test_invalid_connection_protocol()
+    public function testInvalidConnectionProtocol()
     {
         $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::instance('terribledb://user:pass@host/db');
     }
 
-    public function test_no_host_connection()
+    public function testNoHostConnection()
     {
         $this->expectException(DatabaseException::class);
         if (!$GLOBALS['slow_tests']) {
@@ -57,7 +58,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         ActiveRecord\Connection::instance("{$this->connection->protocol}://user:pass");
     }
 
-    public function test_connection_failed_invalid_host()
+    public function testConnectionFailedInvalidHost()
     {
         $this->expectException(DatabaseException::class);
         if (!$GLOBALS['slow_tests']) {
@@ -66,19 +67,19 @@ abstract class AdapterTestCase extends DatabaseTestCase
         ActiveRecord\Connection::instance("{$this->connection->protocol}://user:pass/1.1.1.1/db");
     }
 
-    public function test_connection_failed()
+    public function testConnectionFailed()
     {
         $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://baduser:badpass@127.0.0.1/db");
     }
 
-    public function test_connect_failed()
+    public function testConnectFailed()
     {
         $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://zzz:zzz@127.0.0.1/test");
     }
 
-    public function test_connect_with_port()
+    public function testConnectWithPort()
     {
         $this->expectNotToPerformAssertions();
         $config = ActiveRecord\Config::instance();
@@ -99,13 +100,13 @@ abstract class AdapterTestCase extends DatabaseTestCase
         }
     }
 
-    public function test_connect_to_invalid_database()
+    public function testConnectToInvalidDatabase()
     {
         $this->expectException(ConnectionException::class);
         ActiveRecord\Connection::instance("{$this->connection->protocol}://test:test@127.0.0.1/" . self::InvalidDb);
     }
 
-    public function test_date_time_type()
+    public function testDateTimeType()
     {
         $columns = $this->connection->columns('authors');
         $this->assertEquals('datetime', $columns['created_at']->raw_type);
@@ -113,7 +114,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertTrue($columns['created_at']->length > 0);
     }
 
-    public function test_date()
+    public function testDate()
     {
         $columns = $this->connection->columns('authors');
         $this->assertEquals('date', $columns['some_Date']->raw_type);
@@ -121,27 +122,27 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertTrue($columns['some_Date']->length >= 7);
     }
 
-    public function test_columns_no_inflection_on_hash_key()
+    public function testColumnsNoInflectionOnHashKey()
     {
         $author_columns = $this->connection->columns('authors');
         $this->assertTrue(array_key_exists('author_id', $author_columns));
     }
 
-    public function test_columns_nullable()
+    public function testColumnsNullable()
     {
         $author_columns = $this->connection->columns('authors');
         $this->assertFalse($author_columns['author_id']->nullable);
         $this->assertTrue($author_columns['parent_author_id']->nullable);
     }
 
-    public function test_columns_pk()
+    public function testColumnsPk()
     {
         $author_columns = $this->connection->columns('authors');
         $this->assertTrue($author_columns['author_id']->pk);
         $this->assertFalse($author_columns['parent_author_id']->pk);
     }
 
-    public function test_columns_sequence()
+    public function testColumnsSequence()
     {
         if ($this->connection->supports_sequences()) {
             $author_columns = $this->connection->columns('authors');
@@ -151,13 +152,13 @@ abstract class AdapterTestCase extends DatabaseTestCase
         }
     }
 
-    public function test_columns_default()
+    public function testColumnsDefault()
     {
         $author_columns = $this->connection->columns('authors');
         $this->assertEquals('default_name', $author_columns['name']->default);
     }
 
-    public function test_columns_type()
+    public function testColumnsType()
     {
         $author_columns = $this->connection->columns('authors');
         $this->assertEquals('varchar', substr($author_columns['name']->raw_type, 0, 7));
@@ -165,25 +166,25 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals(25, $author_columns['name']->length);
     }
 
-    public function test_columns_text()
+    public function testColumnsText()
     {
         $author_columns = $this->connection->columns('authors');
         $this->assertEquals('text', $author_columns['some_text']->raw_type);
         $this->assertEquals(null, $author_columns['some_text']->length);
     }
 
-    public function test_columns_time()
+    public function testColumnsTime()
     {
         $author_columns = $this->connection->columns('authors');
         $this->assertEquals('time', $author_columns['some_time']->raw_type);
         $this->assertEquals(Column::TIME, $author_columns['some_time']->type);
     }
 
-    public function test_query()
+    public function testQuery()
     {
         $sth = $this->connection->query('SELECT * FROM authors');
 
-        while (($row = $sth->fetch())) {
+        while ($row = $sth->fetch()) {
             $this->assertNotNull($row);
         }
 
@@ -192,19 +193,19 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals('Tito', $row['name']);
     }
 
-    public function test_invalid_query()
+    public function testInvalidQuery()
     {
         $this->expectException(DatabaseException::class);
         $this->connection->query('alsdkjfsdf');
     }
 
-    public function test_fetch()
+    public function testFetch()
     {
         $sth = $this->connection->query('SELECT * FROM authors WHERE author_id IN(1,2,3)');
         $i = 0;
         $ids = [];
 
-        while (($row = $sth->fetch())) {
+        while ($row = $sth->fetch()) {
             ++$i;
             $ids[] = $row['author_id'];
         }
@@ -213,7 +214,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals([1, 2, 3], $ids);
     }
 
-    public function test_query_with_params()
+    public function testQueryWithParams()
     {
         $x=['Bill Clinton', 'Tito'];
         $sth = $this->connection->query('SELECT * FROM authors WHERE name IN(?,?) ORDER BY name DESC', $x);
@@ -227,38 +228,38 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals(null, $row);
     }
 
-    public function test_insert_id_should_return_explicitly_inserted_id()
+    public function testInsertIdShouldReturnExplicitlyInsertedId()
     {
         $this->connection->query('INSERT INTO authors(author_id,name) VALUES(99,\'name\')');
         $this->assertTrue($this->connection->insert_id() > 0);
     }
 
-    public function test_insert_id()
+    public function testInsertId()
     {
         $this->connection->query("INSERT INTO authors(name) VALUES('name')");
         $this->assertTrue($this->connection->insert_id() > 0);
     }
 
-    public function test_insert_id_with_params()
+    public function testInsertIdWithParams()
     {
         $x = ['name'];
         $this->connection->query('INSERT INTO authors(name) VALUES(?)', $x);
         $this->assertTrue($this->connection->insert_id() > 0);
     }
 
-    public function test_inflection()
+    public function testInflection()
     {
         $columns = $this->connection->columns('authors');
         $this->assertEquals('parent_author_id', $columns['parent_author_id']->inflected_name);
     }
 
-    public function test_escape()
+    public function testEscape()
     {
         $s = "Bob's";
         $this->assertNotEquals($s, $this->connection->escape($s));
     }
 
-    public function test_columnsx()
+    public function testColumnsx()
     {
         $columns = $this->connection->columns('authors');
         $names = ['author_id', 'parent_author_id', 'name', 'updated_at', 'created_at', 'some_Date', 'some_time', 'some_text', 'encrypted_password', 'mixedCaseField'];
@@ -282,7 +283,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals(25, $columns['name']->length);
     }
 
-    public function test_columns_decimal()
+    public function testColumnsDecimal()
     {
         $columns = $this->connection->columns('books');
         $this->assertEquals(Column::DECIMAL, $columns['special']->type);
@@ -298,59 +299,59 @@ abstract class AdapterTestCase extends DatabaseTestCase
         return ActiveRecord\collect($ret, 'author_id');
     }
 
-    public function test_limit()
+    public function testLimit()
     {
         $this->assertEquals([2, 1], $this->limit(1, 2));
     }
 
-    public function test_limit_to_first_record()
+    public function testLimitToFirstRecord()
     {
         $this->assertEquals([3], $this->limit(0, 1));
     }
 
-    public function test_limit_to_last_record()
+    public function testLimitToLastRecord()
     {
         $this->assertEquals([1], $this->limit(2, 1));
     }
 
-    public function test_limit_with_null_offset()
+    public function testLimitWithNullOffset()
     {
         $this->assertEquals([3], $this->limit(0, 1));
     }
 
-    public function test_limit_with_defaults()
+    public function testLimitWithDefaults()
     {
         $this->assertEquals([], $this->limit());
     }
 
-    public function test_fetch_no_results()
+    public function testFetchNoResults()
     {
         $sth = $this->connection->query('SELECT * FROM authors WHERE author_id=65534');
         $this->assertEquals(null, $sth->fetch());
     }
 
-    public function test_tables()
+    public function testTables()
     {
         $this->assertTrue(count($this->connection->tables()) > 0);
     }
 
-    public function test_query_column_info()
+    public function testQueryColumnInfo()
     {
         $this->assertGreaterThan(0, count((array) $this->connection->query_column_info('authors')));
     }
 
-    public function test_query_table_info()
+    public function testQueryTableInfo()
     {
         $this->assertGreaterThan(0, count((array) $this->connection->query_for_tables()));
     }
 
-    public function test_query_table_info_must_return_one_field()
+    public function testQueryTableInfoMustReturnOneField()
     {
         $sth = $this->connection->query_for_tables();
         $this->assertEquals(1, count((array) $sth->fetch()));
     }
 
-    public function test_transaction_commit()
+    public function testTransactionCommit()
     {
         $original = $this->connection->query_and_fetch_one('select count(*) from authors');
 
@@ -361,7 +362,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals($original+1, $this->connection->query_and_fetch_one('select count(*) from authors'));
     }
 
-    public function test_transaction_rollback()
+    public function testTransactionRollback()
     {
         $original = $this->connection->query_and_fetch_one('select count(*) from authors');
 
@@ -372,7 +373,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals($original, $this->connection->query_and_fetch_one('select count(*) from authors'));
     }
 
-    public function test_show_me_a_useful_pdo_exception_message()
+    public function testShowMeAUsefulPdoExceptionMessage()
     {
         try {
             $this->connection->query('select * from an_invalid_column');
@@ -382,7 +383,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         }
     }
 
-    public function test_quote_name_does_not_over_quote()
+    public function testQuoteNameDoesNotOverQuote()
     {
         $c = $this->connection;
         $q = $c::$QUOTE_CHARACTER;
@@ -393,13 +394,13 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals("{$q}string{$q}", $qn("{$q}string{$q}"));
     }
 
-    public function test_datetime_to_string()
+    public function testDatetimeToString()
     {
         $datetime = '2009-01-01 01:01:01';
         $this->assertEquals($datetime, $this->connection->datetime_string(date_create($datetime)));
     }
 
-    public function test_date_to_string()
+    public function testDateToString()
     {
         $datetime = '2009-01-01';
         $this->assertEquals($datetime, $this->connection->date_string(date_create($datetime)));

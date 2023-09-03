@@ -252,6 +252,14 @@ class SQLBuilder
     }
 
     /**
+     * @return array<mixed>
+     */
+    public static function underscored_string_to_parts(string $string, int $flags=PREG_SPLIT_DELIM_CAPTURE): array
+    {
+        return preg_split('/(_and_|_or_)/i', $string, -1, $flags);
+    }
+
+    /**
      * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...).
      *
      * @param string               $name   Underscored string
@@ -267,9 +275,10 @@ class SQLBuilder
             return null;
         }
 
-        $parts = preg_split('/(_and_|_or_)/i', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
         $num_values = count((array) $values);
         $conditions = [''];
+
+        $parts = static::underscored_string_to_parts($name);
 
         for ($i = 0, $j = 0, $n = count($parts); $i < $n; $i += 2, ++$j) {
             if ($i >= 2) {

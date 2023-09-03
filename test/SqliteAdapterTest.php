@@ -2,7 +2,6 @@
 
 use ActiveRecord\Connection;
 use ActiveRecord\Exception\ConnectionException;
-use ActiveRecord\Exception\DatabaseException;
 
 class SqliteAdapterTest extends AdapterTestCase
 {
@@ -33,7 +32,7 @@ class SqliteAdapterTest extends AdapterTestCase
         }
     }
 
-    public function test_limit_with_0_offset_does_not_contain_offset()
+    public function testLimitWith0OffsetDoesNotContainOffset()
     {
         $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
@@ -42,7 +41,7 @@ class SqliteAdapterTest extends AdapterTestCase
         $this->assertTrue(false !== strpos($this->connection->last_query, 'LIMIT 1'));
     }
 
-    public function test_gh183_sqliteadapter_autoincrement()
+    public function testGh183SqliteadapterAutoincrement()
     {
         // defined in lowercase: id integer not null primary key
         $columns = $this->connection->columns('awesome_people');
@@ -61,20 +60,20 @@ class SqliteAdapterTest extends AdapterTestCase
         $this->assertTrue($columns['id']->auto_increment);
     }
 
-    public function test_datetime_to_string()
+    public function testDatetimeToString()
     {
         $datetime = '2009-01-01 01:01:01';
         $this->assertEquals($datetime, $this->connection->datetime_string(date_create($datetime)));
     }
 
-    public function test_date_to_string()
+    public function testDateToString()
     {
         $datetime = '2009-01-01';
         $this->assertEquals($datetime, $this->connection->date_string(date_create($datetime)));
     }
 
     // not supported
-    public function test_connect_with_port()
+    public function testConnectWithPort()
     {
         $this->expectNotToPerformAssertions();
     }

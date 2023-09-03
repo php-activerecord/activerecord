@@ -57,35 +57,35 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         }
     }
 
-    public function test_numericality()
+    public function testNumericality()
     {
-        //$this->assert_invalid(array("0xdeadbeef"));
+        // $this->assert_invalid(array("0xdeadbeef"));
 
         $this->assert_valid(array_merge(self::$FLOATS, self::$INTEGERS));
         $this->assert_invalid(array_merge(self::$NULL, self::$BLANK, self::$JUNK));
     }
 
-    public function test_not_anumber()
+    public function testNotAnumber()
     {
         $this->assert_invalid(['blah'], 'is not a number');
     }
 
-    public function test_invalid_null()
+    public function testInvalidNull()
     {
         $this->assert_invalid([null]);
     }
 
-    public function test_invalid_blank()
+    public function testInvalidBlank()
     {
         $this->assert_invalid([' ', '  '], 'is not a number');
     }
 
-    public function test_invalid_whitespace()
+    public function testInvalidWhitespace()
     {
         $this->assert_invalid(['']);
     }
 
-    public function test_valid_null()
+    public function testValidNull()
     {
         BookNumericality::$validates_numericality_of = [
             'numeric_test' => [
@@ -95,7 +95,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         $this->assert_valid([null]);
     }
 
-    public function test_only_integer()
+    public function testOnlyInteger()
     {
         BookNumericality::$validates_numericality_of = [
             'numeric_test' => [
@@ -107,7 +107,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         $this->assert_invalid([1.5, '1.5']);
     }
 
-    public function test_greater_than()
+    public function testGreaterThan()
     {
         BookNumericality::$validates_numericality_of = [
             'numeric_test' => ['greater_than' => 5]
@@ -117,7 +117,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         $this->assert_invalid([5, '5'], 'must be greater than 5');
     }
 
-    public function test_greater_than_or_equal_to()
+    public function testGreaterThanOrEqualTo()
     {
         BookNumericality::$validates_numericality_of = [
             'numeric_test' => ['greater_than_or_equal_to' => 5]
@@ -127,7 +127,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         $this->assert_invalid([-50, 4.9, '4.9', '-5.1']);
     }
 
-    public function test_less_than()
+    public function testLessThan()
     {
         BookNumericality::$validates_numericality_of = [
             'numeric_test' => ['less_than' => 5]
@@ -137,7 +137,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         $this->assert_invalid([5, '5'], 'must be less than 5');
     }
 
-    public function test_less_than_or_equal_to()
+    public function testLessThanOrEqualTo()
     {
         BookNumericality::$validates_numericality_of = [
             'numeric_test' => ['less_than_or_equal_to' => 5]
@@ -147,7 +147,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         $this->assert_invalid(['8', 5.1], 'must be less than or equal to 5');
     }
 
-    public function test_greater_than_less_than_and_even()
+    public function testGreaterThanLessThanAndEven()
     {
         BookNumericality::$validates_numericality_of = [
             'numeric_test' => [
@@ -161,7 +161,7 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         $this->assert_invalid([1, 3, 4]);
     }
 
-    public function test_custom_message()
+    public function testCustomMessage()
     {
         BookNumericality::$validates_numericality_of = [
             'numeric_test' => ['message' => 'Hello']
