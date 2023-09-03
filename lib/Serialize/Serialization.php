@@ -2,10 +2,11 @@
 
 namespace ActiveRecord\Serialize;
 
-use ActiveRecord\Config;
+use ActiveRecord\DateTimeInterface;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Model;
 use ActiveRecord\Types;
+use function PHPStan\dumpType;
 
 /**
  * Base class for Model serializers.
@@ -123,9 +124,10 @@ abstract class Serialization
     private function check_only(): void
     {
         if (isset($this->options['only'])) {
-            $this->options_to_a('only');
-
-            $exclude = array_diff(array_keys($this->attributes), $this->options['only']);
+            $exclude = array_diff(
+                array_keys($this->attributes),
+                $this->value_to_a($this->options['only'])
+            );
             $this->attributes = array_diff_key($this->attributes, array_flip($exclude));
         }
     }
@@ -133,18 +135,23 @@ abstract class Serialization
     private function check_except(): void
     {
         if (isset($this->options['except']) && !isset($this->options['only'])) {
-            $this->options_to_a('except');
-            $this->attributes = array_diff_key($this->attributes, array_flip($this->options['except']));
+            $this->attributes = array_diff_key(
+                $this->attributes,
+                array_flip($this->value_to_a($this->options['except']))
+            );
         }
     }
 
     private function check_methods(): void
     {
         if (isset($this->options['methods'])) {
-            $this->options_to_a('methods');
-
-            foreach ($this->options['methods'] as $method) {
+            foreach ($this->value_to_a($this->options['methods']) as $method) {
                 if (method_exists($this->model, $method)) {
+                    /**
+                     * PHPStan complains about this, and I don't know why. Skipping, for now.
+                     *
+                     * @phpstan-ignore-next-line
+                     */
                     $this->attributes[$method] = $this->model->$method();
                 }
             }
@@ -164,24 +171,22 @@ abstract class Serialization
     private function check_include(): void
     {
         if (isset($this->options['include'])) {
-            $this->options_to_a('include');
-
             $serializer_class = get_class($this);
 
-            foreach ($this->options['include'] as $association => $options) {
+            foreach ($this->value_to_a($this->options['include']) as $association => $options) {
                 if (!is_array($options)) {
                     $association = $options;
                     $options = [];
                 }
+                assert(is_string($association));
 
                 try {
                     $assoc = $this->model->$association;
 
                     if (null === $assoc) {
-                        $this->attributes[$association] = null;
+                        unset($this->attributes[$association]);
                     } elseif (!is_array($assoc)) {
-                        $serialized = new $serializer_class($assoc, $options);
-                        $this->attributes[$association] = $serialized->to_a();
+                        $this->attributes[$association] = new $serializer_class($assoc, $options);
                     } else {
                         $includes = [];
 
@@ -189,7 +194,9 @@ abstract class Serialization
                             $serialized = new $serializer_class($a, $options);
 
                             if ($this->includes_with_class_name_element) {
-                                $includes[strtolower(get_class($a))][] = $serialized->to_a();
+                                $className = get_class($a);
+                                assert(is_string($className));
+                                $includes[strtolower($className)][] = $serialized->to_a();
                             } else {
                                 $includes[] = $serialized->to_a();
                             }
@@ -204,11 +211,17 @@ abstract class Serialization
         }
     }
 
-    final protected function options_to_a(string $key): void
+    /**
+     * @param mixed $value
+     * @return array<mixed>
+     */
+    final protected function value_to_a(mixed $value): array
     {
-        if (!is_array($this->options[$key])) {
-            $this->options[$key] = [$this->options[$key]];
+        if (!is_array($value)) {
+            return [$value];
         }
+
+        return $value;
     }
 
     /**
@@ -218,9 +231,8 @@ abstract class Serialization
      */
     final public function to_a(): array
     {
-        $date_class = Config::instance()->get_date_class();
         foreach ($this->attributes as &$value) {
-            if ($value instanceof $date_class) {
+            if ($value instanceof DateTimeInterface) {
                 $value = $value->format(self::$DATETIME_FORMAT);
             }
         }

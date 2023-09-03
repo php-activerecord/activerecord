@@ -5,6 +5,7 @@ namespace ActiveRecord\Serialize;
 use function ActiveRecord\denamespace;
 
 use ActiveRecord\Model;
+use function PHPStan\dumpType;
 
 /**
  * XML serializer.
@@ -59,8 +60,7 @@ class XmlSerializer extends Serialization
     {
         foreach ($data as $attr => $value) {
             $attr = $tag ?? $attr;
-
-            if (is_array($value) || is_object($value)) {
+            if (is_array($value)) {
                 if (!is_int(key($value))) {
                     $this->writer->startElement(denamespace($attr));
                     $this->write($value);

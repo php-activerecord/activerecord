@@ -507,10 +507,10 @@ class Table
     private function process_data(array|null $hash): array|null
     {
         if ($hash) {
-            $date_class = Config::instance()->get_date_class();
             foreach ($hash as $name => $value) {
                 if ($value instanceof \DateTime) {
-                    if (Column::DATE == ($this->columns[$name]?->type ?? null)) {
+                    $column = $this->columns[$name] ?? null;
+                    if (isset($column) && Column::DATE == $column->type) {
                         $hash[$name] = $this->conn->date_string($value);
                     } else {
                         $hash[$name] = $this->conn->datetime_string($value);
