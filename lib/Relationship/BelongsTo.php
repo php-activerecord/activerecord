@@ -33,6 +33,7 @@ use ActiveRecord\Types;
  *  ]
  * }
  * ```
+ *
  * @phpstan-import-type BelongsToOptions from Types
  * @phpstan-import-type Attributes from Model
  *

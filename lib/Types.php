@@ -11,7 +11,6 @@ namespace ActiveRecord;
  *  order?: string,
  *  set?: string|array<string, mixed>
  * }
- *
  * @phpstan-type HasManyOptions array{
  *  limit?: int,
  *  offset?: int,
@@ -20,14 +19,12 @@ namespace ActiveRecord;
  *  order?: string,
  *  through?: string
  * }
- *
  * @phpstan-type BelongsToOptions array{
  *  conditions?: array<mixed>,
  *  foreign_key?: string,
  *  class_name?: class-string,
  *  primary_key?: string
  * }
- *
  * @phpstan-type DelegateOptions array{
  *  to: string,
  *  prefix?: string,

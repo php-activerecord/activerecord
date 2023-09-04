@@ -197,7 +197,6 @@ class RelationshipTest extends DatabaseTestCase
         $book = Book::find(1);
         $this->assertEquals(2, $book->secondary_author_id);
         $this->assertEquals($book->secondary_author_id, $book->explicit_author->author_id);
-
     }
 
     public function testBelongsToWithSelect()
