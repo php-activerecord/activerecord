@@ -519,7 +519,7 @@ class Model
         }
 
         if ('id' == $name) {
-            $this->assign_attribute($this->get_primary_key(true), $value);
+            $this->assign_attribute($this->get_primary_key(), $value);
 
             return;
         }
@@ -631,7 +631,7 @@ class Model
         }
 
         if ('id' == $name) {
-            $pk = $this->get_primary_key(true);
+            $pk = $this->get_primary_key();
             if (isset($this->attributes[$pk])) {
                 return $this->attributes[$pk];
             }

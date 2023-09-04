@@ -551,7 +551,7 @@ class Validations
                 }
                 $options = [];
             }
-            $pk = $this->model->get_primary_key(true);
+            $pk = $this->model->get_primary_key();
             $pk_value = $this->model->{$pk};
 
             $fields = array_merge([$attr], $options['scope'] ?? []);
