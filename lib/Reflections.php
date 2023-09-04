@@ -60,9 +60,8 @@ class Reflections extends Singleton
      * @param class-string $className Optional name of a class or an instance of the class
      *
      * @throws ActiveRecordException if class was not found
-     *
      */
-    public function get(string $className): ReflectionClass
+    public function get(string $className): \ReflectionClass
     {
         return $this->reflections[$className] ?? throw new ActiveRecordException("Class not found: $className");
     }

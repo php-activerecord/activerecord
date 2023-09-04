@@ -253,6 +253,7 @@ class SQLBuilder
     {
         $res = preg_split('/(_and_|_or_)/i', $string, -1, $flags);
         assert(is_array($res));
+
         return $res;
     }
 

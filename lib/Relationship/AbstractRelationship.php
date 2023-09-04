@@ -306,12 +306,13 @@ abstract class AbstractRelationship
      */
     protected function set_inferred_class_name(): void
     {
-        $singularize = (bool)($this instanceof HasMany);
+        $singularize = (bool) ($this instanceof HasMany);
         $this->set_class_name(classify($this->attribute_name, $singularize));
     }
 
     /**
      * @param class-string $class_name
+     *
      * @throws RelationshipException
      * @throws \ActiveRecord\Exception\ActiveRecordException
      */

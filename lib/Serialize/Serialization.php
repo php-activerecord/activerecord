@@ -6,7 +6,6 @@ use ActiveRecord\DateTimeInterface;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Model;
 use ActiveRecord\Types;
-use function PHPStan\dumpType;
 
 /**
  * Base class for Model serializers.
@@ -147,7 +146,7 @@ abstract class Serialization
         if (isset($this->options['methods'])) {
             foreach ($this->value_to_a($this->options['methods']) as $method) {
                 if (method_exists($this->model, $method)) {
-                    /**
+                    /*
                      * PHPStan complains about this, and I don't know why. Skipping, for now.
                      *
                      * @phpstan-ignore-next-line
@@ -213,7 +212,6 @@ abstract class Serialization
     }
 
     /**
-     * @param mixed $value
      * @return array<mixed>
      */
     final protected function value_to_a(mixed $value): array

@@ -17,7 +17,6 @@ use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
-use function PHPStan\dumpType;
 
 /**
  * The base class for your models.
@@ -526,7 +525,7 @@ class Model
         }
 
         foreach (static::$delegate as $key => $item) {
-            if($key == 'processed') {
+            if ('processed' == $key) {
                 continue;
             }
             if ($delegated_name = $this->is_delegated($name, $item)) {
@@ -724,6 +723,7 @@ class Model
     public function get_primary_key(): string
     {
         $pk = static::table()->pk;
+
         return $pk[0];
     }
 
@@ -1408,14 +1408,17 @@ class Model
                 // if the related model is null and a poly then we should have an empty array
                 if (is_null($model)) {
                     $this->__relationships[$name] = [];
+
                     return;
                 }
 
                 $this->__relationships[$name][] = $model;
+
                 return;
             }
 
             $this->__relationships[$name] = $model;
+
             return;
         }
 
@@ -1578,7 +1581,6 @@ class Model
 
             if (($association = $table->get_relationship($association_name))
                 || ($association = $table->get_relationship($association_name = Utils::pluralize($association_name)))) {
-
                 // access association to ensure that the relationship has been loaded
                 // so that we do not double-up on records if we append a newly created
                 $this->initRelationships($association_name);

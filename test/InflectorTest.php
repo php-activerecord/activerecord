@@ -7,7 +7,6 @@ require_once __DIR__ . '/../lib/Inflector.php';
 
 class InflectorTest extends TestCase
 {
-
     public function testUnderscorify()
     {
         $this->assertEquals('rm__name__bob', Inflector::variablize('rm--name  bob'));

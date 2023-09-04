@@ -73,7 +73,6 @@ class Table
 
     /**
      * A instance of CallBack for this model/table
-     *
      */
     public CallBack $callback;
 
