@@ -19,14 +19,14 @@ use ActiveRecord\Utils;
  */
 class SqliteAdapter extends Connection
 {
-    public static $datetime_format = 'Y-m-d H:i:s';
+    public static string $datetime_format = 'Y-m-d H:i:s';
 
-    protected function __construct(\stdClass $info)
+    protected function __construct(array $info)
     {
-        if (!file_exists($info->host)) {
-            throw new ConnectionException("Could not find sqlite db: $info->host");
+        if (!file_exists($info['host'])) {
+            throw new ConnectionException("Could not find sqlite db: " . $info['host']);
         }
-        $this->connection = new \PDO("sqlite:$info->host", null, null, static::$PDO_OPTIONS);
+        $this->connection = new \PDO("sqlite:" . $info['host'], null, null, static::$PDO_OPTIONS);
     }
 
     public function limit(string $sql, int $offset = 0, int $limit = 0)

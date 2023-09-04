@@ -365,11 +365,10 @@ class Utils
         return $string;
     }
 
-    /**
-     * @return string|string[]|null
-     */
-    public static function squeeze(string $char, string $string): mixed
+    public static function squeeze(string $char, string $string): string
     {
-        return preg_replace("/$char+/", $char, $string);
+        $res = preg_replace("/$char+/", $char, $string);
+        assert(is_string($res));
+        return $res;
     }
 }
