@@ -1,7 +1,5 @@
 <?php
 
-use ActiveRecord\Exception\ValidationsArgumentError;
-
 class BookFormat extends ActiveRecord\Model
 {
     public static $table = 'books';
@@ -17,7 +15,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         parent::setUp($connection_name);
     }
 
-    public function test_format()
+    public function testFormat()
     {
         BookFormat::$validates_format_of = ['name' => ['with' => '/^[a-z\W]*$/']];
         $book = new BookFormat(['author_id' => 1, 'name' => 'testing reg']);
@@ -30,7 +28,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_null(): void
+    public function testInvalidNull(): void
     {
         BookFormat::$validates_format_of = ['name' => ['with' => '/[0-9]/']];
         $book = new BookFormat();
@@ -39,7 +37,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         $this->assertTrue($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_blank(): void
+    public function testInvalidBlank(): void
     {
         BookFormat::$validates_format_of = ['name' => ['with' => '/[^0-9]/']];
         $book = new BookFormat();
@@ -48,7 +46,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         $this->assertTrue($book->errors->is_invalid('name'));
     }
 
-    public function test_valid_blank_and_allow_blank()
+    public function testValidBlankAndAllowBlank()
     {
         BookFormat::$validates_format_of = [
             'name' => [
@@ -61,7 +59,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_valid_null_and_allow_null()
+    public function testValidNullAndAllowNull()
     {
         BookFormat::$validates_format_of = [
             'name' => [
@@ -76,7 +74,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function test_invalid_with_expression_as_non_regexp()
+    public function testInvalidWithExpressionAsNonRegexp()
     {
         BookFormat::$validates_format_of = [
             'name' => [
@@ -89,7 +87,7 @@ class ValidatesFormatOfTest extends DatabaseTestCase
         $this->assertTrue($book->errors->is_invalid('name'));
     }
 
-    public function test_custom_message()
+    public function testCustomMessage()
     {
         BookFormat::$validates_format_of = [
             'name' => [

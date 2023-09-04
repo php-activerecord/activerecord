@@ -37,89 +37,89 @@ class SQLBuilderTest extends DatabaseTestCase
         }
     }
 
-    public function test_nothing()
+    public function testNothing()
     {
         $this->assertEquals('SELECT * FROM authors', (string) $this->sql);
     }
 
-    public function test_where_with_array()
+    public function testWhereWithArray()
     {
         $this->sql->where('id=? AND name IN(?)', 1, ['Tito', 'Mexican']);
         $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name IN(?,?)', (string) $this->sql);
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
     }
 
-    public function test_where_with_hash()
+    public function testWhereWithHash()
     {
         $this->sql->where(['id' => 1, 'name' => 'Tito']);
         $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name=?', (string) $this->sql);
         $this->assertEquals([1, 'Tito'], $this->sql->get_where_values());
     }
 
-    public function test_where_with_hash_and_array()
+    public function testWhereWithHashAndArray()
     {
         $this->sql->where(['id' => 1, 'name' => ['Tito', 'Mexican']]);
         $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name IN(?,?)', (string) $this->sql);
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
     }
 
-    public function test_gh134_where_with_hash_and_null()
+    public function testGh134WhereWithHashAndNull()
     {
         $this->sql->where(['id' => 1, 'name' => null]);
         $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name IS ?', (string) $this->sql);
         $this->assertEquals([1, null], $this->sql->get_where_values());
     }
 
-    public function test_where_with_null()
+    public function testWhereWithNull()
     {
         $this->sql->where(null);
         $this->assertEquals('SELECT * FROM authors', (string) $this->sql);
     }
 
-    public function test_where_with_no_args()
+    public function testWhereWithNoArgs()
     {
         $this->sql->where();
         $this->assertEquals('SELECT * FROM authors', (string) $this->sql);
     }
 
-    public function test_order()
+    public function testOrder()
     {
         $this->sql->order('name');
         $this->assertEquals('SELECT * FROM authors ORDER BY name', (string) $this->sql);
     }
 
-    public function test_limit()
+    public function testLimit()
     {
         $this->sql->limit(10)->offset(1);
         $this->assertEquals($this->connection->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
     }
 
-    public function test_select()
+    public function testSelect()
     {
         $this->sql->select('id,name');
         $this->assertEquals('SELECT id,name FROM authors', (string) $this->sql);
     }
 
-    public function test_joins()
+    public function testJoins()
     {
         $join = 'inner join books on(authors.id=books.author_id)';
         $this->sql->joins($join);
         $this->assertEquals("SELECT * FROM authors $join", (string) $this->sql);
     }
 
-    public function test_group()
+    public function testGroup()
     {
         $this->sql->group('name');
         $this->assertEquals('SELECT * FROM authors GROUP BY name', (string) $this->sql);
     }
 
-    public function test_having()
+    public function testHaving()
     {
         $this->sql->having("created_at > '2009-01-01'");
         $this->assertEquals("SELECT * FROM authors HAVING created_at > '2009-01-01'", (string) $this->sql);
     }
 
-    public function test_all_clauses_after_where_should_be_correctly_ordered()
+    public function testAllClausesAfterWhereShouldBeCorrectlyOrdered()
     {
         $this->sql->limit(10)->offset(1);
         $this->sql->having("created_at > '2009-01-01'");
@@ -129,32 +129,32 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assert_sql_has($this->connection->limit("SELECT * FROM authors WHERE id=? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
     }
 
-    public function test_insert_requires_hash()
+    public function testInsertRequiresHash()
     {
         $this->expectException(ActiveRecordException::class);
         $this->sql->insert([1]);
     }
 
-    public function test_insert()
+    public function testInsert()
     {
         $this->sql->insert(['id' => 1, 'name' => 'Tito']);
         $this->assert_sql_has('INSERT INTO authors(id,name) VALUES(?,?)', (string) $this->sql);
     }
 
-    public function test_insert_with_null()
+    public function testInsertWithNull()
     {
         $this->sql->insert(['id' => 1, 'name' => null]);
         $this->assert_sql_has('INSERT INTO authors(id,name) VALUES(?,?)', $this->sql->to_s());
     }
 
-    public function test_update_with_hash()
+    public function testUpdateWithHash()
     {
         $this->sql->update(['id' => 1, 'name' => 'Tito'])->where('id=1 AND name IN(?)', ['Tito', 'Mexican']);
         $this->assert_sql_has('UPDATE authors SET id=?, name=? WHERE id=1 AND name IN(?,?)', (string) $this->sql);
         $this->assertEquals([1, 'Tito', 'Tito', 'Mexican'], $this->sql->bind_values());
     }
 
-    public function test_update_with_limit_and_order()
+    public function testUpdateWithLimitAndOrder()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE operation');
@@ -164,39 +164,39 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assert_sql_has('UPDATE authors SET id=? ORDER BY name asc LIMIT 1', $this->sql->to_s());
     }
 
-    public function test_update_with_string()
+    public function testUpdateWithString()
     {
         $this->sql->update("name='Bob'");
         $this->assert_sql_has("UPDATE authors SET name='Bob'", $this->sql->to_s());
     }
 
-    public function test_update_with_null()
+    public function testUpdateWithNull()
     {
         $this->sql->update(['id' => 1, 'name' => null])->where('id=1');
         $this->assert_sql_has('UPDATE authors SET id=?, name=? WHERE id=1', $this->sql->to_s());
     }
 
-    public function test_delete()
+    public function testDelete()
     {
         $this->sql->delete();
         $this->assertEquals('DELETE FROM authors', $this->sql->to_s());
     }
 
-    public function test_delete_with_where()
+    public function testDeleteWithWhere()
     {
         $this->sql->delete('id=? or name in(?)', 1, ['Tito', 'Mexican']);
         $this->assertEquals('DELETE FROM authors WHERE id=? or name in(?,?)', $this->sql->to_s());
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->bind_values());
     }
 
-    public function test_delete_with_hash()
+    public function testDeleteWithHash()
     {
         $this->sql->delete(['id' => 1, 'name' => ['Tito', 'Mexican']]);
         $this->assert_sql_has('DELETE FROM authors WHERE id=? AND name IN(?,?)', $this->sql->to_s());
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
     }
 
-    public function test_delete_with_limit_and_order()
+    public function testDeleteWithLimitAndOrder()
     {
         if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
@@ -206,7 +206,7 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assert_sql_has('DELETE FROM authors WHERE id=? ORDER BY name asc LIMIT 1', $this->sql->to_s());
     }
 
-    public function test_reverse_order()
+    public function testReverseOrder()
     {
         $this->assertEquals('id ASC, name DESC', SQLBuilder::reverse_order('id DESC, name ASC'));
         $this->assertEquals('id ASC, name DESC , zzz ASC', SQLBuilder::reverse_order('id DESC, name ASC , zzz DESC'));
@@ -216,48 +216,48 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assertEquals(' ', SQLBuilder::reverse_order(' '));
     }
 
-    public function test_create_conditions_from_underscored_string()
+    public function testCreateConditionsFromUnderscoredString()
     {
         $this->assert_conditions('id=? AND name=? OR z=?', [1, 'Tito', 'X'], 'id_and_name_or_z');
         $this->assert_conditions('id=?', [1], 'id');
         $this->assert_conditions('id IN(?)', [[1, 2]], 'id');
     }
 
-    public function test_create_conditions_from_underscored_string_with_nulls()
+    public function testCreateConditionsFromUnderscoredStringWithNulls()
     {
         $this->assert_conditions('id=? AND name IS NULL', [1, null], 'id_and_name');
     }
 
-    public function test_create_conditions_from_underscored_string_with_missing_args()
+    public function testCreateConditionsFromUnderscoredStringWithMissingArgs()
     {
         $this->assert_conditions('id=? AND name IS NULL OR z IS NULL', [1, null], 'id_and_name_or_z');
         $this->assert_conditions('id IS NULL', [], 'id');
     }
 
-    public function test_create_conditions_from_underscored_string_with_blank()
+    public function testCreateConditionsFromUnderscoredStringWithBlank()
     {
         $this->assert_conditions('id=? AND name IS NULL OR z=?', [1, null, ''], 'id_and_name_or_z');
     }
 
-    public function test_create_conditions_from_underscored_string_invalid()
+    public function testCreateConditionsFromUnderscoredStringInvalid()
     {
         $this->assertEquals(null, $this->cond_from_s(''));
         $this->assertEquals(null, $this->cond_from_s(null));
     }
 
-    public function test_create_conditions_from_underscored_string_with_mapped_columns()
+    public function testCreateConditionsFromUnderscoredStringWithMappedColumns()
     {
         $this->assert_conditions('id=? AND name=?', [1, 'Tito'], 'id_and_my_name', ['my_name' => 'name']);
     }
 
-    public function test_create_hash_from_underscored_string()
+    public function testCreateHashFromUnderscoredString()
     {
         $values = [1, 'Tito'];
         $hash = SQLBuilder::create_hash_from_underscored_string('id_and_my_name', $values);
         $this->assertEquals(['id' => 1, 'my_name' => 'Tito'], $hash);
     }
 
-    public function test_create_hash_from_underscored_string_with_mapped_columns()
+    public function testCreateHashFromUnderscoredStringWithMappedColumns()
     {
         $values = [1, 'Tito'];
         $map = ['my_name' => 'name'];
@@ -265,7 +265,7 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assertEquals(['id' => 1, 'name' => 'Tito'], $hash);
     }
 
-    public function test_where_with_joins_prepends_table_name_to_fields()
+    public function testWhereWithJoinsPrependsTableNameToFields()
     {
         $joins = 'INNER JOIN books ON (books.id = authors.id)';
         // joins needs to be called prior to where

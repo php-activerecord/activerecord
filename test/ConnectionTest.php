@@ -9,13 +9,13 @@ use PHPUnit\Framework\TestCase;
 
 class ConnectionTest extends TestCase
 {
-    public function test_connection_info_from_should_throw_exception_when_no_host()
+    public function testConnectionInfoFromShouldThrowExceptionWhenNoHost()
     {
         $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::parse_connection_url('mysql://user:pass@');
     }
 
-    public function test_connection_info()
+    public function testConnectionInfo()
     {
         $info = ActiveRecord\Connection::parse_connection_url('mysql://user:pass@127.0.0.1:3306/dbname');
         $this->assertEquals('mysql', $info->protocol);
@@ -26,19 +26,19 @@ class ConnectionTest extends TestCase
         $this->assertEquals('dbname', $info->db);
     }
 
-    public function test_gh_103_sqlite_connection_string_relative()
+    public function testGh103SqliteConnectionStringRelative()
     {
         $info = ActiveRecord\Connection::parse_connection_url('sqlite://../some/path/to/file.db');
         $this->assertEquals('../some/path/to/file.db', $info->host);
     }
 
-    public function test_gh_103_sqlite_connection_string_absolute()
+    public function testGh103SqliteConnectionStringAbsolute()
     {
         $this->expectException(DatabaseException::class);
         ActiveRecord\Connection::parse_connection_url('sqlite:///some/path/to/file.db');
     }
 
-    public function test_gh_103_sqlite_connection_string_unix()
+    public function testGh103SqliteConnectionStringUnix()
     {
         $info = ActiveRecord\Connection::parse_connection_url('sqlite://unix(/some/path/to/file.db)');
         $this->assertEquals('/some/path/to/file.db', $info->host);
@@ -50,26 +50,26 @@ class ConnectionTest extends TestCase
         $this->assertEquals('/some/path/to/file.db', $info->host);
     }
 
-    public function test_gh_103_sqlite_connection_string_windows()
+    public function testGh103SqliteConnectionStringWindows()
     {
         $info = ActiveRecord\Connection::parse_connection_url('sqlite://windows(c%3A/some/path/to/file.db)');
         $this->assertEquals('c:/some/path/to/file.db', $info->host);
     }
 
-    public function test_parse_connection_url_with_unix_sockets()
+    public function testParseConnectionUrlWithUnixSockets()
     {
         $info = ActiveRecord\Connection::parse_connection_url('mysql://user:password@unix(/tmp/mysql.sock)/database');
         $this->assertEquals('/tmp/mysql.sock', $info->host);
     }
 
-    public function test_parse_connection_url_with_decode_option()
+    public function testParseConnectionUrlWithDecodeOption()
     {
         $info = ActiveRecord\Connection::parse_connection_url('mysql://h%20az:h%40i@127.0.0.1/test?decode=true');
         $this->assertEquals('h az', $info->user);
         $this->assertEquals('h@i', $info->pass);
     }
 
-    public function test_encoding()
+    public function testEncoding()
     {
         $info = ActiveRecord\Connection::parse_connection_url('mysql://test:test@127.0.0.1/test?charset=utf8');
         $this->assertEquals('utf8', $info->charset);

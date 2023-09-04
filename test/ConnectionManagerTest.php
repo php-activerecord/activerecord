@@ -1,28 +1,27 @@
 <?php
 
-use ActiveRecord\Config;
 use ActiveRecord\ConnectionManager;
 
 class ConnectionManagerTest extends DatabaseTestCase
 {
-    public function test_get_connection_with_null_connection()
+    public function testGetConnectionWithNullConnection()
     {
         $this->assertNotNull(ConnectionManager::get_connection(null));
         $this->assertNotNull(ConnectionManager::get_connection());
     }
 
-    public function test_get_connection()
+    public function testGetConnection()
     {
         $this->assertNotNull(ConnectionManager::get_connection('mysql'));
     }
 
-    public function test_get_connection_uses_existing_object()
+    public function testGetConnectionUsesExistingObject()
     {
         $a = ConnectionManager::get_connection('mysql');
         $this->assertSame($a === ConnectionManager::get_connection('mysql'), true);
     }
 
-    public function test_gh_91_get_connection_with_null_connection_is_always_default()
+    public function testGh91GetConnectionWithNullConnectionIsAlwaysDefault()
     {
         $conn_one = ConnectionManager::get_connection('mysql');
         $conn_two = ConnectionManager::get_connection();
