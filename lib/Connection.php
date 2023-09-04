@@ -51,18 +51,14 @@ abstract class Connection
     public string $last_query;
     /**
      * Switch for logging.
-     *
      */
     private bool $logging = false;
     /**
      * Contains a Logger object that must implement a log() method.
-     *
      */
     private LoggerInterface $logger;
     /**
      * The name of the protocol that is used.
-     *
-     * @var string
      */
     public string $protocol;
     /**
@@ -73,7 +69,6 @@ abstract class Connection
     public static $date_format = 'Y-m-d';
     /**
      * Database's datetime format
-     *
      */
     public static string $datetime_format = 'Y-m-d H:i:s';
     /**
@@ -170,6 +165,7 @@ abstract class Connection
         require_once $source;
 
         assert(class_exists($fqclass));
+
         return $fqclass;
     }
 
@@ -195,7 +191,6 @@ abstract class Connection
      * @param string $connection_url A connection URL
      *
      * @return ConnectionInfo
-     *
      */
     public static function parse_connection_url(string $connection_url): array
     {
@@ -270,6 +265,7 @@ abstract class Connection
 
     /**
      * Class Connection is a singleton. Access it via instance().
+     *
      * @param ConnectionInfo $info
      */
     protected function __construct(array $info)
@@ -277,13 +273,13 @@ abstract class Connection
         try {
             // unix sockets start with a /
             if ('/' != $info['host'][0]) {
-                $host = "host=" . $info['host'];
+                $host = 'host=' . $info['host'];
 
                 if (isset($info['port'])) {
-                    $host .= ";port=" . $info['port'];
+                    $host .= ';port=' . $info['port'];
                 }
             } else {
-                $host = "unix_socket=" . $info['host'];
+                $host = 'unix_socket=' . $info['host'];
             }
 
             $dsn = $info['protocol'] . ":$host;dbname=" . $info['db'];

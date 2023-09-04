@@ -369,6 +369,7 @@ class Utils
     {
         $res = preg_replace("/$char+/", $char, $string);
         assert(is_string($res));
+
         return $res;
     }
 }

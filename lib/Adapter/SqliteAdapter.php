@@ -24,9 +24,9 @@ class SqliteAdapter extends Connection
     protected function __construct(array $info)
     {
         if (!file_exists($info['host'])) {
-            throw new ConnectionException("Could not find sqlite db: " . $info['host']);
+            throw new ConnectionException('Could not find sqlite db: ' . $info['host']);
         }
-        $this->connection = new \PDO("sqlite:" . $info['host'], null, null, static::$PDO_OPTIONS);
+        $this->connection = new \PDO('sqlite:' . $info['host'], null, null, static::$PDO_OPTIONS);
     }
 
     public function limit(string $sql, int $offset = 0, int $limit = 0)

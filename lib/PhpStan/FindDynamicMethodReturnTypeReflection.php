@@ -4,7 +4,6 @@ namespace ActiveRecord\PhpStan;
 
 use ActiveRecord\Model;
 use PhpParser\Node\Arg;
-use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
@@ -34,7 +33,7 @@ class FindDynamicMethodReturnTypeReflection implements DynamicStaticMethodReturn
 
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type
     {
-        assert($methodCall->class instanceof Name );
+        assert($methodCall->class instanceof Name);
         $subclass = $methodCall->class->toString();
         $args = $methodCall->args;
 
