@@ -64,14 +64,21 @@ abstract class AbstractRelationship
      *
      * @var array<string>
      */
-    protected static $valid_association_options = ['class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly', 'namespace'];
+    protected static $valid_association_options = [
+        'class_name',
+        'foreign_key',
+        'conditions',
+        'select',
+        'readonly',
+        'namespace'
+    ];
 
     /**
      * Constructs a relationship.
      *
      * @param array<mixed> $options Options for the relationship (see {@link valid_association_options})
      */
-    public function __construct(string $attribute_name, $options = [])
+    public function __construct(string $attribute_name, array $options = [])
     {
         $this->attribute_name = $attribute_name;
         $this->options = $this->merge_association_options($options);
@@ -86,9 +93,7 @@ abstract class AbstractRelationship
             $this->options['conditions'] = [$this->options['conditions']];
         }
 
-        if (isset($this->options['class'])) {
-            $this->set_class_name($this->options['class']);
-        } elseif (isset($this->options['class_name'])) {
+        if (isset($this->options['class_name'])) {
             $this->set_class_name($this->options['class_name']);
         }
 
