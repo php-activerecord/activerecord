@@ -40,7 +40,7 @@
     "stan": "phpstan analyse --ansi --memory-limit 256M",
     "test": [
       "Composer\\Config::disableProcessTimeout",
-      "ActiveRecord\\Scripts\\TestCommand"
+      "ActiveRecord\\Scripts\\TestCommand::runTest"
     ]
   },
   "scripts-descriptions": {

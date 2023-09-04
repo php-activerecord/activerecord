@@ -2,35 +2,28 @@
 
 namespace ActiveRecord\Scripts;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Composer\Script\Event;
 use Symfony\Component\Process\Process;
 
-class TestCommand extends Command
+class TestCommand
 {
-    protected function configure(): void
-    {
-        $this->setDefinition([
-            new InputArgument('fileName', InputArgument::OPTIONAL),
-            new InputArgument('filter', InputArgument::OPTIONAL),
-        ]);
-    }
-
-    public function execute(InputInterface $input, OutputInterface $output): int
+    public static function runTest(Event $event)
     {
         try {
-            $args = $this->buildArgs($input->getArgument('fileName'), $input->getArgument('filter'));
+            $args = $event->getArguments();
+            $fileName = count($args) >= 1 ? $args[0] : null;
+            $filter = count($args) >= 2 ? $args[1] : null;
 
-            $str = "Running: " . implode(' ', $args) . "\n";
-            if (count($args) === 1) {
+            $args = TestCommand::buildArgs($fileName, $filter);
+
+            $str = 'Running: ' . implode(' ', $args) . "\n";
+            if (1 === count($args)) {
                 $str .= "To run just the tests in test/CallbackTest.php, try: composer test callback\n";
             }
-            if (count($args) === 1 || count($args) === 2) {
-                $str .= "To run a specific test in test/DateTimeTest.php, try: composer test dateTime testSetIsoDate \n";
+            if (1 === count($args) || 2 === count($args)) {
+                $str .= "To run a specific test in test/DateTimeTest.php, try: composer test dateTime testSetIsoDate\n";
             }
-            $output->writeln($str);
+            echo $str;
 
             $process = new Process($args);
             $process->setTimeout(1200);
@@ -46,13 +39,11 @@ class TestCommand extends Command
 
             return 0;
         } catch (\Exception $e) {
-            $output->writeln("\n".$e->getMessage());
-
-            return 1;
+            echo "\n" . $e->getMessage() . "\n";
         }
     }
 
-    private function buildArgs(string|null $fileName, string|null $filter): array
+    private static function buildArgs(string|null $fileName, string|null $filter): array
     {
         $args = ['vendor/bin/phpunit'];
 
