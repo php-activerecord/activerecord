@@ -551,14 +551,14 @@ class Validations
                 }
                 $options = [];
             }
-            $pk = $this->model->get_primary_key();
-            $pk_value = $this->model->{$pk[0]};
+            $pk = $this->model->get_primary_key(true);
+            $pk_value = $this->model->{$pk};
 
             $fields = array_merge([$attr], $options['scope'] ?? []);
             $add_record = join('_and_', $fields);
 
             $conditions = [''];
-            $pk_quoted = $connection->quote_name($pk[0]);
+            $pk_quoted = $connection->quote_name($pk);
             if (null === $pk_value) {
                 $sql = "{$pk_quoted} IS NOT NULL";
             } else {

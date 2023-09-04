@@ -20,7 +20,7 @@ use ActiveRecord\Relationship\HasOne;
  * reading and writing to its database table. There is one instance of Table
  * for every table you have a model for.
  *
- * @package ActiveRecord
+ * @phpstan-import-type PrimaryKey from Types
  */
 class Table
 {
@@ -74,11 +74,8 @@ class Table
     /**
      * A instance of CallBack for this model/table
      *
-     * @static
-     *
-     * @var object ActiveRecord\CallBack
      */
-    public $callback;
+    public CallBack $callback;
 
     /**
      * @var array<string, AbstractRelationship>
@@ -270,9 +267,9 @@ class Table
     }
 
     /**
-     * @param string|array<string> $pk
+     * @param PrimaryKey $pk
      */
-    public function cache_key_for_model(string|array $pk): string
+    public function cache_key_for_model(mixed $pk): string
     {
         if (is_array($pk)) {
             $pk = implode('-', $pk);
