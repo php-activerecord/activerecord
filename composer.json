@@ -23,17 +23,16 @@
     ],
     "psr-4": {
       "ActiveRecord\\": "lib/",
-      "scripts\\": "scripts/",
       "test\\": "test/"
     }
   },
-  "scripts": {
-	"style-check" : "php vendor/bin/php-cs-fixer fix --dry-run --verbose --diff",
-	"style-fix" : "php vendor/bin/php-cs-fixer fix --verbose",
-	"stan": "phpstan analyse --ansi --memory-limit 256M",
-	"test": [
-	  "Composer\\Config::disableProcessTimeout",
-	  "scripts\\TestCommand"
-	]
+	"scripts": {
+		"style-check" : "php vendor/bin/php-cs-fixer fix --dry-run --verbose --diff",
+		"style-fix" : "php vendor/bin/php-cs-fixer fix --verbose",
+    "test": [
+      "Composer\\Config::disableProcessTimeout",
+      "phpunit"
+    ],
+    "stan": "phpstan analyse --ansi --memory-limit 256M"
   }
 }
