@@ -41,6 +41,9 @@ use ActiveRecord\Types;
  */
 class BelongsTo extends AbstractRelationship
 {
+    /**
+     * @var class-string
+     */
     public $class_name;
 
     /**

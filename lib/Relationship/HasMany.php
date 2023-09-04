@@ -72,9 +72,9 @@ class HasMany extends AbstractRelationship
     ];
 
     /**
-     * @var string|array<string>
+     * @var array<string>
      */
-    protected string|array $primary_key;
+    protected array $primary_key;
 
     private string $through;
 

@@ -35,7 +35,7 @@
 namespace ActiveRecord;
 
 /**
- * @param class-string $class_name
+ * @return class-string
  */
 function classify(string $class_name, bool $singular = false): string
 {

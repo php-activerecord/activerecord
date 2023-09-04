@@ -36,16 +36,16 @@ abstract class AbstractRelationship
     /**
      * Class name of the associated model.
      *
-     * @var string
+     * @var class-string
      */
     public $class_name;
 
     /**
      * Name of the foreign key.
      *
-     * @var string|string[]
+     * @var string[]
      */
-    public mixed $foreign_key = [];
+    public array $foreign_key = [];
 
     /**
      * Options of the relationship.
@@ -230,7 +230,10 @@ abstract class AbstractRelationship
     {
         $class_name = $this->class_name;
 
-        return new $class_name($attributes, $guard_attributes);
+        $model = new $class_name($attributes, $guard_attributes);
+        assert($model instanceof Model);
+
+        return $model;
     }
 
     /**
@@ -303,13 +306,21 @@ abstract class AbstractRelationship
      */
     protected function set_inferred_class_name(): void
     {
-        $singularize = ($this instanceof HasMany ? true : false);
+        $singularize = (bool)($this instanceof HasMany);
         $this->set_class_name(classify($this->attribute_name, $singularize));
     }
 
+    /**
+     * @param class-string $class_name
+     * @throws RelationshipException
+     * @throws \ActiveRecord\Exception\ActiveRecordException
+     */
     protected function set_class_name(string $class_name): void
     {
         if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
+            /**
+             * @var class-string
+             */
             $class_name = $this->options['namespace'] . '\\' . $class_name;
         }
 
