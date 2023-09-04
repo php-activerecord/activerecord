@@ -96,7 +96,7 @@ class HasMany extends AbstractRelationship
             $this->through = $this->options['through'];
 
             if (isset($this->options['source'])) {
-                $this->set_class_name($this->options['source']);
+                $this->set_class_name($this->inferred_class_name($this->options['source']));
             }
         }
 
@@ -105,7 +105,7 @@ class HasMany extends AbstractRelationship
         }
 
         if (!$this->class_name) {
-            $this->set_inferred_class_name();
+            $this->set_class_name($this->inferred_class_name($this->attribute_name));
         }
     }
 

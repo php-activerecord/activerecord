@@ -291,19 +291,6 @@ abstract class AbstractRelationship
     }
 
     /**
-     * Infers the $this->class_name based on $this->attribute_name.
-     *
-     * Will try to guess the appropriate class by singularizing and uppercasing $this->attribute_name.
-     *
-     * @see attribute_name
-     */
-    protected function set_inferred_class_name(): void
-    {
-        $class_name = $this->inferred_class_name($this->attribute_name);
-        $this->set_class_name($class_name);
-    }
-
-    /**
      * @return class-string
      */
     protected function inferred_class_name(string $name): string
@@ -315,7 +302,9 @@ abstract class AbstractRelationship
             $name = $this->options['namespace'] . '\\' . $name;
         }
 
-        assert(class_exists($name));
+        if (!class_exists($name)) {
+            throw new \ReflectionException('Unknown class name: ' . $name);
+        }
 
         return $name;
     }

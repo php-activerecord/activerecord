@@ -66,7 +66,9 @@ class BelongsTo extends AbstractRelationship
         parent::__construct($attributeName, $options);
 
         if (!$this->class_name) {
-            $this->set_inferred_class_name();
+            $this->set_class_name(
+                $this->inferred_class_name($this->attribute_name)
+            );
         }
 
         // infer from class_name
