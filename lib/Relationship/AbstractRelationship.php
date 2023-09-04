@@ -4,7 +4,6 @@ namespace ActiveRecord\Relationship;
 
 use function ActiveRecord\all;
 use function ActiveRecord\classify;
-use function ActiveRecord\denamespace;
 
 use ActiveRecord\Exception\RelationshipException;
 

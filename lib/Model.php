@@ -1410,6 +1410,7 @@ class Model
                 // if the related model is null and a poly then we should have an empty array
                 if (is_null($model)) {
                     $this->__relationships[$name] = [];
+
                     return;
                 }
 
