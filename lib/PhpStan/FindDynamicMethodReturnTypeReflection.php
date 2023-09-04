@@ -3,8 +3,10 @@
 namespace ActiveRecord\PhpStan;
 
 use ActiveRecord\Model;
+use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\ArrayType;
@@ -32,12 +34,13 @@ class FindDynamicMethodReturnTypeReflection implements DynamicStaticMethodReturn
 
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type
     {
-        $subclass = $methodCall->class . '';
+        assert($methodCall->class instanceof Name );
+        $subclass = $methodCall->class->toString();
         $args = $methodCall->args;
 
         $args = array_map(static function ($arg) use ($scope) {
+            assert($arg instanceof Arg);
             $val = $arg->value;
-            assert($val instanceof Expr);
 
             return $scope->getType($val);
         }, $args);
