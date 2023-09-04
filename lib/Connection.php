@@ -13,11 +13,20 @@ use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use Closure;
 use PDO;
+use Psr\Log\LoggerInterface;
 
 /**
  * The base class for database connection adapters.
  *
- * @package ActiveRecord
+ * @phpstan-type ConnectionInfo array{
+ *     protocol: string,
+ *     host: string,
+ *     db: string|null,
+ *     user: string|null,
+ *     pass: string|null,
+ *     port?: int|null,
+ *     charset?: string|null
+ * }
  */
 abstract class Connection
 {
@@ -42,22 +51,16 @@ abstract class Connection
     public string $last_query;
     /**
      * Switch for logging.
-     *
-     * @var bool
      */
-    private $logging = false;
+    private bool $logging = false;
     /**
      * Contains a Logger object that must implement a log() method.
-     *
-     * @var object
      */
-    private $logger;
+    private LoggerInterface $logger;
     /**
      * The name of the protocol that is used.
-     *
-     * @var string
      */
-    public $protocol;
+    public string $protocol;
     /**
      * Database's date format
      *
@@ -66,10 +69,8 @@ abstract class Connection
     public static $date_format = 'Y-m-d';
     /**
      * Database's datetime format
-     *
-     * @var string
      */
-    public static $datetime_format = 'Y-m-d H:i:s';
+    public static string $datetime_format = 'Y-m-d H:i:s';
     /**
      * Default PDO options to set for each connection.
      *
@@ -126,16 +127,17 @@ abstract class Connection
             throw new DatabaseException('Empty connection string');
         }
         $info = static::parse_connection_url($connection_string);
-        $fqclass = static::load_adapter_class($info->protocol);
+        $fqclass = static::load_adapter_class($info['protocol']);
 
         try {
             $connection = new $fqclass($info);
-            $connection->protocol = $info->protocol;
+            assert($connection instanceof Connection);
+            $connection->protocol = $info['protocol'];
             $connection->logging = $config->get_logging();
             $connection->logger = $connection->logging ? $config->get_logger() : null;
 
-            if (isset($info->charset)) {
-                $connection->set_encoding($info->charset);
+            if (isset($info['charset'])) {
+                $connection->set_encoding($info['charset']);
             }
         } catch (\PDOException $e) {
             throw new DatabaseException($e);
@@ -162,6 +164,8 @@ abstract class Connection
         }
         require_once $source;
 
+        assert(class_exists($fqclass));
+
         return $fqclass;
     }
 
@@ -186,26 +190,26 @@ abstract class Connection
      *
      * @param string $connection_url A connection URL
      *
-     * @return object the parsed URL as an object
+     * @return ConnectionInfo
      */
-    public static function parse_connection_url(string $connection_url)
+    public static function parse_connection_url(string $connection_url): array
     {
         $url = @parse_url($connection_url);
 
         if (!isset($url['host'])) {
             throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
         }
-        $info = new \stdClass();
-        $info->protocol = $url['scheme'];
-        $info->host = $url['host'];
-        $info->db = isset($url['path']) ? substr($url['path'], 1) : null;
-        $info->user = isset($url['user']) ? $url['user'] : null;
-        $info->pass = isset($url['pass']) ? $url['pass'] : null;
+        $host = $url['host'];
+        $db = isset($url['path']) ? substr($url['path'], 1) : null;
+        $user = $url['user'] ?? null;
+        $pass = $url['pass'] ?? null;
+        $protocol = $url['scheme'] ?? null;
+        $charset = null;
 
-        $allow_blank_db = ('sqlite' == $info->protocol);
+        $allow_blank_db = ('sqlite' == $protocol);
 
-        if ('unix(' == $info->host) {
-            $socket_database = $info->host . '/' . $info->db;
+        if ('unix(' == $host) {
+            $socket_database = $host . '/' . $db;
 
             if ($allow_blank_db) {
                 $unix_regex = '/^unix\((.+)\)\/?().*$/';
@@ -214,29 +218,25 @@ abstract class Connection
             }
 
             if (preg_match_all($unix_regex, $socket_database, $matches) > 0) {
-                $info->host = $matches[1][0];
-                $info->db = $matches[2][0];
+                $host = $matches[1][0];
+                $db = $matches[2][0];
             }
-        } elseif ('windows(' == substr($info->host, 0, 8)) {
-            $info->host = urldecode(substr($info->host, 8) . '/' . substr($info->db, 0, -1));
-            $info->db = null;
+        } elseif ('windows(' == substr($host, 0, 8)) {
+            $host = urldecode(substr($host, 8) . '/' . substr($db, 0, -1));
+            $db = null;
         }
 
-        if ($allow_blank_db && $info->db) {
-            $info->host .= '/' . $info->db;
-        }
-
-        if (isset($url['port'])) {
-            $info->port = $url['port'];
+        if ($allow_blank_db && $db) {
+            $host .= '/' . $db;
         }
 
         if (false !== strpos($connection_url, 'decode=true')) {
-            if ($info->user) {
-                $info->user = urldecode($info->user);
+            if ($user) {
+                $user = urldecode($user);
             }
 
-            if ($info->pass) {
-                $info->pass = urldecode($info->pass);
+            if ($pass) {
+                $pass = urldecode($pass);
             }
         }
 
@@ -245,33 +245,45 @@ abstract class Connection
                 list($name, $value) = explode('=', $pair);
 
                 if ('charset' == $name) {
-                    $info->charset = $value;
+                    $charset = $value;
                 }
             }
         }
 
-        return $info;
+        assert(!is_null($protocol));
+
+        return [
+            'charset' => $charset,
+            'protocol' => $protocol,
+            'host' => $host,
+            'db' => $db,
+            'user' => $user,
+            'pass' => $pass,
+            'port' => $url['port'] ?? null
+        ];
     }
 
     /**
      * Class Connection is a singleton. Access it via instance().
+     *
+     * @param ConnectionInfo $info
      */
-    protected function __construct(\stdClass $info)
+    protected function __construct(array $info)
     {
         try {
             // unix sockets start with a /
-            if ('/' != $info->host[0]) {
-                $host = "host=$info->host";
+            if ('/' != $info['host'][0]) {
+                $host = 'host=' . $info['host'];
 
-                if (isset($info->port)) {
-                    $host .= ";port=$info->port";
+                if (isset($info['port'])) {
+                    $host .= ';port=' . $info['port'];
                 }
             } else {
-                $host = "unix_socket=$info->host";
+                $host = 'unix_socket=' . $info['host'];
             }
 
-            $dsn = "$info->protocol:$host;dbname=$info->db";
-            $this->connection = new \PDO($dsn, $info->user, $info->pass, static::$PDO_OPTIONS);
+            $dsn = $info['protocol'] . ":$host;dbname=" . $info['db'];
+            $this->connection = new \PDO($dsn, $info['user'], $info['pass'], static::$PDO_OPTIONS);
         } catch (\PDOException $e) {
             throw new Exception\ConnectionException($e);
         }
@@ -484,26 +496,15 @@ abstract class Connection
             $string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
     }
 
-    /**
-     * Return a date time formatted into the database's date format.
-     *
-     * @param DateTime $datetime The DateTime object
-     *
-     * @return string
-     */
-    public function date_to_string($datetime)
+    public function date_string(\DateTimeInterface $datetime): string
     {
         return $datetime->format(static::$date_format);
     }
 
     /**
      * Return a date time formatted into the database's datetime format.
-     *
-     * @param DateTime $datetime The DateTime object
-     *
-     * @return string
      */
-    public function datetime_to_string(\DateTime $datetime)
+    public function datetime_string(\DateTimeInterface $datetime): string
     {
         return $datetime->format(static::$datetime_format);
     }
@@ -523,6 +524,8 @@ abstract class Connection
         if (is_array($errors) && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
             return null;
         }
+
+        assert($date instanceof \DateTime);
 
         $date_class = Config::instance()->get_date_class();
 

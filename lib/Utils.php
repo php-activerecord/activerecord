@@ -34,15 +34,17 @@
 
 namespace ActiveRecord;
 
-function classify(string $class_name, bool $singular = false): string
+function classify(string $string, bool $singular = false): string
 {
     if ($singular) {
-        $class_name = Utils::singularize($class_name);
+        $string = Utils::singularize($string);
     }
 
-    $class_name = Inflector::instance()->camelize($class_name);
+    $string = Inflector::camelize($string);
 
-    return ucfirst($class_name);
+    $res = ucfirst($string);
+
+    return $res;
 }
 
 /**
@@ -196,9 +198,8 @@ class Utils
 
     public static function human_attribute(string $attr): string
     {
-        $inflector = Inflector::instance();
-        $inflected = $inflector->variablize($attr);
-        $normal = $inflector->uncamelize($inflected);
+        $inflected = Inflector::variablize($attr);
+        $normal = Inflector::uncamelize($inflected);
 
         return ucfirst(str_replace('_', ' ', $normal));
     }
@@ -366,11 +367,11 @@ class Utils
         return $string;
     }
 
-    /**
-     * @return string|string[]|null
-     */
-    public static function squeeze(string $char, string $string): mixed
+    public static function squeeze(string $char, string $string): string
     {
-        return preg_replace("/$char+/", $char, $string);
+        $res = preg_replace("/$char+/", $char, $string);
+        assert(is_string($res));
+
+        return $res;
     }
 }

@@ -41,6 +41,9 @@ use ActiveRecord\Types;
  */
 class BelongsTo extends AbstractRelationship
 {
+    /**
+     * @var class-string
+     */
     public $class_name;
 
     /**
@@ -63,22 +66,22 @@ class BelongsTo extends AbstractRelationship
         parent::__construct($attributeName, $options);
 
         if (!$this->class_name) {
-            $this->set_inferred_class_name();
+            $this->set_class_name(
+                $this->inferred_class_name($this->attribute_name)
+            );
         }
 
         // infer from class_name
         if (!$this->foreign_key) {
-            $this->foreign_key = [Inflector::instance()->keyify($this->class_name)];
+            $this->foreign_key = [Inflector::keyify($this->class_name)];
         }
     }
 
     public function load(Model $model): ?Model
     {
         $keys = [];
-        $inflector = Inflector::instance();
-
         foreach ($this->foreign_key as $key) {
-            $keys[] = $inflector->variablize($key);
+            $keys[] = Inflector::variablize($key);
         }
 
         if (!($conditions = $this->create_conditions_from_keys($model, $this->primary_key(), $keys))) {

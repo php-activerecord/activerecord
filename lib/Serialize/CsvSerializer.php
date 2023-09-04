@@ -12,7 +12,7 @@ class CsvSerializer extends Serialization
 
     public function to_s(): string
     {
-        if (true == @$this->options['only_header']) {
+        if ($this->options['only_header'] ?? false) {
             return $this->header();
         }
 
@@ -35,9 +35,12 @@ class CsvSerializer extends Serialization
     private function to_csv(array $arr): string
     {
         $outstream = fopen('php://temp', 'w');
+        assert(false !== $outstream);
         fputcsv($outstream, $arr, self::$delimiter, self::$enclosure);
         rewind($outstream);
-        $buffer = trim(stream_get_contents($outstream));
+        $contents = stream_get_contents($outstream);
+        assert(is_string($contents));
+        $buffer = trim($contents);
         fclose($outstream);
 
         return $buffer;

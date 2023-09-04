@@ -19,14 +19,14 @@ use ActiveRecord\Utils;
  */
 class SqliteAdapter extends Connection
 {
-    public static $datetime_format = 'Y-m-d H:i:s';
+    public static string $datetime_format = 'Y-m-d H:i:s';
 
-    protected function __construct(\stdClass $info)
+    protected function __construct(array $info)
     {
-        if (!file_exists($info->host)) {
-            throw new ConnectionException("Could not find sqlite db: $info->host");
+        if (!file_exists($info['host'])) {
+            throw new ConnectionException('Could not find sqlite db: ' . $info['host']);
         }
-        $this->connection = new \PDO("sqlite:$info->host", null, null, static::$PDO_OPTIONS);
+        $this->connection = new \PDO('sqlite:' . $info['host'], null, null, static::$PDO_OPTIONS);
     }
 
     public function limit(string $sql, int $offset = 0, int $limit = 0)
@@ -49,10 +49,10 @@ class SqliteAdapter extends Connection
     public function create_column(array $column): Column
     {
         $c = new Column();
-        $c->inflected_name  = Inflector::instance()->variablize($column['name']);
+        $c->inflected_name  = Inflector::variablize($column['name']);
         $c->name            = $column['name'];
-        $c->nullable        = $column['notnull'] ? false : true;
-        $c->pk              = $column['pk'] ? true : false;
+        $c->nullable        = !$column['notnull'];
+        $c->pk              = (bool) $column['pk'];
         $c->auto_increment  = in_array(
             strtoupper($column['type']),
             ['INT', 'INTEGER']

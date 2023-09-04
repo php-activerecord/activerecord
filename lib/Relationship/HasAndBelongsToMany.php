@@ -26,6 +26,11 @@ class HasAndBelongsToMany extends AbstractRelationship
         parent::__construct($options[0], $options);
     }
 
+    public function is_poly(): bool
+    {
+        return true;
+    }
+
     public function load(Model $model): mixed
     {
         throw new \Exception("HasAndBelongsToMany doesn't need to load anything.");

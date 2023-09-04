@@ -102,7 +102,7 @@ class CallBack
     /**
      * Holds data for registered callbacks.
      *
-     * @var array<string, CallBack>
+     * @var array<string, array<\Closure|string>>
      */
     private array $registry = [];
 
@@ -141,7 +141,7 @@ class CallBack
      *
      * @param $name string Name of a callback (see {@link VALID_CALLBACKS $VALID_CALLBACKS})
      *
-     * @return array<CallBack> array of callbacks or null if invalid callback name
+     * @return array<\Closure|string> array of callbacks or empty array if invalid callback name
      */
     public function get_callbacks(string $name): array
     {
