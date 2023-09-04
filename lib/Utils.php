@@ -34,18 +34,15 @@
 
 namespace ActiveRecord;
 
-/**
- * @return class-string
- */
-function classify(string $class_name, bool $singular = false): string
+function classify(string $string, bool $singular = false): string
 {
     if ($singular) {
-        $class_name = Utils::singularize($class_name);
+        $string = Utils::singularize($string);
     }
 
-    $class_name = Inflector::camelize($class_name);
+    $string = Inflector::camelize($string);
 
-    return ucfirst($class_name);
+    return ucfirst($string);
 }
 
 /**
