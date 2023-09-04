@@ -85,7 +85,7 @@ SQL;
     public function create_column(array $column): Column
     {
         $c = new Column();
-        $c->inflected_name    = Inflector::instance()->variablize($column['field']);
+        $c->inflected_name    = Inflector::variablize($column['field']);
         $c->name            = $column['field'];
         $c->nullable        = ($column['not_nullable'] ? false : true);
         $c->pk                = ($column['pk'] ? true : false);

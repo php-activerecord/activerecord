@@ -139,7 +139,7 @@ class Model
     /**
      * Array of relationship objects as model_attribute_name => relationship
      *
-     * @var array<class-string,Model>
+     * @var array<string,Model|array<Model>>
      */
     private array $__relationships = [];
 
@@ -184,7 +184,7 @@ class Model
     /**
      * Set this to specify an expiration period for this model. If not set, the expire value you set in your cache options will be used.
      *
-     * @var number
+     * @var int
      */
     public static $cache_expire;
 
@@ -410,7 +410,9 @@ class Model
         $name = strtolower($name);
         if (method_exists($this, "get_$name")) {
             $name = "get_$name";
-            $res = call_user_func([$this, $name]);
+            $callable = [$this, $name];
+            assert(is_callable($callable));
+            $res = call_user_func($callable);
 
             return $res;
         }
@@ -519,12 +521,15 @@ class Model
         }
 
         if ('id' == $name) {
-            $this->assign_attribute($this->get_primary_key(true), $value);
+            $this->assign_attribute($this->get_primary_key(), $value);
 
             return;
         }
 
-        foreach (static::$delegate as $item) {
+        foreach (static::$delegate as $key => $item) {
+            if ('processed' == $key) {
+                continue;
+            }
             if ($delegated_name = $this->is_delegated($name, $item)) {
                 $this->{$item['to']}->$delegated_name = $value;
 
@@ -628,7 +633,7 @@ class Model
         }
 
         if ('id' == $name) {
-            $pk = $this->get_primary_key(true);
+            $pk = $this->get_primary_key();
             if (isset($this->attributes[$pk])) {
                 return $this->attributes[$pk];
             }
@@ -659,7 +664,7 @@ class Model
     /**
      * @throws RelationshipException
      *
-     * @return Model|AbstractRelationship|null
+     * @return Model|array<Model>|null
      */
     protected function initRelationships(string $name): mixed
     {
@@ -717,14 +722,11 @@ class Model
         return $this->attributes;
     }
 
-    /**
-     * @return array<string>|string
-     */
-    public function get_primary_key(bool $first = false): array|string
+    public function get_primary_key(): string
     {
         $pk = static::table()->pk;
 
-        return $first ? $pk[0] : $pk;
+        return $pk[0];
     }
 
     /**
@@ -805,14 +807,14 @@ class Model
      * @param string          $name     Name of an attribute
      * @param DelegateOptions $delegate An array containing delegate data
      */
-    private function is_delegated(string $name, $delegate): string|null
+    private function is_delegated(string $name, array $delegate): string|null
     {
         if (is_array($delegate)) {
-            if ('' != $delegate['prefix']) {
+            if (!empty($delegate['prefix'])) {
                 $name = substr($name, strlen($delegate['prefix']) + 1);
             }
 
-            if (in_array($name, $delegate['delegate'])) {
+            if (in_array($name, $delegate['delegate'] ?? [])) {
                 return $name;
             }
         }
@@ -951,7 +953,7 @@ class Model
             $attributes = $this->attributes;
         }
 
-        $pk = $this->get_primary_key(true);
+        $pk = $this->get_primary_key();
         $use_sequence = false;
 
         if (!empty($table->sequence) && !isset($attributes[$pk])) {
@@ -1132,7 +1134,7 @@ class Model
         $conn = static::connection();
         $sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
 
-        $sql->update($options['set']);
+        isset($options['set']) && $sql->update($options['set']);
 
         if (isset($options['conditions']) && ($conditions = $options['conditions'])) {
             if (is_array($conditions) && !is_hash($conditions)) {
@@ -1399,7 +1401,7 @@ class Model
      *
      * @internal This should <strong>only</strong> be used by eager load
      */
-    public function set_relationship_from_eager_load(Model $model = null, string $name): void
+    public function set_relationship_from_eager_load(?Model $model, string $name): void
     {
         $table = static::table();
 
@@ -1411,8 +1413,9 @@ class Model
 
                     return;
                 }
-
-                $this->__relationships[$name][] = $model;
+                $this->__relationships[$name] ??= [];
+                assert(is_array($this->__relationships[$name]));
+                array_push($this->__relationships[$name], $model);
 
                 return;
             }
@@ -1435,9 +1438,9 @@ class Model
         $this->remove_from_cache();
 
         $this->__relationships = [];
-        $pk = array_values($this->get_values_for($this->get_primary_key()));
-
-        $this->set_attributes_via_mass_assignment($this->find($pk[0])->attributes, false);
+        $model = $this->find($this->{static::table()->pk[0]});
+        assert($model instanceof static);
+        $this->set_attributes_via_mass_assignment($model->attributes, false);
         $this->reset_dirty();
 
         return $this;
@@ -1684,7 +1687,7 @@ class Model
 
         return $sqlPlan->all($needle);
     }
-
+    
     /**
      * Get a count of qualifying records.
      *
@@ -1696,7 +1699,7 @@ class Model
      *
      * @return int Number of records that matched the query
      */
-    public static function count(/* ... */)
+    public static function count(/* ... */): int
     {
         $args = func_get_args();
         $options = static::extract_and_validate_options($args);
@@ -1706,7 +1709,7 @@ class Model
             if (is_hash($args[0])) {
                 $options['conditions'] = $args[0];
             } else {
-                $options['conditions'] = call_user_func_array(static::class . '::pk_conditions', $args);
+                $options['conditions'] = static::pk_conditions(...$args);
             }
         }
 
@@ -1724,41 +1727,43 @@ class Model
      *
      * ```
      * SomeModel::exists(123);
-     * SomeModel::exists(array('conditions' => array('id=? and name=?', 123, 'Tito')));
-     * SomeModel::exists(array('id' => 123, 'name' => 'Tito'));
+     * SomeModel::exists(['conditions' => ['id=? and name=?', 123, 'Tito']]);
+     * SomeModel::exists(['id' => 123, 'name' => 'Tito']);
      * ```
      *
      * @see find
-     *
-     * @return bool
      */
-    public static function exists(/* ... */)
+    public static function exists(/* ... */): bool
     {
-        return call_user_func_array(static::class . '::count', func_get_args()) > 0 ? true : false;
+        return static::count(...func_get_args()) > 0;
     }
 
     /**
      * Alias for self::find('first').
      *
      * @see find
-     *
-     * @return static|null The first matched record or null if not found
      */
-    public static function first(/* ... */)
+    public static function first(/* ... */): static|null
     {
-        return call_user_func_array(static::class . '::find', array_merge(['first'], func_get_args()));
+        $res = static::find('first', ...func_get_args());
+        // this is a workaround for what seems to be a PHPStan bug
+        assert($res instanceof static || is_null($res));
+
+        return $res;
     }
 
     /**
      * Alias for self::find('last')
      *
      * @see find
-     *
-     * @return Model|null The last matched record or null if not found
      */
-    public static function last(/* ... */)
+    public static function last(/* ... */): static|null
     {
-        return call_user_func_array(static::class . '::find', array_merge(['last'], func_get_args()));
+        $res = static::find('last', ...func_get_args());
+        // this is a workaround for what seems to be a PHPStan bug
+        assert($res instanceof static || is_null($res));
+
+        return $res;
     }
 
     /**
@@ -1884,7 +1889,7 @@ class Model
             $list = static::table()->find($options);
         }
 
-        return $single ? (!empty($list) ? $list[0] : null) : $list;
+        return $single ? ($list[0] ?? null) : $list;
     }
 
     /**
@@ -1936,6 +1941,7 @@ class Model
             $pks = is_array($values) ? $values : [$values];
             $list = static::get_models_from_cache($pks);
         } else {
+            // int|string|array<int|string>
             $options['conditions'] = static::pk_conditions($values);
             $list = $table->find($options);
         }
@@ -2016,11 +2022,11 @@ class Model
     /**
      * Returns a hash containing the names => values of the primary key.
      *
-     * @param int|array<number|string> $args Primary key value(s)
+     * @param PrimaryKey $args Primary key value(s)
      *
      * @return array<string, mixed>
      */
-    public static function pk_conditions(int|array $args): array
+    public static function pk_conditions(mixed $args): array
     {
         $table = static::table();
         $ret = [$table->pk[0] => $args];
@@ -2137,6 +2143,8 @@ class Model
         $class = 'ActiveRecord\\Serialize\\' . $type . 'Serializer';
         $serializer = new $class($this, $options);
 
+        assert($serializer instanceof Serialization);
+
         return $serializer->to_s();
     }
 
@@ -2150,7 +2158,7 @@ class Model
      *
      * @return bool True if invoked or null if not
      */
-    private function invoke_callback($method_name, $must_exist = true)
+    private function invoke_callback(string $method_name, bool $must_exist = true)
     {
         return static::table()->callback->invoke($this, $method_name, $must_exist);
     }

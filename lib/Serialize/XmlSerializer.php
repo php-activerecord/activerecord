@@ -43,9 +43,9 @@ class XmlSerializer extends Serialization
         $this->write($this->to_a());
         $this->writer->endElement();
         $this->writer->endDocument();
-        $xml = $this->writer->outputMemory(true);
+        $xml = $this->writer->outputMemory();
 
-        if (true == @$this->options['skip_instruct']) {
+        if ($this->options['skip_instruct'] ?? false) {
             $xml = preg_replace('/<\?xml version.*?\?>/', '', $xml);
         }
 
@@ -59,8 +59,7 @@ class XmlSerializer extends Serialization
     {
         foreach ($data as $attr => $value) {
             $attr = $tag ?? $attr;
-
-            if (is_array($value) || is_object($value)) {
+            if (is_array($value)) {
                 if (!is_int(key($value))) {
                     $this->writer->startElement(denamespace($attr));
                     $this->write($value);

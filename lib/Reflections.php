@@ -29,11 +29,12 @@ class Reflections extends Singleton
      *
      * @return Reflections $this so you can chain calls like Reflections::instance()->add('class')->get()
      */
-    public function add(string $class = null): Reflections
+    public function add(string $class): Reflections
     {
         $class = $this->get_class($class);
 
         if (!isset($this->reflections[$class])) {
+            /* @phpstan-ignore-next-line */
             $this->reflections[$class] = new \ReflectionClass($class);
         }
 
@@ -57,19 +58,13 @@ class Reflections extends Singleton
     /**
      * Get a cached ReflectionClass.
      *
-     * @param class-string|object $className Optional name of a class or an instance of the class
+     * @param class-string $className Optional name of a class or an instance of the class
      *
      * @throws ActiveRecordException if class was not found
-     *
-     * @return mixed null or a ReflectionClass instance
      */
-    public function get($className)
+    public function get(string $className): \ReflectionClass
     {
-        if (isset($this->reflections[$className])) {
-            return $this->reflections[$className];
-        }
-
-        throw new ActiveRecordException("Class not found: $className");
+        return $this->reflections[$className] ?? throw new ActiveRecordException("Class not found: $className");
     }
 
     /**
@@ -77,7 +72,7 @@ class Reflections extends Singleton
      *
      * @param class-string|object $class An object or name of a class
      *
-     * @return string
+     * @return class-string
      */
     private function get_class(string|object $class = null)
     {
@@ -85,10 +80,6 @@ class Reflections extends Singleton
             return get_class($class);
         }
 
-        if (!is_null($class)) {
-            return $class;
-        }
-
-        return $this->get_called_class();
+        return $class;
     }
 }

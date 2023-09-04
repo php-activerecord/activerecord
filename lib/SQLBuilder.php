@@ -115,7 +115,33 @@ class SQLBuilder
 
     public function where(/* (conditions, values) || (hash) */): static
     {
-        $this->apply_where_conditions(func_get_args());
+        $args = func_get_args();
+        $num_args = count($args);
+
+        if (1 == $num_args && is_hash($args[0])) {
+            $hash = empty($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
+            $e = new Expressions($this->connection, $hash);
+            $this->where = $e->to_s();
+            $this->where_values = array_flatten($e->values());
+        } elseif ($num_args > 0) {
+            // if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
+            $values = array_slice($args, 1);
+
+            foreach ($values as $name => &$value) {
+                if (is_array($value)) {
+                    $e = new Expressions($this->connection, $args[0]);
+                    $e->bind_values($values);
+                    $this->where = $e->to_s();
+                    $this->where_values = array_flatten($e->values());
+
+                    return $this;
+                }
+            }
+
+            // no nested array so nothing special to do
+            $this->where = $args[0] ?? '';
+            $this->where_values = $values;
+        }
 
         return $this;
     }
@@ -163,12 +189,7 @@ class SQLBuilder
         return $this;
     }
 
-    /**
-     * @param string|array<string> $joins
-     *
-     * @return $this
-     */
-    public function joins(string|array $joins): static
+    public function joins(string $joins): static
     {
         $this->joins = $joins;
 
@@ -220,7 +241,7 @@ class SQLBuilder
     public function delete(): static
     {
         $this->operation = 'DELETE';
-        $this->apply_where_conditions(func_get_args());
+        $this->where(...func_get_args());
 
         return $this;
     }
@@ -256,7 +277,10 @@ class SQLBuilder
      */
     public static function underscored_string_to_parts(string $string, int $flags=PREG_SPLIT_DELIM_CAPTURE): array
     {
-        return preg_split('/(_and_|_or_)/i', $string, -1, $flags);
+        $res = preg_split('/(_and_|_or_)/i', $string, -1, $flags);
+        assert(is_array($res));
+
+        return $res;
     }
 
     /**
@@ -351,41 +375,6 @@ class SQLBuilder
         }
 
         return $new;
-    }
-
-    /**
-     * @param array<string|array<string,mixed>> $args
-     *
-     * @throws Exception\ExpressionsException
-     */
-    private function apply_where_conditions(array $args): void
-    {
-        $num_args = count($args);
-
-        if (1 == $num_args && is_hash($args[0])) {
-            $hash = empty($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
-            $e = new Expressions($this->connection, $hash);
-            $this->where = $e->to_s();
-            $this->where_values = array_flatten($e->values());
-        } elseif ($num_args > 0) {
-            // if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
-            $values = array_slice($args, 1);
-
-            foreach ($values as $name => &$value) {
-                if (is_array($value)) {
-                    $e = new Expressions($this->connection, $args[0]);
-                    $e->bind_values($values);
-                    $this->where = $e->to_s();
-                    $this->where_values = array_flatten($e->values());
-
-                    return;
-                }
-            }
-
-            // no nested array so nothing special to do
-            $this->where = $args[0] ?? '';
-            $this->where_values = &$values;
-        }
     }
 
     private function build_delete(): string

@@ -4,7 +4,6 @@ namespace ActiveRecord\Relationship;
 
 use function ActiveRecord\all;
 use function ActiveRecord\classify;
-use function ActiveRecord\denamespace;
 
 use ActiveRecord\Exception\RelationshipException;
 
@@ -36,16 +35,16 @@ abstract class AbstractRelationship
     /**
      * Class name of the associated model.
      *
-     * @var string
+     * @var class-string
      */
     public $class_name;
 
     /**
      * Name of the foreign key.
      *
-     * @var string|string[]
+     * @var string[]
      */
-    public mixed $foreign_key = [];
+    public array $foreign_key = [];
 
     /**
      * Options of the relationship.
@@ -55,44 +54,38 @@ abstract class AbstractRelationship
     protected array $options = [];
 
     /**
-     * Is the relationship single or multi.
-     */
-    protected bool $poly_relationship = false;
-
-    /**
      * List of valid options for relationships.
      *
      * @var array<string>
      */
-    protected static $valid_association_options = ['class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly', 'namespace'];
+    protected static $valid_association_options = [
+        'class_name',
+        'foreign_key',
+        'conditions',
+        'select',
+        'readonly',
+        'namespace'
+    ];
 
     /**
      * Constructs a relationship.
      *
      * @param array<mixed> $options Options for the relationship (see {@link valid_association_options})
      */
-    public function __construct(string $attribute_name, $options = [])
+    public function __construct(string $attribute_name, array $options = [])
     {
         $this->attribute_name = $attribute_name;
         $this->options = $this->merge_association_options($options);
-
-        $relationship = strtolower(denamespace(get_called_class()));
-
-        if ('hasmany' === $relationship || 'hasandbelongstomany' === $relationship) {
-            $this->poly_relationship = true;
-        }
 
         if (isset($this->options['conditions']) && !is_array($this->options['conditions'])) {
             $this->options['conditions'] = [$this->options['conditions']];
         }
 
-        if (isset($this->options['class'])) {
-            $this->set_class_name($this->options['class']);
-        } elseif (isset($this->options['class_name'])) {
-            $this->set_class_name($this->options['class_name']);
+        if (isset($this->options['class_name'])) {
+            $this->set_class_name($this->inferred_class_name($this->options['class_name']));
         }
 
-        $this->attribute_name = strtolower(Inflector::instance()->variablize($this->attribute_name));
+        $this->attribute_name = strtolower(Inflector::variablize($this->attribute_name));
 
         if (!$this->foreign_key && isset($this->options['foreign_key'])) {
             $this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : [$this->options['foreign_key']];
@@ -116,7 +109,7 @@ abstract class AbstractRelationship
      */
     public function is_poly(): bool
     {
-        return $this->poly_relationship;
+        return false;
     }
 
     /**
@@ -136,12 +129,11 @@ abstract class AbstractRelationship
     {
         $values = [];
         $options = $this->options;
-        $inflector = Inflector::instance();
         $query_key = $query_keys[0];
         $model_values_key = $model_values_keys[0];
 
         foreach ($attributes as $column => $value) {
-            $values[] = $value[$inflector->variablize($model_values_key)];
+            $values[] = $value[Inflector::variablize($model_values_key)];
         }
 
         $values = [$values];
@@ -192,8 +184,8 @@ abstract class AbstractRelationship
         $related_models = $class::find('all', $options);
         $used_models_map = [];
         $related_models_map = [];
-        $model_values_key = $inflector->variablize($model_values_key);
-        $query_key = $inflector->variablize($query_key);
+        $model_values_key = Inflector::variablize($model_values_key);
+        $query_key = Inflector::variablize($query_key);
 
         foreach ($related_models as $related) {
             $related_models_map[$related->$query_key][] = $related;
@@ -231,7 +223,10 @@ abstract class AbstractRelationship
     {
         $class_name = $this->class_name;
 
-        return new $class_name($attributes, $guard_attributes);
+        $model = new $class_name($attributes, $guard_attributes);
+        assert($model instanceof Model);
+
+        return $model;
     }
 
     /**
@@ -253,7 +248,7 @@ abstract class AbstractRelationship
     {
         $association = &$associate->{$this->attribute_name};
 
-        if ($this->poly_relationship) {
+        if ($this->is_poly()) {
             $association[] = $record;
         } else {
             $association = $record;
@@ -296,24 +291,32 @@ abstract class AbstractRelationship
     }
 
     /**
-     * Infers the $this->class_name based on $this->attribute_name.
-     *
-     * Will try to guess the appropriate class by singularizing and uppercasing $this->attribute_name.
-     *
-     * @see attribute_name
+     * @return class-string
      */
-    protected function set_inferred_class_name(): void
+    protected function inferred_class_name(string $name): string
     {
-        $singularize = ($this instanceof HasMany ? true : false);
-        $this->set_class_name(classify($this->attribute_name, $singularize));
-    }
-
-    protected function set_class_name(string $class_name): void
-    {
-        if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
-            $class_name = $this->options['namespace'] . '\\' . $class_name;
+        if (!has_absolute_namespace($name) && isset($this->options['namespace'])) {
+            if (!isset($this->options['class_name'])) {
+                $name = classify($name, $this instanceof HasMany);
+            }
+            $name = $this->options['namespace'] . '\\' . $name;
         }
 
+        if (!class_exists($name)) {
+            throw new \ReflectionException('Unknown class name: ' . $name);
+        }
+
+        return $name;
+    }
+
+    /**
+     * @param class-string $class_name
+     *
+     * @throws RelationshipException
+     * @throws \ActiveRecord\Exception\ActiveRecordException
+     */
+    protected function set_class_name(string $class_name): void
+    {
         $reflection = Reflections::instance()->add($class_name)->get($class_name);
 
         if (!$reflection->isSubClassOf('ActiveRecord\\Model')) {
