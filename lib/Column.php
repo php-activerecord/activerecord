@@ -130,8 +130,7 @@ class Column
         }
 
         // It's just a decimal number
-        /* @phpstan-ignore-next-line */
-        elseif (is_numeric($value) && floor($value) != $value) {
+        elseif (is_float($value) && floor($value) != $value) {
             return (int) $value;
         }
 
