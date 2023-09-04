@@ -15,7 +15,7 @@ class TestCommand
             $fileName = count($args) >= 1 ? $args[0] : null;
             $filter = count($args) >= 2 ? $args[1] : null;
 
-            if ($fileName != null && !str_starts_with($fileName, '--')) {
+            if (null !== $fileName && !str_starts_with($fileName, '--')) {
                 $args = TestCommand::buildArgs($fileName, $filter);
                 $str = 'Running: ' . implode(' ', $args) . "\n";
                 if (1 === count($args)) {
