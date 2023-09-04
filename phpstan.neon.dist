@@ -6,6 +6,7 @@ parameters:
         - %currentWorkingDirectory%/test/phpstan
 
     reportUnmatchedIgnoredErrors: false
+    checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
 
 services:

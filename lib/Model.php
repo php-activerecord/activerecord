@@ -1413,7 +1413,7 @@ class Model
 
                     return;
                 }
-
+                $this->__relationships[$name] ??= [];
                 assert(is_array($this->__relationships[$name]));
                 array_push($this->__relationships[$name], $model);
 

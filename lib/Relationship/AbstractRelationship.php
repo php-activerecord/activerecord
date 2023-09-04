@@ -82,7 +82,7 @@ abstract class AbstractRelationship
         }
 
         if (isset($this->options['class_name'])) {
-            $this->set_class_name($this->options['class_name']);
+            $this->set_class_name($this->inferred_class_name($this->options['class_name']));
         }
 
         $this->attribute_name = strtolower(Inflector::variablize($this->attribute_name));
@@ -299,9 +299,24 @@ abstract class AbstractRelationship
      */
     protected function set_inferred_class_name(): void
     {
-        $singularize = (bool) ($this instanceof HasMany);
-        $class_name = classify($this->attribute_name, $singularize);
+        $class_name = $this->inferred_class_name($this->attribute_name);
         $this->set_class_name($class_name);
+    }
+
+    /**
+     * @param string $name
+     * @return class-string
+     */
+    protected function inferred_class_name(string $name): string {
+        if (!has_absolute_namespace($name) && isset($this->options['namespace'])) {
+            if (!isset($this->options['class_name'])) {
+                $name = classify($name, $this instanceof HasMany);
+            }
+            $name = $this->options['namespace'] . '\\' . $name;
+        }
+
+        assert(class_exists($name));
+        return $name;
     }
 
     /**
@@ -312,13 +327,6 @@ abstract class AbstractRelationship
      */
     protected function set_class_name(string $class_name): void
     {
-        if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
-            /**
-             * @var class-string
-             */
-            $class_name = $this->options['namespace'] . '\\' . $class_name;
-        }
-
         $reflection = Reflections::instance()->add($class_name)->get($class_name);
 
         if (!$reflection->isSubClassOf('ActiveRecord\\Model')) {

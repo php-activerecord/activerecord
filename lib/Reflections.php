@@ -34,6 +34,7 @@ class Reflections extends Singleton
         $class = $this->get_class($class);
 
         if (!isset($this->reflections[$class])) {
+            /* @phpstan-ignore-next-line */
             $this->reflections[$class] = new \ReflectionClass($class);
         }
 
