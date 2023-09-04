@@ -594,7 +594,7 @@ class Table
                         break;
 
                     case 'belongs_to':
-                        $relationship = new BelongsTo($definition[0], $definition);
+                        $relationship = new BelongsTo($attribute, $definition);
                         break;
 
                     case 'has_and_belongs_to_many':

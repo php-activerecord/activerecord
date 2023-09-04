@@ -5,6 +5,7 @@ namespace ActiveRecord\Relationship;
 use ActiveRecord\Inflector;
 use ActiveRecord\Model;
 use ActiveRecord\Table;
+use ActiveRecord\Types;
 
 /**
  * Belongs to relationship.
@@ -13,9 +14,9 @@ use ActiveRecord\Table;
  * class School extends ActiveRecord\Model {}
  *
  * class Person extends ActiveRecord\Model {
- *   static array $belongs_to = array(
- *     array('school')
- *   );
+ *   static array $belongs_to = [
+ *     'school' => true
+ *   ];
  * }
  * ```
  *
@@ -25,16 +26,17 @@ use ActiveRecord\Table;
  * class School extends ActiveRecord\Model {}
  *
  * class Person extends ActiveRecord\Model {
- *   static array $belongs_to = array(
- *     array('school', 'primary_key' => 'school_id')
- *   );
+ *  static array $belongs_to = [
+ *      'school' => [
+ *          'primary_key' => 'school_id'
+ *      ]
+ *  ]
  * }
  * ```
- *
+ * @phpstan-import-type BelongsToOptions from Types
  * @phpstan-import-type Attributes from Model
  *
  * @see valid_association_options
- * @see http://www.phpactiverecord.org/guides/associations
  */
 class BelongsTo extends AbstractRelationship
 {

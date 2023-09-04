@@ -30,10 +30,10 @@ use ActiveRecord\Types;
  *
  * ```php
  * class Payment extends ActiveRecord\Model {
- *   static array $belongs_to = array(
- *     array('person'),
- *     array('order')
- *   );
+ *   static array $belongs_to = [
+ *     'person'=>true,
+ *     'order'=>true
+ *   ];
  * }
  *
  * class Order extends ActiveRecord\Model {

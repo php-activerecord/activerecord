@@ -4,7 +4,8 @@ class Order extends ActiveRecord\Model
 {
     // order belongs to a person
     public static array $belongs_to = [
-        ['person']];
+        'person' => true
+    ];
 
     // order can have many payments by many people
     // the conditions is just there as an example as it makes no logical sense
