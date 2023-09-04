@@ -84,7 +84,7 @@ class MysqlAdapter extends Connection
     }
 
     /**
-     * @return array<string, array<string, mixed>>
+     * @return array<string, string|array<string, mixed>>
      */
     public function native_database_types(): array
     {
