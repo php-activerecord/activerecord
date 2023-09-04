@@ -304,10 +304,10 @@ abstract class AbstractRelationship
     }
 
     /**
-     * @param string $name
      * @return class-string
      */
-    protected function inferred_class_name(string $name): string {
+    protected function inferred_class_name(string $name): string
+    {
         if (!has_absolute_namespace($name) && isset($this->options['namespace'])) {
             if (!isset($this->options['class_name'])) {
                 $name = classify($name, $this instanceof HasMany);
@@ -316,6 +316,7 @@ abstract class AbstractRelationship
         }
 
         assert(class_exists($name));
+
         return $name;
     }
 

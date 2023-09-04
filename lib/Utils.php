@@ -43,6 +43,7 @@ function classify(string $string, bool $singular = false): string
     $string = Inflector::camelize($string);
 
     $res = ucfirst($string);
+
     return $res;
 }
 
