@@ -1,4 +1,5 @@
 <?php
+
 namespace ActiveRecord\Scripts;
 
 use Composer\Script\Event;
