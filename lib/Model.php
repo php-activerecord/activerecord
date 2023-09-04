@@ -14,6 +14,7 @@ use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Relationship\AbstractRelationship;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
+use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
 
@@ -39,14 +40,20 @@ use ActiveRecord\Serialize\Serialization;
  *
  * ```php
  * class Person extends ActiveRecord\Model {
- *   static array $belongs_to = array(
- *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
- *   );
+ *   static array $belongs_to = [
+ *      'parent' => [
+ *          'foreign_key' => 'parent_id',
+ *          'class_name' => 'Person'
+ *      ]
+ *   ];
  *
- *   static $has_many = array(
- *     array('children', 'foreign_key' => 'parent_id', 'class_name' => 'Person'),
- *     array('orders')
- *   );
+ *   static array $has_many = [
+ *     'children' => [
+ *          'foreign_key' => 'parent_id',
+ *          'class_name' => 'Person'
+ *      ],
+ *      'orders' => true
+ *   ];
  *
  *   static $validates_length_of = [
  *     'first_name' => ['within' => [1,50]],
@@ -56,7 +63,7 @@ use ActiveRecord\Serialize\Serialization;
  *
  * class Order extends ActiveRecord\Model {
  *   static array $belongs_to = [
- *     'person'
+ *     'person' => true
  *   ];
  *
  *   static $validates_numericality_of = [
@@ -75,6 +82,8 @@ use ActiveRecord\Serialize\Serialization;
  * For a more in-depth look at defining models, relationships, callbacks and many other things
  * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
  *
+ * @phpstan-import-type HasManyOptions from Types
+ * @phpstan-import-type BelongsToOptions from Types
  * @phpstan-import-type SerializeOptions from Serialize\Serialization
  * @phpstan-import-type ValidationOptions from Validations
  * @phpstan-import-type ValidateInclusionOptions from Validations
@@ -190,12 +199,12 @@ class Model
     public static array $validates_format_of;
 
     /**
-     * @var ValidateInclusionOptions
+     * @var array<string,ValidateInclusionOptions>
      */
     public static array $validates_inclusion_of;
 
     /**
-     * @var ValidateInclusionOptions
+     * @var array<string,ValidateInclusionOptions>
      */
     public static array $validates_exclusion_of;
 
@@ -213,6 +222,16 @@ class Model
      * @var ValidateLengthOptions
      */
     public static array $validates_length_of;
+
+    /**
+     * @var array<string,HasManyOptions>
+     */
+    public static array $has_many;
+
+    /**
+     * @var array<string,BelongsToOptions>
+     */
+    public static array $belongs_to;
 
     /**
      * Allows you to create aliases for attributes.
@@ -272,8 +291,11 @@ class Model
      *
      * ```
      * class Person extends ActiveRecord\Model {
-     *   static array $belongs_to = array(array('venue'),array('host'));
-     *   static $delegate = array(
+     *  static array $belongs_to = [
+     *      'venue' => true,
+     *      'host' => true
+     *  ];
+     *  static $delegate = array(
      *     array('name', 'state', 'to' => 'venue'),
      *     array('name', 'to' => 'host', 'prefix' => 'woot'));
      * }
@@ -1722,7 +1744,6 @@ class Model
      *  "all"										static[]			User::find("all", ["name"=>"Stephen"]
      *  ...int|string								static[]			User::find(1, 3, 5, 8);
      *  array<int,int|string>						static[]			User::find([1,3,5,8]);
-     * 	array<"conditions", array<string, string>>	static[]			User::find(["conditions"=>["name"=>"Kurt"]]);
      */
     public static function find(/* $type, $options */): static|array|null
     {

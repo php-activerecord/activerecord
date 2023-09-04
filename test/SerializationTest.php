@@ -33,6 +33,10 @@ class SerializationTest extends DatabaseTestCase
 
     public function testOnlyShouldOnlyApplyToAttributes()
     {
+        Book::$belongs_to = [
+            'author' => true
+        ];
+
         $this->assertArrayHasKey('author', $this->_a(['only' => 'name', 'include' => 'author']));
         $this->assertArrayHasKey('name', $this->_a(['only' => 'name', 'include' => 'author']));
         $this->assertArrayHasKey('book_id', $this->_a(['only' => 'book_id', 'methods' => 'upper_name']));

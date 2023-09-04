@@ -10,8 +10,10 @@ class Venue extends Model
     public static bool $use_custom_set_state_setter = false;
 
     public static array $has_many = [
-        'events',
-        ['hosts', 'through' => 'events']
+        'events' => true,
+        'hosts' => [
+            'through' => 'events'
+        ]
     ];
 
     public static array $has_one;
