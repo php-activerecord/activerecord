@@ -4,16 +4,19 @@ class Order extends ActiveRecord\Model
 {
     // order belongs to a person
     public static array $belongs_to = [
-        ['person']];
+        'person' => true
+    ];
 
     // order can have many payments by many people
     // the conditions is just there as an example as it makes no logical sense
-    public static $has_many = [
-        ['payments'],
-        ['people',
+    public static array $has_many = [
+        'payments' => true,
+        'people' => [
             'through'    => 'payments',
             'select'     => 'people.*, payments.amount',
-            'conditions' => 'payments.amount < 200']];
+            'conditions' => 'payments.amount < 200'
+        ]
+    ];
 
     // order must have a price and tax > 0
     public static array $validates_numericality_of = [

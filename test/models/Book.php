@@ -6,7 +6,9 @@ use ActiveRecord\Model;
 
 class Book extends Model
 {
-    public static array $belongs_to = ['author'];
+    public static array $belongs_to = [
+        'author' => true
+    ];
     public static $has_one = [];
 
     public function upper_name()

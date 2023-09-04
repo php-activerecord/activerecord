@@ -7,8 +7,8 @@ use ActiveRecord\Model;
 class Event extends Model
 {
     public static array $belongs_to = [
-        'host',
-        'venue'
+        'host' => true,
+        'venue' => true
     ];
 
     public static array $delegate = [

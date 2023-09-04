@@ -10,6 +10,6 @@ class Amenity extends Model
     public static string $primary_key = 'amenity_id';
 
     public static array $has_many = [
-        'property_amenities'
+        'property_amenities' => true
     ];
 }
