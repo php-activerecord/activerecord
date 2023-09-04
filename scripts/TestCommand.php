@@ -11,19 +11,23 @@ class TestCommand
     {
         try {
             $args = $event->getArguments();
+
             $fileName = count($args) >= 1 ? $args[0] : null;
             $filter = count($args) >= 2 ? $args[1] : null;
 
-            $args = TestCommand::buildArgs($fileName, $filter);
-
-            $str = 'Running: ' . implode(' ', $args) . "\n";
-            if (1 === count($args)) {
-                $str .= "To run just the tests in test/CallbackTest.php, try: composer test callback\n";
+            if ($fileName != null && !str_starts_with($fileName, '--')) {
+                $args = TestCommand::buildArgs($fileName, $filter);
+                $str = 'Running: ' . implode(' ', $args) . "\n";
+                if (1 === count($args)) {
+                    $str .= "To run just the tests in test/CallbackTest.php, try: composer test callback\n";
+                }
+                if (1 === count($args) || 2 === count($args)) {
+                    $str .= "To run a specific test in test/DateTimeTest.php, try: composer test dateTime testSetIsoDate\n";
+                }
+                echo $str;
+            } else {
+                array_unshift($args, 'vendor/bin/phpunit');
             }
-            if (1 === count($args) || 2 === count($args)) {
-                $str .= "To run a specific test in test/DateTimeTest.php, try: composer test dateTime testSetIsoDate\n";
-            }
-            echo $str;
 
             $process = new Process($args);
             $process->setTimeout(1200);
@@ -51,6 +55,9 @@ class TestCommand
             return $args;
         }
 
+        if (str_starts_with($fileName, 'test/')) {
+            $fileName = substr($fileName, strlen('test/'));
+        }
         if (str_ends_with($fileName, '.php')) {
             $fileName = substr($fileName, 0, -strlen('.php'));
         }
