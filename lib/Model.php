@@ -139,7 +139,7 @@ class Model
     /**
      * Array of relationship objects as model_attribute_name => relationship
      *
-     * @var array<class-string,Model|null>
+     * @var array<string,Model|array<Model>>
      */
     private array $__relationships = [];
 
@@ -410,7 +410,9 @@ class Model
         $name = strtolower($name);
         if (method_exists($this, "get_$name")) {
             $name = "get_$name";
-            $res = call_user_func([$this, $name]);
+            $callable = [$this, $name];
+            assert(is_callable($callable));
+            $res = call_user_func($callable);
 
             return $res;
         }
@@ -662,7 +664,7 @@ class Model
     /**
      * @throws RelationshipException
      *
-     * @return Model|AbstractRelationship|null
+     * @return Model|array<Model>|null
      */
     protected function initRelationships(string $name): mixed
     {
@@ -1132,7 +1134,7 @@ class Model
         $conn = static::connection();
         $sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
 
-        $sql->update($options['set']);
+        isset($options['set']) && $sql->update($options['set']);
 
         if (isset($options['conditions']) && ($conditions = $options['conditions'])) {
             if (is_array($conditions) && !is_hash($conditions)) {
@@ -1408,11 +1410,11 @@ class Model
                 // if the related model is null and a poly then we should have an empty array
                 if (is_null($model)) {
                     $this->__relationships[$name] = [];
-
                     return;
                 }
 
-                $this->__relationships[$name][] = $model;
+                assert(is_array($this->__relationships[$name]));
+                array_push($this->__relationships[$name], $model);
 
                 return;
             }

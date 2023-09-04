@@ -23,4 +23,8 @@ namespace ActiveRecord\Relationship;
  */
 class HasOne extends HasMany
 {
+    public function is_poly(): bool
+    {
+        return false;
+    }
 }

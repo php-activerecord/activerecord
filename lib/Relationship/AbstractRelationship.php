@@ -55,11 +55,6 @@ abstract class AbstractRelationship
     protected array $options = [];
 
     /**
-     * Is the relationship single or multi.
-     */
-    protected bool $poly_relationship = false;
-
-    /**
      * List of valid options for relationships.
      *
      * @var array<string>
@@ -82,12 +77,6 @@ abstract class AbstractRelationship
     {
         $this->attribute_name = $attribute_name;
         $this->options = $this->merge_association_options($options);
-
-        $relationship = strtolower(denamespace(get_called_class()));
-
-        if ('hasmany' === $relationship || 'hasandbelongstomany' === $relationship) {
-            $this->poly_relationship = true;
-        }
 
         if (isset($this->options['conditions']) && !is_array($this->options['conditions'])) {
             $this->options['conditions'] = [$this->options['conditions']];
@@ -121,7 +110,7 @@ abstract class AbstractRelationship
      */
     public function is_poly(): bool
     {
-        return $this->poly_relationship;
+        return false;
     }
 
     /**
@@ -260,7 +249,7 @@ abstract class AbstractRelationship
     {
         $association = &$associate->{$this->attribute_name};
 
-        if ($this->poly_relationship) {
+        if ($this->is_poly()) {
             $association[] = $record;
         } else {
             $association = $record;

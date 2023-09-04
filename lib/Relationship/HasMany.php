@@ -78,6 +78,11 @@ class HasMany extends AbstractRelationship
 
     private string $through;
 
+    public function is_poly(): bool
+    {
+        return true;
+    }
+
     /**
      * Constructs a {@link HasMany} relationship.
      *
@@ -168,7 +173,7 @@ class HasMany extends AbstractRelationship
         $options = $this->unset_non_finder_options($this->options);
         $options['conditions'] = $conditions;
 
-        $res = $class_name::find($this->poly_relationship ? 'all' : 'first', $options);
+        $res = $class_name::find($this->is_poly() ? 'all' : 'first', $options);
 
         return $res;
     }
