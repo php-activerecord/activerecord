@@ -580,21 +580,21 @@ class Table
                 continue;
             }
 
-            foreach (wrap_values_in_arrays($definitions) as $definition) {
+            foreach (wrap_values_in_arrays($definitions) as $attribute => $definition) {
                 $relationship = null;
                 $definition += ['namespace' => $namespace];
 
                 switch ($name) {
                     case 'has_many':
-                        $relationship = new HasMany($definition);
+                        $relationship = new HasMany($attribute, $definition);
                         break;
 
                     case 'has_one':
-                        $relationship = new HasOne($definition);
+                        $relationship = new HasOne($definition[0], $definition);
                         break;
 
                     case 'belongs_to':
-                        $relationship = new BelongsTo($definition);
+                        $relationship = new BelongsTo($attribute, $definition);
                         break;
 
                     case 'has_and_belongs_to_many':
