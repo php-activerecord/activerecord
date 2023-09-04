@@ -72,11 +72,16 @@ class HasMany extends AbstractRelationship
     ];
 
     /**
-     * @var string|array<string>
+     * @var array<string>
      */
-    protected string|array $primary_key;
+    protected array $primary_key;
 
     private string $through;
+
+    public function is_poly(): bool
+    {
+        return true;
+    }
 
     /**
      * Constructs a {@link HasMany} relationship.
@@ -91,7 +96,7 @@ class HasMany extends AbstractRelationship
             $this->through = $this->options['through'];
 
             if (isset($this->options['source'])) {
-                $this->set_class_name($this->options['source']);
+                $this->set_class_name($this->inferred_class_name($this->options['source']));
             }
         }
 
@@ -100,15 +105,18 @@ class HasMany extends AbstractRelationship
         }
 
         if (!$this->class_name) {
-            $this->set_inferred_class_name();
+            $this->set_class_name($this->inferred_class_name($this->attribute_name));
         }
     }
 
+    /**
+     * @param class-string $model_class_name
+     */
     protected function set_keys(string $model_class_name, bool $override = false): void
     {
         // infer from class_name
         if (!$this->foreign_key || $override) {
-            $this->foreign_key = [Inflector::instance()->keyify($model_class_name)];
+            $this->foreign_key = [Inflector::keyify($model_class_name)];
         }
 
         if (!isset($this->primary_key) || $override) {
@@ -165,7 +173,7 @@ class HasMany extends AbstractRelationship
         $options = $this->unset_non_finder_options($this->options);
         $options['conditions'] = $conditions;
 
-        $res = $class_name::find($this->poly_relationship ? 'all' : 'first', $options);
+        $res = $class_name::find($this->is_poly() ? 'all' : 'first', $options);
 
         return $res;
     }
@@ -178,7 +186,7 @@ class HasMany extends AbstractRelationship
     private function get_foreign_key_for_new_association(Model $model): array
     {
         $this->set_keys(get_class($model));
-        $primary_key = Inflector::instance()->variablize($this->foreign_key[0]);
+        $primary_key = Inflector::variablize($this->foreign_key[0]);
 
         /*
          * TODO: set up model property reflection stanning

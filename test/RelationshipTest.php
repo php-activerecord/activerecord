@@ -552,7 +552,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasOneBasic()
     {
-        $this->assert_default_has_one($this->get_relationship());
+        $this->assert_default_has_one(Employee::find(1));
     }
 
     public function testHasOneWithExplicitClassName()

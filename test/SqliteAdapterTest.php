@@ -63,13 +63,13 @@ class SqliteAdapterTest extends AdapterTestCase
     public function testDatetimeToString()
     {
         $datetime = '2009-01-01 01:01:01';
-        $this->assertEquals($datetime, $this->connection->datetime_to_string(date_create($datetime)));
+        $this->assertEquals($datetime, $this->connection->datetime_string(date_create($datetime)));
     }
 
     public function testDateToString()
     {
         $datetime = '2009-01-01';
-        $this->assertEquals($datetime, $this->connection->date_to_string(date_create($datetime)));
+        $this->assertEquals($datetime, $this->connection->date_string(date_create($datetime)));
     }
 
     // not supported

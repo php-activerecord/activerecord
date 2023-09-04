@@ -418,7 +418,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
     public function testJoinsOnModelWithAssociationAndExplicitJoins()
     {
         JoinBook::$belongs_to = [
-            'author' => true
+            'author'=>true
         ];
         JoinBook::first(['joins' => ['author', 'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)']]);
         $this->assert_sql_has('INNER JOIN authors ON(books.author_id = authors.author_id)', JoinBook::table()->last_sql);

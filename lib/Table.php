@@ -20,12 +20,12 @@ use ActiveRecord\Relationship\HasOne;
  * reading and writing to its database table. There is one instance of Table
  * for every table you have a model for.
  *
- * @package ActiveRecord
+ * @phpstan-import-type PrimaryKey from Types
  */
 class Table
 {
     /**
-     * @var array<string, Model>
+     * @var array<string, Table>
      */
     private static array $cache = [];
 
@@ -73,18 +73,17 @@ class Table
 
     /**
      * A instance of CallBack for this model/table
-     *
-     * @static
-     *
-     * @var object ActiveRecord\CallBack
      */
-    public $callback;
+    public CallBack $callback;
 
     /**
      * @var array<string, AbstractRelationship>
      */
     private array $relationships = [];
 
+    /**
+     * @param class-string $model_class_name
+     */
     public static function load(string $model_class_name): Table
     {
         if (!isset(self::$cache[$model_class_name])) {
@@ -106,6 +105,11 @@ class Table
         }
     }
 
+    /**
+     * @param class-string $class_name
+     *
+     * @throws Exception\ActiveRecordException
+     */
     public function __construct(string $class_name)
     {
         $this->class = Reflections::instance()->add($class_name)->get($class_name);
@@ -262,9 +266,9 @@ class Table
     }
 
     /**
-     * @param string|array<string> $pk
+     * @param PrimaryKey $pk
      */
-    public function cache_key_for_model(string|array $pk): string
+    public function cache_key_for_model(mixed $pk): string
     {
         if (is_array($pk)) {
             $pk = implode('-', $pk);
@@ -499,13 +503,13 @@ class Table
     private function process_data(array|null $hash): array|null
     {
         if ($hash) {
-            $date_class = Config::instance()->get_date_class();
             foreach ($hash as $name => $value) {
-                if ($value instanceof $date_class || $value instanceof \DateTime) {
-                    if (isset($this->columns[$name]) && Column::DATE == $this->columns[$name]->type) {
-                        $hash[$name] = $this->conn->date_to_string($value);
+                if ($value instanceof \DateTime) {
+                    $column = $this->columns[$name] ?? null;
+                    if (isset($column) && Column::DATE == $column->type) {
+                        $hash[$name] = $this->conn->date_string($value);
                     } else {
-                        $hash[$name] = $this->conn->datetime_to_string($value);
+                        $hash[$name] = $this->conn->datetime_string($value);
                     }
                 } else {
                     $hash[$name] = $value;
@@ -537,7 +541,7 @@ class Table
             $this->table = $table;
         } else {
             // infer table name from the class name
-            $this->table = Inflector::instance()->tableize($this->class->getName());
+            $this->table = Inflector::tableize($this->class->getName());
 
             // strip namespaces from the table name if any
             $parts = explode('\\', $this->table);
@@ -557,7 +561,8 @@ class Table
 
         $model_class_name = $this->class->name;
         $this->cache_individual_model = $model_class_name::$cache;
-        $this->cache_model_expire = $model_class_name::$cache_expire ?? Cache::$options['expire'];
+
+        $this->cache_model_expire = $model_class_name::$cache_expire ?? Cache::$options['expire'] ?? 0;
     }
 
     private function set_sequence_name(): void
