@@ -13,6 +13,7 @@ use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use Closure;
 use PDO;
+use Psr\Log\LoggerInterface;
 
 /**
  * The base class for database connection adapters.
@@ -43,21 +44,19 @@ abstract class Connection
     /**
      * Switch for logging.
      *
-     * @var bool
      */
-    private $logging = false;
+    private bool $logging = false;
     /**
      * Contains a Logger object that must implement a log() method.
      *
-     * @var object
      */
-    private $logger;
+    private LoggerInterface $logger;
     /**
      * The name of the protocol that is used.
      *
      * @var string
      */
-    public $protocol;
+    public string $protocol;
     /**
      * Database's date format
      *
@@ -67,9 +66,8 @@ abstract class Connection
     /**
      * Database's datetime format
      *
-     * @var string
      */
-    public static $datetime_format = 'Y-m-d H:i:s';
+    public static string $datetime_format = 'Y-m-d H:i:s';
     /**
      * Default PDO options to set for each connection.
      *
@@ -186,9 +184,10 @@ abstract class Connection
      *
      * @param string $connection_url A connection URL
      *
-     * @return object the parsed URL as an object
+     * @return \stdClass
+     *
      */
-    public static function parse_connection_url(string $connection_url)
+    public static function parse_connection_url(string $connection_url): stdClass
     {
         $url = @parse_url($connection_url);
 
@@ -199,8 +198,8 @@ abstract class Connection
         $info->protocol = $url['scheme'];
         $info->host = $url['host'];
         $info->db = isset($url['path']) ? substr($url['path'], 1) : null;
-        $info->user = isset($url['user']) ? $url['user'] : null;
-        $info->pass = isset($url['pass']) ? $url['pass'] : null;
+        $info->user = $url['user'] ?? null;
+        $info->pass = $url['pass'] ?? null;
 
         $allow_blank_db = ('sqlite' == $info->protocol);
 
@@ -507,6 +506,7 @@ abstract class Connection
     public function string_to_datetime(string $string): ?DateTime
     {
         $date = date_create($string);
+        assert($date instanceof DateTimeInterface);
         $errors = \DateTime::getLastErrors();
 
         if (is_array($errors) && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
