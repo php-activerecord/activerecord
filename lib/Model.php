@@ -1592,16 +1592,97 @@ class Model
         throw new ActiveRecordException("Call to undefined method: $method");
     }
 
-    /**
-     * Alias for self::find('all').
-     *
-     * @see find
-     *
-     * @return static[]
-     */
-    public static function all(/* ... */)
+    public static function select(string $columns='*'): SQLExecutionPlan
     {
-        return call_user_func_array(static::class . '::find', array_merge(['all'], func_get_args()));
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan->select($columns);
+
+        return $sqlPlan;
+    }
+
+    public static function join(string $joinStatement): SQLExecutionPlan
+    {
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan->join($joinStatement);
+
+        return $sqlPlan;
+    }
+
+    public static function orderBy(string $order): SQLExecutionPlan
+    {
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan->orderBy($order);
+
+        return $sqlPlan;
+    }
+
+    public static function groupBy(string $columns): SQLExecutionPlan
+    {
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan->groupBy($columns);
+
+        return $sqlPlan;
+    }
+
+    public static function limit(int $limit): SQLExecutionPlan
+    {
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan->limit($limit);
+
+        return $sqlPlan;
+    }
+
+    public static function offset(int $offset): SQLExecutionPlan
+    {
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan->offset($offset);
+
+        return $sqlPlan;
+    }
+
+    public static function having(string $having): SQLExecutionPlan
+    {
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan->having($having);
+
+        return $sqlPlan;
+    }
+
+    /**
+     * needle is one of:
+     *
+     * primary key value        where(3)     WHERE author_id=3
+     * mapping of column names  where(["name"=>"Philip", "publisher"=>"Random House"]) finds the first row of WHERE name=Philip AND publisher=Random House
+     * raw WHERE statement      where(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
+     *
+     * @param int|string|array<string> $needle
+     * @param                          $returnFirstRow true to return the first row retrieved. false to return last row
+     *
+     * @return Model|null The single row that matches query. If no rows match, returns null
+     */
+    public static function where(int|string|array $needle, bool $returnFirstRow=true): Model|null
+    {
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+
+        return $sqlPlan->where($needle, $returnFirstRow);
+    }
+
+    /**
+     * needle is one of:
+     *
+     * array of primary keys    all([1, 3, 5, 8]) WHERE author_id in (1, 3, 5, 8)
+     * mapping of column names  all(["name"=>"Philip", "publisher"=>"Random House"]) WHERE name=Philip AND publisher=Random House
+     * raw WHERE statement      all(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
+     *
+     * @param array<number|mixed|string> $needle An array containing values for the pk
+     *
+     * @return array<Model> All the rows that matches query. If no rows match, returns []
+     */
+    public static function all(array $needle = []): array
+    {
+        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+
+        return $sqlPlan->all($needle);
     }
 
     /**
