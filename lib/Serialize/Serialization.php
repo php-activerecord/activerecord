@@ -186,7 +186,8 @@ abstract class Serialization
                     if (null === $assoc) {
                         unset($this->attributes[$association]);
                     } elseif (!is_array($assoc)) {
-                        $this->attributes[$association] = new $serializer_class($assoc, $options);
+                        $serialized = new $serializer_class($assoc, $options);
+                        $this->attributes[$association] = $serialized->to_a();
                     } else {
                         $includes = [];
 
