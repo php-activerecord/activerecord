@@ -381,7 +381,7 @@ class SQLBuilder
 
             // no nested array so nothing special to do
             $this->where = $args[0] ?? '';
-            $this->where_values = &$values;
+            $this->where_values = $values;
         }
     }
 
