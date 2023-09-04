@@ -57,7 +57,7 @@ class Reflections extends Singleton
     /**
      * Get a cached ReflectionClass.
      *
-     * @param class-string|object $className Optional name of a class or an instance of the class
+     * @param class-string $className Optional name of a class or an instance of the class
      *
      * @throws ActiveRecordException if class was not found
      *
@@ -65,11 +65,7 @@ class Reflections extends Singleton
      */
     public function get($className)
     {
-        if (isset($this->reflections[$className])) {
-            return $this->reflections[$className];
-        }
-
-        throw new ActiveRecordException("Class not found: $className");
+        return $this->reflections[$className] ?? throw new ActiveRecordException("Class not found: $className");
     }
 
     /**

@@ -11,8 +11,8 @@ class JsonSerializer extends Serialization
 {
     public function to_s(): string
     {
-        $res = !empty($this->options['include_root']) ? [strtolower(get_class($this->model)) => $this->to_a()] : $this->to_a();
-
-        return json_encode($res);
+        $res = json_encode(!empty($this->options['include_root']) ? [strtolower(get_class($this->model)) => $this->to_a()] : $this->to_a());
+        assert(is_string($res));
+        return $res;
     }
 }

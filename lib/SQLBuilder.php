@@ -163,12 +163,7 @@ class SQLBuilder
         return $this;
     }
 
-    /**
-     * @param string|array<string> $joins
-     *
-     * @return $this
-     */
-    public function joins(string|array $joins): static
+    public function joins(string $joins): static
     {
         $this->joins = $joins;
 
@@ -256,7 +251,9 @@ class SQLBuilder
      */
     public static function underscored_string_to_parts(string $string, int $flags=PREG_SPLIT_DELIM_CAPTURE): array
     {
-        return preg_split('/(_and_|_or_)/i', $string, -1, $flags);
+        $res = preg_split('/(_and_|_or_)/i', $string, -1, $flags);
+        assert(is_array($res));
+        return $res;
     }
 
     /**
