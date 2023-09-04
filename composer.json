@@ -22,17 +22,31 @@
       "lib/Utils.php"
     ],
     "psr-4": {
-      "ActiveRecord\\": "lib/",
+      "ActiveRecord\\": "lib/"
+    }
+  },
+  "autoload-dev": {
+    "files": [
+      "scripts/TestCommand.php"
+    ],
+    "psr-4": {
+      "ActiveRecord\\Scripts\\": "scripts/",
       "test\\": "test/"
     }
   },
-	"scripts": {
-		"style-check" : "php vendor/bin/php-cs-fixer fix --dry-run --verbose --diff",
-		"style-fix" : "php vendor/bin/php-cs-fixer fix --verbose",
+  "scripts": {
+    "style-check" : "php vendor/bin/php-cs-fixer fix --dry-run --verbose --diff",
+    "style-fix" : "php vendor/bin/php-cs-fixer fix --verbose",
+    "stan": "phpstan analyse --ansi --memory-limit 256M",
     "test": [
       "Composer\\Config::disableProcessTimeout",
-      "phpunit"
-    ],
-    "stan": "phpstan analyse --ansi --memory-limit 256M"
+      "ActiveRecord\\Scripts\\TestCommand"
+    ]
+  },
+  "scripts-descriptions": {
+    "style-check": "Dry run of composer style-fix",
+    "style-fix": "Fixes style errors to conform to project standards",
+    "stan": "Runs phpstan static analysis",
+    "test": "Runs PHPUnit. Usage: composer test [fileName [filter]]"
   }
 }
