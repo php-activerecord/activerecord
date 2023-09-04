@@ -11,6 +11,14 @@ namespace ActiveRecord;
  *  order?: string,
  *  set?: string|array<string, mixed>
  * }
+ * @phpstan-type HasManyOptions array{
+ *  limit?: int,
+ *  offset?: int,
+ *  primary_key?: string|array<string>,
+ *  group?: string,
+ *  order?: string,
+ *  through?: string
+ * }
  * @phpstan-type DelegateOptions array{
  *  to: string,
  *  prefix?: string,

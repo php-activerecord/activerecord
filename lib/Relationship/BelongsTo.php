@@ -55,9 +55,9 @@ class BelongsTo extends AbstractRelationship
         return $this->primary_key;
     }
 
-    public function __construct($options = [])
+    public function __construct(string $attributeName, $options = [])
     {
-        parent::__construct($options);
+        parent::__construct($attributeName, $options);
 
         if (!$this->class_name) {
             $this->set_inferred_class_name();

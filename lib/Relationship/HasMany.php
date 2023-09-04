@@ -6,6 +6,7 @@ use ActiveRecord\Exception\HasManyThroughAssociationException;
 use ActiveRecord\Inflector;
 use ActiveRecord\Model;
 use ActiveRecord\Table;
+use ActiveRecord\Types;
 
 /**
  * One-to-many relationship.
@@ -19,9 +20,9 @@ use ActiveRecord\Table;
  * # Table: schools
  * # Primary key: id
  * class School extends ActiveRecord\Model {
- *   static $has_many = array(
- *     array('people')
- *   );
+ *   static array $has_many = [
+ *     'people' => true
+ *   ];
  * });
  * ```
  *
@@ -36,26 +37,16 @@ use ActiveRecord\Table;
  * }
  *
  * class Order extends ActiveRecord\Model {
- *   static $has_many = array(
- *     [
- *          'people',
+ *   static array $has_many = [
+ *      'people' => [
  *          'through'    => 'payments',
  *          'select'     => 'people.*, payments.amount',
- *          'conditions' => 'payments.amount < 200')
  *     ];
- * }
+ * ]
  * ```
  *
  * @phpstan-import-type Attributes from Model
- *
- * @phpstan-type HasManyOptions array{
- *  limit?: int,
- *  offset?: int,
- *  primary_key?: string|array<string>,
- *  group?: string,
- *  order?: string,
- *  through?: string
- * }
+ * @phpstan-import-type HasManyOptions from Types
  *
  * @see http://www.phpactiverecord.org/guides/associations
  * @see valid_association_options
@@ -90,11 +81,11 @@ class HasMany extends AbstractRelationship
     /**
      * Constructs a {@link HasMany} relationship.
      *
-     * @param HasManyOptions $options Options for the association
+     * @param HasManyOptions $options
      */
-    public function __construct(array $options = [])
+    public function __construct(string $attribute, array $options = [])
     {
-        parent::__construct($options);
+        parent::__construct($attribute, $options);
 
         if (isset($this->options['through'])) {
             $this->through = $this->options['through'];

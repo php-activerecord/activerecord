@@ -10,8 +10,12 @@ class Book extends \ActiveRecord\Model
         ['parent_book_3', 'class_name' => '\test\models\Book'],
     ];
 
-    public static $has_many = [
-        ['pages', 'class_name' => '\test\models\namespacetest\subnamespacetest\Page'],
-        ['pages_2', 'class_name' => 'subnamespacetest\Page'],
+    public static array $has_many = [
+        'pages' => [
+            'class_name' => '\test\models\namespacetest\subnamespacetest\Page'
+        ],
+        'pages_2' => [
+            'class_name' => 'subnamespacetest\Page'
+        ],
     ];
 }

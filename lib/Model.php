@@ -14,6 +14,7 @@ use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Relationship\AbstractRelationship;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
+use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
 
@@ -43,10 +44,13 @@ use ActiveRecord\Serialize\Serialization;
  *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
  *   );
  *
- *   static $has_many = array(
- *     array('children', 'foreign_key' => 'parent_id', 'class_name' => 'Person'),
- *     array('orders')
- *   );
+ *   static array $has_many = [
+ *     'children' => [
+ *          'foreign_key' => 'parent_id',
+ *          'class_name' => 'Person'
+ *      ],
+ *      'orders' => true
+ *   ];
  *
  *   static $validates_length_of = [
  *     'first_name' => ['within' => [1,50]],
@@ -75,6 +79,7 @@ use ActiveRecord\Serialize\Serialization;
  * For a more in-depth look at defining models, relationships, callbacks and many other things
  * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
  *
+ * @phpstan-import-type HasManyOptions from Types
  * @phpstan-import-type SerializeOptions from Serialize\Serialization
  * @phpstan-import-type ValidationOptions from Validations
  * @phpstan-import-type ValidateInclusionOptions from Validations
@@ -190,12 +195,12 @@ class Model
     public static array $validates_format_of;
 
     /**
-     * @var ValidateInclusionOptions
+     * @var array<string,ValidateInclusionOptions>
      */
     public static array $validates_inclusion_of;
 
     /**
-     * @var ValidateInclusionOptions
+     * @var array<string,ValidateInclusionOptions>
      */
     public static array $validates_exclusion_of;
 
@@ -213,6 +218,11 @@ class Model
      * @var ValidateLengthOptions
      */
     public static array $validates_length_of;
+
+    /**
+     * @var array<string,HasManyOptions>
+     */
+    public static array $has_many;
 
     /**
      * Allows you to create aliases for attributes.
