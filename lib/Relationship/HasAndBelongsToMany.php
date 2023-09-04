@@ -23,7 +23,7 @@ class HasAndBelongsToMany extends AbstractRelationship
          *   uniq - if true duplicate assoc objects will be ignored
          *   validate
          */
-        parent::__construct($options);
+        parent::__construct($options[0], $options);
     }
 
     public function load(Model $model): mixed

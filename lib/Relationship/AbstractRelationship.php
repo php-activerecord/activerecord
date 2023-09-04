@@ -71,9 +71,9 @@ abstract class AbstractRelationship
      *
      * @param array<mixed> $options Options for the relationship (see {@link valid_association_options})
      */
-    public function __construct($options = [])
+    public function __construct(string $attribute_name, $options = [])
     {
-        $this->attribute_name = $options[0];
+        $this->attribute_name = $attribute_name;
         $this->options = $this->merge_association_options($options);
 
         $relationship = strtolower(denamespace(get_called_class()));

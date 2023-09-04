@@ -6,8 +6,10 @@ use ActiveRecord\Model;
 
 class Host extends Model
 {
-    public static $has_many = [
-        'events',
-        ['venues', 'through' => 'events']
+    public static array $has_many = [
+        'events' => true,
+        'venues' => [
+            'through' => 'events'
+        ]
     ];
 }

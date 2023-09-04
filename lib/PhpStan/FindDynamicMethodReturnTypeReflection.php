@@ -48,8 +48,7 @@ class FindDynamicMethodReturnTypeReflection implements DynamicStaticMethodReturn
 
         if (1 == $numArgs) {
             if (!($args[0] instanceof ConstantArrayType)
-                || ('conditions' != $args[0]->getKeyTypes()[0]->getValue()
-                    && !$this->isNumericArray($args[0]))) {
+                || (!$this->isNumericArray($args[0]))) {
                 $single = true;
             }
         } elseif ($numArgs > 1) {

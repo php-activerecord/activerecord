@@ -10,7 +10,7 @@ class PropertyAmenity extends Model
     public static string $primary_key = 'id';
 
     public static array $belongs_to = [
-        'amenity',
-        'property'
+        'amenity' => true,
+        'property' => true
     ];
 }
