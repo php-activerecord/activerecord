@@ -61,9 +61,8 @@ class Reflections extends Singleton
      *
      * @throws ActiveRecordException if class was not found
      *
-     * @return mixed null or a ReflectionClass instance
      */
-    public function get($className)
+    public function get(string $className): ReflectionClass
     {
         return $this->reflections[$className] ?? throw new ActiveRecordException("Class not found: $className");
     }
