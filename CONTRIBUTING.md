@@ -15,16 +15,34 @@ composer install
 
 After that you can run the tests by invoking the local PHPUnit
 
-To run all test simply use:
+To run all the tests, simply use:
 
 ```sh
 composer test
 ```
+which runs:
+```sh
+vendor/bin/phpunit
+```
 
-Or run a single test file by specifying its path:
+Or run a single test file:
 
 ```sh
-composer test test/InflectorTest.php
+composer test dateTime
+```
+which runs:
+```sh
+vendor/bin/phpunit test/DateTimeTest.php
+```
+
+Or run a single test within a file:
+
+```sh
+composer test dateTime setIsoDate
+```
+which runs:
+```sh
+vendor/bin/phpunit --filter setIsoDate test/DateTimeTest.php
 ```
 
 #### Skipped Tests ####
@@ -70,9 +88,25 @@ If Docker is not available to you, or you would simply not use it, you will have
 * Install the PDO drivers for PostgreSQL (e.g., `brew install php56-pdo-pgsql` on macOS)
 * Create a MySQL database and a PostgreSQL database. You can either create these such that they are available at the default locations of `mysql://test:test@127.0.0.1/test` and `pgsql://test:test@127.0.0.1/test` respectively. Alternatively, you can set the `PHPAR_MYSQL` and `PHPAR_PGSQL` environment variables to specify a different location for the MySQL and PostgreSQL databases.
 
-#### Static checks
+#### Style checker
 
 * You can check your code with a PSR-2 style checker locally with the command:
 ```sh
 composer style-check
 ```
+
+#### Static analysis
+
+* You can check your code with the PHPStan static analysis checker with the command:
+```sh
+composer stan
+```
+
+#### Before you submit your pull request
+
+```sh
+composer style-check
+composer test
+composer stan
+```
+will be run for every [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork) as part of the Docker-enabled [continuous integration](https://docs.github.com/en/actions/automating-builds-and-tests/about-continuous-integration), so it would be good to run these checks locally before submitting your pull request.
