@@ -186,7 +186,6 @@ class Config extends Singleton
     /**
      * Sets the logger object for future SQL logging
      *
-     * @throws ConfigException if Logger object does not implement public log()
      */
     public function set_logger(LoggerInterface $logger): void
     {
