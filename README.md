@@ -1,6 +1,6 @@
 # PHP ActiveRecord
 [![Test](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml/badge.svg)](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml)
-[![Coverage Status](https://codecov.io/gh/shmax/graphql-php-validation-toolkit/branch/master/graph/badge.svg)](https://codecov.io/gh/shmax/graphql-php-validation-toolkit/branch/master)
+[![codecov](https://codecov.io/github/php-activerecord/activerecord/graph/badge.svg?token=IJBKNRHVOC)](https://codecov.io/github/php-activerecord/activerecord)
 
 **We encourage pull requests, and issues will be dealt with thoroughly and in a timely manner.**
 

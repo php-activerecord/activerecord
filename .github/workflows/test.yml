@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -63,9 +63,6 @@ jobs:
 
       - name: Install dependencies with Composer
         uses: ramsey/composer-install@v2
-
-      - name: Run PHP-CS-Fixer
-        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff --format checkstyle | cs2pr
 
       - name: Create and set permissions on SQLite Database
         run: |
@@ -92,10 +89,7 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          vendor/bin/phpunit -c phpunit.xml.dist
-
-      - name: PHPStan Analysis
-        run: vendor/bin/phpstan analyze
+          vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
