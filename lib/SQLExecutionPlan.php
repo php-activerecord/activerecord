@@ -23,7 +23,7 @@ class SQLExecutionPlan
     private array $options = [];
 
     /**
-     * @param class-string $className
+     * @param class-string  $className
      * @param array<string> $alias_attribute
      */
     public function __construct(string $className, array $alias_attribute)
@@ -106,7 +106,7 @@ class SQLExecutionPlan
 
         if (!$returnFirstRow) {
             if (array_key_exists('order', $this->options)) {
-                $this->options['order'] = SQLBuilder::reverse_order((string)$this->options['order']);
+                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
             } else {
                 $this->options['order'] = join(' DESC, ', $this->table->pk) . ' DESC';
             }
