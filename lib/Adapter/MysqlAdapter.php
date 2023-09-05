@@ -88,24 +88,4 @@ class MysqlAdapter extends Connection
     {
         return true;
     }
-
-    /**
-     * @return array<string, string|array<string, mixed>>
-     */
-    public function native_database_types(): array
-    {
-        return [
-            'primary_key' => 'int(11) UNSIGNED DEFAULT NULL auto_increment PRIMARY KEY',
-            'string' => ['name' => 'varchar', 'length' => 255],
-            'text' => ['name' => 'text'],
-            'integer' => ['name' => 'int', 'length' => 11],
-            'float' => ['name' => 'float'],
-            'datetime' => ['name' => 'datetime'],
-            'timestamp' => ['name' => 'datetime'],
-            'time' => ['name' => 'time'],
-            'date' => ['name' => 'date'],
-            'binary' => ['name' => 'blob'],
-            'boolean' => ['name' => 'tinyint', 'length' => 1]
-        ];
-    }
 }

@@ -108,22 +108,4 @@ class SqliteAdapter extends Connection
     {
         return true;
     }
-
-    public function native_database_types(): array
-    {
-        return [
-            'primary_key' => 'integer not null primary key',
-            'string' => ['name' => 'varchar', 'length' => 255],
-            'text' => ['name' => 'text'],
-            'integer' => ['name' => 'integer'],
-            'float' => ['name' => 'float'],
-            'decimal' => ['name' => 'decimal'],
-            'datetime' => ['name' => 'datetime'],
-            'timestamp' => ['name' => 'datetime'],
-            'time' => ['name' => 'time'],
-            'date' => ['name' => 'date'],
-            'binary' => ['name' => 'blob'],
-            'boolean' => ['name' => 'boolean']
-        ];
-    }
 }

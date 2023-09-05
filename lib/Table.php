@@ -133,7 +133,7 @@ class Table
         $connection = $this->class->getStaticPropertyValue('connection', null);
 
         if ($close) {
-            ConnectionManager::drop_connection($connection);
+            ConnectionManager::drop_connection($connection ?? '');
             static::clear_cache();
         }
 
