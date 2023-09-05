@@ -139,7 +139,7 @@ class Model
     /**
      * Array of relationship objects as model_attribute_name => relationship
      *
-     * @var array<string,Model|array<Model>>
+     * @var array<string, Model|array<Model>|null>
      */
     private array $__relationships = [];
 
@@ -968,13 +968,10 @@ class Model
             $table->insert($attributes);
         }
 
-        // if we've got an autoincrementing/sequenced pk set it
-        // don't need this check until the day comes that we decide to support composite pks
-        // if (count($pk) == 1)
         $pk = strtolower($pk);
         $column = $table->get_column_by_inflected_name($pk);
 
-        if ($column->auto_increment || $use_sequence) {
+        if (isset($column) && ($column->auto_increment || $use_sequence)) {
             $this->attributes[$pk] = $column->cast(static::connection()->insert_id($table->sequence ?? null), static::connection());
         }
 
@@ -1899,7 +1896,7 @@ class Model
      *
      * @return array<Model>
      */
-    protected static function get_models_from_cache(array $pks): ?array
+    protected static function get_models_from_cache(array $pks): array
     {
         $models = [];
         $table = static::table();
@@ -1909,7 +1906,7 @@ class Model
             $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
                 $res = $table->find($options);
 
-                return $res ? $res[0] : null;
+                return $res ? $res[0] : [];
             }, $table->cache_model_expire);
         }
 

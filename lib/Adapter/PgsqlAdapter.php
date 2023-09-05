@@ -11,8 +11,6 @@ use ActiveRecord\Inflector;
 
 /**
  * Adapter for Postgres (not completed yet)
- *
- * @package ActiveRecord
  */
 class PgsqlAdapter extends Connection
 {
@@ -82,6 +80,16 @@ SQL;
         return $this->query("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')");
     }
 
+    /**
+     * @param array{
+     *  field: string,
+     *  attlen: int,
+     *  type: string,
+     *  not_nullable: bool,
+     *  pk: bool,
+     *  default: string
+     * } $column
+     */
     public function create_column(array $column): Column
     {
         $c = new Column();

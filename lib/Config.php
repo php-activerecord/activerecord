@@ -146,22 +146,17 @@ class Config extends Singleton
     }
 
     /**
-     * Returns the default connection string or null if there is none.
-     *
-     * @return string
+     * Returns the default connection string.
      */
-    public function get_default_connection_string()
+    public function get_default_connection_string(): string
     {
-        return array_key_exists($this->default_connection, $this->connections) ?
-            $this->connections[$this->default_connection] : null;
+        return $this->connections[$this->default_connection] ?? '';
     }
 
     /**
      * Returns the name of the default connection.
-     *
-     * @return string
      */
-    public function get_default_connection()
+    public function get_default_connection(): string
     {
         return $this->default_connection;
     }
