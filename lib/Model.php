@@ -1687,7 +1687,7 @@ class Model
 
         return $sqlPlan->all($needle);
     }
-    
+
     /**
      * Get a count of qualifying records.
      *

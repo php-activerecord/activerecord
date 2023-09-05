@@ -18,11 +18,12 @@ class SQLExecutionPlan
     private Table $table;
 
     /**
-     * @var array<string, string>
+     * @var array<string, mixed>
      */
     private array $options = [];
 
     /**
+     * @param class-string $className
      * @param array<string> $alias_attribute
      */
     public function __construct(string $className, array $alias_attribute)
@@ -105,7 +106,7 @@ class SQLExecutionPlan
 
         if (!$returnFirstRow) {
             if (array_key_exists('order', $this->options)) {
-                $this->options['order'] = SQLBuilder::reverse_order($this->options['order']);
+                $this->options['order'] = SQLBuilder::reverse_order((string)$this->options['order']);
             } else {
                 $this->options['order'] = join(' DESC, ', $this->table->pk) . ' DESC';
             }
@@ -117,14 +118,14 @@ class SQLExecutionPlan
             $list = $this->table->find($this->options);
         } else {
             unset($this->options['mapped_names']);
-            $list = $this->find_by_pk($needle, false);
+            $list = $this->find_by_pk($needle);
         }
 
-        if (null === $list) {
+        if (null == $list) {
             return null;
         }
 
-        return is_array($list) ? $list[0] : $list;
+        return $list[0];
     }
 
     /**
@@ -146,7 +147,7 @@ class SQLExecutionPlan
         if (array_is_list($needle) && count($needle) > 0) {
             unset($this->options['mapped_names']);
             try {
-                return $this->find_by_pk($needle, true);
+                return $this->find_by_pk($needle);
             } catch (RecordNotFound $mustBeRawWhereStatement) {
             }
         }
@@ -173,16 +174,14 @@ class SQLExecutionPlan
      *
      * @see find
      *
-     * @param array<number|string>|string|int|null $values An array containing values for the pk
+     * @param mixed $values An array containing values for the pk
      *
      * @throws RecordNotFound if a record could not be found
      *
-     * @return Model|Model[]
+     * @return array<Model>
      */
-    private function find_by_pk(array|string|int|null $values, bool $forceArray = false): Model|array|null
+    private function find_by_pk(mixed $values): array
     {
-        $single = !is_array($values) && !$forceArray;
-
         if ($this->table->cache_individual_model ?? false) {
             $pks = is_array($values) ? $values : [$values];
             $list = $this->get_models_from_cache($pks);
@@ -199,19 +198,19 @@ class SQLExecutionPlan
             }
 
             if (1 == $expected) {
-                return $forceArray ? [] : null;
+                return [];
             }
 
             throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
         }
 
-        return $single ? $list[0] : $list;
+        return $list;
     }
 
     /**
      * Will look up a list of primary keys from cache
      *
-     * @param array<number|string> $pks An array of primary keys
+     * @param array<mixed> $pks An array of primary keys
      *
      * @return array<Model>
      */
