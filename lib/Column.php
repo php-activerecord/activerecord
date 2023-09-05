@@ -50,17 +50,13 @@ class Column
 
     /**
      * The inflected name of this columns .. hyphens/spaces will be => _.
-     *
-     * @var string
      */
-    public $inflected_name;
+    public string $inflected_name;
 
     /**
      * The type of this column: STRING, INTEGER, ...
-     *
-     * @var int
      */
-    public $type;
+    public int $type;
 
     /**
      * The raw database specific type.
@@ -74,17 +70,13 @@ class Column
 
     /**
      * True if this column allows null.
-     *
-     * @var bool
      */
-    public $nullable;
+    public bool $nullable;
 
     /**
      * True if this column is a primary key.
-     *
-     * @var bool
      */
-    public $pk;
+    public bool $pk;
 
     /**
      * The default value of the column.
@@ -93,17 +85,13 @@ class Column
 
     /**
      * True if this column is set to auto_increment.
-     *
-     * @var bool
      */
-    public $auto_increment;
+    public bool $auto_increment;
 
     /**
      * Name of the sequence to use for this column if any.
-     *
-     * @var string
      */
-    public $sequence;
+    public string $sequence;
 
     /**
      * Cast a value to an integer type safely

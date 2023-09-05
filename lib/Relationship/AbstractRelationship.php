@@ -27,17 +27,15 @@ abstract class AbstractRelationship
 {
     /**
      * Name to be used that will trigger call to the relationship.
-     *
-     * @var string
      */
-    public $attribute_name;
+    public string $attribute_name;
 
     /**
      * Class name of the associated model.
      *
      * @var class-string
      */
-    public $class_name;
+    public string $class_name;
 
     /**
      * Name of the foreign key.
@@ -87,9 +85,7 @@ abstract class AbstractRelationship
 
         $this->attribute_name = strtolower(Inflector::variablize($this->attribute_name));
 
-        if (!$this->foreign_key && isset($this->options['foreign_key'])) {
-            $this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : [$this->options['foreign_key']];
-        }
+        $this->foreign_key = (array) $this->options['foreign_key'];
     }
 
     protected function get_table(): Table
