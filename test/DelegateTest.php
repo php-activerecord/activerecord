@@ -2,20 +2,12 @@
 
 namespace test;
 
-use ActiveRecord;
 use ActiveRecord\Exception\ActiveRecordException;
-use ActiveRecord\Exception\ReadOnlyException;
-use ActiveRecord\Exception\UndefinedPropertyException;
-use DatabaseTestCase;
 use test\models\Author;
-use test\models\AwesomePerson;
-use test\models\Book;
-use test\models\BookAttrAccessible;
 use test\models\Event;
-use test\models\RmBldg;
 use test\models\Venue;
 
-class DelegateTest extends DatabaseTestCase
+class DelegateTest extends \DatabaseTestCase
 {
     private $options;
 
@@ -24,7 +16,6 @@ class DelegateTest extends DatabaseTestCase
         parent::setUp($connection_name);
         $this->options = ['conditions' => 'blah', 'order' => 'blah'];
     }
-
 
     public function testOptionsHashWithUnknownKeys()
     {
