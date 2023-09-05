@@ -1,5 +1,5 @@
 # PHP ActiveRecord
-[![Test](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml/badge.svg)](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml)
+[![CI](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml/badge.svg)](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml)
 [![codecov](https://codecov.io/github/php-activerecord/activerecord/graph/badge.svg?token=IJBKNRHVOC)](https://codecov.io/github/php-activerecord/activerecord)
 
 **We encourage pull requests, and issues will be dealt with thoroughly and in a timely manner.**
