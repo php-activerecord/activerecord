@@ -9,7 +9,7 @@ namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
 
-class SQLExecutionPlan
+class Relation
 {
     /**
      * @var array<string>
@@ -32,7 +32,7 @@ class SQLExecutionPlan
         $this->table = Table::load($className);
     }
 
-    public function __get(string $name): SQLExecutionPlan
+    public function __get(string $name): Relation
     {
         if ('last' === $name) {
             return $this->last(1);
@@ -41,7 +41,7 @@ class SQLExecutionPlan
         return $this;
     }
 
-    public function last(int $limit): SQLExecutionPlan
+    public function last(int $limit): Relation
     {
         $this->limit($limit);
 
@@ -56,56 +56,56 @@ class SQLExecutionPlan
         return $this;
     }
 
-    public function select(string $columns): SQLExecutionPlan
+    public function select(string $columns): Relation
     {
         $this->options['select'] = $columns;
 
         return $this;
     }
 
-    public function join(string $joinStatement): SQLExecutionPlan
+    public function join(string $joinStatement): Relation
     {
         $this->options['joins'] = $joinStatement;
 
         return $this;
     }
 
-    public function orderBy(string $order): SQLExecutionPlan
+    public function orderBy(string $order): Relation
     {
         $this->options['order'] = $order;
 
         return $this;
     }
 
-    public function limit(int $limit): SQLExecutionPlan
+    public function limit(int $limit): Relation
     {
         $this->options['limit'] = $limit;
 
         return $this;
     }
 
-    public function groupBy(string $columns): SQLExecutionPlan
+    public function groupBy(string $columns): Relation
     {
         $this->options['group'] = $columns;
 
         return $this;
     }
 
-    public function offset(int $offset): SQLExecutionPlan
+    public function offset(int $offset): Relation
     {
         $this->options['offset'] = $offset;
 
         return $this;
     }
 
-    public function having(string $having): SQLExecutionPlan
+    public function having(string $having): Relation
     {
         $this->options['having'] = $having;
 
         return $this;
     }
 
-    public function readonly(bool $readonly): SQLExecutionPlan
+    public function readonly(bool $readonly): Relation
     {
         $this->options['readonly'] = $readonly;
 

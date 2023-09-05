@@ -1622,57 +1622,57 @@ class Model
         throw new ActiveRecordException("Call to undefined method: $method");
     }
 
-    public static function select(string $columns='*'): SQLExecutionPlan
+    public static function select(string $columns='*'): Relation
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
         $sqlPlan->select($columns);
 
         return $sqlPlan;
     }
 
-    public static function join(string $joinStatement): SQLExecutionPlan
+    public static function join(string $joinStatement): Relation
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
         $sqlPlan->join($joinStatement);
 
         return $sqlPlan;
     }
 
-    public static function orderBy(string $order): SQLExecutionPlan
+    public static function orderBy(string $order): Relation
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
         $sqlPlan->orderBy($order);
 
         return $sqlPlan;
     }
 
-    public static function groupBy(string $columns): SQLExecutionPlan
+    public static function groupBy(string $columns): Relation
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
         $sqlPlan->groupBy($columns);
 
         return $sqlPlan;
     }
 
-    public static function limit(int $limit): SQLExecutionPlan
+    public static function limit(int $limit): Relation
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
         $sqlPlan->limit($limit);
 
         return $sqlPlan;
     }
 
-    public static function offset(int $offset): SQLExecutionPlan
+    public static function offset(int $offset): Relation
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
         $sqlPlan->offset($offset);
 
         return $sqlPlan;
     }
 
-    public static function having(string $having): SQLExecutionPlan
+    public static function having(string $having): Relation
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
         $sqlPlan->having($having);
 
         return $sqlPlan;
@@ -1691,7 +1691,7 @@ class Model
      */
     public static function where(int|string|array $needle): Model|null
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
 
         return $sqlPlan->where($needle);
     }
@@ -1709,7 +1709,7 @@ class Model
      */
     public static function all(array $needle = []): array
     {
-        $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
+        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
 
         return $sqlPlan->all($needle);
     }

@@ -2,7 +2,7 @@
 
 use test\models\Author;
 
-class SQLExecutionPlanTest extends DatabaseTestCase
+class RelationTest extends DatabaseTestCase
 {
     public function testWherePrimaryKey()
     {
