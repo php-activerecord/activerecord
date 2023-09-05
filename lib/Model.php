@@ -1874,7 +1874,7 @@ class Model
         $num_args = count($args);
         $single = true;
 
-        if (in_array($args[0], ['all', 'first', 'last'])) {
+        if (count($args) > 0 && in_array($args[0], ['all', 'first', 'last'])) {
             switch ($args[0]) {
                 case 'all':
                     $single = false;
