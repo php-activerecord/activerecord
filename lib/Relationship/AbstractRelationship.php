@@ -85,7 +85,7 @@ abstract class AbstractRelationship
 
         $this->attribute_name = strtolower(Inflector::variablize($this->attribute_name));
 
-        $this->foreign_key = (array) $this->options['foreign_key'];
+        $this->foreign_key = (array) ($this->options['foreign_key'] ?? []);
     }
 
     protected function get_table(): Table
