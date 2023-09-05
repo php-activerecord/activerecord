@@ -1,4 +1,4 @@
-name: Test
+name: Static Analysis
 permissions:
   contents: write
 on:
