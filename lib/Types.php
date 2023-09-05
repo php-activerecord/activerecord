@@ -25,6 +25,14 @@ namespace ActiveRecord;
  *  class_name?: class-string,
  *  primary_key?: string
  * }
+ * @phpstan-type ColumnOptions array{
+ *  field: string,
+ *  type: string,
+ *  null: string,
+ *  key: string,
+ *  default: mixed|null,
+ *  extra: string
+ * }
  * @phpstan-type DelegateOptions array{
  *  to: string,
  *  prefix?: string,

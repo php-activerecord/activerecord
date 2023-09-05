@@ -8,11 +8,12 @@ namespace ActiveRecord\Adapter;
 use ActiveRecord\Column;
 use ActiveRecord\Connection;
 use ActiveRecord\Inflector;
+use ActiveRecord\Types;
 
 /**
  * Adapter for MySQL.
  *
- * @package ActiveRecord
+ * @phpstan-import-type ColumnOptions from Types
  */
 class MysqlAdapter extends Connection
 {
@@ -36,7 +37,7 @@ class MysqlAdapter extends Connection
     }
 
     /**
-     * @param array<string, string|null> $column
+     * @param ColumnOptions $column
      */
     public function create_column(array $column): Column
     {

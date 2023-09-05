@@ -10,12 +10,13 @@ use ActiveRecord\Connection;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Inflector;
+use ActiveRecord\Types;
 use ActiveRecord\Utils;
 
 /**
  * Adapter for SQLite.
  *
- * @package ActiveRecord
+ * @phpstan-import-type ColumnOptions from Types
  */
 class SqliteAdapter extends Connection
 {
@@ -46,6 +47,9 @@ class SqliteAdapter extends Connection
         return $this->query('SELECT name FROM sqlite_master');
     }
 
+    /**
+     * @param ColumnOptions $column
+     */
     public function create_column(array $column): Column
     {
         $c = new Column();

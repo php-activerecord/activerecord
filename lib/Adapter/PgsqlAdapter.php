@@ -8,11 +8,12 @@ namespace ActiveRecord\Adapter;
 use ActiveRecord\Column;
 use ActiveRecord\Connection;
 use ActiveRecord\Inflector;
+use ActiveRecord\Types;
 
 /**
  * Adapter for Postgres (not completed yet)
  *
- * @package ActiveRecord
+ * @phpstan-import-type ColumnOptions from Types
  */
 class PgsqlAdapter extends Connection
 {
@@ -82,6 +83,9 @@ SQL;
         return $this->query("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')");
     }
 
+    /**
+     * @param ColumnOptions $column
+     */
     public function create_column(array $column): Column
     {
         $c = new Column();
