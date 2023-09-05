@@ -49,6 +49,8 @@ class XmlSerializer extends Serialization
             $xml = preg_replace('/<\?xml version.*?\?>/', '', $xml);
         }
 
+        assert(is_string($xml));
+
         return $xml;
     }
 

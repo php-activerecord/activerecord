@@ -258,6 +258,7 @@ class SQLBuilder
         $parts = explode(',', $order);
 
         for ($i = 0, $n = count($parts); $i < $n; ++$i) {
+            assert(is_string($parts[$i]));
             $v = strtolower($parts[$i]);
 
             if (false !== strpos($v, ' asc')) {

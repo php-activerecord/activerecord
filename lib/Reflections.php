@@ -31,8 +31,6 @@ class Reflections extends Singleton
      */
     public function add(string $class): Reflections
     {
-        $class = $this->get_class($class);
-
         if (!isset($this->reflections[$class])) {
             /* @phpstan-ignore-next-line */
             $this->reflections[$class] = new \ReflectionClass($class);
@@ -51,7 +49,7 @@ class Reflections extends Singleton
     public function destroy(string $class): void
     {
         if (isset($this->reflections[$class])) {
-            $this->reflections[$class] = null;
+            unset($this->reflections[$class]);
         }
     }
 
@@ -65,21 +63,5 @@ class Reflections extends Singleton
     public function get(string $className): \ReflectionClass
     {
         return $this->reflections[$className] ?? throw new ActiveRecordException("Class not found: $className");
-    }
-
-    /**
-     * Retrieve a class name to be reflected.
-     *
-     * @param class-string|object $class An object or name of a class
-     *
-     * @return class-string
-     */
-    private function get_class(string|object $class = null)
-    {
-        if (is_object($class)) {
-            return get_class($class);
-        }
-
-        return $class;
     }
 }

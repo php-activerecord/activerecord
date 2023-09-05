@@ -140,7 +140,7 @@ abstract class AbstractRelationship
         $conditions = SQLBuilder::create_conditions_from_underscored_string($table->conn, $query_key, $values);
 
         if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1) {
-            Utils::add_condition($options['conditions'], $conditions);
+            Utils::add_condition($options['conditions'], $conditions ?? []);
         } else {
             $options['conditions'] = $conditions;
         }
@@ -350,7 +350,7 @@ abstract class AbstractRelationship
             $options_conditions = [];
         }
 
-        return Utils::add_condition($options_conditions, $conditions);
+        return Utils::add_condition($options_conditions, $conditions ?? []);
     }
 
     /**

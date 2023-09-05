@@ -16,7 +16,9 @@ abstract class Inflector
     public static function camelize(string $s): string
     {
         $s = preg_replace('/[_-]+/', '_', trim($s));
+        assert(is_string($s));
         $s = str_replace(' ', '_', $s);
+        assert(is_string($s));
 
         $camelized = '';
 

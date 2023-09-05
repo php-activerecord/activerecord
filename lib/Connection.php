@@ -134,7 +134,7 @@ abstract class Connection
             assert($connection instanceof Connection);
             $connection->protocol = $info['protocol'];
             $connection->logging = $config->get_logging();
-            $connection->logger = $connection->logging ? $config->get_logger() : null;
+            $connection->logger = $config->get_logger();
 
             if (isset($info['charset'])) {
                 $connection->set_encoding($info['charset']);
@@ -222,7 +222,7 @@ abstract class Connection
                 $db = $matches[2][0];
             }
         } elseif ('windows(' == substr($host, 0, 8)) {
-            $host = urldecode(substr($host, 8) . '/' . substr($db, 0, -1));
+            $host = urldecode(substr($host, 8) . '/' . substr($db ?? '', 0, -1));
             $db = null;
         }
 
