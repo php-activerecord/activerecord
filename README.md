@@ -62,11 +62,10 @@ Of course, there are some differences which will be obvious to the user if they 
 
 ## Installation ##
 
-Setup is very easy and straight-forward. There are essentially only three configuration points you must concern yourself with:
+Setup is very easy and straight-forward. There are essentially only two configuration points you must concern yourself with:
 
-1. Setting the model autoload directory.
-2. Configuring your database connections.
-3. Setting the database connection to use for your environment.
+1. Configuring your database connections.
+2. Setting the database connection to use for your environment.
 
 Example:
 
@@ -77,10 +76,10 @@ $cfg->set_connections([
     'test' => 'mysql://username:password@localhost/test_database_name',
     'production' => 'mysql://username:password@localhost/production_database_name'
 ]);
-$cfg->set_default_connection('development'); // Set to development | test | production, development is default
+$cfg->set_default_connection('development'); // Set to 'development', 'test', or 'production'. 'development' is default
 ```
 
-Once you have configured these three settings you are done. ActiveRecord takes care of the rest for you.
+Once you have configured these settings you are done. ActiveRecord takes care of the rest for you.
 It does not require that you map your table schema to yaml/xml files. It will query the database for this information and
 cache it so that it does not make multiple calls to the database for a single schema.
 
