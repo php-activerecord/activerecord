@@ -22,11 +22,19 @@ class SQLExecutionPlanTest extends DatabaseTestCase
         $query = Author::where(['mixedCaseField'=>'Bill']);
         $this->assertEquals('Bill Clinton', $query->name);
 
-        $query = Author::where(['mixedCaseField'=>'Bill'], false);
+        $sqlPlan = Author::select('name');
+
+        $query = $sqlPlan->last->where(['mixedCaseField'=>'Bill']);
+        $this->assertEquals('Uncle Bob', $query->name);
+
+        $query = $sqlPlan->last(1)->where(['mixedCaseField'=>'Bill']);
+        $this->assertEquals('Uncle Bob', $query->name);
+
+        $query = $sqlPlan->last(1)->last(2)->where(['mixedCaseField'=>'Bill']);
         $this->assertEquals('Uncle Bob', $query->name);
 
         $query = Author::orderBy('parent_author_id DESC')->where(['mixedCaseField'=>'Bill'], false);
-        $this->assertEquals('Bill Clinton', $query->name);
+        $this->assertEquals('Uncle Bob', $query->name);
     }
 
     public function testWhereAnd()
@@ -87,6 +95,19 @@ class SQLExecutionPlanTest extends DatabaseTestCase
         $this->assertEquals('Uncle Bob', $queries[0]->name);
 
         $queries = Author::all(['mixedCaseField = (?) and parent_author_id <> (?)', 'Bill', 1]);
+        $this->assertEquals(1, count($queries));
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
+    }
+
+    public function testAllLast() {
+        $sqlPlan = Author::select('name');
+
+        $queries = $sqlPlan->last(2)->all(['mixedCaseField'=>'Bill']);
+        $this->assertEquals(2, count($queries));
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
+        $this->assertEquals('Bill Clinton', $queries[1]->name);
+
+        $queries = $sqlPlan->last(2)->last(1)->all(['mixedCaseField'=>'Bill']);
         $this->assertEquals(1, count($queries));
         $this->assertEquals('Uncle Bob', $queries[0]->name);
     }

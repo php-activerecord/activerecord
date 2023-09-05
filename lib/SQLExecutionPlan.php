@@ -8,6 +8,7 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Model;
 
 class SQLExecutionPlan
 {
@@ -16,6 +17,7 @@ class SQLExecutionPlan
      */
     private array $alias_attribute;
     private Table $table;
+    private bool $isLast = false;
 
     /**
      * @var array<string, mixed>
@@ -30,6 +32,27 @@ class SQLExecutionPlan
     {
         $this->alias_attribute = $alias_attribute;
         $this->table = Table::load($className);
+    }
+
+    public function __get(string $name): SQLExecutionPlan {
+        if ($name === 'last') {
+            return $this->last(1);
+        }
+        return $this;
+    }
+    
+    public function last(int $limit): SQLExecutionPlan {
+        $this->limit($limit);
+
+        if (array_key_exists('order', $this->options)) {
+            if (str_contains($this->options['order'], join(' ASC, ', $this->table->pk) . ' ASC')) {
+                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+            }
+        } else {
+            $this->options['order'] = join(' DESC, ', $this->table->pk) . ' DESC';
+        }
+
+        return $this;
     }
 
     public function select(string $columns): SQLExecutionPlan
@@ -100,17 +123,9 @@ class SQLExecutionPlan
      *
      * @return Model|null The single row that matches query. If no rows match, returns null
      */
-    public function where(int|string|array $needle, bool $returnFirstRow=true): Model|null
+    public function where(int|string|array $needle): Model|null
     {
         $this->limit(1);
-
-        if (!$returnFirstRow) {
-            if (array_key_exists('order', $this->options)) {
-                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
-            } else {
-                $this->options['order'] = join(' DESC, ', $this->table->pk) . ' DESC';
-            }
-        }
 
         if (is_array($needle)) {
             $this->options['conditions'] = $needle;
@@ -153,15 +168,15 @@ class SQLExecutionPlan
         }
 
         // Only for backwards compatibility with version 1 API
-        $isVersion1 = false;
-        foreach (['select', 'conditions', 'joins', 'order', 'limit', 'group', 'offset', 'having', 'readonly'] as $key) {
+        $isUsingOriginalFind = false;
+        foreach (Model::$VALID_OPTIONS as $key) {
             if (array_key_exists($key, $needle)) {
                 $this->options[$key] = $needle[$key];
-                $isVersion1 = true;
+                $isUsingOriginalFind = true;
             }
         }
 
-        if (!$isVersion1) {
+        if (!$isUsingOriginalFind) {
             $this->options['conditions'] = $needle;
         }
         $this->options['mapped_names'] = $this->alias_attribute;
