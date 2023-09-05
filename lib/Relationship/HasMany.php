@@ -104,7 +104,7 @@ class HasMany extends AbstractRelationship
             $this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : [$this->options['primary_key']];
         }
 
-        if (!$this->class_name) {
+        if (!isset($this->class_name)) {
             $this->set_class_name($this->inferred_class_name($this->attribute_name));
         }
     }

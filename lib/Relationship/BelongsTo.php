@@ -44,7 +44,7 @@ class BelongsTo extends AbstractRelationship
     /**
      * @var class-string
      */
-    public $class_name;
+    public string $class_name;
 
     /**
      * @var array<string>
@@ -65,7 +65,7 @@ class BelongsTo extends AbstractRelationship
     {
         parent::__construct($attributeName, $options);
 
-        if (!$this->class_name) {
+        if (!isset($this->class_name)) {
             $this->set_class_name(
                 $this->inferred_class_name($this->attribute_name)
             );
