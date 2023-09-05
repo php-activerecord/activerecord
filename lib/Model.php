@@ -1624,58 +1624,58 @@ class Model
 
     public static function select(string $columns='*'): Relation
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
-        $sqlPlan->select($columns);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->select($columns);
 
-        return $sqlPlan;
+        return $relation;
     }
 
     public static function join(string $joinStatement): Relation
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
-        $sqlPlan->join($joinStatement);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->join($joinStatement);
 
-        return $sqlPlan;
+        return $relation;
     }
 
     public static function orderBy(string $order): Relation
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
-        $sqlPlan->orderBy($order);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->orderBy($order);
 
-        return $sqlPlan;
+        return $relation;
     }
 
     public static function groupBy(string $columns): Relation
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
-        $sqlPlan->groupBy($columns);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->groupBy($columns);
 
-        return $sqlPlan;
+        return $relation;
     }
 
     public static function limit(int $limit): Relation
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
-        $sqlPlan->limit($limit);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->limit($limit);
 
-        return $sqlPlan;
+        return $relation;
     }
 
     public static function offset(int $offset): Relation
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
-        $sqlPlan->offset($offset);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->offset($offset);
 
-        return $sqlPlan;
+        return $relation;
     }
 
     public static function having(string $having): Relation
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
-        $sqlPlan->having($having);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->having($having);
 
-        return $sqlPlan;
+        return $relation;
     }
 
     /**
@@ -1691,9 +1691,9 @@ class Model
      */
     public static function where(int|string|array $needle): Model|null
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
 
-        return $sqlPlan->where($needle);
+        return $relation->where($needle);
     }
 
     /**
@@ -1709,9 +1709,9 @@ class Model
      */
     public static function all(array $needle = []): array
     {
-        $sqlPlan = new Relation(get_called_class(), static::$alias_attribute);
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
 
-        return $sqlPlan->all($needle);
+        return $relation->all($needle);
     }
 
     /**

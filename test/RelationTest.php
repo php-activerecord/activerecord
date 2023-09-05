@@ -22,15 +22,15 @@ class RelationTest extends DatabaseTestCase
         $query = Author::where(['mixedCaseField'=>'Bill']);
         $this->assertEquals('Bill Clinton', $query->name);
 
-        $sqlPlan = Author::select('name');
+        $relation = Author::select('name');
 
-        $query = $sqlPlan->last->where(['mixedCaseField'=>'Bill']);
+        $query = $relation->last->where(['mixedCaseField'=>'Bill']);
         $this->assertEquals('Uncle Bob', $query->name);
 
-        $query = $sqlPlan->last(1)->where(['mixedCaseField'=>'Bill']);
+        $query = $relation->last(1)->where(['mixedCaseField'=>'Bill']);
         $this->assertEquals('Uncle Bob', $query->name);
 
-        $query = $sqlPlan->last(1)->last(2)->where(['mixedCaseField'=>'Bill']);
+        $query = $relation->last(1)->last(2)->where(['mixedCaseField'=>'Bill']);
         $this->assertEquals('Uncle Bob', $query->name);
 
         $query = Author::orderBy('parent_author_id DESC')->where(['mixedCaseField'=>'Bill'], false);
@@ -51,13 +51,13 @@ class RelationTest extends DatabaseTestCase
 
     public function testWhereChained()
     {
-        $sqlPlan = Author::select('authors.author_id, authors.name');
-        $sqlPlan = Author::join('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)');
-        $sqlPlan = Author::orderBy('name DESC');
-        $sqlPlan = Author::limit(2);
-        $sqlPlan = Author::groupBy('name');
-        $sqlPlan = Author::offset(2);
-        $query = $sqlPlan->where(3);
+        $relation = Author::select('authors.author_id, authors.name');
+        $relation = Author::join('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)');
+        $relation = Author::orderBy('name DESC');
+        $relation = Author::limit(2);
+        $relation = Author::groupBy('name');
+        $relation = Author::offset(2);
+        $query = $relation->where(3);
 
         $query = Author::select('authors.author_id, authors.name')
             ->orderBy('name DESC')
@@ -101,14 +101,14 @@ class RelationTest extends DatabaseTestCase
 
     public function testAllLast()
     {
-        $sqlPlan = Author::select('name');
+        $relation = Author::select('name');
 
-        $queries = $sqlPlan->last(2)->all(['mixedCaseField'=>'Bill']);
+        $queries = $relation->last(2)->all(['mixedCaseField'=>'Bill']);
         $this->assertEquals(2, count($queries));
         $this->assertEquals('Uncle Bob', $queries[0]->name);
         $this->assertEquals('Bill Clinton', $queries[1]->name);
 
-        $queries = $sqlPlan->last(2)->last(1)->all(['mixedCaseField'=>'Bill']);
+        $queries = $relation->last(2)->last(1)->all(['mixedCaseField'=>'Bill']);
         $this->assertEquals(1, count($queries));
         $this->assertEquals('Uncle Bob', $queries[0]->name);
     }
