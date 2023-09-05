@@ -13,7 +13,6 @@ use ActiveRecord\Types;
 /**
  * Adapter for Postgres (not completed yet)
  *
- * @phpstan-import-type ColumnOptions from Types
  */
 class PgsqlAdapter extends Connection
 {
@@ -84,7 +83,14 @@ SQL;
     }
 
     /**
-     * @param ColumnOptions $column
+     * @param array{
+     *  field: string,
+     *  attlen: int,
+     *  type: string,
+     *  not_nullable: bool,
+     *  pk: bool,
+     *  default: string
+     * } $column
      */
     public function create_column(array $column): Column
     {

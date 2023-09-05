@@ -165,8 +165,12 @@ class CallBack
      */
     public function invoke(Model|null $model, string $name, bool $must_exist = true)
     {
+        if(is_null($model)) {
+            xdebug_break();
+        }
+
         if ($must_exist && !array_key_exists($name, $this->registry)) {
-            throw new ActiveRecordException("No callbacks were defined for: $name on " . get_class($model));
+            throw new ActiveRecordException("No callbacks were defined for: $name on " . ($model ? get_class($model): "null"));
         }
         // if it doesn't exist it might be a /(after|before)_(create|update)/ so we still need to run the save
         // callback
