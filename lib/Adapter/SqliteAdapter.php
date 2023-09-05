@@ -14,8 +14,6 @@ use ActiveRecord\Utils;
 
 /**
  * Adapter for SQLite.
- *
- * @package ActiveRecord
  */
 class SqliteAdapter extends Connection
 {
@@ -46,6 +44,16 @@ class SqliteAdapter extends Connection
         return $this->query('SELECT name FROM sqlite_master');
     }
 
+    /**
+     * @param array{
+     *  cid: int,
+     *  name: string,
+     *  type: string,
+     *  notnull: int,
+     *  dflt_value: mixed,
+     *  pk: mixed
+     * } $column
+     */
     public function create_column(array $column): Column
     {
         $c = new Column();
@@ -58,18 +66,17 @@ class SqliteAdapter extends Connection
             ['INT', 'INTEGER']
         ) && $c->pk;
 
-        $column['type'] = preg_replace('/ +/', ' ', $column['type']);
-        $column['type'] = str_replace(['(', ')'], ' ', $column['type']);
-        $column['type'] = Utils::squeeze(' ', $column['type']);
-        $matches = explode(' ', $column['type']);
+        $type = preg_replace('/ +/', ' ', $column['type']);
+        assert(is_string($type));
+        $type = str_replace(['(', ')'], ' ', $type);
+        assert(is_string($type));
+        $type = Utils::squeeze(' ', $type);
+        $matches = explode(' ', $type);
 
-        /* @phpstan-ignore-next-line */
-        if (count($matches) > 0) {
-            $c->raw_type = strtolower($matches[0]);
+        $c->raw_type = strtolower($matches[0]);
 
-            if (count($matches) > 1) {
-                $c->length = intval($matches[1]);
-            }
+        if (count($matches) > 1) {
+            $c->length = intval($matches[1]);
         }
 
         $c->map_raw_type();

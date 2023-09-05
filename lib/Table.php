@@ -21,6 +21,7 @@ use ActiveRecord\Relationship\HasOne;
  * for every table you have a model for.
  *
  * @phpstan-import-type PrimaryKey from Types
+ * @phpstan-import-type Attributes from Types
  */
 class Table
 {
@@ -161,15 +162,17 @@ class Table
                 if (array_key_exists($value, $this->relationships)) {
                     $rel = $this->get_relationship($value);
 
-                    // if there is more than 1 join for a given table we need to alias the table names
-                    if (array_key_exists($rel->class_name, $existing_tables)) {
-                        $alias = $value;
-                        ++$existing_tables[$rel->class_name];
-                    } else {
-                        $existing_tables[$rel->class_name] = true;
-                        $alias = null;
-                    }
+                    /**
+                     * PHPStan seems to be getting confused about the usage of a class-string
+                     * as an array string.
+                     *
+                     * @phpstan-ignore-next-line
+                     */
+                    $alias = !empty($existing_tables[$rel->class_name]) ? $value : null;
+                    /* @phpstan-ignore-next-line */
+                    $existing_tables[$rel->class_name] = true;
 
+                    /* @phpstan-ignore-next-line */
                     $ret .= $rel->construct_inner_join_sql($this, false, $alias);
                 } else {
                     throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");
@@ -260,9 +263,8 @@ class Table
     {
         $sql = $this->options_to_sql($options);
         $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
-        $eager_load = $options['include'] ?? null;
 
-        return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, $eager_load);
+        return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, (array) ($options['include'] ?? []));
     }
 
     /**
@@ -278,20 +280,20 @@ class Table
     }
 
     /**
-     * @param array<string,mixed>|null  $values
-     * @param string|array<string>|null $includes
+     * @param array<string,mixed>|null $values
+     * @param array<mixed>             $includes
      *
      * @throws RelationshipException
      *
      * @return array<Model>
      */
-    public function find_by_sql(string $sql, array $values = null, bool $readonly = false, string|array $includes = null): array
+    public function find_by_sql(string $sql, array $values = null, bool $readonly = false, array $includes = []): array
     {
         $this->last_sql = $sql;
 
-        $collect_attrs_for_includes = !is_null($includes);
+        $collect_attrs_for_includes = !empty($includes);
         $list = $attrs = [];
-        $processedData = $this->process_data($values) ?? [];
+        $processedData = $this->process_data($values ?? []);
         $sth = $this->conn->query($sql, $processedData);
 
         $self = $this;
@@ -348,7 +350,7 @@ class Table
             }
 
             $rel = $this->get_relationship($name, true);
-            $rel->load_eagerly($models, $attrs, $nested_includes, $this);
+            $rel?->load_eagerly($models, $attrs, $nested_includes, $this);
         }
     }
 
@@ -422,8 +424,8 @@ class Table
     }
 
     /**
-     * @param array<string,mixed>  $data
-     * @param array<string, mixed> $where
+     * @param Attributes $data
+     * @param Attributes $where
      *
      * @throws Exception\ActiveRecordException
      */
@@ -500,20 +502,18 @@ class Table
      *
      * @return array<string,mixed> $hash
      */
-    private function process_data(array|null $hash): array|null
+    private function process_data(array $hash = []): array
     {
-        if ($hash) {
-            foreach ($hash as $name => $value) {
-                if ($value instanceof \DateTime) {
-                    $column = $this->columns[$name] ?? null;
-                    if (isset($column) && Column::DATE == $column->type) {
-                        $hash[$name] = $this->conn->date_string($value);
-                    } else {
-                        $hash[$name] = $this->conn->datetime_string($value);
-                    }
+        foreach ($hash as $name => $value) {
+            if ($value instanceof \DateTime) {
+                $column = $this->columns[$name] ?? null;
+                if (isset($column) && Column::DATE == $column->type) {
+                    $hash[$name] = $this->conn->date_string($value);
                 } else {
-                    $hash[$name] = $value;
+                    $hash[$name] = $this->conn->datetime_string($value);
                 }
+            } else {
+                $hash[$name] = $value;
             }
         }
 

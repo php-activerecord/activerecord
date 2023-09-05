@@ -11,8 +11,6 @@ use ActiveRecord\Inflector;
 
 /**
  * Adapter for MySQL.
- *
- * @package ActiveRecord
  */
 class MysqlAdapter extends Connection
 {
@@ -36,7 +34,15 @@ class MysqlAdapter extends Connection
     }
 
     /**
-     * @param array<string, string|null> $column
+     *  @param array{
+     *  field: string,
+     *  name: string,
+     *  type: string,
+     *  null: string,
+     *  key: string,
+     *  default: mixed|null,
+     *  extra: string
+     * } $column
      */
     public function create_column(array $column): Column
     {

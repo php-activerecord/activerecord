@@ -158,7 +158,7 @@ class ConfigTest extends TestCase
     public function testGetDefaultConnectionStringWhenConnectionNameIsNotValid()
     {
         $this->config->set_default_connection('little mac');
-        $this->assertNull($this->config->get_default_connection_string());
+        $this->assertEmpty($this->config->get_default_connection_string());
     }
 
     public function testDefaultConnectionIsSetWhenOnlyOneConnectionIsPresent()
