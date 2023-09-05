@@ -1686,15 +1686,14 @@ class Model
      * raw WHERE statement      where(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
      *
      * @param int|string|array<string> $needle
-     * @param                          $returnFirstRow true to return the first row retrieved. false to return last row
      *
      * @return Model|null The single row that matches query. If no rows match, returns null
      */
-    public static function where(int|string|array $needle, bool $returnFirstRow=true): Model|null
+    public static function where(int|string|array $needle): Model|null
     {
         $sqlPlan = new SQLExecutionPlan(get_called_class(), static::$alias_attribute);
 
-        return $sqlPlan->where($needle, $returnFirstRow);
+        return $sqlPlan->where($needle);
     }
 
     /**

@@ -16,7 +16,6 @@ class SQLExecutionPlan
      */
     private array $alias_attribute;
     private Table $table;
-    private bool $isLast = false;
 
     /**
      * @var array<string, mixed>
