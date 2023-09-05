@@ -75,9 +75,9 @@ class ConnectionTest extends TestCase
         $this->assertEquals('utf8', $info['charset']);
     }
 
-    public function testReestablishConnection() {
+    public function testReestablishConnection()
+    {
         $connection = \test\models\Book::reestablish_connection(true);
         $this->assertNotNull($connection);
-
     }
 }
