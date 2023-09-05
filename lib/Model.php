@@ -110,17 +110,15 @@ class Model
 {
     /**
      * An instance of {@link ValidationErrors} and will be instantiated once a write method is called.
-     *
-     * @var ValidationErrors
      */
-    public $errors;
+    public ValidationErrors $errors;
 
     /**
      * Contains model values as column_name => value
      *
      * @var Attributes
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     /**
      * Flag whether this model's attributes have been modified since it will either be null or an array of column_names that have been modified
@@ -131,10 +129,8 @@ class Model
 
     /**
      * Flag that determines of this model can have a writer method invoked such as: save/update/insert/delete
-     *
-     * @var bool
      */
-    private $__readonly = false;
+    private bool $__readonly = false;
 
     /**
      * Array of relationship objects as model_attribute_name => relationship
@@ -229,6 +225,11 @@ class Model
     public static array $has_many;
 
     /**
+     * @var array<string,HasManyOptions>
+     */
+    public static array $has_one;
+
+    /**
      * @var array<string,BelongsToOptions>
      */
     public static array $belongs_to;
@@ -238,9 +239,10 @@ class Model
      *
      * ```
      * class Person extends ActiveRecord\Model {
-     *   static $alias_attribute = array(
+     *   static $alias_attribute = [
      *     'alias_first_name' => 'first_name',
-     *     'alias_last_name' => 'last_name');
+     *     'alias_last_name' => 'last_name'
+     *   ];
      * }
      *
      * $person = Person::first();
@@ -259,13 +261,17 @@ class Model
      *
      * ```
      * class Person extends ActiveRecord\Model {
-     *   static $attr_accessible = array('first_name','last_name');
+     *   static $attr_accessible = [
+     *     'first_name',
+     *     'last_name'
+     *   ];
      * }
      *
-     * $person = new Person(array(
+     * $person = new Person([
      *   'first_name' => 'Tito',
      *   'last_name' => 'the Grief',
-     *   'id' => 11111));
+     *   'id' => 11111
+     * ]);
      *
      * echo $person->id; # => null
      * ```
@@ -295,10 +301,22 @@ class Model
      *      'venue' => true,
      *      'host' => true
      *  ];
-     *  static $delegate = array(
-     *     array('name', 'state', 'to' => 'venue'),
-     *     array('name', 'to' => 'host', 'prefix' => 'woot'));
-     * }
+     *  static $delegate = [
+     *    [
+     *      'attributes' => [
+     *        'name',
+     *        'state'
+     *      ],
+     *      'to' => 'venue'
+     *    ],
+     *    [
+     *      'attributes' => [
+     *        'name'
+     *      ],
+     *      'to' => 'host',
+     *      'prefix' => 'woot'
+     *   ];
+     * ]
      * ```
      *
      * Can then do:
@@ -321,7 +339,10 @@ class Model
      * $attributes will be mapped via set_attributes_via_mass_assignment.
      *
      * ```
-     * new Person(array('first_name' => 'Tito', 'last_name' => 'the Grief'));
+     * new Person([
+     *   'first_name' => 'Tito',
+     *   'last_name' => 'the Grief'
+     * ]);
      * ```
      *
      * @param Attributes $attributes             Hash containing names and values to mass assign to the model
@@ -751,13 +772,22 @@ class Model
      * Will return an array looking like:
      *
      * ```
-     * array(
+     * [
      *   'name' => [
-     *     array('validator' => 'validates_presence_of'),
-     *     array('validator' => 'validates_inclusion_of', 'in' => array('Bob','Joe','John')),
-     *   'password' => array(
-     *     array('validator' => 'validates_length_of', 'minimum' => 6))
-     *   )
+     *     [
+     *       'validator' => 'validates_presence_of'
+     *     ],
+     *     [
+     *       'validator' => 'validates_inclusion_of',
+     *       'in' => ['Bob','Joe','John']
+     *     ]
+     *   ],
+     *   'password' => [
+     *     [
+     *       'validator' => 'validates_length_of',
+     *       'minimum' => 6
+     *     ]
+     *   ]
      * ];
      * ```
      *
@@ -814,7 +844,7 @@ class Model
                 $name = substr($name, strlen($delegate['prefix']) + 1);
             }
 
-            if (in_array($name, $delegate['delegate'] ?? [])) {
+            if (in_array($name, $delegate['delegate'])) {
                 return $name;
             }
         }
@@ -1054,19 +1084,19 @@ class Model
      * Delete all using a hash:
      *
      * ```
-     * YourModel::delete_all(array('conditions' => array('name' => 'Tito')));
+     * YourModel::delete_all(['conditions' => ['name' => 'Tito']]);
      * ```
      *
      * Delete all using an array:
      *
      * ```
-     * YourModel::delete_all(array('conditions' => array('name = ?', 'Tito')));
+     * YourModel::delete_all(['conditions' => ['name = ?', 'Tito']]);
      * ```
      *
      * Delete all using a string:
      *
      * ```
-     * YourModel::delete_all(array('conditions' => 'name = "Tito"'));
+     * YourModel::delete_all(['conditions' => 'name = "Tito"']);
      * ```
      *
      * An options array takes the following parameters:
@@ -1110,13 +1140,13 @@ class Model
      * Update all using a hash:
      *
      * ```
-     * YourModel::update_all(array('set' => array('name' => "Bob")));
+     * YourModel::update_all(['set' => ['name' => "Bob"]]);
      * ```
      *
      * Update all using a string:
      *
      * ```
-     * YourModel::update_all(array('set' => 'name = "Bob"'));
+     * YourModel::update_all(['set' => 'name = "Bob"']);
      * ```
      *
      * An options array takes the following parameters:
@@ -1206,7 +1236,7 @@ class Model
      *
      * @param array<string> $attribute_names Array of attribute names
      *
-     * @return Attributes An array in the form array(name => value, ...)
+     * @return Attributes An array in the form [name => value, ...]
      */
     public function values_for(array $attribute_names): array
     {
@@ -1297,7 +1327,7 @@ class Model
     /**
      * Mass update the model with an array of attribute data and saves to the database.
      *
-     * @param Attributes $attributes An attribute data array in the form array(name => value, ...)
+     * @param Attributes $attributes An attribute data array in the form [name => value, ...]
      *
      * @return bool True if successfully updated and saved otherwise false
      */
@@ -1331,7 +1361,7 @@ class Model
      *
      * @see update_attributes
      *
-     * @param Attributes $attributes An array containing data to update in the form array(name => value, ...)
+     * @param Attributes $attributes An array containing data to update in the form of [name => value, ...]
      */
     public function set_attributes(array $attributes): void
     {
@@ -1341,7 +1371,7 @@ class Model
     /**
      * Passing $guard_attributes as true will throw an exception if an attribute does not exist.
      *
-     * @param Attributes $attributes       An array in the form array(name => value, ...)
+     * @param Attributes $attributes       An array in the form [name => value, ...]
      * @param bool       $guard_attributes Whether protected/non-accessible attributes should be guarded
      *
      * @throws UndefinedPropertyException
@@ -1504,14 +1534,14 @@ class Model
      *
      * # would be the equivalent of
      * if (!Person::find_by_name('Tito'))
-     *   Person::create(array('Tito'));
+     *   Person::create(['Tito']);
      * ```
      *
      * Some other examples of find_or_create_by:
      *
      * ```
      * Person::find_or_create_by_name_and_id('Tito',1);
-     * Person::find_or_create_by_name_and_id(array('name' => 'Tito', 'id' => 1));
+     * Person::find_or_create_by_name_and_id(['name' => 'Tito', 'id' => 1]);
      * ```
      *
      * @param $method Name of method
@@ -1609,7 +1639,7 @@ class Model
      * Get a count of qualifying records.
      *
      * ```
-     * YourModel::count(array('conditions' => 'amount > 3.14159265'));
+     * YourModel::count(['conditions' => 'amount > 3.14159265']);
      * ```
      *
      * @see find
@@ -1761,7 +1791,7 @@ class Model
         $num_args = count($args);
         $single = true;
 
-        if ($num_args > 0 && ('all' === $args[0] || 'first' === $args[0] || 'last' === $args[0])) {
+        if (in_array($args[0], ['all', 'first', 'last'])) {
             switch ($args[0]) {
                 case 'all':
                     $single = false;
@@ -1884,7 +1914,7 @@ class Model
      * Find using a raw SELECT query.
      *
      * ```
-     * YourModel::find_by_sql("SELECT * FROM people WHERE name=?",array('Tito'));
+     * YourModel::find_by_sql("SELECT * FROM people WHERE name=?",['Tito']);
      * YourModel::find_by_sql("SELECT * FROM people WHERE name='Tito'");
      * ```
      *
@@ -2086,7 +2116,7 @@ class Model
      * ```
      * YourModel::transaction(function()
      * {
-     *   YourModel::create(array("name" => "blah"));
+     *   YourModel::create(["name" => "blah"]);
      * });
      * ```
      *
@@ -2097,13 +2127,13 @@ class Model
      * ```
      * YourModel::transaction(function()
      * {
-     *   YourModel::create(array("name" => "blah"));
+     *   YourModel::create(["name" => "blah"]);
      *   throw new Exception("rollback!");
      * });
      *
      * YourModel::transaction(function()
      * {
-     *   YourModel::create(array("name" => "blah"));
+     *   YourModel::create(["name" => "blah"]);
      *   return false; # rollback!
      * });
      * ```

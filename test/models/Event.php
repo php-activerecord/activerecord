@@ -12,7 +12,19 @@ class Event extends Model
     ];
 
     public static array $delegate = [
-        ['state', 'address', 'to' => 'venue'],
-        ['name', 'to' => 'host', 'prefix' => 'woot']
+        [
+            'delegate'=>[
+                'state',
+                'address'
+            ],
+            'to' => 'venue'
+        ],
+        [
+            'delegate'=>[
+                'name'
+            ],
+            'to' => 'host',
+            'prefix' => 'woot'
+        ]
     ];
 }
