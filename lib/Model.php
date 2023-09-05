@@ -110,17 +110,15 @@ class Model
 {
     /**
      * An instance of {@link ValidationErrors} and will be instantiated once a write method is called.
-     *
-     * @var ValidationErrors
      */
-    public $errors;
+    public ValidationErrors $errors;
 
     /**
      * Contains model values as column_name => value
      *
      * @var Attributes
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     /**
      * Flag whether this model's attributes have been modified since it will either be null or an array of column_names that have been modified
@@ -131,10 +129,8 @@ class Model
 
     /**
      * Flag that determines of this model can have a writer method invoked such as: save/update/insert/delete
-     *
-     * @var bool
      */
-    private $__readonly = false;
+    private bool $__readonly = false;
 
     /**
      * Array of relationship objects as model_attribute_name => relationship
@@ -295,10 +291,22 @@ class Model
      *      'venue' => true,
      *      'host' => true
      *  ];
-     *  static $delegate = array(
-     *     array('name', 'state', 'to' => 'venue'),
-     *     array('name', 'to' => 'host', 'prefix' => 'woot'));
-     * }
+     *  static $delegate = [
+     *    [
+     *      'attributes' => [
+     *        'name',
+     *        'state'
+     *      ],
+     *      'to' => 'venue'
+     *    ],
+     *    [
+     *      'attributes' => [
+     *        'name'
+     *      ],
+     *      'to' => 'host',
+     *      'prefix' => 'woot'
+     *   ];
+     * ]
      * ```
      *
      * Can then do:
@@ -814,7 +822,7 @@ class Model
                 $name = substr($name, strlen($delegate['prefix']) + 1);
             }
 
-            if (in_array($name, $delegate['delegate'] ?? [])) {
+            if (in_array($name, $delegate['delegate'])) {
                 return $name;
             }
         }

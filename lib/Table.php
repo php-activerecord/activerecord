@@ -120,7 +120,6 @@ class Table
         $this->get_meta_data();
         $this->set_primary_key();
         $this->set_sequence_name();
-        $this->set_delegates();
         $this->set_cache();
 
         $this->callback = new CallBack($class_name);
@@ -611,50 +610,6 @@ class Table
                     $this->add_relationship($relationship);
                 }
             }
-        }
-    }
-
-    /**
-     * Rebuild the delegates array into format that we can more easily work with in Model.
-     * Will end up consisting of array of:
-     *
-     * array('delegate' => array('field1','field2',...),
-     *       'to'       => 'delegate_to_relationship',
-     *       'prefix'	=> 'prefix')
-     */
-    private function set_delegates(): void
-    {
-        $delegates = $this->class->getStaticPropertyValue('delegate', []);
-        $new = [];
-
-        $delegates['processed'] ??= false;
-
-        if (!empty($delegates) && !$delegates['processed']) {
-            foreach ($delegates as &$delegate) {
-                if (!is_array($delegate) || !isset($delegate['to'])) {
-                    continue;
-                }
-
-                if (!isset($delegate['prefix'])) {
-                    $delegate['prefix'] = null;
-                }
-
-                $new_delegate = [
-                    'to'        => $delegate['to'],
-                    'prefix'    => $delegate['prefix'],
-                    'delegate'    => []];
-
-                foreach ($delegate as $name => $value) {
-                    if (is_numeric($name)) {
-                        $new_delegate['delegate'][] = $value;
-                    }
-                }
-
-                $new[] = $new_delegate;
-            }
-
-            $new['processed'] = true;
-            $this->class->setStaticPropertyValue('delegate', $new);
         }
     }
 }
