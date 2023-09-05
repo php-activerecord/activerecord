@@ -225,6 +225,11 @@ class Model
     public static array $has_many;
 
     /**
+     * @var array<string,HasManyOptions>
+     */
+    public static array $has_one;
+
+    /**
      * @var array<string,BelongsToOptions>
      */
     public static array $belongs_to;

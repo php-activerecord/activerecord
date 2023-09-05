@@ -55,7 +55,9 @@ class RelationshipTest extends DatabaseTestCase
             ]
         ];
         Venue::$has_one = [];
-        Employee::$has_one = [['position']];
+        Employee::$has_one = [
+            'position' => []
+        ];
         Host::$has_many = [
             'events' => [
                 'order' => 'id asc'
@@ -516,7 +518,9 @@ class RelationshipTest extends DatabaseTestCase
         Event::$belongs_to = [
             'host' => true
         ];
-        Venue::$has_one = [['invalid_assoc']];
+        Venue::$has_one = [
+            'invalid_assoc' => true
+        ];
         Venue::$has_many = [
             'hosts' => [
                 'through' => 'invalid_assoc'
@@ -557,13 +561,18 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasOneWithExplicitClassName()
     {
-        Employee::$has_one = [['explicit_class_name', 'class_name' => 'Position']];
+        Employee::$has_one = [
+            'explicit_class_name' => [
+                'class_name' => 'Position'
+            ]
+        ];
         $this->assert_default_has_one($this->get_relationship(), 'explicit_class_name');
     }
 
     public function testHasOneWithSelect()
     {
-        Employee::$has_one[0]['select'] = 'title';
+        $ho = Employee::$has_one;
+        Employee::$has_one['position']['select'] = 'title';
         $employee = $this->get_relationship();
         $this->assert_default_has_one($employee);
 
@@ -577,7 +586,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasOneWithOrder()
     {
-        Employee::$has_one[0]['order'] = 'title';
+        Employee::$has_one['position']['order'] = 'title';
         $employee = $this->get_relationship();
         $this->assert_default_has_one($employee);
         $this->assert_sql_has('ORDER BY title', Position::table()->last_sql);
@@ -585,7 +594,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasOneWithConditionsAndNonQualifyingRecord()
     {
-        Employee::$has_one[0]['conditions'] = "title = 'programmer'";
+        Employee::$has_one['position']['conditions'] = "title = 'programmer'";
         $employee = $this->get_relationship();
         $this->assertEquals(1, $employee->id);
         $this->assertNull($employee->position);
@@ -593,13 +602,13 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasOneWithConditionsAndQualifyingRecord()
     {
-        Employee::$has_one[0]['conditions'] = "title = 'physicist'";
+        Employee::$has_one['position']['conditions'] = "title = 'physicist'";
         $this->assert_default_has_one($this->get_relationship());
     }
 
     public function testHasOneWithReadonly()
     {
-        Employee::$has_one[0]['readonly'] = true;
+        Employee::$has_one['position']['readonly'] = true;
         $employee = $this->get_relationship();
         $this->assert_default_has_one($employee);
 
@@ -629,7 +638,13 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasOneWithExplicitKeys()
     {
-        Book::$has_one = [['explicit_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id', 'primary_key' => 'secondary_author_id']];
+        Book::$has_one = [
+            'explicit_author' => [
+                'class_name' => 'Author',
+                'foreign_key' => 'parent_author_id',
+                'primary_key' => 'secondary_author_id'
+            ]
+        ];
 
         $book = Book::find(1);
         $this->assertEquals($book->secondary_author_id, $book->explicit_author->parent_author_id);

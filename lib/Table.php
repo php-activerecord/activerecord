@@ -594,7 +594,7 @@ class Table
                         break;
 
                     case 'has_one':
-                        $relationship = new HasOne($definition[0], $definition);
+                        $relationship = new HasOne($attribute, $definition);
                         break;
 
                     case 'belongs_to':
