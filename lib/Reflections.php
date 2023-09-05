@@ -40,20 +40,6 @@ class Reflections extends Singleton
     }
 
     /**
-     * Destroys the cached ReflectionClass.
-     *
-     * Put this here mainly for testing purposes.
-     *
-     * @param class-string $class name of a class
-     */
-    public function destroy(string $class): void
-    {
-        if (isset($this->reflections[$class])) {
-            unset($this->reflections[$class]);
-        }
-    }
-
-    /**
      * Get a cached ReflectionClass.
      *
      * @param class-string $className Optional name of a class or an instance of the class
