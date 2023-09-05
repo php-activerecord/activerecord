@@ -145,10 +145,10 @@ class ValidationErrors implements \IteratorAggregate
      * ```
      * $model->errors->get_raw_errors();
      *
-     * # array(
-     * #  "name" => array("can't be blank"),
-     * #  "state" => array("is the wrong length (should be 2 chars)",
-     * # )
+     * # [
+     * #  "name" => ["can't be blank"],
+     * #  "state" => ["is the wrong length (should be 2 chars)"],
+     * # ]
      * ```
      *
      * @return array<string, array<string>>
@@ -164,10 +164,10 @@ class ValidationErrors implements \IteratorAggregate
      * ```
      * $model->errors->full_messages();
      *
-     * # array(
+     * # [
      * #  "Name can't be blank",
      * #  "State is the wrong length (should be 2 chars)"
-     * # )
+     * # ]
      * ```
      *
      * @return array<string>
@@ -189,10 +189,10 @@ class ValidationErrors implements \IteratorAggregate
      * ```
      * $model->errors->errors();
      *
-     * # array(
-     * #  "name" => array("Name can't be blank"),
-     * #  "state" => array("State is the wrong length (should be 2 chars)")
-     * # )
+     * # [
+     * #  "name" => ["Name can't be blank"],
+     * #  "state" => ["State is the wrong length (should be 2 chars)"]
+     * # ]
      * ```
      *
      * @param callable $closure closure to fetch the errors in some other format (optional)

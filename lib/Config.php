@@ -15,9 +15,10 @@ use Psr\Log\LoggerInterface;
  * ```
  * ActiveRecord::initialize(function($cfg) {
  *   $cfg->set_model_home('models');
- *   $cfg->set_connections(array(
+ *   $cfg->set_connections([
  *     'development' => 'mysql://user:pass@development.com/awesome_development',
- *     'production' => 'mysql://user:pass@production.com/awesome_production'));
+ *     'production' => 'mysql://user:pass@production.com/awesome_production'
+ *   ]);
  * });
  * ```
  *
@@ -30,9 +31,10 @@ class Config extends Singleton
      *
      * ```
      * ActiveRecord\Config::initialize(function($cfg) {
-     *   $cfg->set_connections(array(
+     *   $cfg->set_connections([
      *     'development' => 'mysql://user:pass@development.com/awesome_development',
-     *     'production' => 'mysql://user:pass@production.com/awesome_production'));
+     *     'production' => 'mysql://user:pass@production.com/awesome_production'
+     *   ]);
      * });
      * ```
      *
@@ -76,8 +78,9 @@ class Config extends Singleton
      *
      * ```
      * ActiveRecord\Config::initialize(function($cfg) {
-     *   $cfg->set_connections(array(
-     *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
+     *   $cfg->set_connections([
+     *     'development' => 'mysql://username:password@127.0.0.1/database_name'
+     *   ]);
      * });
      * ```
      *
@@ -85,8 +88,9 @@ class Config extends Singleton
      *
      * ```
      * $cfg = ActiveRecord\Config::instance();
-     * $cfg->set_connections(array('development' =>
-     *   'mysql://username:password@localhost/database_name'));
+     * $cfg->set_connections([
+     *   'development' => 'mysql://username:password@localhost/database_name'
+     * ]);
      * ```
      *
      * @param \Closure $initializer A closure
@@ -246,7 +250,7 @@ class Config extends Singleton
      *
      * ```
      * $config->set_cache("memcached://localhost");
-     * $config->set_cache("memcached://localhost",array("expire" => 60));
+     * $config->set_cache("memcached://localhost",["expire" => 60]);
      * ```
      *
      * @param string       $url     url to your cache server

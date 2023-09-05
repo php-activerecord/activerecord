@@ -37,8 +37,8 @@ use Closure;
  *
  * ```
  * class Person extends ActiveRecord\Model {
- *   static $before_save = array('make_name_uppercase');
- *   static $after_save = array('do_happy_dance');
+ *   static $before_save = ['make_name_uppercase'];
+ *   static $after_save = ['do_happy_dance'];
  *
  *   public function make_name_uppercase() {
  *     $this->name = strtoupper($this->name);
