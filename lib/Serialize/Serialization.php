@@ -87,12 +87,20 @@ abstract class Serialization
      * Setting to false will produce this:
      *
      * ```
-     * $user = array('id' => 1, 'name' => 'Tito',
-     *   'permissions' => array(
-     *     array('id' => 100, 'name' => 'admin'),
-     *     array('id' => 101, 'name' => 'normal')
-     *   )
-     * );
+     * $user = [
+     *   'id' => 1,
+     *   'name' => 'Tito',
+     *   'permissions' => [
+     *     [
+     *       'id' => 100,
+     *       'name' => 'admin'
+     *     ],
+     *     [
+     *       'id' => 101,
+     *       'name' => 'normal'
+     *     ]
+     *   ]
+     * ];
      * ```
      */
     protected bool $includes_with_class_name_element = false;

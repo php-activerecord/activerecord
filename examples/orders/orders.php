@@ -66,7 +66,13 @@ foreach (Person::all($conditions) as $person) {
 }
 
 // using order has_many people through payments with options
-// array('people', 'through' => 'payments', 'select' => 'people.*, payments.amount', 'conditions' => 'payments.amount < 200'));
+// [
+//   'people' => [
+//     'through' => 'payments',
+//     'select' => 'people.*, payments.amount',
+//     'conditions' => 'payments.amount < 200'
+//   ]
+// ];
 // this means our people in the loop below also has the payment information since it is part of an inner join
 // we will only see 2 of the people instead of 3 because 1 of the payments is greater than 200
 $order = Order::find($pokemon->id);

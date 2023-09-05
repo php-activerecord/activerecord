@@ -104,7 +104,7 @@ $post = Post::find_by_name_and_id('The Bridge Builder',100);
 $post = Post::find_by_name_or_id('The Bridge Builder',100);
 
 # finding using a conditions array
-$posts = Post::find('all',array('conditions' => array('name=? or id > ?','The Bridge Builder',100)));
+$posts = Post::find('all', ['conditions' => ['name=? or id > ?','The Bridge Builder',100]]);
 ```
 
 ### Create ###
