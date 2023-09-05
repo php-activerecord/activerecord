@@ -22,14 +22,10 @@
       "lib/Utils.php"
     ],
     "psr-4": {
-      "ActiveRecord\\": "lib/",
-      "scripts\\": "scripts/"
+      "ActiveRecord\\": "lib/"
     }
   },
   "autoload-dev": {
-    "files": [
-      "scripts/TestCommand.php"
-    ],
     "psr-4": {
       "ActiveRecord\\Scripts\\": "scripts/",
       "test\\": "test/"
