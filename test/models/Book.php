@@ -9,7 +9,7 @@ class Book extends Model
     public static array $belongs_to = [
         'author' => true
     ];
-    public static $has_one = [];
+    public static array $has_one = [];
 
     public function upper_name()
     {

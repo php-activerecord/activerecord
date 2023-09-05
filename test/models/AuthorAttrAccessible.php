@@ -15,8 +15,12 @@ class AuthorAttrAccessible extends Model
             'primary_key' => 'book_id'
         ]
     ];
-    public static $has_one = [
-        ['parent_author', 'class_name' => 'AuthorAttrAccessible', 'foreign_key' => 'parent_author_id', 'primary_key' => 'author_id']
+    public static array $has_one = [
+        'parent_author' => [
+            'class_name' => 'AuthorAttrAccessible',
+            'foreign_key' => 'parent_author_id',
+            'primary_key' => 'author_id'
+        ]
     ];
     public static array $belongs_to = [];
 
