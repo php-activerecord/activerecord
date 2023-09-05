@@ -26,9 +26,6 @@
     }
   },
   "autoload-dev": {
-    "files": [
-      "scripts/TestCommand.php"
-    ],
     "psr-4": {
       "ActiveRecord\\Scripts\\": "scripts/",
       "test\\": "test/"
