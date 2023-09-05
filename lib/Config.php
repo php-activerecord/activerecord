@@ -147,7 +147,6 @@ class Config extends Singleton
 
     /**
      * Returns the default connection string.
-     *
      */
     public function get_default_connection_string(): string
     {
@@ -156,7 +155,6 @@ class Config extends Singleton
 
     /**
      * Returns the name of the default connection.
-     *
      */
     public function get_default_connection(): string
     {

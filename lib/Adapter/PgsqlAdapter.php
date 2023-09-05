@@ -8,11 +8,9 @@ namespace ActiveRecord\Adapter;
 use ActiveRecord\Column;
 use ActiveRecord\Connection;
 use ActiveRecord\Inflector;
-use ActiveRecord\Types;
 
 /**
  * Adapter for Postgres (not completed yet)
- *
  */
 class PgsqlAdapter extends Connection
 {

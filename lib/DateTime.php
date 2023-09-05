@@ -160,7 +160,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
 
     private function flag_dirty(): void
     {
-        if(!is_null($this->attribute_name)) {
+        if (!is_null($this->attribute_name)) {
             $this->model?->flag_dirty($this->attribute_name);
         }
     }

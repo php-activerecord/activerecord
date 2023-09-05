@@ -10,12 +10,10 @@ use ActiveRecord\Connection;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Inflector;
-use ActiveRecord\Types;
 use ActiveRecord\Utils;
 
 /**
  * Adapter for SQLite.
- *
  */
 class SqliteAdapter extends Connection
 {

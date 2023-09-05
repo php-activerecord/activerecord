@@ -25,7 +25,6 @@ namespace ActiveRecord;
  *  class_name?: class-string,
  *  primary_key?: string
  * }
- *
  * @phpstan-type DelegateOptions array{
  *  to: string,
  *  prefix?: string,
