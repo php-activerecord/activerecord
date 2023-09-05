@@ -292,8 +292,20 @@ class Model
      *      'host' => true
      *  ];
      *  static $delegate = [
-     *     ['name', 'state', 'to' => 'venue'],
-     *     ['name', 'to' => 'host', 'prefix' => 'woot'];
+     *    [
+     *      'attributes' => [
+     *        'name',
+     *        'state'
+     *      ],
+     *      'to' => 'venue'
+     *    ],
+     *    [
+     *      'attributes' => [
+     *        'name'
+     *      ],
+     *      'to' => 'host',
+     *      'prefix' => 'woot'
+     *   ];
      * ]
      * ```
      *
