@@ -312,6 +312,7 @@ class Model
      * @var array<DelegateOptions>
      */
     public static array $delegate = [];
+    protected static bool $delegateDirty = true;
 
     /**
      * Constructs a model.

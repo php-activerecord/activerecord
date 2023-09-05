@@ -625,11 +625,10 @@ class Table
     private function set_delegates(): void
     {
         $delegates = $this->class->getStaticPropertyValue('delegate', []);
+        $delegateDirty = $this->class->getStaticPropertyValue('delegateDirty', []);
         $new = [];
 
-        $delegates['processed'] ??= false;
-
-        if (!empty($delegates) && !$delegates['processed']) {
+        if (!empty($delegates) && $delegateDirty) {
             foreach ($delegates as &$delegate) {
                 if (!is_array($delegate) || !isset($delegate['to'])) {
                     continue;
@@ -653,7 +652,7 @@ class Table
                 $new[] = $new_delegate;
             }
 
-            $new['processed'] = true;
+            $this->class->setStaticPropertyValue('delegateDirty', false);
             $this->class->setStaticPropertyValue('delegate', $new);
         }
     }
