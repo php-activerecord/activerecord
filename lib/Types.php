@@ -28,7 +28,7 @@ namespace ActiveRecord;
  * @phpstan-type DelegateOptions array{
  *  to: string,
  *  prefix?: string,
- *  delegate?: array<string>
+ *  delegate: array<string>
  * }
  */
 abstract class Types
