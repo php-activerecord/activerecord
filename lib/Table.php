@@ -45,7 +45,7 @@ class Table
     /**
      * @var array<string, Column>
      */
-    public $columns = [];
+    public array $columns = [];
 
     /**
      * Name of the table.
