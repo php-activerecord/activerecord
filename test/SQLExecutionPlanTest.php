@@ -99,7 +99,8 @@ class SQLExecutionPlanTest extends DatabaseTestCase
         $this->assertEquals('Uncle Bob', $queries[0]->name);
     }
 
-    public function testAllLast() {
+    public function testAllLast()
+    {
         $sqlPlan = Author::select('name');
 
         $queries = $sqlPlan->last(2)->all(['mixedCaseField'=>'Bill']);

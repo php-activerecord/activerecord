@@ -8,7 +8,6 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
-use ActiveRecord\Model;
 
 class SQLExecutionPlan
 {
@@ -34,14 +33,17 @@ class SQLExecutionPlan
         $this->table = Table::load($className);
     }
 
-    public function __get(string $name): SQLExecutionPlan {
-        if ($name === 'last') {
+    public function __get(string $name): SQLExecutionPlan
+    {
+        if ('last' === $name) {
             return $this->last(1);
         }
+
         return $this;
     }
-    
-    public function last(int $limit): SQLExecutionPlan {
+
+    public function last(int $limit): SQLExecutionPlan
+    {
         $this->limit($limit);
 
         if (array_key_exists('order', $this->options)) {
@@ -119,7 +121,6 @@ class SQLExecutionPlan
      * raw WHERE statement      where(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
      *
      * @param int|string|array<string> $needle
-     * @param                          $returnFirstRow true to return the first row retrieved. false to return last row
      *
      * @return Model|null The single row that matches query. If no rows match, returns null
      */
