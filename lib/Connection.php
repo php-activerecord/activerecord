@@ -563,15 +563,6 @@ abstract class Connection
      */
     abstract public function set_encoding(string $charset): void;
 
-    /*
-     * Returns an array mapping of native database types
-     */
-
-    /**
-     * @return array<string, string|array<string, mixed>>
-     */
-    abstract public function native_database_types(): array;
-
     /**
      * Specifies whether adapter can use LIMIT/ORDER clauses with DELETE & UPDATE operations
      *
