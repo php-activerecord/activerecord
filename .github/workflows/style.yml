@@ -9,7 +9,7 @@ on:
 
 jobs:
   phpcsfixer:
-    name: Linting with php-cs-fixer
+    name: PHP CS Fixer
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
