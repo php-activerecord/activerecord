@@ -1,6 +1,7 @@
 # PHP ActiveRecord
 [![CI](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/php-activerecord/activerecord/actions/workflows/test.yml)
 [![codecov](https://codecov.io/github/php-activerecord/activerecord/graph/badge.svg?token=IJBKNRHVOC)](https://codecov.io/github/php-activerecord/activerecord)
+[![Latest Stable Version](https://poser.pugx.org/php-patterns/activerecord/version)](https://packagist.org/packages/php-patterns/activerecord)
 
 **We encourage pull requests, and issues will be dealt with thoroughly and in a timely manner.**
 
