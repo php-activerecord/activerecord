@@ -33,7 +33,7 @@ class RelationTest extends DatabaseTestCase
         $query = $relation->last(1)->last(2)->where(['mixedCaseField'=>'Bill']);
         $this->assertEquals('Uncle Bob', $query->name);
 
-        $query = Author::orderBy('parent_author_id DESC')->where(['mixedCaseField'=>'Bill'], false);
+        $query = Author::order('parent_author_id DESC')->where(['mixedCaseField'=>'Bill'], false);
         $this->assertEquals('Uncle Bob', $query->name);
     }
 
@@ -52,20 +52,21 @@ class RelationTest extends DatabaseTestCase
     public function testWhereChained()
     {
         $relation = Author::select('authors.author_id, authors.name');
-        $relation = Author::join('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)');
-        $relation = Author::orderBy('name DESC');
+        $relation = Author::joins(['LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)']);
+        $relation = Author::order('name DESC');
         $relation = Author::limit(2);
-        $relation = Author::groupBy('name');
+        $relation = Author::group('name');
         $relation = Author::offset(2);
         $query = $relation->where(3);
 
-        $query = Author::select('authors.author_id, authors.name')
-            ->orderBy('name DESC')
+        $query = Author::select('name')
+            ->order('name DESC')
             ->limit(2)
-            ->groupBy('name')
+            ->group('name')
             ->offset(2)
             ->having('length(name) = 2')
             ->readonly(true)
+            ->from('books')
             ->where(3);
         $this->assertEquals(null, $query);
     }
@@ -115,12 +116,13 @@ class RelationTest extends DatabaseTestCase
 
     public function testAllChained()
     {
-        $queries = Author::select('authors.author_id, authors.name')
-            ->orderBy('name DESC')
+        $queries = Author::select('name')
+            ->order('name DESC')
             ->limit(2)
-            ->groupBy('name')
+            ->group('name')
             ->offset(2)
             ->having('length(name) = 2')
+            ->from('books')
             ->readonly(true)
             ->all([3]);
         $this->assertEquals(0, count($queries));

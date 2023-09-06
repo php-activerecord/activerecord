@@ -1630,26 +1630,29 @@ class Model
         return $relation;
     }
 
-    public static function join(string $joinStatement): Relation
+    /**
+     * @param string|array<string> $joins
+     */
+    public static function joins(string|array $joins): Relation
     {
         $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->join($joinStatement);
+        $relation->joins($joins);
 
         return $relation;
     }
 
-    public static function orderBy(string $order): Relation
+    public static function order(string $order): Relation
     {
         $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->orderBy($order);
+        $relation->order($order);
 
         return $relation;
     }
 
-    public static function groupBy(string $columns): Relation
+    public static function group(string $columns): Relation
     {
         $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->groupBy($columns);
+        $relation->group($columns);
 
         return $relation;
     }
@@ -1674,6 +1677,25 @@ class Model
     {
         $relation = new Relation(get_called_class(), static::$alias_attribute);
         $relation->having($having);
+
+        return $relation;
+    }
+
+    public static function from(string $from): Relation
+    {
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->from($from);
+
+        return $relation;
+    }
+
+    /**
+     * @param string|array<string|mixed> $include
+     */
+    public static function include(string|array $include): Relation
+    {
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->include($include);
 
         return $relation;
     }
@@ -1845,22 +1867,22 @@ class Model
      *
      * @throws RecordNotFound if no options are passed or finding by pk and no records matched
      *
-     * @return static|static[]|null
+     * @return Model|Model[]|null
      *
      * The rules for what gets returned are complex, but predictable:
      *
      * /-------------------------------------------------------------------------------------------
      * 	First Argument								Return Type			Example
      * --------------------------------------------------------------------------------------------
-     *	int|string									static				User::find(3);
-     * 	array<string, int|string>					static				User::find(["name"=>"Philip"]);
-     * 	"first"										static|null			User::find("first", ["name"=>"Waldo"]);
-     * 	"last"										static|null			User::find("last", ["name"=>"William"]);
-     *  "all"										static[]			User::find("all", ["name"=>"Stephen"]
-     *  ...int|string								static[]			User::find(1, 3, 5, 8);
-     *  array<int,int|string>						static[]			User::find([1,3,5,8]);
+     *	int|string									Model				User::find(3);
+     * 	array<string, int|string>					Model				User::find(["name"=>"Philip"]);
+     * 	"first"										Model|null			User::find("first", ["name"=>"Waldo"]);
+     * 	"last"										Model|null			User::find("last", ["name"=>"William"]);
+     *  "all"										Model[]			    User::find("all", ["name"=>"Stephen"]
+     *  ...int|string								Model[]			    User::find(1, 3, 5, 8);
+     *  array<int,int|string>						Model[]			    User::find([1,3,5,8]);
      */
-    public static function find(/* $type, $options */): static|array|null
+    public static function find(/* $type, $options */): Model|array|null
     {
         $class = get_called_class();
 
@@ -1869,6 +1891,15 @@ class Model
             throw new RecordNotFound("Couldn't find $class without an ID");
         }
         $options = static::extract_and_validate_options($args);
+
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+
+        foreach (Model::$VALID_OPTIONS as $key) {
+            if ('conditions'!= $key && array_key_exists($key, $options)) {
+                $relation->$key($options[$key]);
+                unset($options[$key]);
+            }
+        }
 
         $num_args = count($args);
         $single = true;
@@ -1880,18 +1911,13 @@ class Model
                     break;
 
                 case 'last':
-                    if (!array_key_exists('order', $options)) {
-                        $options['order'] = join(' DESC, ', static::table()->pk) . ' DESC';
-                    } else {
-                        $options['order'] = SQLBuilder::reverse_order($options['order']);
-                    }
+                    $relation->last(1);
 
                     // fall thru
-
                     // no break
                 case 'first':
-                    $options['limit'] = 1;
-                    $options['offset'] = 0;
+                    $relation->limit(1);
+                    $relation->offset(0);
                     break;
             }
 
@@ -1910,15 +1936,30 @@ class Model
             }
         }
 
-        // anything left in $args is a find by pk
-        if ($num_args > 0 && !isset($options['conditions'])) {
-            $list = static::find_by_pk($args, $options, true);
-        } else {
-            $options['mapped_names'] = static::$alias_attribute;
-            $list = static::table()->find($options);
+        if (is_array($args) && 0 === count($args)) {
+            if (array_key_exists('conditions', $options) && $single) {
+                $args = $options['conditions'];
+                if (!is_array($args)) {
+                    $args = [$args];
+                }
+            } else {
+                $args = $options;
+            }
         }
 
-        return $single ? ($list[0] ?? null) : $list;
+        if ($single) {
+            if (1 === $num_args && is_array($args) && array_is_list($args)) {
+                $args = $args[0];
+            }
+
+            return $relation->where($args, true);
+        }
+
+        if (array_key_exists('conditions', $options)) {
+            $args = $options;
+        }
+
+        return $relation->all($args);
     }
 
     /**
@@ -1930,66 +1971,9 @@ class Model
      */
     protected static function get_models_from_cache(array $pks): array
     {
-        $models = [];
-        $table = static::table();
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
 
-        foreach ($pks as $pk) {
-            $options = ['conditions' => static::pk_conditions($pk)];
-            $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
-                $res = $table->find($options);
-
-                return $res ? $res[0] : [];
-            }, $table->cache_model_expire);
-        }
-
-        return array_filter($models);
-    }
-
-    /**
-     * Finder method which will find by a single or array of primary keys for this model.
-     *
-     * @see find
-     *
-     * @param PrimaryKey   $values  An array containing values for the pk
-     * @param array<mixed> $options An options array
-     *
-     * @throws RecordNotFound if a record could not be found
-     *
-     * @return Model|Model[]
-     */
-    public static function find_by_pk(array|string|int|null $values, array $options, bool $forceArray = false): Model|array
-    {
-        $single = !is_array($values) && !$forceArray;
-        if (null === $values) {
-            throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
-        }
-
-        $table = static::table();
-
-        if ($table->cache_individual_model ?? false) {
-            $pks = is_array($values) ? $values : [$values];
-            $list = static::get_models_from_cache($pks);
-        } else {
-            // int|string|array<int|string>
-            $options['conditions'] = static::pk_conditions($values);
-            $list = $table->find($options);
-        }
-        $results = count($list);
-
-        if ($results != ($expected = @count((array) $values))) {
-            $class = get_called_class();
-            if (is_array($values)) {
-                $values = join(',', $values);
-            }
-
-            if (1 == $expected) {
-                throw new RecordNotFound("Couldn't find $class with ID=$values");
-            }
-
-            throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
-        }
-
-        return $single ? $list[0] : $list;
+        return $relation->get_models_from_cache($pks);
     }
 
     /**

@@ -63,14 +63,17 @@ class Relation
         return $this;
     }
 
-    public function join(string $joinStatement): Relation
+    /**
+     * @param string|array<string> $joins
+     */
+    public function joins(string|array $joins): Relation
     {
-        $this->options['joins'] = $joinStatement;
+        $this->options['joins'] = $joins;
 
         return $this;
     }
 
-    public function orderBy(string $order): Relation
+    public function order(string $order): Relation
     {
         $this->options['order'] = $order;
 
@@ -84,7 +87,7 @@ class Relation
         return $this;
     }
 
-    public function groupBy(string $columns): Relation
+    public function group(string $columns): Relation
     {
         $this->options['group'] = $columns;
 
@@ -105,6 +108,23 @@ class Relation
         return $this;
     }
 
+    public function from(string $from): Relation
+    {
+        $this->options['from'] = $from;
+
+        return $this;
+    }
+
+    /**
+     * @param string|array<string|mixed> $include
+     */
+    public function include(string|array $include): Relation
+    {
+        $this->options['include'] = $include;
+
+        return $this;
+    }
+
     public function readonly(bool $readonly): Relation
     {
         $this->options['readonly'] = $readonly;
@@ -120,20 +140,23 @@ class Relation
      * raw WHERE statement      where(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
      *
      * @param int|string|array<string> $needle
+     * @param bool                     $isUsingOriginalFind true if called from version 1 find, false otherwise
      *
      * @return Model|null The single row that matches query. If no rows match, returns null
      */
-    public function where(int|string|array $needle): Model|null
+    public function where(int|string|array $needle, bool $isUsingOriginalFind = false): Model|null
     {
         $this->limit(1);
 
         if (is_array($needle)) {
-            $this->options['conditions'] = $needle;
+            if (!array_key_exists('conditions', $this->options) && count($needle) > 0) {
+                $this->options['conditions'] = $needle;
+            }
             $this->options['mapped_names'] = $this->alias_attribute;
             $list = $this->table->find($this->options);
         } else {
             unset($this->options['mapped_names']);
-            $list = $this->find_by_pk($needle);
+            $list = $this->find_by_pk($needle, $isUsingOriginalFind);
         }
 
         if (null == $list) {
@@ -159,21 +182,20 @@ class Relation
     {
         $list = [];
 
-        if (array_is_list($needle) && count($needle) > 0) {
-            unset($this->options['mapped_names']);
-            try {
-                return $this->find_by_pk($needle);
-            } catch (RecordNotFound $mustBeRawWhereStatement) {
-            }
-        }
-
         // Only for backwards compatibility with version 1 API
         $isUsingOriginalFind = false;
         foreach (Model::$VALID_OPTIONS as $key) {
             if (array_key_exists($key, $needle)) {
                 $this->options[$key] = $needle[$key];
+                unset($needle[$key]);
                 $isUsingOriginalFind = true;
             }
+        }
+
+        if (array_is_list($needle) && count($needle) > 0 && !$this->isRawWhereStatement($needle)) {
+            unset($this->options['mapped_names']);
+
+            return $this->find_by_pk($needle, $isUsingOriginalFind);
         }
 
         if (!$isUsingOriginalFind) {
@@ -185,17 +207,28 @@ class Relation
     }
 
     /**
+     * Hack until functionality of where is moved into find
+     *
+     * @param array<string> $pieces
+     */
+    private function isRawWhereStatement(array $pieces): bool
+    {
+        return str_contains($pieces[0], '(?)');
+    }
+
+    /**
      * Finder method which will find by a single or array of primary keys for this model.
      *
      * @see find
      *
-     * @param mixed $values An array containing values for the pk
+     * @param mixed $values               An array containing values for the pk
+     * @param bool  $throwErrorIfNotFound True if version 1 behavior, false is version 2
      *
      * @throws RecordNotFound if a record could not be found
      *
      * @return array<Model>
      */
-    private function find_by_pk(mixed $values): array
+    private function find_by_pk(mixed $values, bool $throwErrorIfNotFound): array
     {
         if ($this->table->cache_individual_model ?? false) {
             $pks = is_array($values) ? $values : [$values];
@@ -209,10 +242,10 @@ class Relation
         if ($results != ($expected = @count((array) $values))) {
             $class = get_called_class();
             if (is_array($values)) {
-                $values = join(',', $values);
+                $values = implode(',', $values);
             }
 
-            if (1 == $expected) {
+            if (1 == $expected && !$throwErrorIfNotFound) {
                 return [];
             }
 
@@ -229,7 +262,7 @@ class Relation
      *
      * @return array<Model>
      */
-    private function get_models_from_cache(array $pks): array
+    public function get_models_from_cache(array $pks): array
     {
         $models = [];
         $table = $this->table;

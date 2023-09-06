@@ -155,7 +155,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindNothingWithSqlInString()
     {
-        $this->expectException(RecordNotFound::class);
+        $this->expectException(TypeError::class);
         Author::first('name = 123123123');
     }
 
@@ -512,7 +512,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindByNull()
     {
-        $this->expectException(RecordNotFound::class);
+        $this->expectException(TypeError::class);
         Author::find(null);
     }
 
