@@ -15,7 +15,13 @@ class Relation
      * @var array<string>
      */
     private array $alias_attribute;
-    private Table $table;
+
+    /**
+     * @var class-string
+     */
+    private string $className;
+
+    private ?Table $tableImpl = null;
 
     /**
      * @var array<string, mixed>
@@ -29,7 +35,7 @@ class Relation
     public function __construct(string $className, array $alias_attribute)
     {
         $this->alias_attribute = $alias_attribute;
-        $this->table = Table::load($className);
+        $this->className = $className;
     }
 
     public function __get(string $name): Relation
@@ -41,16 +47,25 @@ class Relation
         return $this;
     }
 
+    private function table(): Table
+    {
+        if (null === $this->tableImpl) {
+            $this->tableImpl = Table::load($this->className);
+        }
+
+        return $this->tableImpl;
+    }
+
     public function last(int $limit): Relation
     {
         $this->limit($limit);
 
         if (array_key_exists('order', $this->options)) {
-            if (str_contains($this->options['order'], join(' ASC, ', $this->table->pk) . ' ASC')) {
+            if (str_contains($this->options['order'], join(' ASC, ', $this->table()->pk) . ' ASC')) {
                 $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
             }
         } else {
-            $this->options['order'] = join(' DESC, ', $this->table->pk) . ' DESC';
+            $this->options['order'] = join(' DESC, ', $this->table()->pk) . ' DESC';
         }
 
         return $this;
@@ -153,7 +168,7 @@ class Relation
                 $this->options['conditions'] = $needle;
             }
             $this->options['mapped_names'] = $this->alias_attribute;
-            $list = $this->table->find($this->options);
+            $list = $this->table()->find($this->options);
         } else {
             unset($this->options['mapped_names']);
             $list = $this->find_by_pk($needle, $isUsingOriginalFind);
@@ -203,7 +218,7 @@ class Relation
         }
         $this->options['mapped_names'] = $this->alias_attribute;
 
-        return $this->table->find($this->options);
+        return $this->table()->find($this->options);
     }
 
     /**
@@ -240,10 +255,10 @@ class Relation
         $this->options['conditions'] = $where;
 
         $this->select('COUNT(*)');
-        $sql = $this->table->options_to_sql($this->options);
+        $sql = $this->table()->options_to_sql($this->options);
         $values = $sql->get_where_values();
 
-        $res = $this->table->conn->query_and_fetch_one($sql->to_s(), $values);
+        $res = $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
 
         return $res;
     }
@@ -262,12 +277,12 @@ class Relation
      */
     private function find_by_pk(mixed $values, bool $throwErrorIfNotFound): array
     {
-        if ($this->table->cache_individual_model ?? false) {
+        if ($this->table()->cache_individual_model ?? false) {
             $pks = is_array($values) ? $values : [$values];
             $list = $this->get_models_from_cache($pks);
         } else {
             $this->options['conditions'] = $this->pk_conditions($values);
-            $list = $this->table->find($this->options);
+            $list = $this->table()->find($this->options);
         }
         $results = count($list);
 
@@ -297,7 +312,7 @@ class Relation
     public function get_models_from_cache(array $pks): array
     {
         $models = [];
-        $table = $this->table;
+        $table = $this->table();
 
         foreach ($pks as $pk) {
             $options = ['conditions' => $this->pk_conditions($pk)];
@@ -320,7 +335,7 @@ class Relation
      */
     private function pk_conditions(int|array $args): array
     {
-        $ret = [$this->table->pk[0] => $args];
+        $ret = [$this->table()->pk[0] => $args];
 
         return $ret;
     }
