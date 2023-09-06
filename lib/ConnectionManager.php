@@ -48,8 +48,6 @@ class ConnectionManager extends Singleton
      */
     public static function drop_connection(string $name): void
     {
-        if (isset(self::$connections[$name])) {
-            unset(self::$connections[$name]);
-        }
+        unset(self::$connections[$name]);
     }
 }

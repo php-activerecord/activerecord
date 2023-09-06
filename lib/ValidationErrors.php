@@ -140,25 +140,6 @@ class ValidationErrors implements \IteratorAggregate
     }
 
     /**
-     * Returns the internal errors object.
-     *
-     * ```
-     * $model->errors->get_raw_errors();
-     *
-     * # [
-     * #  "name" => ["can't be blank"],
-     * #  "state" => ["is the wrong length (should be 2 chars)"],
-     * # ]
-     * ```
-     *
-     * @return array<string, array<string>>
-     */
-    public function get_raw_errors(): array
-    {
-        return $this->errors;
-    }
-
-    /**
      * Returns all the error messages as an array.
      *
      * ```
@@ -245,32 +226,6 @@ class ValidationErrors implements \IteratorAggregate
     public function is_empty()
     {
         return empty($this->errors);
-    }
-
-    /**
-     * Clears out all error messages.
-     */
-    public function clear(): void
-    {
-        $this->errors = [];
-    }
-
-    /**
-     * Returns the number of error messages there are.
-     */
-    public function size(): int
-    {
-        if ($this->is_empty()) {
-            return 0;
-        }
-
-        $count = 0;
-
-        foreach ($this->errors as $attribute => $error) {
-            $count += count($error);
-        }
-
-        return $count;
     }
 
     /**

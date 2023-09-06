@@ -37,11 +37,4 @@ abstract class Singleton
          */
         return self::$instances[$class_name] ??= new $class_name();
     }
-
-    /**
-     * Singleton objects should not be cloned.
-     */
-    private function __clone()
-    {
-    }
 }

@@ -1,0 +1,34 @@
+name: Static Analysis
+permissions:
+  contents: write
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  phpstan:
+    name: Static Analysis with PHPStan and php-cs-fixer
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: pcov
+          ini-values: zend.assertions=1, assert.exception=1
+          php-version: 8.1
+          extensions: memcached
+          tools: cs2pr
+
+      - name: Install dependencies with Composer
+        uses: ramsey/composer-install@v2
+
+      - name: PHPStan Analysis
+        run: vendor/bin/phpstan analyze
