@@ -1740,7 +1740,8 @@ class Model
      * Get a count of qualifying records.
      *
      * ```
-     * YourModel::count(['conditions' => 'amount > 3.14159265']);
+     * YourModel::count('amount > 3.14159265');
+     * YourModel::count(['name' => 'Tito', 'author_id' => 1]));
      * ```
      *
      * @see find
@@ -1751,7 +1752,6 @@ class Model
     {
         $args = func_get_args();
         $options = static::extract_and_validate_options($args);
-        $options['select'] = 'COUNT(*)';
 
         if (!empty($args) && !is_null($args[0]) && !empty($args[0])) {
             if (is_hash($args[0])) {
@@ -1761,13 +1761,13 @@ class Model
             }
         }
 
-        $table = static::table();
-        $sql = $table->options_to_sql($options);
-        $values = $sql->get_where_values();
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
 
-        $res = static::connection()->query_and_fetch_one($sql->to_s(), $values);
+        if (0 === count($options)) {
+            $options['conditions'] = [];
+        }
 
-        return $res;
+        return $relation->count($options['conditions']);
     }
 
     /**
@@ -1960,20 +1960,6 @@ class Model
         }
 
         return $relation->all($args);
-    }
-
-    /**
-     * Will look up a list of primary keys from cache
-     *
-     * @param array<PrimaryKey> $pks An array of primary keys
-     *
-     * @return array<Model>
-     */
-    protected static function get_models_from_cache(array $pks): array
-    {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-
-        return $relation->get_models_from_cache($pks);
     }
 
     /**

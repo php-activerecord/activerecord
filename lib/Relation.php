@@ -217,6 +217,38 @@ class Relation
     }
 
     /**
+     * Get a count of qualifying records.
+     *
+     * ```
+     * count()
+     * count('amount > 3.14159265');
+     * count('author_id=3')
+     * count(['name' => 'Tito', 'author_id' => 1]));
+     * count(['author_id' => [1, 2]));
+     * count(['author_id' => 1]);
+     * count(['author_id=? and name=?', 1, 'Tito']);
+     * ```
+     *
+     * @see find
+     *
+     * @param mixed $where The qualifications for a row to be counted
+     *
+     * @return int Number of records that matched the query
+     */
+    public function count(mixed $where = []): int
+    {
+        $this->options['conditions'] = $where;
+
+        $this->select('COUNT(*)');
+        $sql = $this->table->options_to_sql($this->options);
+        $values = $sql->get_where_values();
+
+        $res = $this->table->conn->query_and_fetch_one($sql->to_s(), $values);
+
+        return $res;
+    }
+
+    /**
      * Finder method which will find by a single or array of primary keys for this model.
      *
      * @see find
