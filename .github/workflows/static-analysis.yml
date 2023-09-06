@@ -9,7 +9,7 @@ on:
 
 jobs:
   phpstan:
-    name: Static Analysis with PHPStan and php-cs-fixer
+    name: PHPStan
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
