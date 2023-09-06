@@ -1,9 +1,45 @@
 <?php
 
+use ActiveRecord\Exception\RecordNotFound;
 use test\models\Author;
 
 class RelationTest extends DatabaseTestCase
 {
+    public function testFindBasic()
+    {
+        $rel = Author::select('name');
+
+        $query = $rel->find(1);
+        $this->assertEquals('Tito', $query->name);
+
+        $query = $rel->find('1');
+        $this->assertEquals('Tito', $query->name);
+        $queries = $rel->find([1, 2]);
+        $this->assertEquals(2, count($queries));
+        $this->assertEquals('Tito', $queries[0]->name);
+        $this->assertEquals('George W. Bush', $queries[1]->name);
+
+        $queries = $rel->find([1]);
+        $this->assertEquals(1, count($queries));
+        $this->assertEquals('Tito', $queries[0]->name);
+
+        $queries = $rel->find([999999]);
+        $this->assertEquals(0, count($queries));
+    }
+
+    public function testFindNotAllArrayElementsFound()
+    {
+        $this->expectException(RecordNotFound::class);
+        $queries = Author::select('name')->find([1, 999999]);
+        $this->assertEquals(0, count($queries));
+    }
+
+    public function testFindWrongType()
+    {
+        $this->expectException(TypeError::class);
+        Author::select('name')->find('not a number');
+    }
+
     public function testWherePrimaryKey()
     {
         $query = Author::where(3);

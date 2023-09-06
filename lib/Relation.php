@@ -148,6 +148,60 @@ class Relation
     }
 
     /**
+     * Main finder function
+     *
+     * @see https://api.rubyonrails.org/v7.0.7.2/classes/ActiveRecord/FinderMethods.html#method-i-find
+     *
+     * Person.find(1)          # returns the object for ID = 1
+     * Person.find("1")        # returns the object for ID = 1
+     * Person.find("does not exist") # returns null
+     *
+     * Person.find([7, 17])    # returns an array for objects with IDs in (7, 17)
+     * Person.find([1])        # returns an array for the object with ID = 1
+     * Person.find([-11])      # returns an empty array
+     *
+     * @param int|string|array<int|string> $id
+     *
+     * @return Model|array<Model>|null See above
+     */
+    public function find(int|string|array $id): Model|null|array
+    {
+        if (array_key_exists('where', $this->options)) {
+            $conditions = $this->options['where'];
+            if (!is_array($conditions)) {
+                $conditions = [$conditions];
+            }
+
+            if (is_array($id)) {
+                array_push($conditions, $this->table()->pk[0] . ' in (' . implode(',', $id) . ')');
+            } else {
+                array_push($conditions, $this->table()->pk[0] . ' = ' . $id);
+            }
+            $this->options['conditions'] = $conditions;
+
+            $this->options['mapped_names'] = $this->alias_attribute;
+            $list = $this->table()->find($this->options);
+
+            unset($this->options['conditions']);
+
+            return $list;
+        }
+
+        unset($this->options['mapped_names']);
+        $list = $this->find_by_pk($id, false);
+        unset($this->options['conditions']);
+
+        if (is_array($id)) {
+            return $list;
+        }
+        if (0 === count($list)) {
+            return null;
+        }
+
+        return $list[0];
+    }
+
+    /**
      * needle is one of:
      *
      * primary key value        where(3)     WHERE author_id=3
