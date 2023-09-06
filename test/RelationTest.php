@@ -1,16 +1,18 @@
 <?php
 
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\ValidationsArgumentError;
 use test\models\Author;
 
 class RelationTest extends DatabaseTestCase
 {
-    public function testFindBasic()
+    public function testFindPrimaryKey()
     {
         $rel = Author::select('name');
 
         $query = $rel->find(1);
         $this->assertEquals('Tito', $query->name);
+        $this->assertEquals(['sharks' => 'lasers'], $query->return_something());
 
         $query = $rel->find('1');
         $this->assertEquals('Tito', $query->name);
@@ -26,10 +28,8 @@ class RelationTest extends DatabaseTestCase
 
     public function testFindSingleArrayElementNotFound()
     {
-        $rel = Author::select('name');
-
         $this->expectException(RecordNotFound::class);
-        $queries = $rel->find([999999]);
+        $queries = Author::select('name')->find([999999]);
     }
 
     public function testFindNotAllArrayElementsFound()
@@ -44,49 +44,106 @@ class RelationTest extends DatabaseTestCase
         Author::select('name')->find('not a number');
     }
 
-    public function testWherePrimaryKey()
+    public function testFindSingleElementNotFound()
     {
-        $query = Author::where(3);
-        $this->assertEquals('Bill Clinton', $query->name);
-        $this->assertEquals(['sharks' => 'lasers'], $query->return_something());
+        $this->expectException(RecordNotFound::class);
+        $query = Author::select('name')->find(99999);
     }
 
-    public function testWhereNull()
+    public function testFindNoWhere()
     {
-        $query = Author::where(99999);
-        $this->assertEquals(null, $query);
+        $this->expectException(ValidationsArgumentError::class);
+        $query = Author::select('name')->find;
+    }
+
+    public function testWhere()
+    {
+        $queries = Author::select('name')->where("mixedCaseField = 'Bill'")->find;
+        $this->assertEquals(2, count($queries));
+        $this->assertEquals('Bill Clinton', $queries[0]->name);
+        $this->assertEquals('Uncle Bob', $queries[1]->name);
+
+        $queries = Author::select('name')->where(['name = (?)', 'Bill Clinton'])->find;
+        $this->assertEquals(1, count($queries));
+        $this->assertEquals('Bill Clinton', $queries[0]->name);
+        $queries = Author::select('name')->where(['name = (?)', 'Not found'])->find;
+        $this->assertEquals(0, count($queries));
+
+        $queries = Author::select('name')->where(['mixedCaseField'=>'Bill'])->find;
+        $this->assertEquals(2, count($queries));
+        $this->assertEquals('Bill Clinton', $queries[0]->name);
+        $this->assertEquals('Uncle Bob', $queries[1]->name);
+    }
+
+    public function testWhereWithPrimaryKey()
+    {
+        $rel = Author::select('name')->where(["mixedCaseField = 'Bill'"]);
+        $queries = $rel->find([3, 4]);
+        $this->assertEquals(2, count($queries));
+        $this->assertEquals('Bill Clinton', $queries[0]->name);
+        $this->assertEquals('Uncle Bob', $queries[1]->name);
+
+        $queries = $rel->find([4, 999999]);
+        $this->assertEquals(1, count($queries));
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
+
+        $queries = $rel->find([999998, 999999]);
+        $this->assertEquals(0, count($queries));
+
+        $query = $rel->find(999999);
+        $this->assertNull($query);
+
+        $query = $rel->find(4);
+        $this->assertEquals('Uncle Bob', $query->name);
     }
 
     public function testWhereOrder()
     {
-        $query = Author::where(['mixedCaseField'=>'Bill']);
-        $this->assertEquals('Bill Clinton', $query->name);
+        $relation = Author::select('name')->where("mixedCaseField = 'Bill'");
 
-        $relation = Author::select('name');
+        $queries = $relation->last->find;
+        $this->assertEquals(1, count($queries));
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
 
-        $query = $relation->last->where(['mixedCaseField'=>'Bill']);
-        $this->assertEquals('Uncle Bob', $query->name);
+        $queries = $relation->last(1)->find;
+        $this->assertEquals(1, count($queries));
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
 
-        $query = $relation->last(1)->where(['mixedCaseField'=>'Bill']);
-        $this->assertEquals('Uncle Bob', $query->name);
+        $queries = $relation->last(2)->find;
+        $this->assertEquals(2, count($queries));
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
+        $this->assertEquals('Bill Clinton', $queries[1]->name);
 
-        $query = $relation->last(1)->last(2)->where(['mixedCaseField'=>'Bill']);
-        $this->assertEquals('Uncle Bob', $query->name);
+        $queries = $relation->last(1)->last(2)->find;
+        $this->assertEquals(2, count($queries));
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
+        $this->assertEquals('Bill Clinton', $queries[1]->name);
 
-        $query = Author::order('parent_author_id DESC')->where(['mixedCaseField'=>'Bill'], false);
-        $this->assertEquals('Uncle Bob', $query->name);
+        $queries = Author::order('parent_author_id DESC')->where(['mixedCaseField'=>'Bill'])->find;
+        $this->assertEquals(2, count($queries));
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
+        $this->assertEquals('Bill Clinton', $queries[1]->name);
     }
 
     public function testWhereAnd()
     {
-        $query = Author::where(['mixedCaseField'=>'Bill', 'parent_author_id'=>1]);
-        $this->assertEquals('Bill Clinton', $query->name);
+        $queries = Author::select('name')->where(['mixedCaseField'=>'Bill', 'parent_author_id'=>1])->find;
+        $this->assertEquals('Bill Clinton', $queries[0]->name);
 
-        $query = Author::where(['mixedCaseField'=>'Bill', 'parent_author_id'=>2]);
-        $this->assertEquals('Uncle Bob', $query->name);
+        $queries = Author::select('name')->where(['mixedCaseField'=>'Bill', 'parent_author_id'=>2])->find;
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
 
-        $query = Author::where(['mixedCaseField = (?) and parent_author_id <> (?)', 'Bill', 1]);
-        $this->assertEquals('Uncle Bob', $query->name);
+        $queries = Author::select('name')->where(['mixedCaseField = (?) and parent_author_id <> (?)', 'Bill', 1])->find;
+        $this->assertEquals('Uncle Bob', $queries[0]->name);
+
+        $queries = Author::select('name')
+            ->where(['mixedCaseField = (?)', 'Bill'])
+            ->where(['parent_author_id = (?)', 1])
+            ->where("author_id = '3'")
+            ->where(['mixedCaseField'=>'Bill', 'name'=>'Bill Clinton'])
+            ->find;
+        $this->assertEquals(1, count($queries));
+        $this->assertEquals('Bill Clinton', $queries[0]->name);
     }
 
     public function testWhereChained()
@@ -107,7 +164,8 @@ class RelationTest extends DatabaseTestCase
             ->having('length(name) = 2')
             ->readonly(true)
             ->from('books')
-            ->where(3);
+            ->where(['name' => 'Bill Clinton'])
+            ->find(3);
         $this->assertEquals(null, $query);
     }
 

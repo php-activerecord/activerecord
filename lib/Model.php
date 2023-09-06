@@ -1493,25 +1493,6 @@ class Model
     }
 
     /**
-     * A list of valid finder options.
-     *
-     * @var array<string>
-     */
-    public static array $VALID_OPTIONS = [
-        'conditions',
-        'limit',
-        'offset',
-        'order',
-        'select',
-        'joins',
-        'include',
-        'readonly',
-        'group',
-        'from',
-        'having'
-    ];
-
-    /**
      * Enables the use of dynamic finders.
      *
      * Dynamic finders are just an easy way to do queries quickly without having to
@@ -1701,21 +1682,13 @@ class Model
     }
 
     /**
-     * needle is one of:
-     *
-     * primary key value        where(3)     WHERE author_id=3
-     * mapping of column names  where(["name"=>"Philip", "publisher"=>"Random House"]) finds the first row of WHERE name=Philip AND publisher=Random House
-     * raw WHERE statement      where(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
-     *
-     * @param int|string|array<string> $needle
-     *
-     * @return Model|null The single row that matches query. If no rows match, returns null
+     * @param string|array<string|mixed> $where
      */
-    public static function where(int|string|array $needle): Model|null
+    public static function where(string|array $where): Relation
     {
         $relation = new Relation(get_called_class(), static::$alias_attribute);
 
-        return $relation->where($needle);
+        return $relation->where($where);
     }
 
     /**
@@ -1894,7 +1867,7 @@ class Model
 
         $relation = new Relation(get_called_class(), static::$alias_attribute);
 
-        foreach (Model::$VALID_OPTIONS as $key) {
+        foreach (Relation::$VALID_OPTIONS as $key) {
             if ('conditions'!= $key && array_key_exists($key, $options)) {
                 $relation->$key($options[$key]);
                 unset($options[$key]);
@@ -1952,7 +1925,7 @@ class Model
                 $args = $args[0];
             }
 
-            return $relation->where($args, true);
+            return $relation->whereToBeReplacedByFind($args, true);
         }
 
         if (array_key_exists('conditions', $options)) {
@@ -2003,12 +1976,12 @@ class Model
     {
         if (is_hash($options)) {
             $keys = array_keys($options);
-            $diff = array_diff($keys, self::$VALID_OPTIONS);
+            $diff = array_diff($keys, Relation::$VALID_OPTIONS);
 
             if (!empty($diff) && $throw) {
                 throw new ActiveRecordException('Unknown key(s): ' . join(', ', $diff));
             }
-            $intersect = array_intersect($keys, self::$VALID_OPTIONS);
+            $intersect = array_intersect($keys, Relation::$VALID_OPTIONS);
 
             if (!empty($intersect)) {
                 return true;

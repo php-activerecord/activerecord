@@ -8,9 +8,29 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\ValidationsArgumentError;
 
 class Relation
 {
+    /**
+     * A list of valid finder options.
+     *
+     * @var array<string>
+     */
+    public static array $VALID_OPTIONS = [
+        'conditions',
+        'limit',
+        'offset',
+        'order',
+        'select',
+        'joins',
+        'include',
+        'readonly',
+        'group',
+        'from',
+        'having'
+    ];
+
     /**
      * @var array<string>
      */
@@ -38,10 +58,13 @@ class Relation
         $this->className = $className;
     }
 
-    public function __get(string $name): Relation
+    public function __get(string $name): mixed
     {
         if ('last' === $name) {
             return $this->last(1);
+        }
+        if ('find' === $name) {
+            return $this->find();
         }
 
         return $this;
@@ -140,6 +163,20 @@ class Relation
         return $this;
     }
 
+    /**
+     * @param string|array<string|mixed> $where
+     */
+    public function where(string|array $where): Relation
+    {
+        if (array_key_exists('where', $this->options)) {
+            array_push($this->options['where'], $where);
+        } else {
+            $this->options['where'] = [$where];
+        }
+
+        return $this;
+    }
+
     public function readonly(bool $readonly): Relation
     {
         $this->options['readonly'] = $readonly;
@@ -148,13 +185,13 @@ class Relation
     }
 
     /**
-     * Main finder function
+     * Implementation of Ruby On Rails finder
      *
      * @see https://api.rubyonrails.org/v7.0.7.2/classes/ActiveRecord/FinderMethods.html#method-i-find
      *
      * Person.find(1)          # returns the object for ID = 1
      * Person.find("1")        # returns the object for ID = 1
-     * Person.find(999999)     # returns null
+     * Person.find(999999)     # throws RecordNotFound
      * Person.find("can't be casted to int") # throws TypeError
      *
      * Person.find([1, 2])     # returns an array for objects with IDs in (7, 17)
@@ -162,40 +199,45 @@ class Relation
      * Person.find([1])        # returns an array for the object with ID = 1
      * Person.find([-11])      # returns an empty array
      *
+     * Person.where('name = Bob').find() # executes the where statement
+     * Person.find()           # throws ValidationsArgumentError as there's no where statement to execute
+     *
      * @param int|string|array<int|string> $id
      *
-     * @throws RecordNotFound if $id is an array and any of its ids cannot be found
+     * @throws RecordNotFound if any of the records cannot be found
      *
      * @return Model|array<Model>|null See above
      */
-    public function find(int|string|array $id): Model|null|array
+    public function find(int|string|array $id = null): Model|null|array
     {
         if (array_key_exists('where', $this->options)) {
-            $conditions = $this->options['where'];
-            if (!is_array($conditions)) {
-                $conditions = [$conditions];
-            }
+            $values = $this->buildWhereSQL($this->options['where']);
 
-            if (is_array($id)) {
-                array_push($conditions, $this->table()->pk[0] . ' in (' . implode(',', $id) . ')');
-            } else {
-                array_push($conditions, $this->table()->pk[0] . ' = ' . $id);
+            if (null !== $id) {
+                $values[0] = "({$values[0]}) AND ";
+                if (is_array($id)) {
+                    $values[0] .= $this->table()->pk[0] . ' in (' . implode(',', $id) . ')';
+                } else {
+                    $values[0] .= $this->table()->pk[0] . ' = ' . $id;
+                }
             }
-            $this->options['conditions'] = $conditions;
+            $this->options['conditions'] = $values;
 
             $this->options['mapped_names'] = $this->alias_attribute;
             $list = $this->table()->find($this->options);
 
             unset($this->options['conditions']);
+        } else {
+            if (null === $id) {
+                throw new ValidationsArgumentError('Cannot call find() without where() being first specified');
+            }
 
-            return $list;
+            unset($this->options['mapped_names']);
+            $list = $this->find_by_pk($id, true);
+            unset($this->options['conditions']);
         }
 
-        unset($this->options['mapped_names']);
-        $list = $this->find_by_pk($id, is_array($id));
-        unset($this->options['conditions']);
-
-        if (is_array($id)) {
+        if (null === $id || is_array($id)) {
             return $list;
         }
         if (0 === count($list)) {
@@ -203,6 +245,39 @@ class Relation
         }
 
         return $list[0];
+    }
+
+    /**
+     * @param array<array<string>|string> $fragments
+     *
+     * @return array<string>
+     */
+    private function buildWhereSQL(array $fragments): array
+    {
+        $templates = [];
+        $values = [];
+
+        foreach ($fragments as $fragment) {
+            if (is_array($fragment)) {
+                if (is_hash($fragment)) {
+                    foreach ($fragment as $key => $value) {
+                        array_push($templates, "{$key} = (?)");
+                        array_push($values, $value);
+                    }
+                } else {
+                    array_push($templates, array_shift($fragment));
+                    if (count($fragment) > 0) {
+                        $values = array_merge($values, $fragment);
+                    }
+                }
+            } else {
+                array_push($templates, $fragment);
+            }
+        }
+
+        array_unshift($values, implode(' AND ', $templates));
+
+        return $values;
     }
 
     /**
@@ -217,7 +292,7 @@ class Relation
      *
      * @return Model|null The single row that matches query. If no rows match, returns null
      */
-    public function where(int|string|array $needle, bool $isUsingOriginalFind = false): Model|null
+    public function whereToBeReplacedByFind(int|string|array $needle, bool $isUsingOriginalFind = false): Model|null
     {
         $this->limit(1);
 
@@ -257,7 +332,7 @@ class Relation
 
         // Only for backwards compatibility with version 1 API
         $isUsingOriginalFind = false;
-        foreach (Model::$VALID_OPTIONS as $key) {
+        foreach (self::$VALID_OPTIONS as $key) {
             if (array_key_exists($key, $needle)) {
                 $this->options[$key] = $needle[$key];
                 unset($needle[$key]);

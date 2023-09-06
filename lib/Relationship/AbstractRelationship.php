@@ -12,6 +12,7 @@ use function ActiveRecord\has_absolute_namespace;
 use ActiveRecord\Inflector;
 use ActiveRecord\Model;
 use ActiveRecord\Reflections;
+use ActiveRecord\Relation;
 use ActiveRecord\SQLBuilder;
 use ActiveRecord\Table;
 use ActiveRecord\Utils;
@@ -278,7 +279,7 @@ abstract class AbstractRelationship
     protected function unset_non_finder_options(array $options): array
     {
         foreach (array_keys($options) as $option) {
-            if (!in_array($option, Model::$VALID_OPTIONS)) {
+            if (!in_array($option, Relation::$VALID_OPTIONS)) {
                 unset($options[$option]);
             }
         }
