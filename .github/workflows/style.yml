@@ -8,27 +8,23 @@ on:
       - master
 
 jobs:
-  phpstan:
-    name: Linting with php-cs-fixer
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-
+  php-cs-fixer:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v4
         with:
-          coverage: pcov
-          ini-values: zend.assertions=1, assert.exception=1
-          php-version: 8.1
-          extensions: memcached
-          tools: cs2pr
+          ref: ${{ github.head_ref }}
 
-      - name: Install dependencies with Composer
-        uses: ramsey/composer-install@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          coverage: none
+          extensions: mbstring
+          php-version: 7.4
 
-      - name: Run PHP-CS-Fixer
-        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff --format checkstyle | cs2pr
+      - uses: ramsey/composer-install@v2
+
+      - run: vendor/bin/php-cs-fixer fix
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply php-cs-fixer changes
