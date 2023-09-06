@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  phpstan:
+  phpcsfixer:
     name: Linting with php-cs-fixer
     runs-on: ubuntu-20.04
     strategy:

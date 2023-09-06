@@ -328,18 +328,14 @@ class Table
     /**
      * Executes an eager load of a given named relationship for this table.
      *
-     * @param array<Model>                       $models
-     * @param array<array<string,mixed>>         $attrs
-     * @param array<string|array<string>>|string $includes
+     * @param array<Model>                $models
+     * @param array<array<string,mixed>>  $attrs
+     * @param array<string|array<string>> $includes
      *
      * @throws RelationshipException
      */
-    private function execute_eager_load(array $models, array $attrs, array|string $includes): void
+    private function execute_eager_load(array $models, array $attrs, array $includes): void
     {
-        if (!is_array($includes)) {
-            $includes = [$includes];
-        }
-
         foreach ($includes as $index => $name) {
             $nested_includes = [];
             // nested include
