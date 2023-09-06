@@ -328,9 +328,9 @@ class Table
     /**
      * Executes an eager load of a given named relationship for this table.
      *
-     * @param array<Model>                       $models
-     * @param array<array<string,mixed>>         $attrs
-     * @param array<string|array<string>>        $includes
+     * @param array<Model>                $models
+     * @param array<array<string,mixed>>  $attrs
+     * @param array<string|array<string>> $includes
      *
      * @throws RelationshipException
      */
