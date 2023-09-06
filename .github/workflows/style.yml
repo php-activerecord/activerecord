@@ -1,0 +1,34 @@
+name: Style Checking
+permissions:
+  contents: write
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  phpcsfixer:
+    name: PHP CS Fixer
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: pcov
+          ini-values: zend.assertions=1, assert.exception=1
+          php-version: 8.1
+          extensions: memcached
+          tools: cs2pr
+
+      - name: Install dependencies with Composer
+        uses: ramsey/composer-install@v2
+
+      - name: Run PHP-CS-Fixer
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff --format checkstyle | cs2pr

@@ -135,21 +135,4 @@ SQL;
     {
         $this->query("SET NAMES '$charset'");
     }
-
-    public function native_database_types(): array
-    {
-        return [
-            'primary_key' => 'serial primary key',
-            'string' => ['name' => 'character varying', 'length' => 255],
-            'text' => ['name' => 'text'],
-            'integer' => ['name' => 'integer'],
-            'float' => ['name' => 'float'],
-            'datetime' => ['name' => 'datetime'],
-            'timestamp' => ['name' => 'timestamp'],
-            'time' => ['name' => 'time'],
-            'date' => ['name' => 'date'],
-            'binary' => ['name' => 'binary'],
-            'boolean' => ['name' => 'boolean']
-        ];
-    }
 }

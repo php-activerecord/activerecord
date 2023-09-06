@@ -74,4 +74,10 @@ class ConnectionTest extends TestCase
         $info = ActiveRecord\Connection::parse_connection_url('mysql://test:test@127.0.0.1/test?charset=utf8');
         $this->assertEquals('utf8', $info['charset']);
     }
+
+    public function testReestablishConnection()
+    {
+        $connection = \test\models\Book::reestablish_connection(true);
+        $this->assertNotNull($connection);
+    }
 }
