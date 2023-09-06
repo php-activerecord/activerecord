@@ -217,7 +217,7 @@ class Table
                     $options['conditions'] = [$options['conditions']];
                 }
 
-                call_user_func_array([$sql, 'where'], $options['conditions']);
+                $sql->where($options['conditions']);
             } else {
                 if (!empty($options['mapped_names'])) {
                     $options['conditions'] = $this->map_names($options['conditions'], $options['mapped_names']);

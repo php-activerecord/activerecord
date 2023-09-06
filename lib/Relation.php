@@ -58,18 +58,6 @@ class Relation
         $this->className = $className;
     }
 
-    public function __get(string $name): mixed
-    {
-        if ('last' === $name) {
-            return $this->last(1);
-        }
-        if ('find' === $name) {
-            return $this->find();
-        }
-
-        return $this;
-    }
-
     private function table(): Table
     {
         if (null === $this->tableImpl) {
@@ -168,11 +156,8 @@ class Relation
      */
     public function where(string|array $where): Relation
     {
-        if (array_key_exists('where', $this->options)) {
-            array_push($this->options['where'], $where);
-        } else {
-            $this->options['where'] = [$where];
-        }
+        $this->options['conditions'] ??= [];
+        $this->options['conditions'][] = $where;
 
         return $this;
     }
@@ -315,66 +300,26 @@ class Relation
     }
 
     /**
-     * needle is one of:
-     *
-     * empty array              all()       returns all rows in the database
-     * array of primary keys    all([1, 3]) WHERE author_id in (1, 3)
-     * mapping of column names  all(["name"=>"Philip", "publisher"=>"Random House"]) WHERE name=Philip AND publisher=Random House
-     * raw WHERE statement      all(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
-     *
-     * @param array<number|mixed|string> $needle An array containing values for the pk
-     *
      * @return array<Model> All the rows that matches query. If no rows match, returns []
      */
-    public function all(array $needle = []): array
+    public function to_a(): array
     {
-        $list = [];
-
-        // Only for backwards compatibility with version 1 API
-        $isUsingOriginalFind = false;
-        foreach (self::$VALID_OPTIONS as $key) {
-            if (array_key_exists($key, $needle)) {
-                $this->options[$key] = $needle[$key];
-                unset($needle[$key]);
-                $isUsingOriginalFind = true;
-            }
-        }
-
-        if (array_is_list($needle) && count($needle) > 0 && !$this->isRawWhereStatement($needle)) {
-            unset($this->options['mapped_names']);
-
-            return $this->find_by_pk($needle, $isUsingOriginalFind);
-        }
-
-        if (!$isUsingOriginalFind) {
-            $this->options['conditions'] = $needle;
-        }
         $this->options['mapped_names'] = $this->alias_attribute;
-
         return $this->table()->find($this->options);
     }
 
-    /**
-     * Hack until functionality of where is moved into find
-     *
-     * @param array<string> $pieces
-     */
-    private function isRawWhereStatement(array $pieces): bool
-    {
-        return str_contains($pieces[0], '(?)');
+    public function all(): Relation {
+        return $this;
     }
 
     /**
      * Get a count of qualifying records.
      *
      * ```
-     * count()
-     * count('amount > 3.14159265');
-     * count('author_id=3')
-     * count(['name' => 'Tito', 'author_id' => 1]));
-     * count(['author_id' => [1, 2]));
-     * count(['author_id' => 1]);
-     * count(['author_id=? and name=?', 1, 'Tito']);
+     * People::count() // all
+     * People::count('name'); // SELECT COUNT("people"."age") FROM "people"
+     * People::count(['conditions' => "age > 30"])
+     *
      * ```
      *
      * @see find
@@ -383,13 +328,18 @@ class Relation
      *
      * @return int Number of records that matched the query
      */
-    public function count(mixed $where = []): int
+    public function count(): int
     {
-        $this->options['conditions'] = $where;
+        $args =  func_get_args();
+        // arg handling tbd
 
+//        $this->options['conditions'] = $where;
+//
         $this->select('COUNT(*)');
         $sql = $this->table()->options_to_sql($this->options);
-        $values = $sql->get_where_values();
+//        $values = $sql->get_where_values();
+
+        $values = [];
 
         $res = $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
 

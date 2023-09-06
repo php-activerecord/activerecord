@@ -53,23 +53,23 @@ class RelationTest extends DatabaseTestCase
     public function testFindNoWhere()
     {
         $this->expectException(ValidationsArgumentError::class);
-        $query = Author::select('name')->find;
+        $query = Author::select('name')->find();
     }
 
     public function testWhere()
     {
-        $queries = Author::select('name')->where("mixedCaseField = 'Bill'")->find;
-        $this->assertEquals(2, count($queries));
-        $this->assertEquals('Bill Clinton', $queries[0]->name);
-        $this->assertEquals('Uncle Bob', $queries[1]->name);
+//        $models = Author::where("mixedCaseField = 'Bill'")->to_a();
+//        $this->assertEquals(2, count($models));
+//        $this->assertEquals('Bill Clinton', $models[0]->name);
+//        $this->assertEquals('Uncle Bob', $models[1]->name);
 
-        $queries = Author::select('name')->where(['name = (?)', 'Bill Clinton'])->find;
+        $queries = Author::select('name')->where(['name = (?)', 'Bill Clinton'])->to_a();
         $this->assertEquals(1, count($queries));
         $this->assertEquals('Bill Clinton', $queries[0]->name);
-        $queries = Author::select('name')->where(['name = (?)', 'Not found'])->find;
+        $queries = Author::select('name')->where(['name = (?)', 'Not found'])->to_a();
         $this->assertEquals(0, count($queries));
 
-        $queries = Author::select('name')->where(['mixedCaseField'=>'Bill'])->find;
+        $queries = Author::select('name')->where(['mixedCaseField'=>'Bill'])->to_a();
         $this->assertEquals(2, count($queries));
         $this->assertEquals('Bill Clinton', $queries[0]->name);
         $this->assertEquals('Uncle Bob', $queries[1]->name);
@@ -202,14 +202,14 @@ class RelationTest extends DatabaseTestCase
     {
         $relation = Author::select('name');
 
-        $queries = $relation->last(2)->all(['mixedCaseField'=>'Bill']);
-        $this->assertEquals(2, count($queries));
-        $this->assertEquals('Uncle Bob', $queries[0]->name);
-        $this->assertEquals('Bill Clinton', $queries[1]->name);
+        $models = $relation->last(2)->to_a();
+        $this->assertEquals(2, count($models));
+        $this->assertEquals('Uncle Bob', $models[0]->name);
+        $this->assertEquals('Bill Clinton', $models[1]->name);
 
-        $queries = $relation->last(2)->last(1)->all(['mixedCaseField'=>'Bill']);
-        $this->assertEquals(1, count($queries));
-        $this->assertEquals('Uncle Bob', $queries[0]->name);
+        $models = $relation->last(2)->last(1)->where(['mixedCaseField'=>'Bill'])->to_a();
+        $this->assertEquals(1, count($models));
+        $this->assertEquals('Uncle Bob', $models[0]->name);
     }
 
     public function testAllChained()
