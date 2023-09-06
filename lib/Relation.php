@@ -154,13 +154,17 @@ class Relation
      *
      * Person.find(1)          # returns the object for ID = 1
      * Person.find("1")        # returns the object for ID = 1
-     * Person.find("does not exist") # returns null
+     * Person.find(999999)     # returns null
+     * Person.find("can't be casted to int") # throws TypeError
      *
-     * Person.find([7, 17])    # returns an array for objects with IDs in (7, 17)
+     * Person.find([1, 2])     # returns an array for objects with IDs in (7, 17)
+     * Person.find([1, -999])  # throws RecordNotFound
      * Person.find([1])        # returns an array for the object with ID = 1
      * Person.find([-11])      # returns an empty array
      *
      * @param int|string|array<int|string> $id
+     *
+     * @throws RecordNotFound if $id is an array and any of its ids cannot be found
      *
      * @return Model|array<Model>|null See above
      */
@@ -188,7 +192,7 @@ class Relation
         }
 
         unset($this->options['mapped_names']);
-        $list = $this->find_by_pk($id, false);
+        $list = $this->find_by_pk($id, is_array($id));
         unset($this->options['conditions']);
 
         if (is_array($id)) {

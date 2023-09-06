@@ -22,16 +22,20 @@ class RelationTest extends DatabaseTestCase
         $queries = $rel->find([1]);
         $this->assertEquals(1, count($queries));
         $this->assertEquals('Tito', $queries[0]->name);
+    }
 
+    public function testFindSingleArrayElementNotFound()
+    {
+        $rel = Author::select('name');
+
+        $this->expectException(RecordNotFound::class);
         $queries = $rel->find([999999]);
-        $this->assertEquals(0, count($queries));
     }
 
     public function testFindNotAllArrayElementsFound()
     {
         $this->expectException(RecordNotFound::class);
         $queries = Author::select('name')->find([1, 999999]);
-        $this->assertEquals(0, count($queries));
     }
 
     public function testFindWrongType()
