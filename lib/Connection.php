@@ -133,7 +133,7 @@ abstract class Connection
             $connection = new $fqclass($info);
             assert($connection instanceof Connection);
             $connection->protocol = $info['protocol'];
-             $connection->logging = $config->get_logging();
+            $connection->logging = $config->get_logging();
             $connection->logger = $config->get_logger();
 
             if (isset($info['charset'])) {
