@@ -113,6 +113,23 @@ class SQLBuilder
         return $this->where_values;
     }
 
+//    public function addVars(array $vars, string $statement): string
+//    {
+//        foreach ($vars as $varName=>$value) {
+//            if (isset($this->_vars[$varName])) {
+//                // already exists. Rename the var, and store it
+//                $varNameFinal = $varName.count($this->_vars[$varName]);
+//                $this->_vars[$varName][$varNameFinal] = $value;
+//                if ($statement) {
+//                    $statement = str_replace(":".$varName, ":".$varNameFinal, $statement);
+//                }
+//            } else {
+//                $this->_vars[$varName][$varName] = $value;
+//            }
+//        }
+//        return $statement;
+//    }
+
     public function where(/* (conditions, values) || (hash) */): static
     {
         $args = func_get_args();
