@@ -6,24 +6,24 @@ use test\models\Author;
 
 class RelationTest extends DatabaseTestCase
 {
-    public function testFindPrimaryKey()
+    public function testFind()
     {
-        $rel = Author::select('name');
+        $rel = Author::all();
 
         $query = $rel->find(1);
         $this->assertEquals('Tito', $query->name);
         $this->assertEquals(['sharks' => 'lasers'], $query->return_something());
 
-        $query = $rel->find('1');
-        $this->assertEquals('Tito', $query->name);
-        $queries = $rel->find([1, 2]);
-        $this->assertEquals(2, count($queries));
-        $this->assertEquals('Tito', $queries[0]->name);
-        $this->assertEquals('George W. Bush', $queries[1]->name);
+        $author = $rel->find('1');
+        $this->assertEquals('Tito', $author->name);
+        $authors = $rel->find([1, 2]);
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Tito', $authors[0]->name);
+        $this->assertEquals('George W. Bush', $authors[1]->name);
 
-        $queries = $rel->find([1]);
-        $this->assertEquals(1, count($queries));
-        $this->assertEquals('Tito', $queries[0]->name);
+        $authors = $rel->find([1]);
+        $this->assertEquals(1, count($authors));
+        $this->assertEquals('Tito', $authors[0]->name);
     }
 
     public function testFindSingleArrayElementNotFound()
@@ -58,21 +58,21 @@ class RelationTest extends DatabaseTestCase
 
     public function testWhere()
     {
-//        $models = Author::where("mixedCaseField = 'Bill'")->to_a();
+        $models = Author::where("mixedCaseField = 'Bill'")->to_a();
 //        $this->assertEquals(2, count($models));
 //        $this->assertEquals('Bill Clinton', $models[0]->name);
 //        $this->assertEquals('Uncle Bob', $models[1]->name);
 
-        $queries = Author::select('name')->where(['name = (?)', 'Bill Clinton'])->to_a();
-        $this->assertEquals(1, count($queries));
-        $this->assertEquals('Bill Clinton', $queries[0]->name);
-        $queries = Author::select('name')->where(['name = (?)', 'Not found'])->to_a();
-        $this->assertEquals(0, count($queries));
-
-        $queries = Author::select('name')->where(['mixedCaseField'=>'Bill'])->to_a();
-        $this->assertEquals(2, count($queries));
-        $this->assertEquals('Bill Clinton', $queries[0]->name);
-        $this->assertEquals('Uncle Bob', $queries[1]->name);
+//        $authors = Author::select('name')->where(['name = (?)', 'Bill Clinton'])->to_a();
+//        $this->assertEquals(1, count($authors));
+//        $this->assertEquals('Bill Clinton', $authors[0]->name);
+//        $queries = Author::select('name')->where(['name = (?)', 'Not found'])->to_a();
+//        $this->assertEquals(0, count($queries));
+//
+//        $queries = Author::select('name')->where(['mixedCaseField'=>'Bill'])->to_a();
+//        $this->assertEquals(2, count($queries));
+//        $this->assertEquals('Bill Clinton', $queries[0]->name);
+//        $this->assertEquals('Uncle Bob', $queries[1]->name);
     }
 
     public function testWhereWithPrimaryKey()

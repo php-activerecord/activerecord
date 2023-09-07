@@ -50,12 +50,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $authors = Author::all();
         $this->assertIsArray($authors);
 
-        $authors = Author::find('all', ['limit' => 1]);
-        $this->assertIsArray($authors);
-
-        $authors = Author::find('all', ['name' => 'Bill Clinton']);
-        $this->assertIsArray($authors);
-
         $authors = Author::find_all_by_name('Bill Clinton');
         $this->assertIsArray($authors);
 
@@ -63,12 +57,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assertIsArray($authors);
 
         $authors = Author::find([1, 2, 3]);
-        $this->assertIsArray($authors);
-
-        $authors = Author::find(['conditions'=> ['name' => 'Bill Clinton']]);
-        $this->assertIsArray($authors);
-
-        $authors = Author::find(['conditions'=>['author_id = ?', 3]]);
         $this->assertIsArray($authors);
     }
 

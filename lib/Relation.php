@@ -7,6 +7,7 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
@@ -152,12 +153,70 @@ class Relation
     }
 
     /**
-     * @param string|array<string|mixed> $where
+     * Returns a new relation, which is the result of filtering the
+     * current relation according to the conditions in the arguments.
+     *
+     * // string (not recommended; see alternatives below)
+     * Book::where("book_id = '2'");
+     * // SELECT * from clients where orders_count = '2';
+     *
+     * // array
+     * If an array is passed, then the first element of the array
+     * is treated as a template, and the remaining elements are
+     * inserted into the template to generate the condition.
+     * Active Record takes care of building the query to avoid
+     * injection attacks, and will convert from the PHP type to the
+     * database type where needed. Elements are inserted into the string
+     * in the order in which they appear.
+     *
+     * User.where([
+     *   "name = ? and email = ?",
+     *   "Joe",
+     *   "joe@example.com"
+     * ])
+     * # SELECT * FROM users WHERE name = 'Joe' AND email = 'joe@example.com';
+     *
+     * Alternatively, you can use named placeholders in the template, and pass
+     * a hash as the second element of the array. The names in the template
+     * are replaced with the corresponding values from the hash.
+     *
+     * User.where([
+     *   "name = :name and email = :email", [
+     *     name => "Joe",
+     *     email => "joe@example.com"
+     * ]])
+     * # SELECT * FROM users WHERE name = 'Joe' AND email = 'joe@example.com';
+     *
+     * If where is called with multiple arguments, these are treated as
+     * if they were passed as the elements of a single array.
+     *
+     * User.where("name = :name and email = :email", [
+     *   name => "Joe",
+     *   email => "joe@example.com"
+     * ])
+     * # SELECT * FROM users WHERE name = 'Joe' AND email = 'joe@example.com';
+     *
+     * # hash
+     * `where` will also accept a hash condition, in which the keys are fields
+     * and the values are values to be searched for.
+     *
+     * Fields can be symbols or strings. Values can be single values, arrays, or ranges.
+     *
+     * User.where([
+     *   'name' => "Joe",
+     *   'email' => "joe@example.com"
+     * ])
+     * # SELECT * FROM users WHERE name = 'Joe' AND email = 'joe@example.com'
+     * @param string|array<int,mixed>|array<string|mixed> $where
      */
-    public function where(string|array $where): Relation
+    public function where(): Relation
     {
+        $args = func_get_args();
+        if(1 === count($args)) {
+            $args = $args[0];
+        }
         $this->options['conditions'] ??= [];
-        $this->options['conditions'][] = $where;
+        $this->options['conditions'][] = $args;
 
         return $this;
     }
@@ -170,66 +229,165 @@ class Relation
     }
 
     /**
-     * Implementation of Ruby On Rails finder
+     * Pulls out the options hash from $array if any.
      *
-     * @see https://api.rubyonrails.org/v7.0.7.2/classes/ActiveRecord/FinderMethods.html#method-i-find
+     * @param array<mixed> &$options An array
+     *
+     * @return array<string,mixed> A valid options array
+     *
+     */
+    public static function extract_and_validate_options(array $options): array
+    {
+        $res = [];
+        if ($options) {
+            $last = $options[count($options) - 1];
+
+            try {
+                if (self::is_options_hash($last)) {
+                    array_pop($options);
+                    $res = $last;
+                }
+            } catch (ActiveRecordException $e) {
+                if (!is_hash($last)) {
+                    throw $e;
+                }
+                $res = ['conditions' => $last];
+            }
+        }
+
+        return $res;
+    }
+
+    /**
+     * Determines if the specified array is a valid ActiveRecord options array.
+     *
+     * @param mixed $options An options array
+     * @param bool  $throw   True to throw an exception if not valid
+     *
+     * @throws ActiveRecordException if the array contained any invalid options
+     */
+    public static function is_options_hash(mixed $options, bool $throw = true): bool
+    {
+        if (is_hash($options)) {
+            $keys = array_keys($options);
+            $diff = array_diff($keys, Relation::$VALID_OPTIONS);
+
+            if (!empty($diff) && $throw) {
+                throw new ActiveRecordException('Unknown key(s): ' . join(', ', $diff));
+            }
+            $intersect = array_intersect($keys, Relation::$VALID_OPTIONS);
+
+            if (!empty($intersect)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Find by id - This can either be a specific id (1),
+     * a list of ids (1, 5, 6), or an array of ids ([5, 6, 10]).
+     *
+     * If one or more records cannot be found for the requested ids,
+     * then ActiveRecord::RecordNotFound will be raised.
+     *
+     * If the primary key is an integer, find by id coerces its arguments by using to_i.
      *
      * Person.find(1)          # returns the object for ID = 1
      * Person.find("1")        # returns the object for ID = 1
-     * Person.find(999999)     # throws RecordNotFound
-     * Person.find("can't be casted to int") # throws TypeError
-     *
-     * Person.find([1, 2])     # returns an array for objects with IDs in (7, 17)
-     * Person.find([1, -999])  # throws RecordNotFound
+     * Person.find("31-sarah") # returns the object for ID = 31
+     * Person.find(1, 2, 6)    # returns an array for objects with IDs in (1, 2, 6)
+     * Person.find([7, 17])    # returns an array for objects with IDs in (7, 17)
      * Person.find([1])        # returns an array for the object with ID = 1
-     * Person.find([-11])      # returns an empty array
      *
-     * Person.where('name = Bob').find() # executes the where statement
+     * Person.where("administrator = 1").order("created_on DESC").find(1)
+     *
+     * Person.find(-1)          # throws RecordNotFound
+
      * Person.find()           # throws ValidationsArgumentError as there's no where statement to execute
      *
      * @param int|string|array<int|string> $id
      *
      * @throws RecordNotFound if any of the records cannot be found
      *
-     * @return Model|array<Model>|null See above
+     * @return Model|array<Model> See above
      */
-    public function find(int|string|array $id = null): Model|null|array
+    public function find(): Model|array
     {
-        if (array_key_exists('where', $this->options)) {
-            $values = $this->buildWhereSQL($this->options['where']);
+        $args = func_get_args();
+        $num_args = count($args);
 
-            if (null !== $id) {
-                $values[0] = "({$values[0]}) AND ";
-                if (is_array($id)) {
-                    $values[0] .= $this->table()->pk[0] . ' in (' . implode(',', $id) . ')';
-                } else {
-                    $values[0] .= $this->table()->pk[0] . ' = ' . $id;
-                }
-            }
-            $this->options['conditions'] = $values;
+        if (0 === $num_args) {
+            throw new RecordNotFound("Couldn't find $class without an ID");
+        }
 
-            $this->options['mapped_names'] = $this->alias_attribute;
-            $list = $this->table()->find($this->options);
 
-            unset($this->options['conditions']);
+        // find by pk
+        if (1 === $num_args) {
+            $args = $args[0];
+        }
+
+        $single = !is_array($args) || !array_is_list($args);
+
+
+        // anything left in $args is a find by pk
+        if ($num_args > 0) {
+            $list = $this->find_by_pk($args, true);
         } else {
-            if (null === $id) {
-                throw new ValidationsArgumentError('Cannot call find() without where() being first specified');
+            $options['mapped_names'] = static::$alias_attribute;
+            $list = $this->table()->find($this->options);
+        }
+
+        return $single ? $list[0] : $list;
+    }
+
+    /**
+     * Finder method which will find by a single or array of primary keys for this model.
+     *
+     * @see find
+     *
+     * @param PrimaryKey   $values  An array containing values for the pk
+     * @param array<mixed> $options An options array
+     *
+     * @throws RecordNotFound if a record could not be found
+     *
+     * @return Model|Model[]
+     */
+    public function find_by_pk(array|string|int|null $values, bool $forceArray = false): Model|array
+    {
+        $single = !is_array($values) && !$forceArray;
+        if (null === $values) {
+            throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
+        }
+
+        $table = $this->table();
+
+        if ($table->cache_individual_model ?? false) {
+            $pks = is_array($values) ? $values : [$values];
+            $list = static::get_models_from_cache($pks);
+        } else {
+            // int|string|array<int|string>
+            $options['conditions'] = static::pk_conditions($values);
+            $list = $table->find($options);
+        }
+        $results = count($list);
+
+        if ($results != ($expected = @count((array) $values))) {
+            $class = get_called_class();
+            if (is_array($values)) {
+                $values = join(',', $values);
             }
 
-            unset($this->options['mapped_names']);
-            $list = $this->find_by_pk($id, true);
-            unset($this->options['conditions']);
+            if (1 == $expected) {
+                throw new RecordNotFound("Couldn't find $class with ID=$values");
+            }
+
+            throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
         }
 
-        if (null === $id || is_array($id)) {
-            return $list;
-        }
-        if (0 === count($list)) {
-            return null;
-        }
-
-        return $list[0];
+        return $single ? $list[0] : $list;
     }
 
     /**
@@ -347,45 +505,6 @@ class Relation
     }
 
     /**
-     * Finder method which will find by a single or array of primary keys for this model.
-     *
-     * @see find
-     *
-     * @param mixed $values               An array containing values for the pk
-     * @param bool  $throwErrorIfNotFound True if version 1 behavior, false is version 2
-     *
-     * @throws RecordNotFound if a record could not be found
-     *
-     * @return array<Model>
-     */
-    private function find_by_pk(mixed $values, bool $throwErrorIfNotFound): array
-    {
-        if ($this->table()->cache_individual_model ?? false) {
-            $pks = is_array($values) ? $values : [$values];
-            $list = $this->get_models_from_cache($pks);
-        } else {
-            $this->options['conditions'] = $this->pk_conditions($values);
-            $list = $this->table()->find($this->options);
-        }
-        $results = count($list);
-
-        if ($results != ($expected = @count((array) $values))) {
-            $class = get_called_class();
-            if (is_array($values)) {
-                $values = implode(',', $values);
-            }
-
-            if (1 == $expected && !$throwErrorIfNotFound) {
-                return [];
-            }
-
-            throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
-        }
-
-        return $list;
-    }
-
-    /**
      * Will look up a list of primary keys from cache
      *
      * @param array<mixed> $pks An array of primary keys
@@ -418,8 +537,6 @@ class Relation
      */
     private function pk_conditions(int|array $args): array
     {
-        $ret = [$this->table()->pk[0] => $args];
-
-        return $ret;
+        return [$this->table()->pk[0] => $args];
     }
 }

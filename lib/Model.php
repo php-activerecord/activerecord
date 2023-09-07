@@ -1532,43 +1532,43 @@ class Model
      *
      * @see find
      */
-    public static function __callStatic(string $method, mixed $args): mixed
-    {
-        $options = static::extract_and_validate_options($args);
-        $create = false;
-
-        if ('find_or_create_by' == substr($method, 0, 17)) {
-            $attributes = substr($method, 17);
-
-            // can't take any finders with OR in it when doing a find_or_create_by
-            if (false !== strpos($attributes, '_or_')) {
-                throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
-            }
-            $create = true;
-            $method = 'find_by' . substr($method, 17);
-        }
-
-        if (str_starts_with($method, 'find_by')) {
-            $attributes = substr($method, 8);
-            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
-
-            if (!($ret = static::find('first', $options)) && $create) {
-                return static::create(SQLBuilder::create_hash_from_underscored_string($attributes, $args, static::$alias_attribute));
-            }
-
-            return $ret;
-        } elseif (str_starts_with($method, 'find_all_by')) {
-            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
-
-            return static::find('all', $options);
-        } elseif ('count_by' === substr($method, 0, 8)) {
-            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 9), $args, static::$alias_attribute);
-
-            return static::count($options);
-        }
-
-        throw new ActiveRecordException("Call to undefined method: $method");
-    }
+//    public static function __callStatic(string $method, mixed $args): mixed
+//    {
+//        $options = static::extract_and_validate_options($args);
+//        $create = false;
+//
+//        if ('find_or_create_by' == substr($method, 0, 17)) {
+//            $attributes = substr($method, 17);
+//
+//            // can't take any finders with OR in it when doing a find_or_create_by
+//            if (false !== strpos($attributes, '_or_')) {
+//                throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
+//            }
+//            $create = true;
+//            $method = 'find_by' . substr($method, 17);
+//        }
+//
+//        if (str_starts_with($method, 'find_by')) {
+//            $attributes = substr($method, 8);
+//            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
+//
+//            if (!($ret = static::find('first', $options)) && $create) {
+//                return static::create(SQLBuilder::create_hash_from_underscored_string($attributes, $args, static::$alias_attribute));
+//            }
+//
+//            return $ret;
+//        } elseif (str_starts_with($method, 'find_all_by')) {
+//            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
+//
+//            return static::find('all', $options);
+//        } elseif ('count_by' === substr($method, 0, 8)) {
+//            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 9), $args, static::$alias_attribute);
+//
+//            return static::count($options);
+//        }
+//
+//        throw new ActiveRecordException("Call to undefined method: $method");
+//    }
 
     /**
      * Enables the use of build|create for associations.
@@ -1702,11 +1702,11 @@ class Model
      *
      * @return array<Model> All the rows that matches query. If no rows match, returns []
      */
-    public static function all(array $needle = []): array
+    public static function all(): Relation
     {
         $relation = new Relation(get_called_class(), static::$alias_attribute);
 
-        return $relation->all($needle);
+        return $relation->all();
     }
 
     /**
@@ -1965,33 +1965,6 @@ class Model
     }
 
     /**
-     * Determines if the specified array is a valid ActiveRecord options array.
-     *
-     * @param mixed $options An options array
-     * @param bool  $throw   True to throw an exception if not valid
-     *
-     * @throws ActiveRecordException if the array contained any invalid options
-     */
-    public static function is_options_hash(mixed $options, bool $throw = true): bool
-    {
-        if (is_hash($options)) {
-            $keys = array_keys($options);
-            $diff = array_diff($keys, Relation::$VALID_OPTIONS);
-
-            if (!empty($diff) && $throw) {
-                throw new ActiveRecordException('Unknown key(s): ' . join(', ', $diff));
-            }
-            $intersect = array_intersect($keys, Relation::$VALID_OPTIONS);
-
-            if (!empty($intersect)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Returns a hash containing the names => values of the primary key.
      *
      * @param PrimaryKey $args Primary key value(s)
@@ -2006,36 +1979,36 @@ class Model
         return $ret;
     }
 
-    /**
-     * Pulls out the options hash from $array if any.
-     *
-     * @param array<mixed> &$options An array
-     *
-     * @return array<string,mixed> A valid options array
-     *
-     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
-     */
-    public static function extract_and_validate_options(array &$options): array
-    {
-        $res = [];
-        if ($options) {
-            $last = &$options[count($options) - 1];
-
-            try {
-                if (self::is_options_hash($last)) {
-                    array_pop($options);
-                    $res = $last;
-                }
-            } catch (ActiveRecordException $e) {
-                if (!is_hash($last)) {
-                    throw $e;
-                }
-                $res = ['conditions' => $last];
-            }
-        }
-
-        return $res;
-    }
+//    /**
+//     * Pulls out the options hash from $array if any.
+//     *
+//     * @param array<mixed> &$options An array
+//     *
+//     * @return array<string,mixed> A valid options array
+//     *
+//     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
+//     */
+//    public static function extract_and_validate_options(array &$options): array
+//    {
+//        $res = [];
+//        if ($options) {
+//            $last = &$options[count($options) - 1];
+//
+//            try {
+//                if (self::is_options_hash($last)) {
+//                    array_pop($options);
+//                    $res = $last;
+//                }
+//            } catch (ActiveRecordException $e) {
+//                if (!is_hash($last)) {
+//                    throw $e;
+//                }
+//                $res = ['conditions' => $last];
+//            }
+//        }
+//
+//        return $res;
+//    }
 
     /**
      * Returns a JSON representation of this model.
