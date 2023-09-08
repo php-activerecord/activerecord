@@ -58,14 +58,23 @@ class RelationTest extends DatabaseTestCase
 
     public function testWhere()
     {
-        $models = Author::where("mixedCaseField = 'Bill'")->to_a();
+//        // string
+//        $models = Author::where("mixedCaseField = 'Bill'")->to_a();
 //        $this->assertEquals(2, count($models));
 //        $this->assertEquals('Bill Clinton', $models[0]->name);
 //        $this->assertEquals('Uncle Bob', $models[1]->name);
-
-//        $authors = Author::select('name')->where(['name = (?)', 'Bill Clinton'])->to_a();
+//
+//        // array
+//        $authors = Author::where(['name = ?', 'Bill Clinton'])->to_a();
 //        $this->assertEquals(1, count($authors));
 //        $this->assertEquals('Bill Clinton', $authors[0]->name);
+
+        // hash
+        $authors = Author::where(['name'=>'Bill Clinton'])->to_a();
+        $this->assertEquals(1, count($authors));
+        $this->assertEquals('Bill Clinton', $authors[0]->name);
+
+
 //        $queries = Author::select('name')->where(['name = (?)', 'Not found'])->to_a();
 //        $this->assertEquals(0, count($queries));
 //

@@ -17,11 +17,13 @@ use ActiveRecord\Exception\ExpressionsException;
  *
  * @phpstan-import-type Attributes from Types
  */
-class Expressions
+class WhereClause
 {
     public const ParameterMarker = '?';
 
-    private string $expressions;
+    private array|string $expression;
+
+    private bool $inverse = false;
 
     /**
      * @var array<mixed>
@@ -30,26 +32,33 @@ class Expressions
     private Connection|null $connection;
 
     /**
-     * @param string|array<mixed>|null $expressions
+     * @param string|array<mixed> $expression
      */
-    public function __construct(Connection|null $connection, string|array $expressions = null)
+    public function __construct(string|array $expression, array $values, bool $inverse = false)
     {
-        $values = null;
-        $this->connection = $connection;
+        $this->inverse = $inverse;
+        $this->expression = $expression;
+        $this->values = $values;
 
-        if (is_array($expressions)) {
-            $glue = func_num_args() > 2 ? func_get_arg(2) : ' AND ';
-            list($expressions, $values) = $this->build_sql_from_hash($expressions, $glue);
-        }
+//        $values = null;
 
-        if ('' != $expressions) {
-            if (!$values) {
-                $values = array_slice(func_get_args(), 2);
-            }
+//        if (is_array($expression)) {
+//            $glue = func_num_args() > 2 ? func_get_arg(2) : ' AND ';
+//            list($expression, $values) = $this->build_sql_from_hash($expression, $glue);
+//        }
+//
+//        if ('' != $expression) {
+//            if (!$values) {
+//                $values = array_slice(func_get_args(), 2);
+//            }
+//
+//            $this->values = $values;
+//            $this->expression = $expression;
+//        }
+    }
 
-            $this->values = $values;
-            $this->expressions = $expressions;
-        }
+    public function inverse(): bool {
+        return $this->inverse;
     }
 
     /**
@@ -108,31 +117,36 @@ class Expressions
      *
      * @throws ExpressionsException
      */
-    public function to_s(bool $substitute = false, array $options = []): string
+    public function to_s(bool $prependTableName = false): array
     {
-        $values = $options['values'] ?? $this->values;
+        $values = $this->values;
+        $expression = $this->expression;
+        if(is_hash($expression)) {
+           list($expression, $values) = $this->build_sql_from_hash($expression, $prependTableName);
+        }
+
         $ret = '';
         $num_values = count($values);
         $quotes = 0;
 
-        for ($i = 0, $n = strlen($this->expressions), $j = 0; $i < $n; ++$i) {
-            $ch = $this->expressions[$i];
+        for ($i = 0, $j = 0; $i < strlen($expression); ++$i) {
+            $ch = $expression[$i];
 
             if (self::ParameterMarker == $ch) {
                 if (0 == $quotes % 2) {
                     if ($j > $num_values - 1) {
                         throw new ExpressionsException("No bound parameter for index $j");
                     }
-                    $ch = $this->substitute($values, $substitute, $i, $j++);
+                    $ch = $this->substitute($values, false, $i, $j++);
                 }
-            } elseif ('\'' == $ch && $i > 0 && '\\' != $this->expressions[$i - 1]) {
+            } elseif ('\'' == $ch && $i > 0 && '\\' != $expression[$i - 1]) {
                 ++$quotes;
             }
 
             $ret .= $ch;
         }
 
-        return $ret;
+        return [$ret, $values];
     }
 
     /**
@@ -140,13 +154,20 @@ class Expressions
      *
      * @return array<mixed>
      */
-    private function build_sql_from_hash(array $hash, string $glue): array
+    private function build_sql_from_hash(array $hash, bool $prependTableName): array
     {
         $sql = $g = '';
+        $glue = ' AND ';
+
+        $table = $prependTableName ? $this->connection->quote_name($this->table) : '';
 
         foreach ($hash as $name => $value) {
             if ($this->connection) {
                 $name = $this->connection->quote_name($name);
+            }
+
+            if($prependTableName) {
+                $name = $table . '.' . $name;
             }
 
             if (is_array($value)) {
@@ -200,7 +221,7 @@ class Expressions
             return $this->stringify_value($value);
         }
 
-        return $this->expressions[$pos];
+        return $this->expression[$pos];
     }
 
     private function stringify_value(mixed $value): string

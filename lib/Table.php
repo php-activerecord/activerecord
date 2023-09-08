@@ -194,7 +194,7 @@ class Table
      */
     public function options_to_sql(array $options): SQLBuilder
     {
-        $table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
+        $table = $options['from'] ?? $this->get_fully_qualified_table_name();
         $sql = new SQLBuilder($this->conn, $table);
 
         if (array_key_exists('joins', $options)) {
@@ -212,17 +212,17 @@ class Table
         }
 
         $conditions = [];
-        foreach($options['conditions'] ?? [] as $condition) {
-            if (is_hash($condition)) {
-                if (!empty($options['mapped_names'])) {
-                    $conditions = $this->map_names($options['conditions'], $options['mapped_names']);
-                }
-            } else {
-                $conditions[] = $condition;
-            }
-        }
+//        foreach($options['conditions'] ?? [] as $condition) {
+//            if (is_hash($condition)) {
+//                if (!empty($options['mapped_names'])) {
+//                    $conditions = $this->map_names($options['conditions'], $options['mapped_names']);
+//                }
+//            } else {
+//                $conditions[] = $condition;
+//            }
+//        }
 
-        $sql->where($conditions);
+        $sql->where($options['conditions']);
 
 //        if (array_key_exists('conditions', $options)) {
 //            if (!is_hash($options['conditions'])) {

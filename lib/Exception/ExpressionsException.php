@@ -3,7 +3,7 @@
 namespace ActiveRecord\Exception;
 
 /**
- * Thrown by {@link Expressions}.
+ * Thrown by {@link WhereClause}.
  *
  * @package ActiveRecord
  */

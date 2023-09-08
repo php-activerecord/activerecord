@@ -113,52 +113,70 @@ class SQLBuilder
         return $this->where_values;
     }
 
-//    public function addVars(array $vars, string $statement): string
-//    {
-//        foreach ($vars as $varName=>$value) {
-//            if (isset($this->_vars[$varName])) {
-//                // already exists. Rename the var, and store it
-//                $varNameFinal = $varName.count($this->_vars[$varName]);
-//                $this->_vars[$varName][$varNameFinal] = $value;
-//                if ($statement) {
-//                    $statement = str_replace(":".$varName, ":".$varNameFinal, $statement);
-//                }
-//            } else {
-//                $this->_vars[$varName][$varName] = $value;
-//            }
-//        }
-//        return $statement;
-//    }
+    //    public function addVars(array $vars, string $statement): string
+    //    {
+    //        foreach ($vars as $varName=>$value) {
+    //            if (isset($this->_vars[$varName])) {
+    //                // already exists. Rename the var, and store it
+    //                $varNameFinal = $varName.count($this->_vars[$varName]);
+    //                $this->_vars[$varName][$varNameFinal] = $value;
+    //                if ($statement) {
+    //                    $statement = str_replace(":".$varName, ":".$varNameFinal, $statement);
+    //                }
+    //            } else {
+    //                $this->_vars[$varName][$varName] = $value;
+    //            }
+    //        }
+    //        return $statement;
+    //    }
 
-    public function where(/* (conditions, values) || (hash) */): static
+    /**
+     * @param array<WhereClause> $clauses
+     *
+     * @throws Exception\ExpressionsException
+     *
+     * @return $this
+     */
+    public function where(array $clauses): static
     {
-        $args = func_get_args();
-        $num_args = count($args);
-
-        if (1 == $num_args && is_hash($args[0])) {
-            $hash = empty($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
-            $e = new Expressions($this->connection, $hash);
-            $this->where = $e->to_s();
-            $this->where_values = array_flatten($e->values());
-        } elseif ($num_args > 0) {
-            // if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
-            $values = array_slice($args, 1);
-
-            foreach ($values as $name => &$value) {
-                if (is_array($value)) {
-                    $e = new Expressions($this->connection, $args[0]);
-                    $e->bind_values($values);
-                    $this->where = $e->to_s();
-                    $this->where_values = array_flatten($e->values());
-
-                    return $this;
-                }
-            }
-
-            // no nested array so nothing special to do
-            $this->where = $args[0] ?? '';
-            $this->where_values = $values;
+        $values = [];
+        $sql = '';
+        $glue = ' AND ';
+        foreach ($clauses as $idx => $clause) {
+            $clause->set_connection($this->connection);
+            list($expression, $vals) = $clause->to_s(!empty($this->joins));
+            $values += $vals;
+            $inverse = $clause->inverse() ? '!' : '';
+            $sql .=  "$inverse(" . $expression . ')' . ($idx < (count($clauses) - 1) ? $glue : '');
         }
+
+        $this->where = $sql;
+        $this->where_values = $values;
+
+        //        if (1 == $num_args && is_hash($args[0])) {
+        //            $hash = empty($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
+        //            $clause = new WhereClause($this->connection, $hash);
+        //            $this->where = $clause->to_s();
+        //            $this->where_values = array_flatten($clause->values());
+        //        } elseif ($num_args > 0) {
+        //            // if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
+        //            $values = array_slice($args, 1);
+        //
+        //            foreach ($values as $name => &$value) {
+        //                if (is_array($value)) {
+        //                    $clause = new WhereClause($this->connection, $args[0]);
+        //                    $clause->bind_values($values);
+        //                    $this->where = $clause->to_s();
+        //                    $this->where_values = array_flatten($clause->values());
+        //
+        //                    return $this;
+        //                }
+        //            }
+        //
+        //            // no nested array so nothing special to do
+        //            $this->where = $args[0] ?? '';
+        //            $this->where_values = $values;
+        //        }
 
         return $this;
     }
@@ -375,27 +393,6 @@ class SQLBuilder
         return $hash;
     }
 
-    /**
-     * Prepends table name to hash of field names to get around ambiguous fields when SQL builder
-     * has joins
-     *
-     * @param array<string,string> $hash
-     *
-     * @return array<string,string> $new
-     */
-    private function prepend_table_name_to_fields(array $hash = [])
-    {
-        $new = [];
-        $table = $this->connection->quote_name($this->table);
-
-        foreach ($hash as $key => $value) {
-            $k = $this->connection->quote_name($key);
-            $new[$table . '.' . $k] = $value;
-        }
-
-        return $new;
-    }
-
     private function build_delete(): string
     {
         $sql = "DELETE FROM $this->table";
@@ -430,7 +427,7 @@ class SQLBuilder
             $sql = "INSERT INTO $this->table($keys) VALUES(?)";
         }
 
-        $e = new Expressions($this->connection, $sql, array_values($this->data));
+        $e = new WhereClause($this->connection, $sql, array_values($this->data));
 
         return $e->to_s();
     }
