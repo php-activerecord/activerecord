@@ -199,7 +199,7 @@ class WhereClause
             $expression .= $connection->quote_name($name) . $bind;
         }
 
-        return new WhereClause($expression, $conditionValues);
+        return new WhereClause($expression, [$conditionValues]);
     }
 
     /**
