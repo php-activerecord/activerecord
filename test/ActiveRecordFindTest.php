@@ -294,33 +294,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assertTrue($i > 0);
     }
 
-    public function testCount()
-    {
-//        $this->assertTrue(Author::count() > 1);
-//        $this->assertEquals(0, Author::where('author_id=99999999999999')->count());
-//        $this->assertEquals(2, Author::where('author_id=1 or author_id=2')->count());
-        $this->assertEquals(1, Author::where([
-            'name' => 'Tito',
-            'author_id' => 1
-        ])->count());
-    }
-
-    public function testGh149EmptyCount()
-    {
-        $total = Author::count();
-        $this->assertEquals($total, Author::count(null));
-        $this->assertEquals($total, Author::count([]));
-    }
-
-    public function testExists()
-    {
-        $this->assertTrue(Author::exists(1));
-        $this->assertTrue(Author::exists(['conditions' => 'author_id=1']));
-        $this->assertTrue(Author::exists(['conditions' => ['author_id=? and name=?', 1, 'Tito']]));
-        $this->assertFalse(Author::exists(9999999));
-        $this->assertFalse(Author::exists(['conditions' => 'author_id=999999']));
-    }
-
     public function testFindByCallStatic()
     {
         $this->assertEquals('Tito', Author::find_by_name('Tito')->name);

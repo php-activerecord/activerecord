@@ -445,7 +445,11 @@ class Relation
         $sql = $this->table()->options_to_sql($this->options);
         //        $values = $sql->get_where_values();
 
-        $values = [];
+
+
+        $table = $this->table();
+        $sql = $table->options_to_sql($this->options);
+        $values = $sql->get_where_values();
 
         $res = $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
 
