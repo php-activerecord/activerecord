@@ -17,7 +17,7 @@ class WhereClauseTest extends TestCase
     public function testOneVariable()
     {
         $c = new WhereClause('name=?', ['Tito']);
-        $this->assertEquals('name=?', $c->to_s()[0]);
+        $this->assertEquals('name=?', $c->to_s());
         $this->assertEquals(['Tito'], $c->values());
     }
 
@@ -30,27 +30,27 @@ class WhereClauseTest extends TestCase
     public function testMultipleVariables()
     {
         $c = new WhereClause('name=? and book=?', ['Tito', 'Sharks']);
-        $this->assertEquals('name=? and book=?', $c->to_s()[0]);
+        $this->assertEquals('name=? and book=?', $c->to_s());
         $this->assertEquals(['Tito', 'Sharks'], $c->values());
     }
 
     public function testToString()
     {
         $c = new WhereClause('name=? and book=?', ['Tito', 'Sharks']);
-        $this->assertEquals('name=? and book=?', $c->to_s()[0]);
+        $this->assertEquals('name=? and book=?', $c->to_s());
     }
 
     public function testToStringWithArrayVariable()
     {
         $c = new WhereClause('name IN(?) and id=?', [['Tito', 'George'], 1]);
-        $this->assertEquals('name IN(?,?) and id=?', $c->to_s()[0]);
+        $this->assertEquals('name IN(?,?) and id=?', $c->to_s());
     }
 
     public function testToStringWithEmptyOptions()
     {
         $c = new WhereClause('name=? and book=?', ['Tito', 'Sharks']);
         $x = [];
-        $this->assertEquals('name=? and book=?', $c->to_s(false, $x)[0]);
+        $this->assertEquals('name=? and book=?', $c->to_s(false, $x));
     }
 
     public function testInsufficientVariables()
@@ -63,46 +63,46 @@ class WhereClauseTest extends TestCase
     public function testNoValues()
     {
         $c = new WhereClause( "name='Tito'");
-        $this->assertEquals("name='Tito'", $c->to_s()[0]);
+        $this->assertEquals("name='Tito'", $c->to_s());
         $this->assertEquals(0, count($c->values()));
     }
 
     public function testEmptyVariable()
     {
         $a = new WhereClause('name=?', [null]);
-        $this->assertEquals('name=?', $a->to_s()[0]);
+        $this->assertEquals('name=?', $a->to_s());
         $this->assertEquals([null], $a->values());
     }
 
     public function testZeroVariable()
     {
         $a = new WhereClause('name=?', [0]);
-        $this->assertEquals('name=?', $a->to_s()[0]);
+        $this->assertEquals('name=?', $a->to_s());
         $this->assertEquals([0], $a->values());
     }
 
     public function testEmptyArrayVariable()
     {
-        $a = new WhereClause(null, 'id IN(?)', []);
+        $a = new WhereClause( 'id IN(?)', [[]]);
         $this->assertEquals('id IN(?)', $a->to_s());
         $this->assertEquals([[]], $a->values());
     }
 
     public function testIgnoreInvalidParameterMarker()
     {
-        $a = new WhereClause(null, "question='Do you love backslashes?' and id in(?)", [1, 2]);
+        $a = new WhereClause("question='Do you love backslashes?' and id in(?)", [1, 2]);
         $this->assertEquals("question='Do you love backslashes?' and id in(?,?)", $a->to_s());
     }
 
     public function testIgnoreParameterMarkerWithEscapedQuote()
     {
-        $a = new WhereClause(null, "question='Do you love''s backslashes?' and id in(?)", [1, 2]);
+        $a = new WhereClause("question='Do you love''s backslashes?' and id in(?)", [1, 2]);
         $this->assertEquals("question='Do you love''s backslashes?' and id in(?,?)", $a->to_s());
     }
 
     public function testIgnoreParameterMarkerWithBackspaceEscapedQuote()
     {
-        $a = new WhereClause(null, "question='Do you love\\'s backslashes?' and id in(?)", [1, 2]);
+        $a = new WhereClause("question='Do you love\\'s backslashes?' and id in(?)", [1, 2]);
         $this->assertEquals("question='Do you love\\'s backslashes?' and id in(?,?)", $a->to_s());
     }
 
@@ -146,7 +146,7 @@ class WhereClauseTest extends TestCase
         $a = new WhereClause('name=?', ["Tito's Guild"]);
         $a->set_connection($conn);
         $escaped = $conn->escape("Tito's Guild");
-        $this->assertEquals("name=$escaped", $a->to_s(substitute: true)[0]);
+        $this->assertEquals("name=$escaped", $a->to_s(substitute: true));
     }
 
     public function testBind()
@@ -181,7 +181,7 @@ class WhereClauseTest extends TestCase
     public function testNullValue()
     {
         $a = new WhereClause('name=?', [null]);
-        $this->assertEquals('name=NULL', $a->to_s(substitute: true)[0]);
+        $this->assertEquals('name=NULL', $a->to_s(substitute: true));
     }
 
     public function testHashWithDefaultGlue()
@@ -196,7 +196,7 @@ class WhereClauseTest extends TestCase
             'id' => 1,
             'name' => 'Tito'
         ]);
-        $this->assertEquals('id=?, name=?', $a->to_s(glue: ', ')[0]);
+        $this->assertEquals('id=?, name=?', $a->to_s(glue: ', '));
     }
 
     public function testHashWithArray()
@@ -205,6 +205,6 @@ class WhereClauseTest extends TestCase
             'id' => 1,
             'name' => ['Tito', 'Mexican']
         ]);
-        $this->assertEquals('id=? AND name IN(?,?)', $a->to_s()[0]);
+        $this->assertEquals('id=? AND name IN(?,?)', $a->to_s());
     }
 }

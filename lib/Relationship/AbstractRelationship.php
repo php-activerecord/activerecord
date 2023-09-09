@@ -135,13 +135,8 @@ abstract class AbstractRelationship
         }
 
         $values = [$values];
-        $conditions = WhereClause::from_underscored_string($table->conn, $query_key, $values);
-
-        if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1) {
-            Utils::add_condition($options['conditions'], $conditions ?? []);
-        } else {
-            $options['conditions'] = $conditions;
-        }
+        $options['conditions'] ??= [];
+        $options['conditions'][] = WhereClause::from_underscored_string($table->conn, $query_key, $values);
 
         if (!empty($includes)) {
             $options['include'] = $includes;
@@ -179,7 +174,9 @@ abstract class AbstractRelationship
 
         $class = $this->class_name;
 
-        $related_models = $class::find('all', $options);
+        $rel = new Relation($class, [], $options);
+
+        $related_models = $rel->to_a();
         $used_models_map = [];
         $related_models_map = [];
         $model_values_key = Inflector::variablize($model_values_key);
@@ -348,7 +345,7 @@ abstract class AbstractRelationship
             $options_conditions = [];
         }
 
-        return Utils::add_condition($options_conditions, $conditions ?? []);
+        return [$conditions]; // Utils::add_condition($options_conditions, $conditions ?? []);
     }
 
     /**

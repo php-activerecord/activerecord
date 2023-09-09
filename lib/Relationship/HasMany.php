@@ -5,6 +5,7 @@ namespace ActiveRecord\Relationship;
 use ActiveRecord\Exception\HasManyThroughAssociationException;
 use ActiveRecord\Inflector;
 use ActiveRecord\Model;
+use ActiveRecord\Relation;
 use ActiveRecord\Table;
 use ActiveRecord\Types;
 
@@ -173,9 +174,13 @@ class HasMany extends AbstractRelationship
         $options = $this->unset_non_finder_options($this->options);
         $options['conditions'] = $conditions;
 
-        $res = $class_name::find($this->is_poly() ? 'all' : 'first', $options);
-
-        return $res;
+        $rel = new Relation($class_name, [], $options);
+        if($this->is_poly()) {
+            return $rel->to_a();
+        }
+        else {
+            return $rel->first();
+        }
     }
 
     /**

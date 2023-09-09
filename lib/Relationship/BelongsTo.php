@@ -4,6 +4,7 @@ namespace ActiveRecord\Relationship;
 
 use ActiveRecord\Inflector;
 use ActiveRecord\Model;
+use ActiveRecord\Relation;
 use ActiveRecord\Table;
 use ActiveRecord\Types;
 
@@ -92,7 +93,9 @@ class BelongsTo extends AbstractRelationship
         $options['conditions'] = $conditions;
         $class = $this->class_name;
 
-        return $class::first($options);
+        $rel = new Relation($class, [], $options);
+
+        return $rel->first();
     }
 
     /**

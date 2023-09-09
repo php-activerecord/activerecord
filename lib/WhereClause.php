@@ -118,7 +118,7 @@ class WhereClause
      * @throws ExpressionsException
      */
     public function to_s(bool $prependTableName = false, array $mappedNames = [],
-                         bool $substitute=false, string $glue=' AND '): array
+                         bool $substitute=false, string $glue=' AND '): string
     {
         $values = $this->values;
         $expression = $this->expression;
@@ -148,7 +148,8 @@ class WhereClause
             $ret .= $ch;
         }
 
-        return [$ret, $values];
+        $this->values = $values;
+        return $ret;
     }
 
     /**

@@ -144,8 +144,8 @@ class SQLBuilder
         $glue = ' AND ';
         foreach ($clauses as $idx => $clause) {
             $clause->set_connection($this->connection);
-            list($expression, $vals) = $clause->to_s(!empty($this->joins), $mappedNames);
-            $values = array_merge($values, array_flatten($vals));
+            $expression = $clause->to_s(!empty($this->joins), $mappedNames);
+            $values = array_merge($values, array_flatten($clause->values()));
             $inverse = $clause->inverse() ? '!' : '';
             $wrappedExpression = $inverse || count($clauses) > 1 ? "(" . $expression . ')' : $expression;
             $sql .=  $inverse . $wrappedExpression . ($idx < (count($clauses) - 1) ? $glue : '');
@@ -389,7 +389,7 @@ class SQLBuilder
         $e = new WhereClause($sql, [array_values($this->data)]);
         $e->set_connection($this->connection);
 
-        return $e->to_s()[0];
+        return $e->to_s();
     }
 
     private function build_select(): string

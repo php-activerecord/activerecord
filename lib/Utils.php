@@ -180,7 +180,7 @@ class Utils
      *
      * @return array<mixed>
      */
-    public static function add_condition(array &$conditions, string|array $condition, string $conjuction = 'AND'): array
+    public static function add_condition(array &$conditions, mixed $condition, string $conjuction = 'AND'): array
     {
         if (is_array($condition)) {
             if (empty($conditions)) {

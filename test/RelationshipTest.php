@@ -121,11 +121,16 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_default_has_many($this->get_relationship());
     }
 
-    public function testGh256EagerLoadingThreeLevelsDeep()
+    public function testEagerLoadingThreeLevelsDeep()
     {
         /* Before fix Undefined offset: 0 */
-        $conditions['include'] = ['events'=>['host'=>['events']]];
-        $venue = Venue::find(2, $conditions);
+        $venue = Venue::include([
+            'events'=>[
+                'host'=>[
+                    'events'
+                ]
+            ]
+        ])->find(2);
 
         $events = $venue->events;
         $this->assertEquals(2, count($events));
@@ -143,7 +148,7 @@ class RelationshipTest extends DatabaseTestCase
     public function testJoinsOnModelViaUndeclaredAssociation()
     {
         $this->expectException(RelationshipException::class);
-        JoinBook::first(['joins' => ['undeclared']]);
+        JoinBook::joins('undeclared')->first();
     }
 
     public function testJoinsOnlyLoadsGivenModelAttributes()
