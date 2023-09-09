@@ -77,7 +77,7 @@ class ActiveRecordTest extends DatabaseTestCase
     public function testInvalidAttribute()
     {
         $this->expectException(UndefinedPropertyException::class);
-        $author = Author::find('first', ['conditions' => 'author_id=1']);
+        $author = Author::where('author_id=1')->first();
         $author->some_invalid_field_name;
     }
 

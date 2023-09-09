@@ -884,16 +884,6 @@ class Model
     }
 
     /**
-     * Flag model as readonly.
-     *
-     * @param bool $readonly Set to true to put the model into readonly mode
-     */
-    public function readonly(bool $readonly = true): void
-    {
-        $this->__readonly = $readonly;
-    }
-
-    /**
      * Retrieve the connection for this model.
      *
      * @return Connection
@@ -1615,6 +1605,18 @@ class Model
     }
 
     /**
+     * Flag as readonly.
+     *
+     */
+    public static function readonly(bool $readonly = true): Relation
+    {
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        $relation->readonly($readonly);
+
+        return $relation;
+    }
+
+    /**
      * @param string|array<string> $joins
      */
     public static function joins(string|array $joins): Relation
@@ -2061,6 +2063,37 @@ class Model
         }
 
         return false;
+    }
+
+    /**
+     * Pulls out the options hash from $array if any.
+     *
+     * @param array<mixed> &$options An array
+     *
+     * @return array<string,mixed> A valid options array
+     *
+     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
+     */
+    public static function extract_and_validate_options(array &$options): array
+    {
+        $res = [];
+        if ($options) {
+            $last = &$options[count($options) - 1];
+
+            try {
+                if (self::is_options_hash($last)) {
+                    array_pop($options);
+                    $res = $last;
+                }
+            } catch (ActiveRecordException $e) {
+                if (!is_hash($last)) {
+                    throw $e;
+                }
+                $res = ['conditions' => $last];
+            }
+        }
+
+        return $res;
     }
 
     /**
