@@ -53,8 +53,9 @@ class Relation
      * @param class-string  $className
      * @param array<string> $alias_attribute
      */
-    public function __construct(string $className, array $alias_attribute)
+    public function __construct(string $className, array $alias_attribute, array $options = [])
     {
+        $this->options = $options;
         $this->alias_attribute = $alias_attribute;
         $this->className = $className;
     }
@@ -66,21 +67,6 @@ class Relation
         }
 
         return $this->tableImpl;
-    }
-
-    public function last(int $limit): Relation
-    {
-        $this->limit($limit);
-
-        if (array_key_exists('order', $this->options)) {
-            if (str_contains($this->options['order'], join(' ASC, ', $this->table()->pk) . ' ASC')) {
-                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
-            }
-        } else {
-            $this->options['order'] = join(' DESC, ', $this->table()->pk) . ' DESC';
-        }
-
-        return $this;
     }
 
     public function select(string $columns): Relation
@@ -207,7 +193,6 @@ class Relation
      *   'email' => "joe@example.com"
      * ])
      * # SELECT * FROM users WHERE name = 'Joe' AND email = 'joe@example.com'
-     * @param string|array<int,mixed>|array<string|mixed> $where
      */
     public function where(): Relation
     {
@@ -216,20 +201,20 @@ class Relation
         $args = func_get_args();
         $numArgs = count($args);
 
-        if($numArgs != 1) {
-            throw new \ArgumentCountError("`where` requires exactly one argument.");
+        if (1 != $numArgs) {
+            throw new \ArgumentCountError('`where` requires exactly one argument.');
         }
         $arg = $args[0];
 
         // user passed in a string, a hash, or an array consisting of a string and values
-        if(is_string($arg) || is_hash($arg)) {
+        if (is_string($arg) || is_hash($arg)) {
             $expression = new WhereClause($arg, []);
-        }
-        else {
-            $expression = new WhereClause($arg[0], array_slice($arg,1));
+        } else {
+            $expression = new WhereClause($arg[0], array_slice($arg, 1));
         }
 
         $this->options['conditions'][] = $expression;
+
         return $this;
     }
 
@@ -246,7 +231,6 @@ class Relation
      * @param array<mixed> &$options An array
      *
      * @return array<string,mixed> A valid options array
-     *
      */
     public static function extract_and_validate_options(array $options): array
     {
@@ -297,7 +281,6 @@ class Relation
         return false;
     }
 
-
     /**
      * Find by id - This can either be a specific id (1),
      * a list of ids (1, 5, 6), or an array of ids ([5, 6, 10]).
@@ -317,10 +300,8 @@ class Relation
      * Person.where("administrator = 1").order("created_on DESC").find(1)
      *
      * Person.find(-1)          # throws RecordNotFound
-
-     * Person.find()           # throws ValidationsArgumentError as there's no where statement to execute
      *
-     * @param int|string|array<int|string> $id
+     * Person.find()           # throws ValidationsArgumentError as there's no where statement to execute
      *
      * @throws RecordNotFound if any of the records cannot be found
      *
@@ -330,11 +311,11 @@ class Relation
     {
         $args = func_get_args();
         $num_args = count($args);
+        $class = $this->className;
 
         if (0 === $num_args) {
-            throw new RecordNotFound("Couldn't find $class without an ID");
+            throw new ValidationsArgumentError("find requires at least one argument");
         }
-
 
         // find by pk
         if (1 === $num_args) {
@@ -343,63 +324,52 @@ class Relation
 
         $single = !is_array($args) || !array_is_list($args);
 
+        $options = $this->options;
+        $options['conditions'] ??= [];
+        $options['conditions'][] = $this->pk_conditions($args);
+        $options['mapped_names'] = $this->alias_attribute;
 
-        // anything left in $args is a find by pk
-        if ($num_args > 0) {
-            $list = $this->find_by_pk($args, true);
-        } else {
-            $options['mapped_names'] = static::$alias_attribute;
-            $list = $this->table()->find($this->options);
+        $list = $this->table()->find($options);
+        if(is_array($args) && count($list) != count($args)) {
+            throw new RecordNotFound("tbd");
         }
 
-        return $single ? $list[0] : $list;
+
+        return $single ? ($list[0] ?? throw new RecordNotFound("tbd")): $list;
     }
 
     /**
-     * Finder method which will find by a single or array of primary keys for this model.
-     *
-     * @see find
-     *
-     * @param PrimaryKey   $values  An array containing values for the pk
-     * @param array<mixed> $options An options array
-     *
-     * @throws RecordNotFound if a record could not be found
-     *
-     * @return Model|Model[]
+     * @return Model|array<Model>|null
      */
-    public function find_by_pk(array|string|int|null $values, bool $forceArray = false): Model|array
+    public function first(int $limit = null): mixed
     {
-        $single = !is_array($values) && !$forceArray;
-        if (null === $values) {
-            throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
+        $this->limit($limit ?? 1);
+        if (!isset($limit)) {
+            $models = $this->to_a();
+            return $models[0] ?? null;
         }
 
-        $table = $this->table();
+        return $this->to_a();
+    }
 
-        if ($table->cache_individual_model ?? false) {
-            $pks = is_array($values) ? $values : [$values];
-            $list = static::get_models_from_cache($pks);
+    /**
+     * @return Model|array<Model>|null
+     */
+    public function last(int $limit = null): mixed
+    {
+        $this->limit($limit ?? 1);
+
+        if (array_key_exists('order', $this->options)) {
+            if (str_contains($this->options['order'], implode(' ASC, ', $this->table()->pk) . ' ASC')) {
+                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+            }
         } else {
-            // int|string|array<int|string>
-            $options['conditions'] = static::pk_conditions($values);
-            $list = $table->find($options);
-        }
-        $results = count($list);
-
-        if ($results != ($expected = @count((array) $values))) {
-            $class = get_called_class();
-            if (is_array($values)) {
-                $values = join(',', $values);
-            }
-
-            if (1 == $expected) {
-                throw new RecordNotFound("Couldn't find $class with ID=$values");
-            }
-
-            throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
+            $this->options['order'] = implode(' DESC, ', $this->table()->pk) . ' DESC';
         }
 
-        return $single ? $list[0] : $list;
+        $models = $this->to_a();
+
+        return isset($limit) ? $models : $models[0] ?? null;
     }
 
     /**
@@ -436,49 +406,17 @@ class Relation
     }
 
     /**
-     * needle is one of:
-     *
-     * primary key value        where(3)     WHERE author_id=3
-     * mapping of column names  where(["name"=>"Philip", "publisher"=>"Random House"]) finds the first row of WHERE name=Philip AND publisher=Random House
-     * raw WHERE statement      where(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
-     *
-     * @param int|string|array<string> $needle
-     * @param bool                     $isUsingOriginalFind true if called from version 1 find, false otherwise
-     *
-     * @return Model|null The single row that matches query. If no rows match, returns null
-     */
-    public function whereToBeReplacedByFind(int|string|array $needle, bool $isUsingOriginalFind = false): Model|null
-    {
-        $this->limit(1);
-
-        if (is_array($needle)) {
-            if (!array_key_exists('conditions', $this->options) && count($needle) > 0) {
-                $this->options['conditions'] = $needle;
-            }
-            $this->options['mapped_names'] = $this->alias_attribute;
-            $list = $this->table()->find($this->options);
-        } else {
-            unset($this->options['mapped_names']);
-            $list = $this->find_by_pk($needle, $isUsingOriginalFind);
-        }
-
-        if (null == $list) {
-            return null;
-        }
-
-        return $list[0];
-    }
-
-    /**
      * @return array<Model> All the rows that matches query. If no rows match, returns []
      */
     public function to_a(): array
     {
         $this->options['mapped_names'] = $this->alias_attribute;
+
         return $this->table()->find($this->options);
     }
 
-    public function all(): Relation {
+    public function all(): Relation
+    {
         return $this;
     }
 
@@ -494,8 +432,6 @@ class Relation
      *
      * @see find
      *
-     * @param mixed $where The qualifications for a row to be counted
-     *
      * @return int Number of records that matched the query
      */
     public function count(): int
@@ -503,11 +439,11 @@ class Relation
         $args =  func_get_args();
         // arg handling tbd
 
-//        $this->options['conditions'] = $where;
-//
+        //        $this->options['conditions'] = $where;
+        //
         $this->select('COUNT(*)');
         $sql = $this->table()->options_to_sql($this->options);
-//        $values = $sql->get_where_values();
+        //        $values = $sql->get_where_values();
 
         $values = [];
 
@@ -547,8 +483,8 @@ class Relation
      *
      * @return array<string, mixed>
      */
-    private function pk_conditions(int|array $args): array
+    private function pk_conditions(int|array $args): WhereClause
     {
-        return [$this->table()->pk[0] => $args];
+        return new WhereClause([$this->table()->pk[0] => $args], []);
     }
 }

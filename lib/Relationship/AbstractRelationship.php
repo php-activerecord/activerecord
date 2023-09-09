@@ -2,6 +2,7 @@
 
 namespace ActiveRecord\Relationship;
 
+use ActiveRecord\WhereClause;
 use function ActiveRecord\all;
 use function ActiveRecord\classify;
 
@@ -134,7 +135,7 @@ abstract class AbstractRelationship
         }
 
         $values = [$values];
-        $conditions = SQLBuilder::create_conditions_from_underscored_string($table->conn, $query_key, $values);
+        $conditions = WhereClause::from_underscored_string($table->conn, $query_key, $values);
 
         if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1) {
             Utils::add_condition($options['conditions'], $conditions ?? []);
@@ -338,7 +339,7 @@ abstract class AbstractRelationship
             return null;
         }
 
-        $conditions = SQLBuilder::create_conditions_from_underscored_string(Table::load(get_class($model))->conn, $condition_string, $condition_values);
+        $conditions = WhereClause::from_underscored_string(Table::load(get_class($model))->conn, $condition_string, $condition_values);
 
         // DO NOT CHANGE THE NEXT TWO LINES. add_condition operates on a reference and will screw options array up
         if (isset($this->options['conditions'])) {

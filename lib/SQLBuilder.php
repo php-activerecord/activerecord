@@ -145,7 +145,7 @@ class SQLBuilder
         foreach ($clauses as $idx => $clause) {
             $clause->set_connection($this->connection);
             list($expression, $vals) = $clause->to_s(!empty($this->joins));
-            $values += $vals;
+            $values = array_merge($values, array_flatten($vals));
             $inverse = $clause->inverse() ? '!' : '';
             $sql .=  "$inverse(" . $expression . ')' . ($idx < (count($clauses) - 1) ? $glue : '');
         }
@@ -317,55 +317,6 @@ class SQLBuilder
         assert(is_array($res));
 
         return $res;
-    }
-
-    /**
-     * Converts a string like "id_and_name_or_z" into a conditions value like
-     * ["id=? AND name=? OR z=?", values, ...].
-     *
-     * @param string               $name   Underscored string
-     * @param array<mixed>         $values Array of values for the field names. This is used
-     *                                     to determine what kind of bind marker to use: =?, IN(?), IS NULL
-     * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
-     *
-     * @return array<mixed>
-     */
-    public static function create_conditions_from_underscored_string(Connection $connection, ?string $name, array $values = [], array $map = []): ?array
-    {
-        if (!$name) {
-            return null;
-        }
-
-        $num_values = count((array) $values);
-        $conditions = [''];
-
-        $parts = static::underscored_string_to_parts($name);
-
-        for ($i = 0, $j = 0, $n = count($parts); $i < $n; $i += 2, ++$j) {
-            if ($i >= 2) {
-                $res = preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i - 1]);
-                assert(is_string($res));
-                $conditions[0] .= $res;
-            }
-
-            if ($j < $num_values) {
-                if (!is_null($values[$j])) {
-                    $bind = is_array($values[$j]) ? ' IN(?)' : '=?';
-                    $conditions[] = $values[$j];
-                } else {
-                    $bind = ' IS NULL';
-                }
-            } else {
-                $bind = ' IS NULL';
-            }
-
-            // map to correct name if $map was supplied
-            $name = $map && isset($map[$parts[$i]]) ? $map[$parts[$i]] : $parts[$i];
-
-            $conditions[0] .= $connection->quote_name($name) . $bind;
-        }
-
-        return $conditions;
     }
 
     /**

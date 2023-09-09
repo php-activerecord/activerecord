@@ -137,7 +137,7 @@ class WhereClause
                     if ($j > $num_values - 1) {
                         throw new ExpressionsException("No bound parameter for index $j");
                     }
-                    $ch = $this->substitute($values, false, $i, $j++);
+                    $ch = $this->substitute($expression, $values, false, $i, $j++);
                 }
             } elseif ('\'' == $ch && $i > 0 && '\\' != $expression[$i - 1]) {
                 ++$quotes;
@@ -147,6 +147,58 @@ class WhereClause
         }
 
         return [$ret, $values];
+    }
+
+    /**
+     * Converts a string like "id_and_name_or_z" into a conditions value like
+     * ["id=? AND name=? OR z=?", values, ...].
+     *
+     * @param string               $name   Underscored string
+     * @param array<mixed>         $values Array of values for the field names. This is used
+     *                                     to determine what kind of bind marker to use: =?, IN(?), IS NULL
+     * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
+     *
+     * @return array<mixed>
+     */
+    public static function from_underscored_string(
+        Connection $connection, ?string $name, array $values = [], array $map = []): ?WhereClause
+    {
+        if (!$name) {
+            return null;
+        }
+
+        $expression = '';
+
+        $num_values = count((array) $values);
+        $conditionValues = [];
+
+        $parts = SQLBuilder::underscored_string_to_parts($name);
+
+        for ($i = 0, $j = 0, $n = count($parts); $i < $n; $i += 2, ++$j) {
+            if ($i >= 2) {
+                $res = preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i - 1]);
+                assert(is_string($res));
+                $expression .= $res;
+            }
+
+            if ($j < $num_values) {
+                if (!is_null($values[$j])) {
+                    $bind = is_array($values[$j]) ? ' IN(?)' : '=?';
+                    $conditionValues[] = $values[$j];
+                } else {
+                    $bind = ' IS NULL';
+                }
+            } else {
+                $bind = ' IS NULL';
+            }
+
+            // map to correct name if $map was supplied
+            $name = $map && isset($map[$parts[$i]]) ? $map[$parts[$i]] : $parts[$i];
+
+            $expression .= $connection->quote_name($name) . $bind;
+        }
+
+        return new WhereClause($expression, $conditionValues);
     }
 
     /**
@@ -189,7 +241,7 @@ class WhereClause
      *
      * @return mixed|string
      */
-    private function substitute(array $values, bool $substitute, int $pos, int $parameter_index)
+    private function substitute(string $expression, array $values, bool $substitute, int $pos, int $parameter_index)
     {
         $value = $values[$parameter_index];
 
@@ -221,7 +273,7 @@ class WhereClause
             return $this->stringify_value($value);
         }
 
-        return $this->expression[$pos];
+        return $expression[$pos];
     }
 
     private function stringify_value(mixed $value): string

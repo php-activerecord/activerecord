@@ -1532,43 +1532,48 @@ class Model
      *
      * @see find
      */
-//    public static function __callStatic(string $method, mixed $args): mixed
-//    {
+    public static function __callStatic(string $method, mixed $args): mixed
+    {
 //        $options = static::extract_and_validate_options($args);
-//        $create = false;
-//
-//        if ('find_or_create_by' == substr($method, 0, 17)) {
-//            $attributes = substr($method, 17);
-//
-//            // can't take any finders with OR in it when doing a find_or_create_by
-//            if (false !== strpos($attributes, '_or_')) {
-//                throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
-//            }
-//            $create = true;
-//            $method = 'find_by' . substr($method, 17);
-//        }
-//
-//        if (str_starts_with($method, 'find_by')) {
-//            $attributes = substr($method, 8);
-//            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
-//
-//            if (!($ret = static::find('first', $options)) && $create) {
-//                return static::create(SQLBuilder::create_hash_from_underscored_string($attributes, $args, static::$alias_attribute));
-//            }
-//
-//            return $ret;
-//        } elseif (str_starts_with($method, 'find_all_by')) {
-//            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
-//
-//            return static::find('all', $options);
-//        } elseif ('count_by' === substr($method, 0, 8)) {
-//            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 9), $args, static::$alias_attribute);
-//
-//            return static::count($options);
-//        }
-//
-//        throw new ActiveRecordException("Call to undefined method: $method");
-//    }
+        $options = [];
+        $create = false;
+
+        if (str_starts_with($method, 'find_or_create_by')) {
+            $attributes = substr($method, 17);
+
+            // can't take any finders with OR in it when doing a find_or_create_by
+            if (false !== strpos($attributes, '_or_')) {
+                throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
+            }
+            $create = true;
+            $method = 'find_by' . substr($method, 17);
+        }
+
+        $options['conditions'] ??= [];
+
+        if (str_starts_with($method, 'find_by')) {
+            $attributes = substr($method, 8);
+            $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
+
+            $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
+
+            if (!(($ret = $rel->first()) && $create)) {
+                return static::create(SQLBuilder::create_hash_from_underscored_string($attributes, $args, static::$alias_attribute));
+            }
+
+            return $ret->to_a();
+        } elseif (str_starts_with($method, 'find_all_by')) {
+            $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
+
+            return static::find('all', $options);
+        } elseif ('count_by' === substr($method, 0, 8)) {
+            $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), substr($method, 9), $args, static::$alias_attribute);
+
+            return static::count($options);
+        }
+
+        throw new ActiveRecordException("Call to undefined method: $method");
+    }
 
     /**
      * Enables the use of build|create for associations.
@@ -1760,32 +1765,26 @@ class Model
     }
 
     /**
-     * Alias for self::find('first').
      *
-     * @see find
+     * @return static|array<static>|null
+     *
      */
-    public static function first(/* ... */): static|null
+    public static function first(int $limit = null): mixed
     {
-        $res = static::find('first', ...func_get_args());
-        // this is a workaround for what seems to be a PHPStan bug
-        assert($res instanceof static || is_null($res));
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
 
-        return $res;
+        return $relation->first($limit);
     }
 
     /**
-     * Alias for self::find('last')
-     *
-     * @see find
+     * @return static|array<static>|null
      */
-    public static function last(/* ... */): static|null
+    public static function last(int $limit = null): mixed
     {
-        $res = static::find('last', ...func_get_args());
-        // this is a workaround for what seems to be a PHPStan bug
-        assert($res instanceof static || is_null($res));
-
-        return $res;
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        return $relation->last($limit);
     }
+
 
     /**
      * Find records in the database.
@@ -1857,82 +1856,8 @@ class Model
      */
     public static function find(/* $type, $options */): Model|array|null
     {
-        $class = get_called_class();
-
-        $args = func_get_args();
-        if (0 === count($args)) {
-            throw new RecordNotFound("Couldn't find $class without an ID");
-        }
-        $options = static::extract_and_validate_options($args);
-
         $relation = new Relation(get_called_class(), static::$alias_attribute);
-
-        foreach (Relation::$VALID_OPTIONS as $key) {
-            if ('conditions'!= $key && array_key_exists($key, $options)) {
-                $relation->$key($options[$key]);
-                unset($options[$key]);
-            }
-        }
-
-        $num_args = count($args);
-        $single = true;
-
-        if (count($args) > 0 && in_array($args[0], ['all', 'first', 'last'])) {
-            switch ($args[0]) {
-                case 'all':
-                    $single = false;
-                    break;
-
-                case 'last':
-                    $relation->last(1);
-
-                    // fall thru
-                    // no break
-                case 'first':
-                    $relation->limit(1);
-                    $relation->offset(0);
-                    break;
-            }
-
-            $args = array_slice($args, 1);
-            --$num_args;
-        }
-
-        // find by pk
-        else {
-            if (1 === $num_args) {
-                $args = $args[0];
-            }
-
-            if (is_array($args) && array_values($args) == $args) {
-                $single = false;
-            }
-        }
-
-        if (is_array($args) && 0 === count($args)) {
-            if (array_key_exists('conditions', $options) && $single) {
-                $args = $options['conditions'];
-                if (!is_array($args)) {
-                    $args = [$args];
-                }
-            } else {
-                $args = $options;
-            }
-        }
-
-        if ($single) {
-            if (1 === $num_args && is_array($args) && array_is_list($args)) {
-                $args = $args[0];
-            }
-
-            return $relation->whereToBeReplacedByFind($args, true);
-        }
-
-        if (array_key_exists('conditions', $options)) {
-            $args = $options;
-        }
-
-        return $relation->all($args);
+        return $relation->find(...func_get_args());
     }
 
     /**

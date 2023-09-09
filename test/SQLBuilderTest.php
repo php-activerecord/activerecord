@@ -3,6 +3,7 @@
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\SQLBuilder;
 use ActiveRecord\Table;
+use ActiveRecord\WhereClause;
 use test\models\Author;
 
 class SQLBuilderTest extends DatabaseTestCase
@@ -20,14 +21,14 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->table = Table::load($this->class_name);
     }
 
-    protected function cond_from_s($name, $values=[], $map=[])
+    protected function cond_from_s($name, $values=[], $map=[]): ?WhereClause
     {
-        return SQLBuilder::create_conditions_from_underscored_string($this->table->conn, $name, $values, $map);
+        return WhereClause::from_underscored_string($this->table->conn, $name, $values, $map);
     }
 
     public function assert_conditions($expected_sql, $values, $underscored_string, $map=[])
     {
-        $cond = SQLBuilder::create_conditions_from_underscored_string($this->table->conn, $underscored_string, $values, $map);
+        $cond = WhereClause::from_underscored_string($this->table->conn, $underscored_string, $values, $map);
         $this->assert_sql_has($expected_sql, array_shift($cond));
 
         if ($values) {

@@ -4,6 +4,7 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Model;
 use test\models\Author;
 use test\models\HonestLawyer;
@@ -14,20 +15,20 @@ class ActiveRecordFindTest extends DatabaseTestCase
 {
     public function testFindWithNoParams()
     {
-        $this->expectException(RecordNotFound::class);
+        $this->expectException(ValidationsArgumentError::class);
         Author::find();
     }
 
     public function testFindReturnsSingleModel()
     {
-        $author = Author::find(3, ['select' => 'author_id']);
+        $author = Author::select('author_id')->find(3);
         $this->assertInstanceOf(Model::class, $author);
 
         $author = Author::find('3');
         $this->assertInstanceOf(Model::class, $author);
 
-        $author = Author::find(['name'=>'Bill Clinton']);
-        $this->assertInstanceOf(Model::class, $author);
+        $authors = Author::where(['name'=>'Bill Clinton'])->to_a();
+        $this->assertIsArray($authors);
 
         $author = Author::find_by_name('Bill Clinton');
         $this->assertInstanceOf(Model::class, $author);
@@ -185,7 +186,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindAllHash()
     {
-        $books = \test\models\Book::find('all', ['conditions' => ['author_id' => 1]]);
+        $books = \test\models\Book::all()->where(['author_id' => 1])->to_a();
         $this->assertTrue(count($books) > 0);
     }
 

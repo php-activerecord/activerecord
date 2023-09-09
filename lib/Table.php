@@ -211,7 +211,6 @@ class Table
             $sql->select($options['select']);
         }
 
-        $conditions = [];
 //        foreach($options['conditions'] ?? [] as $condition) {
 //            if (is_hash($condition)) {
 //                if (!empty($options['mapped_names'])) {
@@ -222,7 +221,7 @@ class Table
 //            }
 //        }
 
-        $sql->where($options['conditions']);
+        $sql->where($options['conditions'] ?? []);
 
 //        if (array_key_exists('conditions', $options)) {
 //            if (!is_hash($options['conditions'])) {
