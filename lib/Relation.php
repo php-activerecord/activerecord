@@ -314,7 +314,7 @@ class Relation
         $class = $this->className;
 
         if (0 === $num_args) {
-            throw new ValidationsArgumentError("find requires at least one argument");
+            throw new ValidationsArgumentError('find requires at least one argument');
         }
 
         // find by pk
@@ -330,12 +330,11 @@ class Relation
         $options['mapped_names'] = $this->alias_attribute;
 
         $list = $this->table()->find($options);
-        if(is_array($args) && count($list) != count($args)) {
-            throw new RecordNotFound('found '. count($list) .', but was looking for ' . count($args));
+        if (is_array($args) && count($list) != count($args)) {
+            throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));
         }
 
-
-        return $single ? ($list[0] ?? throw new RecordNotFound("tbd")): $list;
+        return $single ? ($list[0] ?? throw new RecordNotFound('tbd')) : $list;
     }
 
     /**
@@ -346,6 +345,7 @@ class Relation
         $this->limit($limit ?? 1);
         if (!isset($limit)) {
             $models = $this->to_a();
+
             return $models[0] ?? null;
         }
 
@@ -445,8 +445,6 @@ class Relation
         $sql = $this->table()->options_to_sql($this->options);
         //        $values = $sql->get_where_values();
 
-
-
         $table = $this->table();
         $sql = $table->options_to_sql($this->options);
         $values = $sql->get_where_values();
@@ -454,6 +452,26 @@ class Relation
         $res = $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
 
         return $res;
+    }
+
+    public function exists(mixed $conditions = []): int
+    {
+        if (is_array($conditions) || is_hash($conditions)) {
+            !empty($conditions) && $this->where($conditions);
+        } else {
+            try {
+                static::find($conditions);
+
+                return true;
+            } catch (\Exception $e) {
+                return false;
+            }
+        }
+
+        $this->options['select'] = 1;
+        $res = $this->count();
+
+        return $res > 0;
     }
 
     /**

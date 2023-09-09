@@ -147,7 +147,8 @@ class SQLBuilder
             list($expression, $vals) = $clause->to_s(!empty($this->joins), $mappedNames);
             $values = array_merge($values, array_flatten($vals));
             $inverse = $clause->inverse() ? '!' : '';
-            $sql .=  "$inverse(" . $expression . ')' . ($idx < (count($clauses) - 1) ? $glue : '');
+            $wrappedExpression = $inverse || count($clauses) > 1 ? "(" . $expression . ')' : $expression;
+            $sql .=  $inverse . $wrappedExpression . ($idx < (count($clauses) - 1) ? $glue : '');
         }
 
         $this->where = $sql;
@@ -367,7 +368,6 @@ class SQLBuilder
 
     private function build_insert(): string
     {
-        require_once 'Expressions.php';
         $keys = join(',', $this->quoted_key_names());
 
         if ($this->sequence) {

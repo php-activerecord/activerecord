@@ -16,10 +16,6 @@ class ModelMethodsClassReflectionExtension implements MethodsClassReflectionExte
                 return true;
             }
 
-            if (preg_match('/\bcount_by_/', $methodName)) {
-                return true;
-            }
-
             if (str_ends_with($methodName, '_set')) {
                 return true;
             }

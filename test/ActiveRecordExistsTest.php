@@ -24,9 +24,16 @@ class ActiveRecordExistsTest extends DatabaseTestCase
 
     public function testWithSingleId() {
         $this->assertTrue(Author::exists(1));
-//        $this->assertTrue(Author::exists('author_id=1'));
-//        $this->assertTrue(Author::exists(['conditions' => ['author_id=? and name=?', 1, 'Tito']]));
-//        $this->assertFalse(Author::exists(9999999));
-//        $this->assertFalse(Author::exists(['conditions' => 'author_id=999999']));
+        $this->assertTrue(Author::exists('1'));
+        $this->assertFalse(Author::exists(134234));
+    }
+
+    public function testWithArrayConditions() {
+        $this->assertTrue(Author::exists(['author_id=? and name=?', 1, 'Tito']));
+        $this->assertFalse(Author::exists(['author_id=? and name=?', 1, 'Sam']));
+    }
+
+    public function testWithHashConditions() {
+        $this->assertTrue(Author::exists(['name' => 'Tito']));
     }
 }

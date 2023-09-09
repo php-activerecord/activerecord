@@ -17,6 +17,7 @@ use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
+use function PHPUnit\Framework\stringStartsWith;
 
 /**
  * The base class for your models.
@@ -1502,10 +1503,6 @@ class Model
      * SomeModel::find_by_first_name('Tito');
      * SomeModel::find_by_first_name_and_last_name('Tito','the Grief');
      * SomeModel::find_by_first_name_or_last_name('Tito','the Grief');
-     * SomeModel::find_all_by_last_name('Smith');
-     * SomeModel::count_by_name('Bob')
-     * SomeModel::count_by_name_or_state('Bob','VA')
-     * SomeModel::count_by_name_and_state('Bob','VA')
      * ```
      *
      * You can also create the model if the find call returned no results:
@@ -1538,15 +1535,14 @@ class Model
         $options = [];
         $create = false;
 
-        if (str_starts_with($method, 'find_or_create_by')) {
-            $attributes = substr($method, 17);
+        if ($attributes = static::extract_dynamic_vars($method, 'find_or_create_by')) {
+
 
             // can't take any finders with OR in it when doing a find_or_create_by
             if (false !== strpos($attributes, '_or_')) {
                 throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
             }
             $create = true;
-            $method = 'find_by' . substr($method, 17);
         }
 
         $options['conditions'] ??= [];
@@ -1561,18 +1557,17 @@ class Model
             }
 
             return $ret;
-        } elseif (str_starts_with($method, 'find_all_by')) {
-            $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
-            $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
-
-            return $rel->to_a();
-        } elseif ('count_by' === substr($method, 0, 8)) {
-            $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), substr($method, 9), $args, static::$alias_attribute);
-
-            return static::count($options);
         }
 
         throw new ActiveRecordException("Call to undefined method: $method");
+    }
+
+    public static function extract_dynamic_vars(string $methodName, string $dynamicPart): string {
+        if(stringStartsWith($methodName, $dynamicPart)) {
+            $attributes = substr($methodName, strlen($dynamicPart) +1);
+            return $attributes;
+        }
+        return '';
     }
 
     /**
@@ -1747,16 +1742,34 @@ class Model
      * Determine if a record exists.
      *
      * ```
+     * // no arguments
+     * SomeModel::exists();
+     *
+     * // by primary key
      * SomeModel::exists(123);
-     * SomeModel::exists(['conditions' => ['id=? and name=?', 123, 'Tito']]);
-     * SomeModel::exists(['id' => 123, 'name' => 'Tito']);
+     * SomeModel::exists([123, 15]);
+     *
+     * // array conditions
+     * SomeModel::exists([
+     *   'id=? and name=?', 123, 'Tito'
+     * ]);
+     *
+     * // hash conditions
+     * SomeModel::exists([
+     *   'id' => 123,
+     *   'name' => 'Tito'
+     * ]);
+     *
      * ```
      *
+     * @see where
      * @see find
      */
-    public static function exists(/* ... */): bool
+    public static function exists(mixed $conditions = []): bool
     {
-        return static::count(...func_get_args()) > 0;
+        $relation = new Relation(get_called_class(), static::$alias_attribute);
+
+        return $relation->exists($conditions);
     }
 
     /**
