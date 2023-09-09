@@ -1554,18 +1554,18 @@ class Model
         if (str_starts_with($method, 'find_by')) {
             $attributes = substr($method, 8);
             $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
-
             $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
 
-            if (!(($ret = $rel->first()) && $create)) {
+            if (!($ret = $rel->first()) && $create) {
                 return static::create(SQLBuilder::create_hash_from_underscored_string($attributes, $args, static::$alias_attribute));
             }
 
-            return $ret->to_a();
+            return $ret;
         } elseif (str_starts_with($method, 'find_all_by')) {
             $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
+            $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
 
-            return static::find('all', $options);
+            return $rel->to_a();
         } elseif ('count_by' === substr($method, 0, 8)) {
             $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), substr($method, 9), $args, static::$alias_attribute);
 

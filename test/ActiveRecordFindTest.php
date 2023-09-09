@@ -31,24 +31,24 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assertIsArray($authors);
 
         $author = Author::find_by_name('Bill Clinton');
-        $this->assertInstanceOf(Model::class, $author);
+        $this->assertInstanceOf(Author::class, $author);
 
         $author = Author::first();
-        $this->assertInstanceOf(Model::class, $author);
+        $this->assertInstanceOf(Author::class, $author);
 
-        $author = Author::find('first', ['name'=>'Bill Clinton']);
-        $this->assertInstanceOf(Model::class, $author);
+        $author = Author::where(['name'=>'Bill Clinton'])->first();
+        $this->assertInstanceOf(Author::class, $author);
 
         $author = Author::last();
-        $this->assertInstanceOf(Model::class, $author);
+        $this->assertInstanceOf(Author::class, $author);
 
-        $author = Author::find('last', ['name'=>'Bill Clinton']);
-        $this->assertInstanceOf(Model::class, $author);
+        $author = Author::where(['name'=>'Bill Clinton'])->last();
+        $this->assertInstanceOf(Author::class, $author);
     }
 
     public function testFindReturnsArrayOfModels()
     {
-        $authors = Author::all();
+        $authors = Author::all()->to_a();
         $this->assertIsArray($authors);
 
         $authors = Author::find_all_by_name('Bill Clinton');
@@ -69,10 +69,10 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $lawyer = HonestLawyer::last();
         $this->assertNull($lawyer);
 
-        $lawyer = HonestLawyer::find('first', ['name'=>'Abe']);
+        $lawyer = HonestLawyer::where(['name'=>'Abe'])->first();
         $this->assertNull($lawyer);
 
-        $lawyer = HonestLawyer::find('last', ['name'=>'Abe']);
+        $lawyer = HonestLawyer::where(['name'=>'Abe'])->last();
         $this->assertNull($lawyer);
     }
 
@@ -81,10 +81,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
         return [
             [
                 -1,
-                null,
-                ['first', ['name'=>'Abe']],
-                ['last', ['name'=>'Abe']],
-                ['conditions'=> ['name' => 'Bill Clinton']]
+                null
             ]
         ];
     }
@@ -122,7 +119,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindByPkWithOptions()
     {
-        $author = Author::find(3, ['order' => 'name']);
+        $author = Author::order('name')->find(3);
         $this->assertEquals(3, $author->id);
         $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name'));
     }
@@ -137,7 +134,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindByPkArrayWithOptions()
     {
-        $authors = Author::find(1, '2', ['order' => 'name']);
+        $authors = Author::order('name')->find(1, '2');
         $this->assertEquals(2, count($authors));
         $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name'));
     }
@@ -150,26 +147,28 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindAll()
     {
-        $authors = Author::find('all', ['conditions' => ['author_id IN(?)', [1, 2, 3]]]);
+        $authors = Author::where(['author_id IN(?)', [1, 2, 3]])->to_a();
         $this->assertTrue(count($authors) >= 3);
     }
 
     public function testFindAllWithNoBindValues()
     {
-        $authors = Author::find('all', ['conditions' => ['author_id IN(1,2,3)']]);
+        $authors = Author::where('author_id IN(1,2,3)')->to_a();
         $this->assertEquals(1, $authors[0]->author_id);
     }
 
     public function testFindAllWithEmptyArrayBindValueThrowsException()
     {
         $this->expectException(DatabaseException::class);
-        $authors = Author::find('all', ['conditions' => ['author_id IN(?)', []]]);
-        $this->assertCount(0, $authors);
+        Author::where(['author_id IN(?)', []])->to_a();
     }
 
     public function testFindHashUsingAlias()
     {
-        $venues = Venue::all(['conditions' => ['marquee' => 'Warner Theatre', 'city' => ['Washington', 'New York']]]);
+        $venues = Venue::where(['marquee' => 'Warner Theatre', 'city' => [
+            'Washington',
+            'New York'
+        ]])->to_a();
         $this->assertTrue(count($venues) >= 1);
     }
 

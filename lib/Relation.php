@@ -331,7 +331,7 @@ class Relation
 
         $list = $this->table()->find($options);
         if(is_array($args) && count($list) != count($args)) {
-            throw new RecordNotFound("tbd");
+            throw new RecordNotFound('found '. count($list) .', but was looking for ' . count($args));
         }
 
 
