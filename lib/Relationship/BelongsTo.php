@@ -90,7 +90,8 @@ class BelongsTo extends AbstractRelationship
         }
 
         $options = $this->unset_non_finder_options($this->options);
-        $options['conditions'] = $conditions;
+        $r = $this->options['conditions'];
+        $options['conditions'] = array_merge($conditions, $this->options['conditions']);
         $class = $this->class_name;
 
         $rel = new Relation($class, [], $options);

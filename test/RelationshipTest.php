@@ -148,19 +148,21 @@ class RelationshipTest extends DatabaseTestCase
     public function testJoinsOnModelViaUndeclaredAssociation()
     {
         $this->expectException(RelationshipException::class);
-        JoinBook::joins('undeclared')->first();
+        JoinBook::joins(['undeclared'])->first();
     }
 
     public function testJoinsOnlyLoadsGivenModelAttributes()
     {
-        $x = Event::first(['joins' => ['venue']]);
+        $x = Event::joins(['venue'])->first();
         $this->assert_sql_has('SELECT events.*', Event::table()->last_sql);
         $this->assertFalse(array_key_exists('city', $x->attributes()));
     }
 
     public function testJoinsCombinedWithSelectLoadsAllAttributes()
     {
-        $x = Event::first(['select' => 'events.*, venues.city as venue_city', 'joins' => ['venue']]);
+        $x = Event::select('events.*, venues.city as venue_city')
+            ->joins(['venue'])
+            ->first();
         $this->assert_sql_has('SELECT events.*, venues.city as venue_city', Event::table()->last_sql);
         $this->assertTrue(array_key_exists('venue_city', $x->attributes()));
     }
@@ -261,7 +263,7 @@ class RelationshipTest extends DatabaseTestCase
                 'conditions' => "state = 'NY'"
             ]
         ];
-        $event = $this->get_relationship();
+        $event = Event::find(5);
         $this->assertEquals(5, $event->id);
         $this->assertNull($event->venue);
     }
@@ -435,11 +437,11 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals(2, $property->amenities[1]->amenity_id);
     }
 
-    public function testGh16HasManyThroughInsideALoopShouldNotCauseAnException()
+    public function testHasManyThroughInsideALoopShouldNotCauseAnException()
     {
         $count = 0;
 
-        foreach (Venue::all() as $venue) {
+        foreach (Venue::all()->to_a() as $venue) {
             $count += count($venue->hosts);
         }
 

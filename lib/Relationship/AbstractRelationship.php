@@ -77,9 +77,9 @@ abstract class AbstractRelationship
         $this->attribute_name = $attribute_name;
         $this->options = $this->merge_association_options($options);
 
-        if (isset($this->options['conditions']) && !is_array($this->options['conditions'])) {
-            $this->options['conditions'] = [$this->options['conditions']];
-        }
+        $this->options['conditions'] = array_map(function ($condition) {
+            return WhereClause::from_arg($condition);
+        }, (array)($options['conditions'] ?? []));
 
         if (isset($this->options['class_name'])) {
             $this->set_class_name($this->inferred_class_name($this->options['class_name']));
@@ -336,16 +336,13 @@ abstract class AbstractRelationship
             return null;
         }
 
-        $conditions = WhereClause::from_underscored_string(Table::load(get_class($model))->conn, $condition_string, $condition_values);
+        $conditions[] = WhereClause::from_underscored_string(
+            Table::load(get_class($model))->conn,
+            $condition_string,
+            $condition_values
+        );
 
-        // DO NOT CHANGE THE NEXT TWO LINES. add_condition operates on a reference and will screw options array up
-        if (isset($this->options['conditions'])) {
-            $options_conditions = $this->options['conditions'];
-        } else {
-            $options_conditions = [];
-        }
-
-        return [$conditions]; // Utils::add_condition($options_conditions, $conditions ?? []);
+        return $conditions; // Utils::add_condition($options_conditions, $conditions ?? []);
     }
 
     /**
