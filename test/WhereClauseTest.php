@@ -6,7 +6,7 @@ use ActiveRecord\Exception\ExpressionsException;
 use ActiveRecord\WhereClause;
 use PHPUnit\Framework\TestCase;
 
-class ExpressionsTest extends TestCase
+class WhereClauseTest extends TestCase
 {
     public function testValues()
     {
@@ -17,67 +17,67 @@ class ExpressionsTest extends TestCase
     public function testOneVariable()
     {
         $c = new WhereClause('name=?', ['Tito']);
-        $this->assertEquals('name=?', $c->to_s());
+        $this->assertEquals('name=?', $c->to_s()[0]);
         $this->assertEquals(['Tito'], $c->values());
     }
 
     public function testArrayVariable()
     {
-        $c = new WhereClause(null, 'name IN(?) and id=?', ['Tito', 'George'], 1);
+        $c = new WhereClause('name IN(?) and id=?', [['Tito', 'George'],1]);
         $this->assertEquals([['Tito', 'George'], 1], $c->values());
     }
 
     public function testMultipleVariables()
     {
-        $c = new WhereClause(null, 'name=? and book=?', 'Tito', 'Sharks');
-        $this->assertEquals('name=? and book=?', $c->to_s());
+        $c = new WhereClause('name=? and book=?', ['Tito', 'Sharks']);
+        $this->assertEquals('name=? and book=?', $c->to_s()[0]);
         $this->assertEquals(['Tito', 'Sharks'], $c->values());
     }
 
     public function testToString()
     {
-        $c = new WhereClause(null, 'name=? and book=?', 'Tito', 'Sharks');
-        $this->assertEquals('name=? and book=?', $c->to_s());
+        $c = new WhereClause('name=? and book=?', ['Tito', 'Sharks']);
+        $this->assertEquals('name=? and book=?', $c->to_s()[0]);
     }
 
     public function testToStringWithArrayVariable()
     {
-        $c = new WhereClause(null, 'name IN(?) and id=?', ['Tito', 'George'], 1);
-        $this->assertEquals('name IN(?,?) and id=?', $c->to_s());
+        $c = new WhereClause('name IN(?) and id=?', [['Tito', 'George'], 1]);
+        $this->assertEquals('name IN(?,?) and id=?', $c->to_s()[0]);
     }
 
     public function testToStringWithEmptyOptions()
     {
-        $c = new WhereClause(null, 'name=? and book=?', 'Tito', 'Sharks');
+        $c = new WhereClause('name=? and book=?', ['Tito', 'Sharks']);
         $x = [];
-        $this->assertEquals('name=? and book=?', $c->to_s(false, $x));
+        $this->assertEquals('name=? and book=?', $c->to_s(false, $x)[0]);
     }
 
     public function testInsufficientVariables()
     {
         $this->expectException(ExpressionsException::class);
-        $c = new WhereClause(null, 'name=? and id=?', 'Tito');
+        $c = new WhereClause('name=? and id=?', ['Tito']);
         $c->to_s();
     }
 
     public function testNoValues()
     {
-        $c = new WhereClause(null, "name='Tito'");
-        $this->assertEquals("name='Tito'", $c->to_s());
+        $c = new WhereClause( "name='Tito'");
+        $this->assertEquals("name='Tito'", $c->to_s()[0]);
         $this->assertEquals(0, count($c->values()));
     }
 
-    public function testNullVariable()
+    public function testEmptyVariable()
     {
-        $a = new WhereClause(null, 'name=?', null);
-        $this->assertEquals('name=?', $a->to_s());
+        $a = new WhereClause('name=?', [null]);
+        $this->assertEquals('name=?', $a->to_s()[0]);
         $this->assertEquals([null], $a->values());
     }
 
     public function testZeroVariable()
     {
-        $a = new WhereClause(null, 'name=?', 0);
-        $this->assertEquals('name=?', $a->to_s());
+        $a = new WhereClause('name=?', [0]);
+        $this->assertEquals('name=?', $a->to_s()[0]);
         $this->assertEquals([0], $a->values());
     }
 
@@ -143,10 +143,10 @@ class ExpressionsTest extends TestCase
         } catch (DatabaseException $e) {
             $this->markTestSkipped('failed to connect. ' . $e->getMessage());
         }
-        $a = new WhereClause(null, 'name=?', "Tito's Guild");
+        $a = new WhereClause('name=?', ["Tito's Guild"]);
         $a->set_connection($conn);
         $escaped = $conn->escape("Tito's Guild");
-        $this->assertEquals("name=$escaped", $a->to_s(true));
+        $this->assertEquals("name=$escaped", $a->to_s(true)[0]);
     }
 
     public function testBind()

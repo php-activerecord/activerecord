@@ -34,7 +34,7 @@ class WhereClause
     /**
      * @param string|array<mixed> $expression
      */
-    public function __construct(string|array $expression, array $values, bool $inverse = false)
+    public function __construct(string|array $expression, array $values=[], bool $inverse = false)
     {
         $this->inverse = $inverse;
         $this->expression = $expression;
