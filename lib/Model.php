@@ -1543,17 +1543,20 @@ class Model
                 throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
             }
             $create = true;
+            $method = 'find_by_' . $attributes;
         }
 
         $options['conditions'] ??= [];
 
-        if (str_starts_with($method, 'find_by')) {
-            $attributes = substr($method, 8);
+        if ($attributes = static::extract_dynamic_vars($method, 'find_by')) {
             $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
             $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
 
             if (!($ret = $rel->first()) && $create) {
-                return static::create(SQLBuilder::create_hash_from_underscored_string($attributes, $args, static::$alias_attribute));
+                return static::create(SQLBuilder::create_hash_from_underscored_string(
+                    $attributes,
+                    $args,
+                    static::$alias_attribute));
             }
 
             return $ret;
