@@ -117,11 +117,12 @@ class WhereClause
      *
      * @throws ExpressionsException
      */
-    public function to_s(bool $prependTableName = false): array
+    public function to_s(bool $prependTableName = false, array $mappedNames = []): array
     {
         $values = $this->values;
         $expression = $this->expression;
         if(is_hash($expression)) {
+           $expression = $this->map_names($expression, $mappedNames);
            list($expression, $values) = $this->build_sql_from_hash($expression, $prependTableName);
         }
 
@@ -199,6 +200,29 @@ class WhereClause
         }
 
         return new WhereClause($expression, $conditionValues);
+    }
+
+    /**
+     * Replaces any aliases used in a hash based condition.
+     *
+     * @param array<string, string> $hash A hash
+     * @param array<string, string> $map  Hash of used_name => real_name
+     *
+     * @return array<string, string> Array with any aliases replaced with their read field name
+     */
+    private function map_names(array &$hash, array &$map): array
+    {
+        $ret = [];
+
+        foreach ($hash as $name => &$value) {
+            if (array_key_exists($name, $map)) {
+                $name = $map[$name];
+            }
+
+            $ret[$name] = $value;
+        }
+
+        return $ret;
     }
 
     /**

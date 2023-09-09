@@ -221,7 +221,7 @@ class Table
 //            }
 //        }
 
-        $sql->where($options['conditions'] ?? []);
+        $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
 
 //        if (array_key_exists('conditions', $options)) {
 //            if (!is_hash($options['conditions'])) {
@@ -479,29 +479,6 @@ class Table
         $table_name = $this->get_fully_qualified_table_name($quote_name);
         $conn = $this->conn;
         $this->columns = Cache::get("get_meta_data-$table_name", function () use ($conn, $table_name) { return $conn->columns($table_name); });
-    }
-
-    /**
-     * Replaces any aliases used in a hash based condition.
-     *
-     * @param array<string, string> $hash A hash
-     * @param array<string, string> $map  Hash of used_name => real_name
-     *
-     * @return array<string, string> Array with any aliases replaced with their read field name
-     */
-    private function map_names(array &$hash, array &$map): array
-    {
-        $ret = [];
-
-        foreach ($hash as $name => &$value) {
-            if (array_key_exists($name, $map)) {
-                $name = $map[$name];
-            }
-
-            $ret[$name] = $value;
-        }
-
-        return $ret;
     }
 
     /**

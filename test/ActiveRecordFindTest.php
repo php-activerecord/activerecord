@@ -174,7 +174,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindHashUsingAliasWithNull()
     {
-        $venues = Venue::all(['conditions' => ['marquee' => null]]);
+        $venues = Venue::where(['marquee' => null])->to_a();
         $this->assertEquals(0, count($venues));
     }
 
@@ -191,49 +191,43 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindAllHashWithOrder()
     {
-        $books = \test\models\Book::find('all', ['conditions' => ['author_id' => 1], 'order' => 'name DESC']);
+        $books = \test\models\Book::order('name DESC')->where(['author_id' => 1])->to_a();
         $this->assertTrue(count($books) > 0);
     }
 
     public function testFindAllNoArgs()
     {
-        $author = Author::all();
-        $this->assertTrue(count($author) > 1);
+        $authors = Author::all()->to_a();
+        $this->assertTrue(count($authors) > 1);
     }
 
     public function testFindAllNoResults()
     {
-        $authors = Author::find('all', ['conditions' => ['author_id IN(11111111111,22222222222,333333333333)']]);
+        $authors = Author::where('author_id IN(11111111111,22222222222,333333333333)')->to_a();
         $this->assertEquals([], $authors);
     }
 
     public function testFindFirst()
     {
-        $author = Author::find('first', ['conditions' => ['author_id IN(?)', [1, 2, 3]]]);
+        $author = Author::where(['author_id IN(?)', [1, 2, 3]])->first();
         $this->assertEquals(1, $author->author_id);
         $this->assertEquals('Tito', $author->name);
     }
 
     public function testFindFirstNoResults()
     {
-        $this->assertNull(Author::find('first', ['conditions' => 'author_id=1111111']));
-    }
-
-    public function testFindFirstUsingPk()
-    {
-        $author = Author::find('first', 3);
-        $this->assertEquals(3, $author->author_id);
+        $this->assertNull(Author::where('author_id=1111111')->first());
     }
 
     public function testFindFirstWithConditionsAsString()
     {
-        $author = Author::find('first', ['conditions' => 'author_id=3']);
+        $author = Author::where('author_id=3')->first();
         $this->assertEquals(3, $author->author_id);
     }
 
     public function testFindAllWithConditionsAsString()
     {
-        $author = Author::find('all', ['conditions' => 'author_id in(2,3)']);
+        $author = Author::all()->where('author_id in(2,3)')->to_a();
         $this->assertEquals(2, count($author));
     }
 
@@ -252,7 +246,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindWithConditions()
     {
-        $author = Author::find('first', ['conditions' => ['author_id=? and name=?', 1, 'Tito']]);
+        $author = Author::where(['author_id=? and name=?', 1, 'Tito'])->first();
         $this->assertEquals(1, $author->author_id);
     }
 
@@ -265,14 +259,14 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindLastUsingStringCondition()
     {
-        $author = Author::find('last', ['conditions' => 'author_id IN(1,2,3,4)']);
+        $author = Author::where('author_id IN(1,2,3,4)')->last();
         $this->assertEquals(4, $author->author_id);
         $this->assertEquals('Uncle Bob', $author->name);
     }
 
     public function testLimitBeforeOrder()
     {
-        $authors = Author::all(['limit' => 2, 'order' => 'author_id desc', 'conditions' => 'author_id in(1,2)']);
+        $authors = Author::limit(2)->order('author_id desc')->where(['author_id in(1,2)'])->to_a();
         $this->assertEquals(2, $authors[0]->author_id);
         $this->assertEquals(1, $authors[1]->author_id);
     }

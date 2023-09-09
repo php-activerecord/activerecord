@@ -137,14 +137,14 @@ class SQLBuilder
      *
      * @return $this
      */
-    public function where(array $clauses): static
+    public function where(array $clauses, array $mappedNames): static
     {
         $values = [];
         $sql = '';
         $glue = ' AND ';
         foreach ($clauses as $idx => $clause) {
             $clause->set_connection($this->connection);
-            list($expression, $vals) = $clause->to_s(!empty($this->joins));
+            list($expression, $vals) = $clause->to_s(!empty($this->joins), $mappedNames);
             $values = array_merge($values, array_flatten($vals));
             $inverse = $clause->inverse() ? '!' : '';
             $sql .=  "$inverse(" . $expression . ')' . ($idx < (count($clauses) - 1) ? $glue : '');
