@@ -1566,7 +1566,7 @@ class Model
     }
 
     public static function extract_dynamic_vars(string $methodName, string $dynamicPart): string {
-        if(stringStartsWith($methodName, $dynamicPart)) {
+        if(str_starts_with($methodName, $dynamicPart)) {
             $attributes = substr($methodName, strlen($dynamicPart) +1);
             return $attributes;
         }
