@@ -292,7 +292,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function testReadonlyOnlyHaltOnWriteMethod()
     {
-        $book = Book::first(['readonly' => true]);
+        $book = Book::readonly(true)->first();
         $this->assertTrue($book->is_readonly());
 
         try {
