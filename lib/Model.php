@@ -1729,7 +1729,7 @@ class Model
     public static function count(/* ... */): int
     {
         $args = func_get_args();
-        $options = static::extract_and_validate_options($args);
+        $options = [];
 
         if (!empty($args) && !is_null($args[0]) && !empty($args[0])) {
             if (is_hash($args[0])) {
@@ -1739,13 +1739,8 @@ class Model
             }
         }
 
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-
-        if (0 === count($options)) {
-            $options['conditions'] = [];
-        }
-
-        return $relation->count($options['conditions']);
+        $relation = new Relation(get_called_class(), static::$alias_attribute, $options);
+        return $relation->count();
     }
 
     /**
