@@ -320,7 +320,7 @@ class Table
             }
 
             if ($readonly) {
-                $model->readonly();
+                $model->set_read_only();
             }
 
             if ($collect_attrs_for_includes) {

@@ -1616,6 +1616,11 @@ class Model
         return $relation;
     }
 
+    public function set_read_only(bool $readonly = true): void
+    {
+        $this->__readonly = $readonly;
+    }
+
     /**
      * @param string|array<string> $joins
      */
