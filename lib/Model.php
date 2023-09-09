@@ -2044,6 +2044,25 @@ class Model
         return static::table()->callback->invoke($this, $method_name, $must_exist);
     }
 
+    public static function is_options_hash(mixed $options, bool $throw = true): bool
+    {
+        if (is_hash($options)) {
+            $keys = array_keys($options);
+            $diff = array_diff($keys, Relation::$VALID_OPTIONS);
+
+            if (!empty($diff) && $throw) {
+                throw new ActiveRecordException('Unknown key(s): ' . join(', ', $diff));
+            }
+            $intersect = array_intersect($keys, Relation::$VALID_OPTIONS);
+
+            if (!empty($intersect)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Executes a block of code inside a database transaction.
      *
