@@ -117,13 +117,14 @@ class WhereClause
      *
      * @throws ExpressionsException
      */
-    public function to_s(bool $prependTableName = false, array $mappedNames = [], bool $substitute=false): array
+    public function to_s(bool $prependTableName = false, array $mappedNames = [],
+                         bool $substitute=false, string $glue=' AND '): array
     {
         $values = $this->values;
         $expression = $this->expression;
         if(is_hash($expression)) {
            $expression = $this->map_names($expression, $mappedNames);
-           list($expression, $values) = $this->build_sql_from_hash($expression, $prependTableName);
+           list($expression, $values) = $this->build_sql_from_hash($expression, $prependTableName, $glue);
         }
 
         $ret = '';
@@ -240,10 +241,9 @@ class WhereClause
      *
      * @return array<mixed>
      */
-    private function build_sql_from_hash(array $hash, bool $prependTableName): array
+    private function build_sql_from_hash(array $hash, bool $prependTableName, $glue = ' AND '): array
     {
         $sql = $g = '';
-        $glue = ' AND ';
 
         $table = $prependTableName ? $this->connection->quote_name($this->table) : '';
 

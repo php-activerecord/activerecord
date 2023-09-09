@@ -180,8 +180,8 @@ class WhereClauseTest extends TestCase
 
     public function testNullValue()
     {
-        $a = new WhereClause(null, 'name=?', null);
-        $this->assertEquals('name=NULL', $a->to_s(true));
+        $a = new WhereClause('name=?', [null]);
+        $this->assertEquals('name=NULL', $a->to_s(substitute: true)[0]);
     }
 
     public function testHashWithDefaultGlue()
@@ -196,7 +196,7 @@ class WhereClauseTest extends TestCase
             'id' => 1,
             'name' => 'Tito'
         ]);
-        $this->assertEquals('id=?, name=?', $a->to_s()[0]);
+        $this->assertEquals('id=?, name=?', $a->to_s(glue: ', ')[0]);
     }
 
     public function testHashWithArray()
