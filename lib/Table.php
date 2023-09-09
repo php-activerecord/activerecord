@@ -441,7 +441,7 @@ class Table
         $data = $this->process_data($data);
 
         $sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
-        $sql->update($data)->where($where);
+        $sql->update($data)->where([new WhereClause($where, [])], []);
 
         $values = $sql->bind_values();
 

@@ -378,7 +378,7 @@ class SQLBuilder
             $sql = "INSERT INTO $this->table($keys) VALUES(?)";
         }
 
-        $e = new WhereClause($sql, array_values($this->data));
+        $e = new WhereClause($sql, [array_values($this->data)]);
         $e->set_connection($this->connection);
 
         return $e->to_s()[0];

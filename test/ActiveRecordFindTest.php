@@ -418,7 +418,8 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $arnow = new ActiveRecord\DateTime();
         $arnow->setTimestamp($now->getTimestamp());
 
-        Author::find(1)->update_attribute('created_at', $now);
+        $author = Author::find(1);
+        $author->update_attribute('created_at', $now);
         $this->assertNotNull(Author::find_by_created_at($now));
         $this->assertNotNull(Author::find_by_created_at($arnow));
     }
