@@ -117,7 +117,7 @@ class WhereClause
      *
      * @throws ExpressionsException
      */
-    public function to_s(bool $prependTableName = false, array $mappedNames = []): array
+    public function to_s(bool $prependTableName = false, array $mappedNames = [], bool $substitute=false): array
     {
         $values = $this->values;
         $expression = $this->expression;
@@ -138,7 +138,7 @@ class WhereClause
                     if ($j > $num_values - 1) {
                         throw new ExpressionsException("No bound parameter for index $j");
                     }
-                    $ch = $this->substitute($expression, $values, false, $i, $j++);
+                    $ch = $this->substitute($expression, $values, $substitute, $i, $j++);
                 }
             } elseif ('\'' == $ch && $i > 0 && '\\' != $expression[$i - 1]) {
                 ++$quotes;
@@ -248,7 +248,7 @@ class WhereClause
         $table = $prependTableName ? $this->connection->quote_name($this->table) : '';
 
         foreach ($hash as $name => $value) {
-            if ($this->connection) {
+            if (isset($this->connection)) {
                 $name = $this->connection->quote_name($name);
             }
 

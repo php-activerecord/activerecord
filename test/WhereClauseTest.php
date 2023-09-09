@@ -146,7 +146,7 @@ class WhereClauseTest extends TestCase
         $a = new WhereClause('name=?', ["Tito's Guild"]);
         $a->set_connection($conn);
         $escaped = $conn->escape("Tito's Guild");
-        $this->assertEquals("name=$escaped", $a->to_s(true)[0]);
+        $this->assertEquals("name=$escaped", $a->to_s(substitute: true)[0]);
     }
 
     public function testBind()
@@ -192,13 +192,19 @@ class WhereClauseTest extends TestCase
 
     public function testHashWithGlue()
     {
-        $a = new WhereClause(null, ['id' => 1, 'name' => 'Tito'], ', ');
-        $this->assertEquals('id=?, name=?', $a->to_s());
+        $a = new WhereClause([
+            'id' => 1,
+            'name' => 'Tito'
+        ]);
+        $this->assertEquals('id=?, name=?', $a->to_s()[0]);
     }
 
     public function testHashWithArray()
     {
-        $a = new WhereClause(null, ['id' => 1, 'name' => ['Tito', 'Mexican']]);
-        $this->assertEquals('id=? AND name IN(?,?)', $a->to_s());
+        $a = new WhereClause([
+            'id' => 1,
+            'name' => ['Tito', 'Mexican']
+        ]);
+        $this->assertEquals('id=? AND name IN(?,?)', $a->to_s()[0]);
     }
 }
