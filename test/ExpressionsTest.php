@@ -10,13 +10,13 @@ class ExpressionsTest extends TestCase
 {
     public function testValues()
     {
-        $c = new WhereClause(null, 'a=? and b=?', 1, 2);
+        $c = new WhereClause('a=? and b=?', [1, 2]);
         $this->assertEquals([1, 2], $c->values());
     }
 
     public function testOneVariable()
     {
-        $c = new WhereClause(null, 'name=?', 'Tito');
+        $c = new WhereClause('name=?', ['Tito']);
         $this->assertEquals('name=?', $c->to_s());
         $this->assertEquals(['Tito'], $c->values());
     }

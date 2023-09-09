@@ -206,12 +206,7 @@ class Relation
         }
         $arg = $args[0];
 
-        // user passed in a string, a hash, or an array consisting of a string and values
-        if (is_string($arg) || is_hash($arg)) {
-            $expression = new WhereClause($arg, []);
-        } else {
-            $expression = new WhereClause($arg[0], array_slice($arg, 1));
-        }
+        $expression = WhereClause::from_arg($arg);
 
         $this->options['conditions'][] = $expression;
 

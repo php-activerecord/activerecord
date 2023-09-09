@@ -17,7 +17,6 @@ use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
-use function PHPUnit\Framework\stringStartsWith;
 
 /**
  * The base class for your models.
@@ -1104,7 +1103,7 @@ class Model
         $conditions = $options['conditions'] ?? $options;
 
         if (is_array($conditions) && !is_hash($conditions)) {
-            call_user_func_array([$sql, 'delete'], $conditions);
+            $sql->delete($conditions);
         } else {
             $sql->delete($conditions);
         }
@@ -1155,11 +1154,7 @@ class Model
         isset($options['set']) && $sql->update($options['set']);
 
         if (isset($options['conditions']) && ($conditions = $options['conditions'])) {
-            if (is_array($conditions) && !is_hash($conditions)) {
-                call_user_func_array([$sql, 'where'], $conditions);
-            } else {
-                $sql->where($conditions);
-            }
+            $sql->where([WhereClause::from_arg($conditions)]);
         }
 
         if (isset($options['limit'])) {
@@ -1521,13 +1516,11 @@ class Model
      */
     public static function __callStatic(string $method, mixed $args): mixed
     {
-//        $options = static::extract_and_validate_options($args);
+        //        $options = static::extract_and_validate_options($args);
         $options = [];
         $create = false;
 
         if ($attributes = static::extract_dynamic_vars($method, 'find_or_create_by')) {
-
-
             // can't take any finders with OR in it when doing a find_or_create_by
             if (false !== strpos($attributes, '_or_')) {
                 throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
@@ -1555,11 +1548,14 @@ class Model
         throw new ActiveRecordException("Call to undefined method: $method");
     }
 
-    public static function extract_dynamic_vars(string $methodName, string $dynamicPart): string {
-        if(str_starts_with($methodName, $dynamicPart)) {
+    public static function extract_dynamic_vars(string $methodName, string $dynamicPart): string
+    {
+        if (str_starts_with($methodName, $dynamicPart)) {
             $attributes = substr($methodName, strlen($dynamicPart) +1);
+
             return $attributes;
         }
+
         return '';
     }
 
@@ -1606,7 +1602,6 @@ class Model
 
     /**
      * Flag as readonly.
-     *
      */
     public static function readonly(bool $readonly = true): Relation
     {
@@ -1708,8 +1703,6 @@ class Model
      * mapping of column names  all(["name"=>"Philip", "publisher"=>"Random House"]) WHERE name=Philip AND publisher=Random House
      * raw WHERE statement      all(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
      *
-     * @param array<number|mixed|string> $needle An array containing values for the pk
-     *
      * @return array<Model> All the rows that matches query. If no rows match, returns []
      */
     public static function all(): Relation
@@ -1745,6 +1738,7 @@ class Model
         }
 
         $relation = new Relation(get_called_class(), static::$alias_attribute, $options);
+
         return $relation->count();
     }
 
@@ -1783,9 +1777,7 @@ class Model
     }
 
     /**
-     *
      * @return static|array<static>|null
-     *
      */
     public static function first(int $limit = null): mixed
     {
@@ -1800,9 +1792,9 @@ class Model
     public static function last(int $limit = null): mixed
     {
         $relation = new Relation(get_called_class(), static::$alias_attribute);
+
         return $relation->last($limit);
     }
-
 
     /**
      * Find records in the database.
@@ -1875,6 +1867,7 @@ class Model
     public static function find(/* $type, $options */): Model|array|null
     {
         $relation = new Relation(get_called_class(), static::$alias_attribute);
+
         return $relation->find(...func_get_args());
     }
 
@@ -1922,36 +1915,36 @@ class Model
         return $ret;
     }
 
-//    /**
-//     * Pulls out the options hash from $array if any.
-//     *
-//     * @param array<mixed> &$options An array
-//     *
-//     * @return array<string,mixed> A valid options array
-//     *
-//     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
-//     */
-//    public static function extract_and_validate_options(array &$options): array
-//    {
-//        $res = [];
-//        if ($options) {
-//            $last = &$options[count($options) - 1];
-//
-//            try {
-//                if (self::is_options_hash($last)) {
-//                    array_pop($options);
-//                    $res = $last;
-//                }
-//            } catch (ActiveRecordException $e) {
-//                if (!is_hash($last)) {
-//                    throw $e;
-//                }
-//                $res = ['conditions' => $last];
-//            }
-//        }
-//
-//        return $res;
-//    }
+    //    /**
+    //     * Pulls out the options hash from $array if any.
+    //     *
+    //     * @param array<mixed> &$options An array
+    //     *
+    //     * @return array<string,mixed> A valid options array
+    //     *
+    //     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
+    //     */
+    //    public static function extract_and_validate_options(array &$options): array
+    //    {
+    //        $res = [];
+    //        if ($options) {
+    //            $last = &$options[count($options) - 1];
+    //
+    //            try {
+    //                if (self::is_options_hash($last)) {
+    //                    array_pop($options);
+    //                    $res = $last;
+    //                }
+    //            } catch (ActiveRecordException $e) {
+    //                if (!is_hash($last)) {
+    //                    throw $e;
+    //                }
+    //                $res = ['conditions' => $last];
+    //            }
+    //        }
+    //
+    //        return $res;
+    //    }
 
     /**
      * Returns a JSON representation of this model.

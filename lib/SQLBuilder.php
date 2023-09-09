@@ -137,7 +137,7 @@ class SQLBuilder
      *
      * @return $this
      */
-    public function where(array $clauses, array $mappedNames): static
+    public function where(array $clauses, array $mappedNames=[]): static
     {
         $values = [];
         $sql = '';
@@ -276,8 +276,16 @@ class SQLBuilder
 
     public function delete(): static
     {
+        $args = func_get_args();
+        $numArgs = count($args);
+
+        if (1 != $numArgs) {
+            throw new \ArgumentCountError('`SqlBuilder::delete` requires exactly one argument.');
+        }
+        $arg = $args[0];
+
         $this->operation = 'DELETE';
-        $this->where(...func_get_args());
+        $this->where([WhereClause::from_arg($arg)], []);
 
         return $this;
     }
