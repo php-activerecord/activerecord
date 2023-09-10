@@ -7,7 +7,6 @@ use ActiveRecord\Model;
 use ActiveRecord\Relation;
 use ActiveRecord\Table;
 use ActiveRecord\Types;
-use function PHPStan\dumpType;
 
 /**
  * Belongs to relationship.
@@ -104,6 +103,7 @@ class BelongsTo extends AbstractRelationship
          */
         $rel = new Relation($class, [], $options);
         $first = $rel->first();
+
         return $first;
     }
 

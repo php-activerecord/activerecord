@@ -2,7 +2,6 @@
 
 namespace ActiveRecord\PhpStan\Model;
 
-use ActiveRecord\iRelation;
 use ActiveRecord\Model;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\StaticCall;
@@ -29,7 +28,7 @@ class ModelDynamicStaticMethodReturnTypeReflection implements DynamicStaticMetho
 
     public function isStaticMethodSupported(MethodReflection $methodReflection): bool
     {
-        return in_array($methodReflection->getName(), ['first','find']);
+        return in_array($methodReflection->getName(), ['first', 'find']);
     }
 
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type
@@ -45,9 +44,8 @@ class ModelDynamicStaticMethodReturnTypeReflection implements DynamicStaticMetho
             return $scope->getType($val);
         }, $args);
 
-        switch($methodCall->name) {
-            case "find":
-
+        switch ($methodCall->name) {
+            case 'find':
                 $numArgs = count($args);
                 $single = false;
                 $nullable = false;
@@ -59,9 +57,9 @@ class ModelDynamicStaticMethodReturnTypeReflection implements DynamicStaticMetho
                     }
                 } elseif ($numArgs > 1) {
                     if (($args[0] instanceof ConstantStringType) && (
-                            'first' === $args[0]->getValue()
-                            || 'last' === $args[0]->getValue()
-                        )) {
+                        'first' === $args[0]->getValue()
+                        || 'last' === $args[0]->getValue()
+                    )) {
                         $single = true;
                         $nullable = true;
                     }
@@ -78,7 +76,7 @@ class ModelDynamicStaticMethodReturnTypeReflection implements DynamicStaticMetho
 
                 return new ArrayType(new IntegerType(), new ObjectType($subclass));
 
-            case "first":
+            case 'first':
                 $numArgs = count($args);
                 $single = false;
                 $nullable = false;
@@ -88,14 +86,15 @@ class ModelDynamicStaticMethodReturnTypeReflection implements DynamicStaticMetho
                         new IntegerType(),
                         new ObjectType($subclass)
                     );
-                } else {
-                    return new UnionType([
-                        new ObjectType($methodCall->class),
-                        new NullType()
-                    ]);
                 }
+
+                return new UnionType([
+                    new ObjectType($methodCall->class),
+                    new NullType()
+                ]);
+
             default:
-                throw new \Exception("Unknown method");
+                throw new \Exception('Unknown method');
         }
     }
 

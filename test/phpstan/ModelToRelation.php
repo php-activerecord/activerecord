@@ -10,32 +10,26 @@
 
 use ActiveRecord\Relation;
 use test\models\Book;
-use function PHPStan\dumpType;
 
-class RelationTester {
-
-/**
- * Confirm that anything that returns a Relation has knowledge of the static type
- */
+class RelationTester
+{
+    /**
+     * Confirm that anything that returns a Relation has knowledge of the static type
+     */
 
     /**
      * @return Relation<Book>
      */
-    function all(): Relation {
+    public function all(): Relation
+    {
         return Book::all();
     }
 
     /**
      * @return Relation<Book>
      */
-    function where(): Relation {
+    public function where(): Relation
+    {
         return Book::where([]);
     }
 }
-
-
-
-
-
-
-

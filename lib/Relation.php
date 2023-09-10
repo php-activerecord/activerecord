@@ -10,10 +10,10 @@ namespace ActiveRecord;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
-use function PHPStan\dumpType;
 
 /**
  * @template TModel of Model
+ *
  * @phpstan-import-type RelationOptions from Types
  */
 class Relation
@@ -55,8 +55,8 @@ class Relation
     private array $options = [];
 
     /**
-     * @param class-string  $className
-     * @param array<string> $alias_attribute
+     * @param class-string    $className
+     * @param array<string>   $alias_attribute
      * @param RelationOptions $options
      */
     public function __construct(string $className, array $alias_attribute, array $options = [])

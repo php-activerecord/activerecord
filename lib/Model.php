@@ -17,7 +17,6 @@ use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
-use function PHPStan\dumpType;
 
 /**
  * The base class for your models.
@@ -107,7 +106,6 @@ use function PHPStan\dumpType;
  * @see HasAndBelongsToMany
  * @see Serialization
  * @see Validations
- *
  */
 class Model
 {
@@ -915,6 +913,7 @@ class Model
     public static function table()
     {
         $table = Table::load(get_called_class());
+
         return $table;
     }
 
@@ -1684,13 +1683,16 @@ class Model
 
     /**
      * @param RelationOptions $options
+     *
      * @return Relation<static>
      */
-    protected static function Relation(array $options = []): Relation {
+    protected static function Relation(array $options = []): Relation
+    {
         /**
          * @var Relation<static> $rel
          */
         $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
+
         return $rel;
     }
 
@@ -1882,6 +1884,7 @@ class Model
     public static function pk_conditions(mixed $args): array
     {
         $table = static::table();
+
         return [$table->pk[0] => $args];
     }
 

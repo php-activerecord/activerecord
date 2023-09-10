@@ -9,8 +9,6 @@
  */
 
 use test\models\Book;
-use function PHPStan\dumpType;
-
 
 /**
  * Static checking for single model
@@ -21,5 +19,5 @@ assert($book instanceof Book);
 /**
  * Static checking for array of models
  */
-$books = Book::find([1,2]);
+$books = Book::find([1, 2]);
 assert(is_array($books));

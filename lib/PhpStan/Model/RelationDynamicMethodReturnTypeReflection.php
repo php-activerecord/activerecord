@@ -2,20 +2,14 @@
 
 namespace ActiveRecord\PhpStan\Model;
 
-use ActiveRecord\iRelation;
 use ActiveRecord\Relation;
 use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\StaticCall;
-use PhpParser\Node\Identifier;
-use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
-use PHPStan\Node\Method\MethodCall;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
-use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\IntegerType;
 use PHPStan\Type\NullType;
@@ -29,20 +23,21 @@ class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTy
     public function getClass(): string
     {
         $res = Relation::class;
+
         return $res;
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return in_array($methodReflection->getName(), ['first', 'last','find']);
+        return in_array($methodReflection->getName(), ['first', 'last', 'find']);
     }
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, \PhpParser\Node\Expr\MethodCall $methodCall, Scope $scope): Type
     {
         $calledOnType = $scope->getType($methodCall->var);
 
-        assert($calledOnType instanceof \PHPStan\Type\Generic\GenericObjectType);
-            // Here you have access to the generic type
+        assert($calledOnType instanceof GenericObjectType);
+        // Here you have access to the generic type
         $genericTypes = $calledOnType->getTypes();
 
         assert($genericTypes[0] instanceof TypeWithClassName);

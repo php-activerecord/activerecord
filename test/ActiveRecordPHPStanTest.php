@@ -37,6 +37,5 @@ class ActiveRecordPHPStanTest extends \DatabaseTestCase
                 ]
             )
         );
-
     }
 }

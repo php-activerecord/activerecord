@@ -9,7 +9,6 @@
  */
 
 use test\models\Book;
-use function PHPStan\dumpType;
 
 /**
  * Static checking for single model

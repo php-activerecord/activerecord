@@ -12,7 +12,6 @@ use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Relationship\HasOne;
-use function PHPStan\dumpType;
 
 /**
  * Manages reading and writing to a database table.
@@ -24,6 +23,7 @@ use function PHPStan\dumpType;
  * @phpstan-import-type PrimaryKey from Types
  * @phpstan-import-type Attributes from Types
  * @phpstan-import-type RelationOptions from Types
+ *
  * @template TModel of Model
  */
 class Table
@@ -87,6 +87,7 @@ class Table
 
     /**
      * @param class-string $model_class_name
+     *
      * @return Table<TModel>
      */
     public static function load(string $model_class_name): Table

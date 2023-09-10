@@ -16,6 +16,7 @@ use ActiveRecord\Exception\ExpressionsException;
  * 'id IN(:subselect)'
  *
  * @phpstan-import-type Attributes from Types
+ *
  * @phpstan-type Expression string|array<mixed>
  */
 class WhereClause
@@ -36,7 +37,7 @@ class WhereClause
     private Connection $connection;
 
     /**
-     * @param Expression $expression
+     * @param Expression   $expression
      * @param array<mixed> $values
      */
     public function __construct(string|array $expression, array $values=[], bool $inverse = false)
@@ -126,7 +127,8 @@ class WhereClause
 
     /**
      * @param array<string,string> $mappedNames
-     * @param array<mixed> $values
+     * @param array<mixed>         $values
+     *
      * @throws ExpressionsException
      */
     public function to_s(string $prependTableName = '', array $mappedNames = [],
@@ -173,7 +175,6 @@ class WhereClause
      * @param array<mixed>         $values Array of values for the field names. This is used
      *                                     to determine what kind of bind marker to use: =?, IN(?), IS NULL
      * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
-     *
      */
     public static function from_underscored_string(
         Connection $connection, string $name, array $values = [], array $map = []): WhereClause
