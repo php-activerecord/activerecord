@@ -138,31 +138,6 @@ class SQLBuilder
         $this->where = $sql;
         $this->where_values = $values;
 
-        //        if (1 == $num_args && is_hash($args[0])) {
-        //            $hash = empty($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
-        //            $clause = new WhereClause($this->connection, $hash);
-        //            $this->where = $clause->to_s();
-        //            $this->where_values = array_flatten($clause->values());
-        //        } elseif ($num_args > 0) {
-        //            // if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
-        //            $values = array_slice($args, 1);
-        //
-        //            foreach ($values as $name => &$value) {
-        //                if (is_array($value)) {
-        //                    $clause = new WhereClause($this->connection, $args[0]);
-        //                    $clause->bind_values($values);
-        //                    $this->where = $clause->to_s();
-        //                    $this->where_values = array_flatten($clause->values());
-        //
-        //                    return $this;
-        //                }
-        //            }
-        //
-        //            // no nested array so nothing special to do
-        //            $this->where = $args[0] ?? '';
-        //            $this->where_values = $values;
-        //        }
-
         return $this;
     }
 
