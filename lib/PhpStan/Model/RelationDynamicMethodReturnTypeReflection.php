@@ -23,7 +23,6 @@ use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 
-// DynamicStaticMethodReturnTypeExtension
 class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTypeExtension
 {
     public function getClass(): string
@@ -34,7 +33,7 @@ class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTy
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return in_array($methodReflection->getName(), ['first', 'find']);
+        return in_array($methodReflection->getName(), ['first', 'last','find']);
     }
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, \PhpParser\Node\Expr\MethodCall $methodCall, Scope $scope): Type
@@ -87,6 +86,7 @@ class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTy
 
                 return new ArrayType(new IntegerType(), new ObjectType($subclass));
 
+            case 'last':
             case 'first':
                 $numArgs = count($args);
                 if (1 == $numArgs) {

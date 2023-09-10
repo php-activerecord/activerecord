@@ -1874,13 +1874,13 @@ class Model
      * /-------------------------------------------------------------------------------------------
      * 	First Argument								Return Type			Example
      * --------------------------------------------------------------------------------------------
-     *	int|string									Model				User::find(3);
-     * 	array<string, int|string>					Model				User::find(["name"=>"Philip"]);
-     * 	"first"										Model|null			User::find("first", ["name"=>"Waldo"]);
-     * 	"last"										Model|null			User::find("last", ["name"=>"William"]);
-     *  "all"										Model[]			    User::find("all", ["name"=>"Stephen"]
-     *  ...int|string								Model[]			    User::find(1, 3, 5, 8);
-     *  array<int,int|string>						Model[]			    User::find([1,3,5,8]);
+     *	int|string									static				User::find(3);
+     * 	array<string, int|string>					static				User::find(["name"=>"Philip"]);
+     * 	"first"										static|null			User::find("first", ["name"=>"Waldo"]);
+     * 	"last"										static|null			User::find("last", ["name"=>"William"]);
+     *  "all"										static[]			User::find("all", ["name"=>"Stephen"]
+     *  ...int|string								static[]			User::find(1, 3, 5, 8);
+     *  array<int,int|string>						static[]			User::find([1,3,5,8]);
      */
     public static function find(/* $type, $options */): Model|array|null
     {

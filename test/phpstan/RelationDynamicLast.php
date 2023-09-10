@@ -11,7 +11,7 @@
 use ActiveRecord\Relation;
 use test\models\Book;
 
-class RelationDynamicFirst
+class RelationDynamicLast
 {
     /**
      * @var Book|null
@@ -30,7 +30,7 @@ class RelationDynamicFirst
          */
         $rel = new Relation(Book::class, [], []);
 
-        $this->book = $rel->first();
-        $this->books = $rel->first(1);
+        $this->book = $rel->last();
+        $this->books = $rel->last(1);
     }
 }
