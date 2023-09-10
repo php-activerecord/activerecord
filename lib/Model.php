@@ -1753,7 +1753,15 @@ class Model
      */
     public static function exists(mixed $conditions = []): bool
     {
+<<<<<<< Updated upstream
         return static::Relation()->exists($conditions);
+=======
+        /**
+         * TODO: we should be using the EXISTS feature in SQL, eg:
+         * SELECT 1 AS one FROM "users" WHERE "users"."id" = ? LIMIT ?
+         */
+        return static::count(...func_get_args()) > 0;
+>>>>>>> Stashed changes
     }
 
     /**
