@@ -492,6 +492,9 @@ abstract class Connection
      */
     public function quote_name($string)
     {
+        if(is_null($string)) {
+            xdebug_break();
+        }
         return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string) - 1] === static::$QUOTE_CHARACTER ?
             $string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
     }

@@ -137,14 +137,14 @@ class SQLBuilder
      *
      * @return $this
      */
-    public function where(array $clauses, array $mappedNames=[]): static
+    public function where(array $clauses=[], array $mappedNames=[]): static
     {
         $values = [];
         $sql = '';
         $glue = ' AND ';
         foreach ($clauses as $idx => $clause) {
             $clause->set_connection($this->connection);
-            $expression = $clause->to_s(!empty($this->joins), $mappedNames);
+            $expression = $clause->to_s(!empty($this->joins) ? $this->table : '', $mappedNames);
             $values = array_merge($values, array_flatten($clause->values()));
             $inverse = $clause->inverse() ? '!' : '';
             $wrappedExpression = $inverse || count($clauses) > 1 ? "(" . $expression . ')' : $expression;
@@ -277,15 +277,10 @@ class SQLBuilder
     public function delete(): static
     {
         $args = func_get_args();
-        $numArgs = count($args);
-
-        if (1 != $numArgs) {
-            throw new \ArgumentCountError('`SqlBuilder::delete` requires exactly one argument.');
-        }
-        $arg = $args[0];
+        $arg = $args[0] ?? null;
 
         $this->operation = 'DELETE';
-        $this->where([WhereClause::from_arg($arg)], []);
+        isset($arg) && $this->where([WhereClause::from_arg($arg)], []);
 
         return $this;
     }

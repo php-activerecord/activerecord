@@ -172,7 +172,7 @@ class HasMany extends AbstractRelationship
         }
 
         $options = $this->unset_non_finder_options($this->options);
-        $options['conditions'][] = $conditions;
+        $options['conditions'] = array_merge($conditions, $options['conditions']);
 
         $rel = new Relation($class_name, [], $options);
         if($this->is_poly()) {

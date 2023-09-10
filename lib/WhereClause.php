@@ -91,6 +91,10 @@ class WhereClause
         return $this->values;
     }
 
+    public function expression(): string {
+        return $this->expression;
+    }
+
     /**
      * Returns the connection object.
      */
@@ -117,7 +121,7 @@ class WhereClause
      *
      * @throws ExpressionsException
      */
-    public function to_s(bool $prependTableName = false, array $mappedNames = [],
+    public function to_s(string $prependTableName = '', array $mappedNames = [],
                          bool $substitute=false, string $glue=' AND '): string
     {
         $values = $this->values;
@@ -242,18 +246,18 @@ class WhereClause
      *
      * @return array<mixed>
      */
-    private function build_sql_from_hash(array $hash, bool $prependTableName, $glue = ' AND '): array
+    private function build_sql_from_hash(array $hash, string $prependTableName, $glue = ' AND '): array
     {
         $sql = $g = '';
 
-        $table = $prependTableName ? $this->connection->quote_name($this->table) : '';
+        $table = !empty($prependTableName) ? $this->connection->quote_name($prependTableName) : '';
 
         foreach ($hash as $name => $value) {
             if (isset($this->connection)) {
                 $name = $this->connection->quote_name($name);
             }
 
-            if($prependTableName) {
+            if(!empty($prependTableName)) {
                 $name = $table . '.' . $name;
             }
 

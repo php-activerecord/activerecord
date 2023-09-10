@@ -77,9 +77,10 @@ abstract class AbstractRelationship
         $this->attribute_name = $attribute_name;
         $this->options = $this->merge_association_options($options);
 
-        $this->options['conditions'] = array_map(function ($condition) {
-            return WhereClause::from_arg($condition);
-        }, (array)($options['conditions'] ?? []));
+        $this->options['conditions'] = [];
+        if(isset($options['conditions'])) {
+            $this->options['conditions'][] = WhereClause::from_arg($options['conditions'] ?? []);
+        }
 
         if (isset($this->options['class_name'])) {
             $this->set_class_name($this->inferred_class_name($this->options['class_name']));
