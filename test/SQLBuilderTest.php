@@ -8,11 +8,15 @@ use test\models\Author;
 
 class SQLBuilderTest extends DatabaseTestCase
 {
-    private $sql;
+    private SQLBuilder $sql;
 
-    protected $table_name = 'authors';
-    protected $class_name = Author::class;
-    protected $table;
+    protected string $table_name = 'authors';
+
+    /**
+     * @var class-string
+     */
+    protected string $class_name = Author::class;
+    protected Table $table;
 
     public function setUp($connection_name=null): void
     {

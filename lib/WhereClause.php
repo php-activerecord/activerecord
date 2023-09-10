@@ -122,9 +122,9 @@ class WhereClause
      * @throws ExpressionsException
      */
     public function to_s(string $prependTableName = '', array $mappedNames = [],
-                         bool $substitute=false, string $glue=' AND '): string
+                         bool $substitute=false, string $glue=' AND ', array $values=null): string
     {
-        $values = $this->values;
+        $values = $values ?? $this->values;
         $expression = $this->expression;
         if(is_hash($expression)) {
            $expression = $this->map_names($expression, $mappedNames);
@@ -326,7 +326,7 @@ class WhereClause
 
     private function quote_string(string $value): string
     {
-        if ($this->connection) {
+        if (isset($this->connection)) {
             return $this->connection->escape($value);
         }
 

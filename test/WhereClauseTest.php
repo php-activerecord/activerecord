@@ -90,50 +90,50 @@ class WhereClauseTest extends TestCase
 
     public function testIgnoreInvalidParameterMarker()
     {
-        $a = new WhereClause("question='Do you love backslashes?' and id in(?)", [1, 2]);
+        $a = new WhereClause("question='Do you love backslashes?' and id in(?)", [[1, 2]]);
         $this->assertEquals("question='Do you love backslashes?' and id in(?,?)", $a->to_s());
     }
 
     public function testIgnoreParameterMarkerWithEscapedQuote()
     {
-        $a = new WhereClause("question='Do you love''s backslashes?' and id in(?)", [1, 2]);
+        $a = new WhereClause("question='Do you love''s backslashes?' and id in(?)", [[1, 2]]);
         $this->assertEquals("question='Do you love''s backslashes?' and id in(?,?)", $a->to_s());
     }
 
     public function testIgnoreParameterMarkerWithBackspaceEscapedQuote()
     {
-        $a = new WhereClause("question='Do you love\\'s backslashes?' and id in(?)", [1, 2]);
+        $a = new WhereClause("question='Do you love\\'s backslashes?' and id in(?)", [[1, 2]]);
         $this->assertEquals("question='Do you love\\'s backslashes?' and id in(?,?)", $a->to_s());
     }
 
     public function testSubstitute()
     {
-        $a = new WhereClause(null, 'name=? and id=?', 'Tito', 1);
-        $this->assertEquals("name='Tito' and id=1", $a->to_s(true));
+        $a = new WhereClause('name=? and id=?', ['Tito', 1]);
+        $this->assertEquals("name='Tito' and id=1", $a->to_s(substitute: true));
     }
 
     public function testSubstituteQuotesScalarsButNotOthers()
     {
-        $a = new WhereClause(null, 'id in(?)', [1, '2', 3.5]);
-        $this->assertEquals("id in(1,'2',3.5)", $a->to_s(true));
+        $a = new WhereClause('id in(?)', [[1, '2', 3.5]]);
+        $this->assertEquals("id in(1,'2',3.5)", $a->to_s(substitute: true));
     }
 
     public function testSubstituteWhereValueHasQuestionMark()
     {
-        $a = new WhereClause(null, 'name=? and id=?', '??????', 1);
-        $this->assertEquals("name='??????' and id=1", $a->to_s(true));
+        $a = new WhereClause('name=? and id=?', ['??????', 1]);
+        $this->assertEquals("name='??????' and id=1", $a->to_s(substitute: true));
     }
 
     public function testSubstituteArrayValue()
     {
-        $a = new WhereClause(null, 'id in(?)', [1, 2]);
-        $this->assertEquals('id in(1,2)', $a->to_s(true));
+        $a = new WhereClause('id in(?)', [[1, 2]]);
+        $this->assertEquals('id in(1,2)', $a->to_s(substitute: true));
     }
 
     public function testSubstituteEscapesQuotes()
     {
-        $a = new WhereClause(null, 'name=? or name in(?)', "Tito's Guild", [1, "Tito's Guild"]);
-        $this->assertEquals("name='Tito''s Guild' or name in(1,'Tito''s Guild')", $a->to_s(true));
+        $a = new WhereClause('name=? or name in(?)', ["Tito's Guild", [1, "Tito's Guild"]]);
+        $this->assertEquals("name='Tito''s Guild' or name in(1,'Tito''s Guild')", $a->to_s(substitute: true));
     }
 
     public function testSubstituteEscapeQuotesWithConnectionsEscapeMethod()
@@ -151,14 +151,14 @@ class WhereClauseTest extends TestCase
 
     public function testBind()
     {
-        $a = new WhereClause(null, 'name=? and id=?', 'Tito');
+        $a = new WhereClause('name=? and id=?', ['Tito']);
         $a->bind(2, 1);
         $this->assertEquals(['Tito', 1], $a->values());
     }
 
     public function testBindOverwriteExisting()
     {
-        $a = new WhereClause(null, 'name=? and id=?', 'Tito', 1);
+        $a = new WhereClause('name=? and id=?', ['Tito', 1]);
         $a->bind(2, 99);
         $this->assertEquals(['Tito', 99], $a->values());
     }
@@ -166,16 +166,15 @@ class WhereClauseTest extends TestCase
     public function testBindInvalidParameterNumber()
     {
         $this->expectException(ExpressionsException::class);
-        $a = new WhereClause(null, 'name=?');
+        $a = new WhereClause('name=?');
         $a->bind(0, 99);
     }
 
     public function testSubstituteUsingAlternateValues()
     {
-        $a = new WhereClause(null, 'name=?', 'Tito');
-        $this->assertEquals("name='Tito'", $a->to_s(true));
-        $x = ['values' => ['Hocus']];
-        $this->assertEquals("name='Hocus'", $a->to_s(true, $x));
+        $a = new WhereClause( 'name=?', ['Tito']);
+        $this->assertEquals("name='Tito'", $a->to_s(substitute: true));
+        $this->assertEquals("name='Hocus'", $a->to_s(substitute: true, values:  ['Hocus']));
     }
 
     public function testNullValue()
@@ -186,7 +185,7 @@ class WhereClauseTest extends TestCase
 
     public function testHashWithDefaultGlue()
     {
-        $a = new WhereClause(null, ['id' => 1, 'name' => 'Tito']);
+        $a = new WhereClause(['id' => 1, 'name' => 'Tito']);
         $this->assertEquals('id=? AND name=?', $a->to_s());
     }
 
