@@ -16,11 +16,15 @@ use ActiveRecord\Exception\ExpressionsException;
  * 'id IN(:subselect)'
  *
  * @phpstan-import-type Attributes from Types
+ * @phpstan-type Expression string|array<mixed>
  */
 class WhereClause
 {
     public const ParameterMarker = '?';
 
+    /**
+     * @var Expression
+     */
     private array|string $expression;
 
     private bool $inverse = false;
@@ -29,10 +33,11 @@ class WhereClause
      * @var array<mixed>
      */
     private array $values = [];
-    private Connection|null $connection;
+    private Connection $connection;
 
     /**
-     * @param string|array<mixed> $expression
+     * @param Expression $expression
+     * @param array<mixed> $values
      */
     public function __construct(string|array $expression, array $values=[], bool $inverse = false)
     {
@@ -92,7 +97,10 @@ class WhereClause
         return $this->values;
     }
 
-    public function expression(): string
+    /**
+     * @return Expression
+     */
+    public function expression(): array|string
     {
         return $this->expression;
     }
@@ -117,10 +125,8 @@ class WhereClause
     }
 
     /**
-     * @param array{
-     *   values?: array<mixed>
-     * } $options
-     *
+     * @param array<string,string> $mappedNames
+     * @param array<mixed> $values
      * @throws ExpressionsException
      */
     public function to_s(string $prependTableName = '', array $mappedNames = [],
@@ -168,7 +174,6 @@ class WhereClause
      *                                     to determine what kind of bind marker to use: =?, IN(?), IS NULL
      * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
      *
-     * @return array<mixed>
      */
     public static function from_underscored_string(
         Connection $connection, ?string $name, array $values = [], array $map = []): ?WhereClause
@@ -211,7 +216,7 @@ class WhereClause
         return new WhereClause($expression, $conditionValues);
     }
 
-    public static function from_arg(mixed $arg)
+    public static function from_arg(mixed $arg): WhereClause
     {
         // user passed in a string, a hash, or an array consisting of a string and values
         if (is_string($arg) || is_hash($arg)) {
@@ -251,7 +256,7 @@ class WhereClause
      *
      * @return array<mixed>
      */
-    private function build_sql_from_hash(array $hash, string $prependTableName, $glue = ' AND '): array
+    private function build_sql_from_hash(array $hash, string $prependTableName, string $glue = ' AND '): array
     {
         $sql = $g = '';
 

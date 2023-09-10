@@ -1,6 +1,6 @@
 <?php
 
-namespace ActiveRecord\PhpStan;
+namespace ActiveRecord\PhpStan\Model;
 
 use ActiveRecord\Model;
 use PhpParser\Node\Arg;

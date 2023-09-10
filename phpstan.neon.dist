@@ -11,15 +11,15 @@ parameters:
 
 services:
     -
-        class: ActiveRecord\PhpStan\FindDynamicMethodReturnTypeReflection
+        class: ActiveRecord\PhpStan\Model\FindDynamicMethodReturnTypeReflection
         tags:
           - phpstan.broker.dynamicStaticMethodReturnTypeExtension
     -
-        class: ActiveRecord\PhpStan\FindAllDynamicMethodReturnTypeReflection
+        class: ActiveRecord\PhpStan\Model\FindAllDynamicMethodReturnTypeReflection
         tags:
           - phpstan.broker.dynamicStaticMethodReturnTypeExtension
     -
-        class: ActiveRecord\PhpStan\ModelMethodsClassReflectionExtension
+        class: ActiveRecord\PhpStan\Model\ModelMethodsClassReflectionExtension
         tags:
           - phpstan.broker.methodsClassReflectionExtension
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ActiveRecord\PhpStan;
+namespace ActiveRecord\PhpStan\Model;
 
 use ActiveRecord\SQLBuilder;
 use PHPStan\Reflection\ClassMemberReflection;

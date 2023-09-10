@@ -132,6 +132,7 @@ class SQLBuilder
 
     /**
      * @param array<WhereClause> $clauses
+     * @param array<string,string> $mappedNames
      *
      * @throws Exception\ExpressionsException
      *
