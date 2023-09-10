@@ -30,6 +30,20 @@ namespace ActiveRecord;
  *  prefix?: string,
  *  delegate: array<string>
  * }
+ * @phpstan-type RelationOptions array{
+ *  conditions?: array<WhereClause>,
+ *  limit?: int,
+ *  offset?: int,
+ *  order?: string,
+ *  select?: string,
+ *  joins?: string|array<string>,
+ *  include?: string|array<string>,
+ *  readonly?: bool,
+ *  group?: string,
+ *  from?: string,
+ *  having?: string,
+ *  mapped_names?: array<string, string>
+ * }
  */
 abstract class Types
 {

@@ -176,12 +176,8 @@ class WhereClause
      *
      */
     public static function from_underscored_string(
-        Connection $connection, ?string $name, array $values = [], array $map = []): ?WhereClause
+        Connection $connection, string $name, array $values = [], array $map = []): WhereClause
     {
-        if (!$name) {
-            return null;
-        }
-
         $expression = '';
 
         $num_values = count((array) $values);

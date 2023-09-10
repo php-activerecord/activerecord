@@ -17,6 +17,7 @@ use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Serialize\JsonSerializer;
 use ActiveRecord\Serialize\Serialization;
+use function PHPStan\dumpType;
 
 /**
  * The base class for your models.
@@ -98,6 +99,7 @@ use ActiveRecord\Serialize\Serialization;
  * @phpstan-import-type PrimaryKey from Types
  * @phpstan-import-type QueryOptions from Types
  * @phpstan-import-type DelegateOptions from Types
+ * @phpstan-import-type RelationOptions from Types
  *
  * @see BelongsTo
  * @see CallBack
@@ -105,8 +107,9 @@ use ActiveRecord\Serialize\Serialization;
  * @see HasAndBelongsToMany
  * @see Serialization
  * @see Validations
+ *
  */
-class Model implements iRelation
+class Model
 {
     /**
      * An instance of {@link ValidationErrors} and will be instantiated once a write method is called.
@@ -911,7 +914,8 @@ class Model implements iRelation
      */
     public static function table()
     {
-        return Table::load(get_called_class());
+        $table = Table::load(get_called_class());
+        return $table;
     }
 
     /**
@@ -1514,7 +1518,9 @@ class Model implements iRelation
      */
     public static function __callStatic(string $method, mixed $args): mixed
     {
-        //        $options = static::extract_and_validate_options($args);
+        /**
+         * @var RelationOptions
+         */
         $options = [];
         $create = false;
 
@@ -1531,16 +1537,20 @@ class Model implements iRelation
 
         if ($attributes = static::extract_dynamic_vars($method, 'find_by')) {
             $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
+
+            /**
+             * @var Relation<static> $rel
+             */
             $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
 
-            if (!($ret = $rel->first()) && $create) {
-                return static::create(SQLBuilder::create_hash_from_underscored_string(
-                    $attributes,
-                    $args,
-                    static::$alias_attribute));
-            }
+//            if (!($ret = $rel->first()) && $create) {
+//                return static::create(SQLBuilder::create_hash_from_underscored_string(
+//                    $attributes,
+//                    $args,
+//                    static::$alias_attribute));
+//            }
 
-            return $ret;
+            return null; // $ret;
         }
 
         throw new ActiveRecordException("Call to undefined method: $method");
@@ -1685,13 +1695,11 @@ class Model implements iRelation
     }
 
     /**
-     * @param string|array<string|mixed> $where
+     * @return Relation<static>
      */
-    public static function where(string|array $where): Relation
+    public static function where(): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-
-        return $relation->where($where);
+        return static::Relation()->where(...func_get_args());
     }
 
     /**
@@ -1701,13 +1709,22 @@ class Model implements iRelation
      * mapping of column names  all(["name"=>"Philip", "publisher"=>"Random House"]) WHERE name=Philip AND publisher=Random House
      * raw WHERE statement      all(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
      *
-     * @return array<Model> All the rows that matches query. If no rows match, returns []
+     * @return Relation<static>
      */
     public static function all(): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
+        return static::Relation()->all();
+    }
 
-        return $relation->all();
+    /**
+     * @return Relation<static>
+     */
+    protected static function Relation(): Relation {
+        /**
+         * @var Relation<static> $rel
+         */
+        $rel = new Relation(get_called_class(), static::$alias_attribute);
+        return $rel;
     }
 
     /**
@@ -1775,7 +1792,7 @@ class Model implements iRelation
     }
 
     /**
-     * @return static|array<static>|null
+     * @see iRelation::first()
      */
     public static function first(int $limit = null): mixed
     {
@@ -1789,6 +1806,9 @@ class Model implements iRelation
      */
     public static function last(int $limit = null): mixed
     {
+        /**
+         * @var Relation<static> $relation
+         */
         $relation = new Relation(get_called_class(), static::$alias_attribute);
 
         return $relation->last($limit);
@@ -1912,37 +1932,6 @@ class Model implements iRelation
 
         return $ret;
     }
-
-    //    /**
-    //     * Pulls out the options hash from $array if any.
-    //     *
-    //     * @param array<mixed> &$options An array
-    //     *
-    //     * @return array<string,mixed> A valid options array
-    //     *
-    //     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
-    //     */
-    //    public static function extract_and_validate_options(array &$options): array
-    //    {
-    //        $res = [];
-    //        if ($options) {
-    //            $last = &$options[count($options) - 1];
-    //
-    //            try {
-    //                if (self::is_options_hash($last)) {
-    //                    array_pop($options);
-    //                    $res = $last;
-    //                }
-    //            } catch (ActiveRecordException $e) {
-    //                if (!is_hash($last)) {
-    //                    throw $e;
-    //                }
-    //                $res = ['conditions' => $last];
-    //            }
-    //        }
-    //
-    //        return $res;
-    //    }
 
     /**
      * Returns a JSON representation of this model.

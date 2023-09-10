@@ -12,6 +12,7 @@ use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Relationship\HasOne;
+use function PHPStan\dumpType;
 
 /**
  * Manages reading and writing to a database table.
@@ -22,6 +23,8 @@ use ActiveRecord\Relationship\HasOne;
  *
  * @phpstan-import-type PrimaryKey from Types
  * @phpstan-import-type Attributes from Types
+ * @phpstan-import-type RelationOptions from Types
+ * @template TModel of Model
  */
 class Table
 {
@@ -84,6 +87,7 @@ class Table
 
     /**
      * @param class-string $model_class_name
+     * @return Table<TModel>
      */
     public static function load(string $model_class_name): Table
     {
@@ -187,7 +191,7 @@ class Table
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param RelationOptions $options
      *
      * @throws Exception\ActiveRecordException
      * @throws RelationshipException
@@ -211,33 +215,7 @@ class Table
             $sql->select($options['select']);
         }
 
-        //        foreach($options['conditions'] ?? [] as $condition) {
-        //            if (is_hash($condition)) {
-        //                if (!empty($options['mapped_names'])) {
-        //                    $conditions = $this->map_names($options['conditions'], $options['mapped_names']);
-        //                }
-        //            } else {
-        //                $conditions[] = $condition;
-        //            }
-        //        }
-
         $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
-
-        //        if (array_key_exists('conditions', $options)) {
-        //            if (!is_hash($options['conditions'])) {
-        //                if (is_string($options['conditions'])) {
-        //                    $options['conditions'] = [$options['conditions']];
-        //                }
-        //
-        //                $sql->where($options['conditions']);
-        //            } else {
-        //                if (!empty($options['mapped_names'])) {
-        //                    $options['conditions'] = $this->map_names($options['conditions'], $options['mapped_names']);
-        //                }
-        //
-        //                $sql->where($options['conditions']);
-        //            }
-        //        }
 
         if (array_key_exists('order', $options)) {
             $sql->order($options['order']);
@@ -263,12 +241,12 @@ class Table
     }
 
     /**
-     * @param array<string, array<string,mixed>> $options
+     * @param RelationOptions $options
      *
      * @throws Exception\ActiveRecordException
      * @throws RelationshipException
      *
-     * @return array<Model>
+     * @return array<TModel>
      */
     public function find(array $options): array
     {
@@ -296,7 +274,7 @@ class Table
      *
      * @throws RelationshipException
      *
-     * @return array<Model>
+     * @return array<TModel>
      */
     public function find_by_sql(string $sql, array $values = null, bool $readonly = false, array $includes = []): array
     {
@@ -583,6 +561,9 @@ class Table
                         break;
 
                     case 'belongs_to':
+                        /**
+                         * @var BelongsTo<TModel> $relationship
+                         */
                         $relationship = new BelongsTo($attribute, $definition);
                         break;
 

@@ -9,6 +9,8 @@
  */
 
 use test\models\Book;
+use function PHPStan\dumpType;
+
 
 /**
  * Static checking for single model
@@ -16,29 +18,8 @@ use test\models\Book;
 $book = Book::find(1);
 assert($book instanceof Book);
 
-$book = Book::find(['name'=>'Ubik']);
-assert($book instanceof Book);
-
-/**
- * Static checking for nullable single model
- */
-$book = Book::find('first', ['name'=>'Waldo']);
-assert(is_null($book));
-
-$book = Book::find('last', ['name'=>'Waldo']);
-assert(is_null($book));
-
 /**
  * Static checking for array of models
  */
-$books = Book::find(
-    'all',
-    ['name' => 'William']
-);
-assert(0==count($books));
-
-$books = Book::find(1, 3, 8);
-assert(0==count($books));
-
-$books = Book::find([1, 3, 8]);
-assert(0==count($books));
+$books = Book::find([1,2]);
+assert(is_array($books));

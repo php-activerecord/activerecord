@@ -10,8 +10,13 @@ namespace ActiveRecord;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
+use function PHPStan\dumpType;
 
-class Relation implements iRelation
+/**
+ * @template TModel of Model
+ * @phpstan-import-type RelationOptions from Types
+ */
+class Relation
 {
     /**
      * A list of valid finder options.
@@ -45,13 +50,14 @@ class Relation implements iRelation
     private ?Table $tableImpl = null;
 
     /**
-     * @var array<string, mixed>
+     * @var RelationOptions
      */
     private array $options = [];
 
     /**
      * @param class-string  $className
      * @param array<string> $alias_attribute
+     * @param RelationOptions $options
      */
     public function __construct(string $className, array $alias_attribute, array $options = [])
     {
@@ -60,6 +66,9 @@ class Relation implements iRelation
         $this->className = $className;
     }
 
+    /**
+     * @return Table<TModel>
+     */
     private function table(): Table
     {
         if (null === $this->tableImpl) {
@@ -221,35 +230,6 @@ class Relation implements iRelation
     }
 
     /**
-     * Pulls out the options hash from $array if any.
-     *
-     * @param array<mixed> &$options An array
-     *
-     * @return array<string,mixed> A valid options array
-     */
-    public static function extract_and_validate_options(array $options): array
-    {
-        $res = [];
-        if ($options) {
-            $last = $options[count($options) - 1];
-
-            try {
-                if (self::is_options_hash($last)) {
-                    array_pop($options);
-                    $res = $last;
-                }
-            } catch (ActiveRecordException $e) {
-                if (!is_hash($last)) {
-                    throw $e;
-                }
-                $res = ['conditions' => $last];
-            }
-        }
-
-        return $res;
-    }
-
-    /**
      * Determines if the specified array is a valid ActiveRecord options array.
      *
      * @param mixed $options An options array
@@ -300,9 +280,9 @@ class Relation implements iRelation
      *
      * @throws RecordNotFound if any of the records cannot be found
      *
-     * @return Model|array<Model> See above
+     * @return Model|array<Model>
      */
-    public function find(): Model|array
+    public function find()
     {
         $args = func_get_args();
         $num_args = count($args);
@@ -332,9 +312,6 @@ class Relation implements iRelation
         return $single ? ($list[0] ?? throw new RecordNotFound('tbd')) : $list;
     }
 
-    /**
-     * @return Model|array<Model>|null
-     */
     public function first(int $limit = null): mixed
     {
         $this->limit($limit ?? 1);
@@ -348,7 +325,7 @@ class Relation implements iRelation
     }
 
     /**
-     * @return Model|array<Model>|null
+     * @return TModel|array<TModel>|null
      */
     public function last(int $limit = null): mixed
     {
@@ -368,48 +345,20 @@ class Relation implements iRelation
     }
 
     /**
-     * @param array<array<string>|string> $fragments
-     *
-     * @return array<string>
-     */
-    private function buildWhereSQL(array $fragments): array
-    {
-        $templates = [];
-        $values = [];
-
-        foreach ($fragments as $fragment) {
-            if (is_array($fragment)) {
-                if (is_hash($fragment)) {
-                    foreach ($fragment as $key => $value) {
-                        array_push($templates, "{$key} = (?)");
-                        array_push($values, $value);
-                    }
-                } else {
-                    array_push($templates, array_shift($fragment));
-                    if (count($fragment) > 0) {
-                        $values = array_merge($values, $fragment);
-                    }
-                }
-            } else {
-                array_push($templates, $fragment);
-            }
-        }
-
-        array_unshift($values, implode(' AND ', $templates));
-
-        return $values;
-    }
-
-    /**
-     * @return array<Model> All the rows that matches query. If no rows match, returns []
+     * @return array<TModel> All the rows that matches query. If no rows match, returns []
      */
     public function to_a(): array
     {
         $this->options['mapped_names'] = $this->alias_attribute;
 
+        $table = $this->table();
+
         return $this->table()->find($this->options);
     }
 
+    /**
+     * @return Relation<TModel>
+     */
     public function all(): Relation
     {
         return $this;
@@ -449,7 +398,7 @@ class Relation implements iRelation
         return $res;
     }
 
-    public function exists(mixed $conditions = []): int
+    public function exists(mixed $conditions = []): bool
     {
         if (is_array($conditions) || is_hash($conditions)) {
             !empty($conditions) && $this->where($conditions);
@@ -463,7 +412,7 @@ class Relation implements iRelation
             }
         }
 
-        $this->options['select'] = 1;
+        $this->options['select'] = '1';
         $res = $this->count();
 
         return $res > 0;
@@ -474,7 +423,7 @@ class Relation implements iRelation
      *
      * @param array<mixed> $pks An array of primary keys
      *
-     * @return array<Model>
+     * @return array<TModel>
      */
     public function get_models_from_cache(array $pks): array
     {
@@ -482,7 +431,7 @@ class Relation implements iRelation
         $table = $this->table();
 
         foreach ($pks as $pk) {
-            $options = ['conditions' => $this->pk_conditions($pk)];
+            $options = ['conditions' => [$this->pk_conditions($pk)]];
             $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
                 $res = $table->find($options);
 
@@ -497,8 +446,6 @@ class Relation implements iRelation
      * Returns a hash containing the names => values of the primary key.
      *
      * @param int|array<number|string> $args Primary key value(s)
-     *
-     * @return array<string, mixed>
      */
     private function pk_conditions(int|array $args): WhereClause
     {
