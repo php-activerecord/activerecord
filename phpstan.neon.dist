@@ -15,10 +15,6 @@ services:
         tags:
           - phpstan.broker.dynamicStaticMethodReturnTypeExtension
     -
-        class: ActiveRecord\PhpStan\Model\FindAllDynamicMethodReturnTypeReflection
-        tags:
-          - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-    -
         class: ActiveRecord\PhpStan\Model\ModelMethodsClassReflectionExtension
         tags:
           - phpstan.broker.methodsClassReflectionExtension

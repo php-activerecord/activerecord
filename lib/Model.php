@@ -106,7 +106,7 @@ use ActiveRecord\Serialize\Serialization;
  * @see Serialization
  * @see Validations
  */
-class Model
+class Model implements iRelation
 {
     /**
      * An instance of {@link ValidationErrors} and will be instantiated once a write method is called.
