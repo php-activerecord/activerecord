@@ -2,6 +2,7 @@
 
 namespace ActiveRecord\PhpStan\Model;
 
+use ActiveRecord\iRelation;
 use ActiveRecord\Model;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\StaticCall;
@@ -23,12 +24,12 @@ class FindDynamicMethodReturnTypeReflection implements DynamicStaticMethodReturn
 {
     public function getClass(): string
     {
-        return Model::class;
+        return iRelation::class;
     }
 
     public function isStaticMethodSupported(MethodReflection $methodReflection): bool
     {
-        return 'find' === $methodReflection->getName();
+        return  'find' === $methodReflection->getName();
     }
 
     public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type

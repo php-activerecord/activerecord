@@ -11,7 +11,7 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
-class Relation
+class Relation implements iRelation
 {
     /**
      * A list of valid finder options.
