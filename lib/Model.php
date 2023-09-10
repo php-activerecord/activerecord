@@ -1538,19 +1538,15 @@ class Model
         if ($attributes = static::extract_dynamic_vars($method, 'find_by')) {
             $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
 
-            /**
-             * @var Relation<static> $rel
-             */
-            $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
+            $rel = static::Relation($options);
+            if (!($ret = $rel->first()) && $create) {
+                return static::create(SQLBuilder::create_hash_from_underscored_string(
+                    $attributes,
+                    $args,
+                    static::$alias_attribute));
+            }
 
-//            if (!($ret = $rel->first()) && $create) {
-//                return static::create(SQLBuilder::create_hash_from_underscored_string(
-//                    $attributes,
-//                    $args,
-//                    static::$alias_attribute));
-//            }
-
-            return null; // $ret;
+            return $ret;
         }
 
         throw new ActiveRecordException("Call to undefined method: $method");
@@ -1602,10 +1598,7 @@ class Model
 
     public static function select(string $columns='*'): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->select($columns);
-
-        return $relation;
+        return static::Relation()->select($columns);
     }
 
     /**
@@ -1613,10 +1606,7 @@ class Model
      */
     public static function readonly(bool $readonly = true): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->readonly($readonly);
-
-        return $relation;
+        return static::Relation()->readonly($readonly);
     }
 
     public function set_read_only(bool $readonly = true): void
@@ -1629,58 +1619,37 @@ class Model
      */
     public static function joins(string|array $joins): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->joins($joins);
-
-        return $relation;
+        return static::Relation()->joins($joins);
     }
 
     public static function order(string $order): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->order($order);
-
-        return $relation;
+        return static::Relation()->order($order);
     }
 
     public static function group(string $columns): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->group($columns);
-
-        return $relation;
+        return static::Relation()->group($columns);
     }
 
     public static function limit(int $limit): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->limit($limit);
-
-        return $relation;
+        return static::Relation()->limit($limit);
     }
 
     public static function offset(int $offset): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->offset($offset);
-
-        return $relation;
+        return static::Relation()->offset($offset);
     }
 
     public static function having(string $having): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->having($having);
-
-        return $relation;
+        return static::Relation()->having($having);
     }
 
     public static function from(string $from): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->from($from);
-
-        return $relation;
+        return static::Relation()->from($from);
     }
 
     /**
@@ -1688,10 +1657,7 @@ class Model
      */
     public static function include(string|array $include): Relation
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-        $relation->include($include);
-
-        return $relation;
+        return static::Relation()->include($include);
     }
 
     /**
@@ -1717,13 +1683,14 @@ class Model
     }
 
     /**
+     * @param RelationOptions $options
      * @return Relation<static>
      */
-    protected static function Relation(): Relation {
+    protected static function Relation(array $options = []): Relation {
         /**
          * @var Relation<static> $rel
          */
-        $rel = new Relation(get_called_class(), static::$alias_attribute);
+        $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
         return $rel;
     }
 
@@ -1752,9 +1719,7 @@ class Model
             }
         }
 
-        $relation = new Relation(get_called_class(), static::$alias_attribute, $options);
-
-        return $relation->count();
+        return static::Relation($options)->count();
     }
 
     /**
@@ -1786,32 +1751,23 @@ class Model
      */
     public static function exists(mixed $conditions = []): bool
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-
-        return $relation->exists($conditions);
+        return static::Relation()->exists($conditions);
     }
 
     /**
-     * @see iRelation::first()
+     * @see Relation::first
      */
     public static function first(int $limit = null): mixed
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-
-        return $relation->first($limit);
+        return static::Relation()->first($limit);
     }
 
     /**
-     * @return static|array<static>|null
+     * @see Relation::last
      */
     public static function last(int $limit = null): mixed
     {
-        /**
-         * @var Relation<static> $relation
-         */
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-
-        return $relation->last($limit);
+        return static::Relation()->last($limit);
     }
 
     /**
@@ -1884,9 +1840,7 @@ class Model
      */
     public static function find(/* $type, $options */): Model|array|null
     {
-        $relation = new Relation(get_called_class(), static::$alias_attribute);
-
-        return $relation->find(...func_get_args());
+        return static::Relation()->find(...func_get_args());
     }
 
     /**
@@ -1928,9 +1882,7 @@ class Model
     public static function pk_conditions(mixed $args): array
     {
         $table = static::table();
-        $ret = [$table->pk[0] => $args];
-
-        return $ret;
+        return [$table->pk[0] => $args];
     }
 
     /**

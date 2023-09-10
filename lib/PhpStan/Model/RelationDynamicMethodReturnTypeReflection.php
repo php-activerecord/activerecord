@@ -21,6 +21,7 @@ use PHPStan\Type\IntegerType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
 
 class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTypeExtension
@@ -43,7 +44,8 @@ class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTy
         assert($calledOnType instanceof \PHPStan\Type\Generic\GenericObjectType);
             // Here you have access to the generic type
         $genericTypes = $calledOnType->getTypes();
-        assert($genericTypes[0] instanceof ObjectType);
+
+        assert($genericTypes[0] instanceof TypeWithClassName);
         $subclass = $genericTypes[0]->getClassName();
         $args = $methodCall->args;
 

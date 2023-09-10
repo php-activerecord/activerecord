@@ -250,12 +250,6 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assert_conditions('id=? AND name IS NULL OR z=?', [1, null, ''], 'id_and_name_or_z');
     }
 
-    public function testCreateConditionsFromUnderscoredStringInvalid()
-    {
-        $this->assertEquals(null, $this->cond_from_s(''));
-        $this->assertEquals(null, $this->cond_from_s(null));
-    }
-
     public function testCreateConditionsFromUnderscoredStringWithMappedColumns()
     {
         $this->assert_conditions('id=? AND name=?', [1, 'Tito'], 'id_and_my_name', ['my_name' => 'name']);

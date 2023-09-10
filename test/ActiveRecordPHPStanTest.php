@@ -33,7 +33,7 @@ class ActiveRecordPHPStanTest extends \DatabaseTestCase
                     '--debug',
                     '-c',
                     './phpstan.neon.dist',
-                    'test/phpstan/RelationDynamicLast.php',
+                    'lib',
                 ]
             )
         );
