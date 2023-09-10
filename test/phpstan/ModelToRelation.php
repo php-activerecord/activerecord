@@ -32,4 +32,12 @@ class RelationTester
     {
         return Book::where([]);
     }
+
+    /**
+     * @return Relation<Book>
+     */
+    public function include(): Relation
+    {
+        return Book::include([]);
+    }
 }

@@ -11,7 +11,7 @@
 use ActiveRecord\Relation;
 use test\models\Book;
 
-class RelationDynamicFirst
+class RelationFindDynamicReturn
 {
     /**
      * @var Book|null
@@ -25,12 +25,7 @@ class RelationDynamicFirst
 
     public function __construct()
     {
-        /**
-         * @var Relation<Book> $rel
-         */
-        $rel = new Relation(Book::class, [], []);
-
-        $this->book = $rel->first();
-        $this->books = $rel->first(1);
+        $this->book = Book::All()->find(1);
+        $this->books = Book::All()->find([1, 2]);
     }
 }
