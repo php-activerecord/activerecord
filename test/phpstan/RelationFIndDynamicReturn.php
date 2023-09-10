@@ -8,7 +8,6 @@
  * see lib/PhpStan/RelationDynamicMethodReturnTypeReflection.php
  */
 
-use ActiveRecord\Relation;
 use test\models\Book;
 
 class RelationFindDynamicReturn
