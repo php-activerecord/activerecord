@@ -23,7 +23,7 @@ class WhereClauseTest extends TestCase
 
     public function testArrayVariable()
     {
-        $c = new WhereClause('name IN(?) and id=?', [['Tito', 'George'],1]);
+        $c = new WhereClause('name IN(?) and id=?', [['Tito', 'George'], 1]);
         $this->assertEquals([['Tito', 'George'], 1], $c->values());
     }
 
@@ -62,7 +62,7 @@ class WhereClauseTest extends TestCase
 
     public function testNoValues()
     {
-        $c = new WhereClause( "name='Tito'");
+        $c = new WhereClause("name='Tito'");
         $this->assertEquals("name='Tito'", $c->to_s());
         $this->assertEquals(0, count($c->values()));
     }
@@ -83,7 +83,7 @@ class WhereClauseTest extends TestCase
 
     public function testEmptyArrayVariable()
     {
-        $a = new WhereClause( 'id IN(?)', [[]]);
+        $a = new WhereClause('id IN(?)', [[]]);
         $this->assertEquals('id IN(?)', $a->to_s());
         $this->assertEquals([[]], $a->values());
     }
@@ -172,9 +172,9 @@ class WhereClauseTest extends TestCase
 
     public function testSubstituteUsingAlternateValues()
     {
-        $a = new WhereClause( 'name=?', ['Tito']);
+        $a = new WhereClause('name=?', ['Tito']);
         $this->assertEquals("name='Tito'", $a->to_s(substitute: true));
-        $this->assertEquals("name='Hocus'", $a->to_s(substitute: true, values:  ['Hocus']));
+        $this->assertEquals("name='Hocus'", $a->to_s(substitute: true, values: ['Hocus']));
     }
 
     public function testNullValue()

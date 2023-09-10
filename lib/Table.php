@@ -211,33 +211,33 @@ class Table
             $sql->select($options['select']);
         }
 
-//        foreach($options['conditions'] ?? [] as $condition) {
-//            if (is_hash($condition)) {
-//                if (!empty($options['mapped_names'])) {
-//                    $conditions = $this->map_names($options['conditions'], $options['mapped_names']);
-//                }
-//            } else {
-//                $conditions[] = $condition;
-//            }
-//        }
+        //        foreach($options['conditions'] ?? [] as $condition) {
+        //            if (is_hash($condition)) {
+        //                if (!empty($options['mapped_names'])) {
+        //                    $conditions = $this->map_names($options['conditions'], $options['mapped_names']);
+        //                }
+        //            } else {
+        //                $conditions[] = $condition;
+        //            }
+        //        }
 
         $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
 
-//        if (array_key_exists('conditions', $options)) {
-//            if (!is_hash($options['conditions'])) {
-//                if (is_string($options['conditions'])) {
-//                    $options['conditions'] = [$options['conditions']];
-//                }
-//
-//                $sql->where($options['conditions']);
-//            } else {
-//                if (!empty($options['mapped_names'])) {
-//                    $options['conditions'] = $this->map_names($options['conditions'], $options['mapped_names']);
-//                }
-//
-//                $sql->where($options['conditions']);
-//            }
-//        }
+        //        if (array_key_exists('conditions', $options)) {
+        //            if (!is_hash($options['conditions'])) {
+        //                if (is_string($options['conditions'])) {
+        //                    $options['conditions'] = [$options['conditions']];
+        //                }
+        //
+        //                $sql->where($options['conditions']);
+        //            } else {
+        //                if (!empty($options['mapped_names'])) {
+        //                    $options['conditions'] = $this->map_names($options['conditions'], $options['mapped_names']);
+        //                }
+        //
+        //                $sql->where($options['conditions']);
+        //            }
+        //        }
 
         if (array_key_exists('order', $options)) {
             $sql->order($options['order']);

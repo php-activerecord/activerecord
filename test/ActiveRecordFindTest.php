@@ -331,7 +331,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $venues = Venue::select('state')
             ->group('state')
             ->having('length(state) = 2')
-            ->order( 'state')
+            ->order('state')
             ->limit(2)
             ->to_a();
         $this->assertTrue(count($venues) > 0);

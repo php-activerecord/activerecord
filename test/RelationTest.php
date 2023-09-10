@@ -26,32 +26,37 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Tito', $authors[0]->name);
     }
 
-    public function testFirst() {
+    public function testFirst()
+    {
         $rel = Author::first();
         $this->assertInstanceOf(Author::class, $rel);
-        $this->assertEquals( 1, $rel->author_id);
+        $this->assertEquals(1, $rel->author_id);
     }
 
-    public function testFirstWithCount() {
+    public function testFirstWithCount()
+    {
         $authors = Author::first(2);
         $this->assertIsArray($authors);
         $this->assertEquals(2, count($authors));
     }
 
-    public function testFirstWithCountOverridesLimit() {
+    public function testFirstWithCountOverridesLimit()
+    {
         $authors = Author::limit(1)->first(2);
         $this->assertIsArray($authors);
         $this->assertEquals(2, count($authors));
     }
 
-    public function testLast() {
+    public function testLast()
+    {
         $authors = Author::all()->to_a();
         $author = Author::last();
         $this->assertInstanceOf(Author::class, $author);
-        $this->assertEquals( $author, $authors[count($authors)-1]);
+        $this->assertEquals($author, $authors[count($authors)-1]);
     }
 
-    public function testLastWithCount() {
+    public function testLastWithCount()
+    {
         $allAuthors = Author::all()->to_a();
         $authors = Author::last(2);
         $this->assertIsArray($authors);
@@ -60,7 +65,8 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals($allAuthors[count($allAuthors)-2], $authors[1]);
     }
 
-    public function testLastWithCountOverridesLimit() {
+    public function testLastWithCountOverridesLimit()
+    {
         $authors = Author::limit(1)->last(2);
         $this->assertIsArray($authors);
         $this->assertEquals(2, count($authors));
@@ -215,6 +221,7 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals(1, count($authors));
         $this->assertEquals('Uncle Bob', $authors[0]->name);
     }
+
     public function testAllChained()
     {
         $queries = Author::select('name')

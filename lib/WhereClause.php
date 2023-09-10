@@ -40,24 +40,25 @@ class WhereClause
         $this->expression = $expression;
         $this->values = $values;
 
-//        $values = null;
+        //        $values = null;
 
-//        if (is_array($expression)) {
-//            $glue = func_num_args() > 2 ? func_get_arg(2) : ' AND ';
-//            list($expression, $values) = $this->build_sql_from_hash($expression, $glue);
-//        }
-//
-//        if ('' != $expression) {
-//            if (!$values) {
-//                $values = array_slice(func_get_args(), 2);
-//            }
-//
-//            $this->values = $values;
-//            $this->expression = $expression;
-//        }
+        //        if (is_array($expression)) {
+        //            $glue = func_num_args() > 2 ? func_get_arg(2) : ' AND ';
+        //            list($expression, $values) = $this->build_sql_from_hash($expression, $glue);
+        //        }
+        //
+        //        if ('' != $expression) {
+        //            if (!$values) {
+        //                $values = array_slice(func_get_args(), 2);
+        //            }
+        //
+        //            $this->values = $values;
+        //            $this->expression = $expression;
+        //        }
     }
 
-    public function inverse(): bool {
+    public function inverse(): bool
+    {
         return $this->inverse;
     }
 
@@ -91,7 +92,8 @@ class WhereClause
         return $this->values;
     }
 
-    public function expression(): string {
+    public function expression(): string
+    {
         return $this->expression;
     }
 
@@ -122,13 +124,13 @@ class WhereClause
      * @throws ExpressionsException
      */
     public function to_s(string $prependTableName = '', array $mappedNames = [],
-                         bool $substitute=false, string $glue=' AND ', array $values=null): string
+        bool $substitute=false, string $glue=' AND ', array $values=null): string
     {
         $values = $values ?? $this->values;
         $expression = $this->expression;
-        if(is_hash($expression)) {
-           $expression = $this->map_names($expression, $mappedNames);
-           list($expression, $values) = $this->build_sql_from_hash($expression, $prependTableName, $glue);
+        if (is_hash($expression)) {
+            $expression = $this->map_names($expression, $mappedNames);
+            list($expression, $values) = $this->build_sql_from_hash($expression, $prependTableName, $glue);
         }
 
         $ret = '';
@@ -153,6 +155,7 @@ class WhereClause
         }
 
         $this->values = $values;
+
         return $ret;
     }
 
@@ -208,13 +211,15 @@ class WhereClause
         return new WhereClause($expression, $conditionValues);
     }
 
-    public static function from_arg(mixed $arg) {
+    public static function from_arg(mixed $arg)
+    {
         // user passed in a string, a hash, or an array consisting of a string and values
         if (is_string($arg) || is_hash($arg)) {
             $expression = new WhereClause($arg, []);
         } else {
             $expression = new WhereClause($arg[0], array_slice($arg, 1));
         }
+
         return $expression;
     }
 
@@ -257,7 +262,7 @@ class WhereClause
                 $name = $this->connection->quote_name($name);
             }
 
-            if(!empty($prependTableName)) {
+            if (!empty($prependTableName)) {
                 $name = $table . '.' . $name;
             }
 

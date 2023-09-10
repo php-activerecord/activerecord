@@ -2,20 +2,12 @@
 
 namespace test;
 
-use ActiveRecord;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
-use ActiveRecord\Exception\RecordNotFound;
-use ActiveRecord\Exception\UndefinedPropertyException;
-use ActiveRecord\Exception\ValidationsArgumentError;
-use ActiveRecord\Model;
-use DatabaseTestCase;
 use test\models\Author;
-use test\models\HonestLawyer;
-use test\models\JoinBook;
 use test\models\Venue;
 
-class ActiveRecordFindByTest extends DatabaseTestCase
+class ActiveRecordFindByTest extends \DatabaseTestCase
 {
     public function testEscapeQuotes()
     {

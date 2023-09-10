@@ -2,7 +2,6 @@
 
 namespace ActiveRecord\Relationship;
 
-use ActiveRecord\WhereClause;
 use function ActiveRecord\all;
 use function ActiveRecord\classify;
 
@@ -14,9 +13,9 @@ use ActiveRecord\Inflector;
 use ActiveRecord\Model;
 use ActiveRecord\Reflections;
 use ActiveRecord\Relation;
-use ActiveRecord\SQLBuilder;
 use ActiveRecord\Table;
 use ActiveRecord\Utils;
+use ActiveRecord\WhereClause;
 
 /**
  * Abstract class that all relationships must extend from.
@@ -78,7 +77,7 @@ abstract class AbstractRelationship
         $this->options = $this->merge_association_options($options);
 
         $this->options['conditions'] = [];
-        if(isset($options['conditions'])) {
+        if (isset($options['conditions'])) {
             $this->options['conditions'][] = WhereClause::from_arg($options['conditions'] ?? []);
         }
 
