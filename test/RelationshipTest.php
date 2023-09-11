@@ -695,7 +695,7 @@ class RelationshipTest extends DatabaseTestCase
         AuthorWithNonModelRelationship::first()->books;
     }
 
-    public function testGh93AndGh100EagerLoadingRespectsAssociationOptions()
+    public function testEagerLoadingRespectsAssociationOptions()
     {
         Venue::$has_many = [
             'events' => [
@@ -710,6 +710,22 @@ class RelationshipTest extends DatabaseTestCase
 
         $this->assert_sql_has('WHERE (length(title) = ?) AND (venue_id IN(?,?)) ORDER BY id asc', ActiveRecord\Table::load(Event::class)->last_sql);
         $this->assertEquals(1, count($venues[0]->events));
+    }
+
+    public function testEagerLoadingWithThrough()
+    {
+        Venue::$has_many = [
+            'events' => [
+                'order' => 'id asc'
+            ],
+            'hosts' => [
+                'class_name' => 'Host',
+                'through' => 'events',
+                'order' => 'hosts.id asc'
+            ]
+        ];
+        $venues = Venue::include('hosts')->find([2, 6]);
+        $this->assertEquals(2, count($venues));
     }
 
     public function testEagerLoadingHasManyX()

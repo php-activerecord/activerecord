@@ -158,6 +158,9 @@ abstract class AbstractRelationship
                 $through_table = $class::table();
             } else {
                 $class = $options['class_name'];
+                if (isset($this->options['namespace']) && !class_exists($class)) {
+                    $class = $this->options['namespace'] . '\\' . $class;
+                }
                 $relation = $class::table()->get_relationship($options['through']);
                 $through_table = $relation->get_table();
             }
@@ -339,7 +342,6 @@ abstract class AbstractRelationship
     public function construct_inner_join_sql(Table $from_table, $using_through = false, $alias = null)
     {
         if ($using_through) {
-            $join_table = $from_table;
             $join_table_name = $from_table->get_fully_qualified_table_name();
             $from_table_name = Table::load($this->class_name)->get_fully_qualified_table_name();
         } else {
