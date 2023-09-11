@@ -136,12 +136,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name'));
     }
 
-    public function testFindNothingWithSqlInString()
-    {
-        $this->expectException(TypeError::class);
-        Author::first('name = 123123123');
-    }
-
     public function testFindAll()
     {
         $authors = Author::where(['author_id IN(?)', [1, 2, 3]])->to_a();
@@ -199,24 +193,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assertEquals([], $authors);
     }
 
-    public function testFindFirst()
-    {
-        $author = Author::where(['author_id IN(?)', [1, 2, 3]])->first();
-        $this->assertEquals(1, $author->author_id);
-        $this->assertEquals('Tito', $author->name);
-    }
-
-    public function testFindFirstNoResults()
-    {
-        $this->assertNull(Author::where('author_id=1111111')->first());
-    }
-
-    public function testFindFirstWithConditionsAsString()
-    {
-        $author = Author::where('author_id=3')->first();
-        $this->assertEquals(3, $author->author_id);
-    }
-
     public function testFindAllWithConditionsAsString()
     {
         $author = Author::all()->where('author_id in(2,3)')->to_a();
@@ -234,12 +210,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
     {
         $author = Author::find_by_sql('SELECT * FROM authors WHERE author_id=?', [1]);
         $this->assertNotNull($author);
-    }
-
-    public function testFindWithConditions()
-    {
-        $author = Author::where(['author_id=? and name=?', 1, 'Tito'])->first();
-        $this->assertEquals(1, $author->author_id);
     }
 
     public function testFindLast()

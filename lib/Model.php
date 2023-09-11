@@ -1740,6 +1740,14 @@ class Model
     }
 
     /**
+     * @see Relation::take
+     */
+    public static function take(int $limit = null): mixed
+    {
+        return static::Relation()->take($limit);
+    }
+
+    /**
      * @see Relation::first
      */
     public static function first(int $limit = null): mixed

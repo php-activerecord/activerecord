@@ -29,7 +29,7 @@ class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTy
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return in_array($methodReflection->getName(), ['first', 'last', 'find']);
+        return in_array($methodReflection->getName(), ['first', 'last', 'find', 'take']);
     }
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, \PhpParser\Node\Expr\MethodCall $methodCall, Scope $scope): Type
@@ -85,6 +85,7 @@ class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTy
 
             case 'last':
             case 'first':
+            case 'take':
                 $numArgs = count($args);
                 if (1 == $numArgs) {
                     return new ArrayType(

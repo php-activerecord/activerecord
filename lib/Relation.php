@@ -265,9 +265,26 @@ class Relation
         return $single ? ($list[0] ?? throw new RecordNotFound('tbd')) : $list;
     }
 
+    public function take(int $limit = null): mixed
+    {
+        $this->limit($limit ?? 1);
+        if (!isset($limit)) {
+            $models = $this->to_a();
+
+            return $models[0] ?? null;
+        }
+
+        return $this->to_a();
+    }
+
     public function first(int $limit = null): mixed
     {
         $this->limit($limit ?? 1);
+
+        if (!array_key_exists('order', $this->options)) {
+            $this->options['order'] = implode(' ASC, ', $this->table()->pk) . ' ASC';
+        }
+
         if (!isset($limit)) {
             $models = $this->to_a();
 
