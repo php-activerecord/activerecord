@@ -58,6 +58,9 @@ class Relation
         return $this->tableImpl;
     }
 
+    /**
+     * @return Relation<TModel>
+     */
     public function select(string $columns): Relation
     {
         $this->options['select'] = $columns;
@@ -66,7 +69,23 @@ class Relation
     }
 
     /**
+     * Performs JOINs on +args+. The given symbol(s) should match the name of
+     * the association(s).
+     *
+     * User::joins('posts') // SELECT "users".*
+     *                      // FROM "users"
+     *                      // INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
+     *
+     * // Multiple joins:
+     *
+     * User::joins(['posts', 'account']) // SELECT "users".*
+     *                                   // FROM "users"
+     *                                   // INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
+     *                                   // INNER JOIN "accounts" ON "accounts"."id" = "users"."account_id"
+     *
      * @param string|array<string> $joins
+     *
+     * @returns Relation<TModel>
      */
     public function joins(string|array $joins): Relation
     {
@@ -75,6 +94,9 @@ class Relation
         return $this;
     }
 
+    /**
+     * @return Relation<TModel>
+     */
     public function order(string $order): Relation
     {
         $this->options['order'] = $order;
@@ -82,6 +104,14 @@ class Relation
         return $this;
     }
 
+    /**
+     * Specifies a limit for the number of records to retrieve.
+     *
+     * User::limit(10) // generated SQL has 'LIMIT 10'
+     * User::limit(10)->limit(20) # generated SQL has 'LIMIT 20'
+     *
+     * @return Relation<TModel>
+     */
     public function limit(int $limit): Relation
     {
         $this->options['limit'] = $limit;
@@ -89,6 +119,9 @@ class Relation
         return $this;
     }
 
+    /**
+     * @return Relation<TModel>
+     */
     public function group(string $columns): Relation
     {
         $this->options['group'] = $columns;
@@ -96,6 +129,17 @@ class Relation
         return $this;
     }
 
+    /**
+     * Specifies the number of rows to skip before returning rows.
+     *
+     *  User::offset(10) // generated SQL has "OFFSET 10"
+     *
+     * Should be used with order.
+     *
+     *  User::offset(10)->order("name ASC")
+     *
+     * @return Relation<TModel>
+     */
     public function offset(int $offset): Relation
     {
         $this->options['offset'] = $offset;
@@ -103,6 +147,14 @@ class Relation
         return $this;
     }
 
+    /**
+     * Allows to specify a HAVING clause. Note that you can't use HAVING
+     * without also specifying a GROUP clause.
+     *
+     * Order::having('SUM(price) > 30')->group('user_id')
+     *
+     * @return Relation<TModel>
+     */
     public function having(string $having): Relation
     {
         $this->options['having'] = $having;
@@ -110,6 +162,9 @@ class Relation
         return $this;
     }
 
+    /**
+     * @return Relation<TModel>
+     */
     public function from(string $from): Relation
     {
         $this->options['from'] = $from;
@@ -119,6 +174,8 @@ class Relation
 
     /**
      * @param string|array<string|mixed> $include
+     *
+     * @return Relation<TModel>
      */
     public function include(string|array $include): Relation
     {
@@ -182,6 +239,8 @@ class Relation
      *   'email' => "joe@example.com"
      * ])
      * # SELECT * FROM users WHERE name = 'Joe' AND email = 'joe@example.com'
+     *
+     * @return Relation<TModel>
      */
     public function where(): Relation
     {
@@ -202,6 +261,13 @@ class Relation
         return $this;
     }
 
+    /**
+     * Sets readonly attributes for the returned relation. If value is true (default),
+     * attempting to update a record will result in an error.
+     *
+     * $users = User::readonly()
+     * $users->first()->save()  // throws exception ActiveRecord::ReadOnlyRecord: User is marked as readonly
+     */
     public function readonly(bool $readonly): Relation
     {
         $this->options['readonly'] = $readonly;
@@ -286,6 +352,16 @@ class Relation
         return $this->to_a();
     }
 
+    /**
+     * Find the first record (or first N records if a parameter is supplied).
+     * If no order is defined it will order by primary key.
+     *
+     * Person::first() // returns the first object fetched by SELECT * FROM people ORDER BY people.id LIMIT 1
+     * Person::where(["user_name = ?", user_name])->first()
+     * Person::where(["user_name = :u", { u: user_name }])->first()
+     * Person::order("created_on DESC")->offset(5).first()
+     * Person.first(3) // returns the first three objects fetched by SELECT * FROM people ORDER BY people.id LIMIT 3
+     */
     public function first(int $limit = null): mixed
     {
         $this->limit($limit ?? 1);
@@ -305,6 +381,17 @@ class Relation
     }
 
     /**
+     * Find the last record (or last N records if a parameter is supplied). If no order is
+     * defined it will order by primary key.
+     *
+     * Person::last()  // returns the last object fetched by SELECT * FROM people
+     * Person::where(["user_name = ?", user_name])->last()
+     * Person::order("created_on DESC")->offset(5)->last()
+     * Person::last(3) // returns the last three objects fetched by SELECT * FROM people.
+     *
+     * Returns a single record, unless limit is supplied, in which case an array of
+     * records is returned. If no records are found, returns null.
+     *
      * @return TModel|array<TModel>|null
      */
     public function last(int $limit = null): mixed
@@ -325,18 +412,28 @@ class Relation
     }
 
     /**
+     * Converts relation objects to array.
+     *
      * @return array<TModel> All the rows that matches query. If no rows match, returns []
      */
     public function to_a(): array
     {
         $this->options['mapped_names'] = $this->alias_attribute;
 
-        $table = $this->table();
-
         return $this->table()->find($this->options);
     }
 
     /**
+     * Returns a Relation scope object.
+     *
+     * $posts = Post::all()
+     * $posts->count() // Fires "select count(*) from  posts" and returns the count
+     * foreach($posts as $post) { echo $p->name; } # Fires "select * from posts" and loads post objects
+     *
+     * $fruits = Fruit::all()
+     * $fruits = $fruits->where(['color' => 'red'])
+     * $fruits = $fruits->limit(10)
+     *
      * @return Relation<TModel>
      */
     public function all(): Relation
@@ -360,26 +457,52 @@ class Relation
      */
     public function count(): int
     {
-        $args =  func_get_args();
-        // arg handling tbd
-
-        //        $this->options['conditions'] = $where;
-        //
         $this->select('COUNT(*)');
-        $sql = $this->table()->options_to_sql($this->options);
-        //        $values = $sql->get_where_values();
 
         $table = $this->table();
         $sql = $table->options_to_sql($this->options);
         $values = $sql->get_where_values();
 
-        $res = $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
-
-        return $res;
+        return $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
     }
 
+    /**
+     * Returns true if a record exists in the table that matches the id or conditions given, or false
+     * otherwise. The argument can take six forms:
+     *
+     *   * Integer - Finds the record with this primary key.
+     *   * String - Finds the record with a primary key corresponding to this string (such as '5').
+     *   * Array - Finds the record that matches these where-style conditions (such as ['name LIKE ?', "%#{query}%"]).
+     *   * Hash - Finds the record that matches these where-style conditions (such as ['name' => 'David']).
+     *   * false - Returns always false.
+     *   * No args - Returns false if the relation is empty, true otherwise.
+     *
+     *  // no arguments
+     *  Person::exists()
+     *
+     *  // by primary key
+     *  Person::exists(5)
+     *  Person::exists('5')
+     *
+     *  // by array conditions
+     *  Person::exists(['name LIKE ?', "%#{query}%"])
+     *
+     *  // by hash conditions
+     *  Person::exists(['id': [1, 4, 8]])
+     *  Person::exists([name: 'David'])
+     *
+     *  // by boolean
+     *  Person::exists(false)
+     *
+     *  // chained
+     *  Person::where([name=> 'Spartacus', 'rating' => 4]).exists()
+     */
     public function exists(mixed $conditions = []): bool
     {
+        if (is_bool($conditions) && empty($conditions)) {
+            return false;
+        }
+
         if (is_array($conditions) || is_hash($conditions)) {
             !empty($conditions) && $this->where($conditions);
         } else {

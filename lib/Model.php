@@ -1589,13 +1589,20 @@ class Model
         throw new ActiveRecordException("Call to undefined method: $method");
     }
 
+    /**
+     * @see Relation::select()
+     *
+     * @return Relation<static>
+     */
     public static function select(string $columns='*'): Relation
     {
         return static::Relation()->select($columns);
     }
 
     /**
-     * Flag as readonly.
+     * @see Relation::readonly()
+     *
+     * @return Relation<static>
      */
     public static function readonly(bool $readonly = true): Relation
     {
@@ -1608,38 +1615,72 @@ class Model
     }
 
     /**
+     * @see Relation::joins()
+     *
      * @param string|array<string> $joins
+     *
+     * @return Relation<static>
      */
     public static function joins(string|array $joins): Relation
     {
         return static::Relation()->joins($joins);
     }
 
+    /**
+     * @see Relation::order()
+     *
+     * @return Relation<static>
+     */
     public static function order(string $order): Relation
     {
         return static::Relation()->order($order);
     }
 
+    /**
+     * @see Relation::group()
+     *
+     * @return Relation<static>
+     */
     public static function group(string $columns): Relation
     {
         return static::Relation()->group($columns);
     }
 
+    /**
+     * @see Relation::limit()
+     *
+     * @return Relation<static>
+     */
     public static function limit(int $limit): Relation
     {
         return static::Relation()->limit($limit);
     }
 
+    /**
+     * @see Relation::having()
+     *
+     * @return Relation<static>
+     */
     public static function offset(int $offset): Relation
     {
         return static::Relation()->offset($offset);
     }
 
+    /**
+     * @see Relation::having()
+     *
+     * @return Relation<static>
+     */
     public static function having(string $having): Relation
     {
         return static::Relation()->having($having);
     }
 
+    /**
+     * @see Relation::having()
+     *
+     * @return Relation<static>
+     */
     public static function from(string $from): Relation
     {
         return static::Relation()->from($from);
@@ -1647,6 +1688,8 @@ class Model
 
     /**
      * @param string|array<string|mixed> $include
+     *
+     * @return Relation<static>
      */
     public static function include(string|array $include): Relation
     {
@@ -1654,6 +1697,8 @@ class Model
     }
 
     /**
+     * @see Relation::where()
+     *
      * @return Relation<static>
      */
     public static function where(): Relation
@@ -1710,29 +1755,7 @@ class Model
     /**
      * Determine if a record exists.
      *
-     * ```
-     * // no arguments
-     * SomeModel::exists();
-     *
-     * // by primary key
-     * SomeModel::exists(123);
-     * SomeModel::exists([123, 15]);
-     *
-     * // array conditions
-     * SomeModel::exists([
-     *   'id=? and name=?', 123, 'Tito'
-     * ]);
-     *
-     * // hash conditions
-     * SomeModel::exists([
-     *   'id' => 123,
-     *   'name' => 'Tito'
-     * ]);
-     *
-     * ```
-     *
-     * @see where
-     * @see find
+     * @see Relation::exists()
      */
     public static function exists(mixed $conditions = []): bool
     {
@@ -1740,7 +1763,7 @@ class Model
     }
 
     /**
-     * @see Relation::take
+     * @see Relation::take()
      */
     public static function take(int $limit = null): mixed
     {
@@ -1748,7 +1771,7 @@ class Model
     }
 
     /**
-     * @see Relation::first
+     * @see Relation::first()
      */
     public static function first(int $limit = null): mixed
     {
@@ -1756,7 +1779,7 @@ class Model
     }
 
     /**
-     * @see Relation::last
+     * @see Relation::last()
      */
     public static function last(int $limit = null): mixed
     {

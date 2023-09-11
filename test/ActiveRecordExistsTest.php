@@ -28,4 +28,9 @@ class ActiveRecordExistsTest extends \DatabaseTestCase
     {
         $this->assertTrue(Author::exists(['name' => 'Tito']));
     }
+
+    public function testWithFalse()
+    {
+        $this->assertFalse(Author::exists(false));
+    }
 }
