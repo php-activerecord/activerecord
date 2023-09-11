@@ -223,7 +223,8 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Uncle Bob', $authors[0]->name);
     }
 
-    public function testModelToRelation() {
+    public function testModelToRelation()
+    {
         $this->assertInstanceOf(Relation::class, Author::offset(0));
         $this->assertInstanceOf(Relation::class, Author::group('name'));
         $this->assertInstanceOf(Relation::class, Author::having('length(name) > 2'));
