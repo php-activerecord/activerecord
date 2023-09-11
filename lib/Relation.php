@@ -7,7 +7,6 @@
 
 namespace ActiveRecord;
 
-use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
 

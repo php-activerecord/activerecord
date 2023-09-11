@@ -34,7 +34,6 @@ class WhereClause
      * @var array<mixed>
      */
     private array $values = [];
-    private Connection $connection;
 
     /**
      * @param Expression   $expression
@@ -93,38 +92,19 @@ class WhereClause
     }
 
     /**
-     * Returns the connection object.
-     */
-    public function get_connection(): ?Connection
-    {
-        return $this->connection;
-    }
-
-    /**
-     * Sets the connection object. It is highly recommended to set this so we can
-     * use the adapter's native escaping mechanism.
-     *
-     * @param Connection $connection a Connection instance
-     */
-    public function set_connection(Connection $connection): void
-    {
-        $this->connection = $connection;
-    }
-
-    /**
      * @param array<string,string> $mappedNames
      * @param array<mixed>         $values
      *
      * @throws ExpressionsException
      */
-    public function to_s(string $prependTableName = '', array $mappedNames = [],
+    public function to_s(Connection $connection, string $prependTableName = '', array $mappedNames = [],
         bool $substitute=false, string $glue=' AND ', array $values=null): string
     {
         $values = $values ?? $this->values;
         $expression = $this->expression;
         if (is_hash($expression)) {
             $expression = $this->map_names($expression, $mappedNames);
-            list($expression, $values) = $this->build_sql_from_hash($expression, $prependTableName, $glue);
+            list($expression, $values) = $this->build_sql_from_hash($connection, $expression, $prependTableName, $glue);
         }
 
         $ret = '';
@@ -139,7 +119,7 @@ class WhereClause
                     if ($j > $num_values - 1) {
                         throw new ExpressionsException("No bound parameter for index $j");
                     }
-                    $ch = $this->substitute($expression, $values, $substitute, $i, $j++);
+                    $ch = $this->substitute($connection, $expression, $values, $substitute, $i, $j++);
                 }
             } elseif ('\'' == $ch && $i > 0 && '\\' != $expression[$i - 1]) {
                 ++$quotes;
@@ -239,15 +219,15 @@ class WhereClause
      *
      * @return array<mixed>
      */
-    private function build_sql_from_hash(array $hash, string $prependTableName, string $glue = ' AND '): array
+    private function build_sql_from_hash(Connection $connection, array $hash, string $prependTableName, string $glue = ' AND '): array
     {
         $sql = $g = '';
 
-        $table = !empty($prependTableName) ? $this->connection->quote_name($prependTableName) : '';
+        $table = !empty($prependTableName) ? $connection->quote_name($prependTableName) : '';
 
         foreach ($hash as $name => $value) {
             if (isset($this->connection)) {
-                $name = $this->connection->quote_name($name);
+                $name = $connection->quote_name($name);
             }
 
             if (!empty($prependTableName)) {
@@ -273,7 +253,7 @@ class WhereClause
      *
      * @return mixed|string
      */
-    private function substitute(string $expression, array $values, bool $substitute, int $pos, int $parameter_index)
+    private function substitute(Connection $connection, string $expression, array $values, bool $substitute, int $pos, int $parameter_index)
     {
         $value = $values[$parameter_index];
 
@@ -292,7 +272,7 @@ class WhereClause
                 $ret = '';
 
                 for ($i = 0, $n = $value_count; $i < $n; ++$i) {
-                    $ret .= ($i > 0 ? ',' : '') . $this->stringify_value($value[$i]);
+                    $ret .= ($i > 0 ? ',' : '') . $this->stringify_value($connection, $value[$i]);
                 }
 
                 return $ret;
@@ -302,27 +282,18 @@ class WhereClause
         }
 
         if ($substitute) {
-            return $this->stringify_value($value);
+            return $this->stringify_value($connection, $value);
         }
 
         return $expression[$pos];
     }
 
-    private function stringify_value(mixed $value): string
+    private function stringify_value(Connection $connection, mixed $value): string
     {
         if (is_null($value)) {
             return 'NULL';
         }
 
-        return is_string($value) ? $this->quote_string($value) : $value;
-    }
-
-    private function quote_string(string $value): string
-    {
-        if (isset($this->connection)) {
-            return $this->connection->escape($value);
-        }
-
-        return "'" . str_replace("'", "''", $value) . "'";
+        return is_string($value) ? $connection->escape($value) : $value;
     }
 }
