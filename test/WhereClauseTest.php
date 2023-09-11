@@ -198,7 +198,7 @@ class WhereClauseTest extends TestCase
     public function testHashWithDefaultGlue()
     {
         $a = new WhereClause(['id' => 1, 'name' => 'Tito']);
-        $this->assertEquals('id=? AND name=?', $a->to_s($this->connection));
+        $this->assertEquals('`id`=? AND `name`=?', $a->to_s($this->connection));
     }
 
     public function testHashWithGlue()
@@ -207,7 +207,7 @@ class WhereClauseTest extends TestCase
             'id' => 1,
             'name' => 'Tito'
         ]);
-        $this->assertEquals('id=?, name=?', $a->to_s($this->connection, glue: ', '));
+        $this->assertEquals('`id`=?, `name`=?', $a->to_s($this->connection, glue: ', '));
     }
 
     public function testHashWithArray()
@@ -216,6 +216,6 @@ class WhereClauseTest extends TestCase
             'id' => 1,
             'name' => ['Tito', 'Mexican']
         ]);
-        $this->assertEquals('id=? AND name IN(?,?)', $a->to_s($this->connection));
+        $this->assertEquals('`id`=? AND `name` IN(?,?)', $a->to_s($this->connection));
     }
 }
