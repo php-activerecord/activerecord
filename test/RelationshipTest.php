@@ -345,7 +345,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_default_has_many($this->get_relationship(), 'explicit_class_name');
     }
 
-    public function testHasManyWithInvalidAssociation()
+    public function testInvalidRelationship()
     {
         $this->expectException(RelationshipException::class);
         Venue::table()->get_relationship('non_existent_table', true);
