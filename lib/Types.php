@@ -32,17 +32,17 @@ namespace ActiveRecord;
  * }
  * @phpstan-type RelationOptions array{
  *  conditions?: array<WhereClause>,
+ *  from?: string,
+ *  group?: string,
+ *  having?: string,
+ *  include?: string|array<string>,
+ *  joins?: string|array<string>,
  *  limit?: int,
+ *  mapped_names?: array<string, string>
  *  offset?: int,
  *  order?: string,
  *  select?: string,
- *  joins?: string|array<string>,
- *  include?: string|array<string>,
  *  readonly?: bool,
- *  group?: string,
- *  from?: string,
- *  having?: string,
- *  mapped_names?: array<string, string>
  * }
  */
 abstract class Types

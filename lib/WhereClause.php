@@ -39,28 +39,14 @@ class WhereClause
     /**
      * @param Expression   $expression
      * @param array<mixed> $values
+     * @param bool         $inverse    if true, then this where clause will be a logical
+     *                                 not when the SQL is generated
      */
     public function __construct(string|array $expression, array $values=[], bool $inverse = false)
     {
         $this->inverse = $inverse;
         $this->expression = $expression;
         $this->values = $values;
-
-        //        $values = null;
-
-        //        if (is_array($expression)) {
-        //            $glue = func_num_args() > 2 ? func_get_arg(2) : ' AND ';
-        //            list($expression, $values) = $this->build_sql_from_hash($expression, $glue);
-        //        }
-        //
-        //        if ('' != $expression) {
-        //            if (!$values) {
-        //                $values = array_slice(func_get_args(), 2);
-        //            }
-        //
-        //            $this->values = $values;
-        //            $this->expression = $expression;
-        //        }
     }
 
     public function inverse(): bool
