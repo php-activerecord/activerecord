@@ -1710,18 +1710,7 @@ class Model
      */
     public static function count(/* ... */): int
     {
-        $args = func_get_args();
-        $options = [];
-
-        if (!empty($args) && !is_null($args[0]) && !empty($args[0])) {
-            if (is_hash($args[0])) {
-                $options['conditions'] = $args[0];
-            } else {
-                $options['conditions'] = static::pk_conditions(...$args);
-            }
-        }
-
-        return static::Relation($options)->count();
+        return static::Relation()->count(...func_get_args());
     }
 
     /**
