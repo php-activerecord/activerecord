@@ -549,9 +549,6 @@ class Model
         }
 
         foreach (static::$delegate as $key => $item) {
-            if ('processed' == $key) {
-                continue;
-            }
             if ($delegated_name = $this->is_delegated($name, $item)) {
                 $this->{$item['to']}->$delegated_name = $value;
 
@@ -665,9 +662,6 @@ class Model
         $null = null;
 
         foreach (static::$delegate as $delegateName => $item) {
-            if ('processed' == $delegateName) {
-                continue;
-            }
             if ($delegated_name = $this->is_delegated($name, $item)) {
                 $to = $item['to'];
                 if ($this->$to) {
