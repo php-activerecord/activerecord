@@ -213,7 +213,7 @@ class SQLBuilder
     }
 
     /**
-     * @param array<string,string>|string $mixed
+     * @param Attributes|string $mixed
      *
      * @throws ActiveRecordException
      */
@@ -225,8 +225,6 @@ class SQLBuilder
             $this->data = $mixed;
         } elseif (is_string($mixed)) {
             $this->update = $mixed;
-        } else {
-            throw new ActiveRecordException('Updating requires a hash or string.');
         }
 
         return $this;
