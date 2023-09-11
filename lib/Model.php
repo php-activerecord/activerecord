@@ -1788,24 +1788,6 @@ class Model
      * YourModel::find('all',['name' => 'Tito', 'id' => 1]);
      * ```
      *
-     * An options array can take the following parameters:
-     *
-     * <ul>
-     * <li><b>select:</b> A SQL fragment for what fields to return such as: '*', 'people.*', 'first_name, last_name, id'</li>
-     * <li><b>joins:</b> A SQL join fragment such as: 'JOIN roles ON(roles.user_id=user.id)' or a named association on the model</li>
-     * <li><b>include:</b> TODO not implemented yet</li>
-     * <li><b>conditions:</b> A SQL fragment such as:
-     *   'id=1',
-     *   ['id=1'],
-     *   ['name=? and id=?', 'Tito',1], ['name IN(?)', ['Tito','Bob']],
-     *   ['name' => 'Tito', 'id' => 1]</li>
-     * <li><b>limit:</b> Number of records to limit the query to</li>
-     * <li><b>offset:</b> The row offset to return results from for the query</li>
-     * <li><b>order:</b> A SQL fragment for order such as: 'name asc', 'name asc, id desc'</li>
-     * <li><b>readonly:</b> Return all the models in readonly mode</li>
-     * <li><b>group:</b> A SQL group by fragment</li>
-     * </ul>
-     *
      * @throws RecordNotFound if no options are passed or finding by pk and no records matched
      *
      * @return Model|Model[]|null
@@ -1823,7 +1805,7 @@ class Model
      *  ...int|string								static[]			User::find(1, 3, 5, 8);
      *  array<int,int|string>						static[]			User::find([1,3,5,8]);
      */
-    public static function find(/* $type, $options */): Model|array|null
+    public static function find(/* $pk */): Model|array|null
     {
         return static::Relation()->find(...func_get_args());
     }

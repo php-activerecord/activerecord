@@ -2,6 +2,7 @@
 
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
+use ActiveRecord\Relation;
 use test\models\Author;
 
 class RelationTest extends DatabaseTestCase
@@ -220,6 +221,12 @@ class RelationTest extends DatabaseTestCase
             ->to_a();
         $this->assertEquals(1, count($authors));
         $this->assertEquals('Uncle Bob', $authors[0]->name);
+    }
+
+    public function testModelToRelation() {
+        $this->assertInstanceOf(Relation::class, Author::offset(0));
+        $this->assertInstanceOf(Relation::class, Author::group('name'));
+        $this->assertInstanceOf(Relation::class, Author::having('length(name) > 2'));
     }
 
     public function testAllChained()
