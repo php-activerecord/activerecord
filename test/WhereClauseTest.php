@@ -118,10 +118,16 @@ class WhereClauseTest extends TestCase
         $this->assertEquals("question='Do you love\\'s backslashes?' and id in(?,?)", $a->to_s($this->connection));
     }
 
-    public function testSubstitute()
+    public function testSubstituteOnString()
     {
         $a = new WhereClause('name=? and id=?', ['Tito', 1]);
         $this->assertEquals("name='Tito' and id=1", $a->to_s($this->connection, substitute: true));
+    }
+
+    public function testSubstituteOnHash()
+    {
+        $a = new WhereClause(['name' => 'Tito', 'id'=> 1]);
+        $this->assertEquals("`name`='Tito' AND `id`=1", $a->to_s($this->connection, substitute: true));
     }
 
     public function testSubstituteQuotesScalarsButNotOthers()

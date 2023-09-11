@@ -66,14 +66,6 @@ class WhereClause
     }
 
     /**
-     * @param array<mixed> $values
-     */
-    public function bind_values(array $values): void
-    {
-        $this->values = $values;
-    }
-
-    /**
      * Returns all the values currently bound.
      *
      * @return array<mixed>
@@ -103,8 +95,8 @@ class WhereClause
         $values = $values ?? $this->values;
         $expression = $this->expression;
         if (is_hash($expression)) {
-            $expression = $this->map_names($expression, $mappedNames);
-            list($expression, $values) = $this->build_sql_from_hash($connection, $expression, $prependTableName, $glue);
+            $hash = $this->map_names($expression, $mappedNames);
+            list($expression, $values) = $this->build_sql_from_hash($connection, $hash, $prependTableName, $glue);
         }
 
         $ret = '';
@@ -226,9 +218,7 @@ class WhereClause
         $table = !empty($prependTableName) ? $connection->quote_name($prependTableName) : '';
 
         foreach ($hash as $name => $value) {
-            if (isset($this->connection)) {
-                $name = $connection->quote_name($name);
-            }
+            $name = $connection->quote_name($name);
 
             if (!empty($prependTableName)) {
                 $name = $table . '.' . $name;
