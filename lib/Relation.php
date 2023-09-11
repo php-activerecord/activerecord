@@ -265,6 +265,15 @@ class Relation
         return $single ? ($list[0] ?? throw new RecordNotFound('tbd')) : $list;
     }
 
+    /**
+     * Returns a record (or N records if a parameter is supplied) without any implied
+     * order. The order will depend on the database implementation.
+     * If an order is supplied it will be respected.
+     *
+     *   Person::take() # returns an object fetched by SELECT * FROM people LIMIT 1
+     *   Person::take(5) # returns 5 objects fetched by SELECT * FROM people LIMIT 5
+     *   Person::where(["name LIKE '%?'", name]).take()
+     */
     public function take(int $limit = null): mixed
     {
         $this->limit($limit ?? 1);
