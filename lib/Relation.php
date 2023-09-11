@@ -281,7 +281,8 @@ class Relation
     {
         $this->limit($limit ?? 1);
 
-        if (!array_key_exists('order', $this->options)) {
+        $pk = $this->table()->pk;
+        if (!empty($pk) && !array_key_exists('order', $this->options) && !array_key_exists('group', $this->options)) {
             $this->options['order'] = implode(' ASC, ', $this->table()->pk) . ' ASC';
         }
 

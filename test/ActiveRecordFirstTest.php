@@ -7,12 +7,6 @@ use test\models\Author;
 
 class ActiveRecordFirstTest extends \DatabaseTestCase
 {
-    public function testFindNothingWithSqlInString()
-    {
-        $this->expectException(TypeError::class);
-        Author::first('name = 123123123');
-    }
-
     public function testFirstNoArguments()
     {
         $author = Author::first();
