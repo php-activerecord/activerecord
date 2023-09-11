@@ -345,6 +345,13 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_default_has_many($this->get_relationship(), 'explicit_class_name');
     }
 
+    public function testHasManyWithInvalidAssociation()
+    {
+        $this->expectException(RelationshipException::class);
+        Venue::table()->get_relationship('non_existent_table', true);
+        $this->assert_sql_has($this->connection->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
+    }
+
     public function testHasManyWithSelect()
     {
         Venue::$has_many = [
