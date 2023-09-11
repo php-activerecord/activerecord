@@ -1840,20 +1840,6 @@ class Model
     }
 
     /**
-     * Returns a hash containing the names => values of the primary key.
-     *
-     * @param PrimaryKey $args Primary key value(s)
-     *
-     * @return array<string, mixed>
-     */
-    public static function pk_conditions(mixed $args): array
-    {
-        $table = static::table();
-
-        return [$table->pk[0] => $args];
-    }
-
-    /**
      * Returns a JSON representation of this model.
      *
      * @param SerializeOptions $options
