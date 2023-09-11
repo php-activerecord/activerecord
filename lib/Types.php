@@ -38,11 +38,11 @@ namespace ActiveRecord;
  *  include?: string|array<string>,
  *  joins?: string|array<string>,
  *  limit?: int,
- *  mapped_names?: array<string, string>
+ *  mapped_names?: array<string, string>,
  *  offset?: int,
  *  order?: string,
- *  select?: string,
  *  readonly?: bool,
+ *  select?: string,
  * }
  */
 abstract class Types

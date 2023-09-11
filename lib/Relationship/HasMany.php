@@ -171,7 +171,7 @@ class HasMany extends AbstractRelationship
             return null;
         }
 
-        $options = $this->unset_non_finder_options($this->options);
+        $options = $this->options;
         $options['conditions'] = array_merge($conditions, $options['conditions']);
 
         $rel = new Relation($class_name, [], $options);

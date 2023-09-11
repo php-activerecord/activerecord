@@ -19,25 +19,6 @@ use ActiveRecord\Exception\ValidationsArgumentError;
 class Relation
 {
     /**
-     * A list of valid finder options.
-     *
-     * @var array<string>
-     */
-    public static array $VALID_OPTIONS = [
-        'conditions',
-        'limit',
-        'offset',
-        'order',
-        'select',
-        'joins',
-        'include',
-        'readonly',
-        'group',
-        'from',
-        'having'
-    ];
-
-    /**
      * @var array<string>
      */
     private array $alias_attribute;
@@ -227,33 +208,6 @@ class Relation
         $this->options['readonly'] = $readonly;
 
         return $this;
-    }
-
-    /**
-     * Determines if the specified array is a valid ActiveRecord options array.
-     *
-     * @param mixed $options An options array
-     * @param bool  $throw   True to throw an exception if not valid
-     *
-     * @throws ActiveRecordException if the array contained any invalid options
-     */
-    public static function is_options_hash(mixed $options, bool $throw = true): bool
-    {
-        if (is_hash($options)) {
-            $keys = array_keys($options);
-            $diff = array_diff($keys, Relation::$VALID_OPTIONS);
-
-            if (!empty($diff) && $throw) {
-                throw new ActiveRecordException('Unknown key(s): ' . join(', ', $diff));
-            }
-            $intersect = array_intersect($keys, Relation::$VALID_OPTIONS);
-
-            if (!empty($intersect)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

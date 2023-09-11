@@ -1986,56 +1986,6 @@ class Model
         return static::table()->callback->invoke($this, $method_name, $must_exist);
     }
 
-    public static function is_options_hash(mixed $options, bool $throw = true): bool
-    {
-        if (is_hash($options)) {
-            $keys = array_keys($options);
-            $diff = array_diff($keys, Relation::$VALID_OPTIONS);
-
-            if (!empty($diff) && $throw) {
-                throw new ActiveRecordException('Unknown key(s): ' . join(', ', $diff));
-            }
-            $intersect = array_intersect($keys, Relation::$VALID_OPTIONS);
-
-            if (!empty($intersect)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Pulls out the options hash from $array if any.
-     *
-     * @param array<mixed> &$options An array
-     *
-     * @return array<string,mixed> A valid options array
-     *
-     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
-     */
-    public static function extract_and_validate_options(array &$options): array
-    {
-        $res = [];
-        if ($options) {
-            $last = &$options[count($options) - 1];
-
-            try {
-                if (self::is_options_hash($last)) {
-                    array_pop($options);
-                    $res = $last;
-                }
-            } catch (ActiveRecordException $e) {
-                if (!is_hash($last)) {
-                    throw $e;
-                }
-                $res = ['conditions' => $last];
-            }
-        }
-
-        return $res;
-    }
-
     /**
      * Executes a block of code inside a database transaction.
      *

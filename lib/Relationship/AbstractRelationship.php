@@ -170,8 +170,6 @@ abstract class AbstractRelationship
             $this->foreign_key = $fk;
         }
 
-        $options = $this->unset_non_finder_options($options);
-
         $class = $this->class_name;
 
         $rel = new Relation($class, [], $options);
@@ -267,22 +265,6 @@ abstract class AbstractRelationship
         }
 
         return $valid_options;
-    }
-
-    /**
-     * @param array<string,mixed> $options
-     *
-     * @return array<string,mixed>
-     */
-    protected function unset_non_finder_options(array $options): array
-    {
-        foreach (array_keys($options) as $option) {
-            if (!in_array($option, Relation::$VALID_OPTIONS)) {
-                unset($options[$option]);
-            }
-        }
-
-        return $options;
     }
 
     /**

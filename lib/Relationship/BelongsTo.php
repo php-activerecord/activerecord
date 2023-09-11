@@ -94,7 +94,7 @@ class BelongsTo extends AbstractRelationship
             return null;
         }
 
-        $options = $this->unset_non_finder_options($this->options);
+        $options = $this->options;
         $options['conditions'] = array_merge($conditions, $this->options['conditions'] ?? []);
         $class = $this->class_name;
 
