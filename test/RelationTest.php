@@ -191,6 +191,19 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals(4, count($authors));
     }
 
+    public function testCanIterate()
+    {
+        $authors = Author::all();
+
+        foreach ($authors as $author) {
+            $this->assertInstanceOf(Author::class, $author);
+        }
+
+        foreach ($authors as $author) {
+            $this->assertInstanceOf(Author::class, $author);
+        }
+    }
+
     public function testAllPrimaryKeys()
     {
         $rel = Author::all();

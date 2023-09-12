@@ -2,6 +2,7 @@
 
 use ActiveRecord\Connection;
 use ActiveRecord\Exception\ConnectionException;
+use test\models\Author;
 
 class SqliteAdapterTest extends AdapterTestCase
 {
@@ -14,6 +15,20 @@ class SqliteAdapterTest extends AdapterTestCase
     {
         @unlink(self::InvalidDb);
     }
+
+    public function testCanIterate()
+    {
+        $authors = Author::all();
+
+        foreach ($authors as $author) {
+            $this->assertInstanceOf(Author::class, $author);
+        }
+
+        foreach ($authors as $author) {
+            $this->assertInstanceOf(Author::class, $author);
+        }
+    }
+
 
     public static function tearDownAfterClass(): void
     {

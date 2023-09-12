@@ -9,14 +9,55 @@ namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
+use PHPUnit\Event\TypeMap;
 
 /**
  * @template TModel of Model
  *
  * @phpstan-import-type RelationOptions from Types
  */
-class Relation
+class Relation implements \Iterator
 {
+    /**
+     * @var array<TModel>
+     */
+    private \PDO $pdo;
+    private \PDOStatement $sth;
+    protected int $_count = 0;
+    private int $currentIndex = 0;
+
+    public function rewind(): void {
+        $this->currentIndex = 0;
+        $this->loadItems();
+    }
+
+    protected function loadItems(): void {
+        $this->_pdo = $this->table()->conn->connection;
+        $this->options['mapped_names'] = $this->alias_attribute;
+        $this->sth = $this->table()->find_to_pdo($this->options, true);
+        $this->_count = $this->table()->conn->query_and_fetch_one("SELECT FOUND_ROWS() AS numitems");
+    }
+
+    /**
+     * @return TModel
+     */
+    public function current(): mixed {
+        $row = $this->sth->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $this->currentIndex);
+        return $this->table()->attributesToModel($row);
+    }
+
+    public function key(): mixed {
+        return $this->currentIndex;
+    }
+
+    public function next(): void {
+        ++$this->currentIndex;
+    }
+
+    public function valid(): bool {
+        return $this->currentIndex < $this->_count;
+    }
+
     /**
      * @var array<string>
      */

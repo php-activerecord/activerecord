@@ -262,6 +262,14 @@ class Table
         return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, (array) ($options['include'] ?? []));
     }
 
+    public function find_to_pdo(array $options): \PDOStatement
+    {
+        $sql = $this->options_to_sql($options);
+        $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
+
+        return $this->find_by_sql_to_pdo($sql->to_s(), $sql->get_where_values(), $readonly, (array) ($options['include'] ?? []));
+    }
+
     /**
      * @param PrimaryKey $pk
      */
@@ -274,6 +282,13 @@ class Table
         return $this->class->name . '-' . $pk;
     }
 
+    public function find_by_sql_to_pdo(string $sql, array $values): \PDOStatement
+    {
+        $processedData = $this->process_data($values ?? []);
+
+        return $this->conn->query($sql, $processedData);
+    }
+
     /**
      * @param array<string,mixed>|null $values
      * @param array<mixed>             $includes
@@ -282,30 +297,17 @@ class Table
      *
      * @return array<TModel>
      */
-    public function find_by_sql(string $sql, array $values = null, bool $readonly = false, array $includes = []): array
+    public function find_by_sql(string $sql, array $values = [], bool $readonly = false, array $includes = []): array
     {
         $this->last_sql = $sql;
 
         $collect_attrs_for_includes = !empty($includes);
         $list = $attrs = [];
-        $processedData = $this->process_data($values ?? []);
-        $sth = $this->conn->query($sql, $processedData);
 
-        $self = $this;
+        $sth = $this->find_by_sql_to_pdo($sql, $values);
+
         while ($row = $sth->fetch()) {
-            $cb = function () use ($row, $self) {
-                return new $self->class->name($row, false, true, false);
-            };
-            if ($this->cache_individual_model ?? false) {
-                $key = $this->cache_key_for_model(array_intersect_key($row, array_flip($this->pk)));
-                $model = Cache::get($key, $cb, $this->cache_model_expire);
-            } else {
-                $model = $cb();
-            }
-
-            if ($readonly) {
-                $model->set_read_only();
-            }
+            $model = $this->attributesToModel($row);
 
             if ($collect_attrs_for_includes) {
                 $attrs[] = $model->attributes();
@@ -319,6 +321,24 @@ class Table
         }
 
         return $list;
+    }
+
+    public function attributesToModel($row, $readonly=false) {
+        $cb = function () use ($row) {
+            return new $this->class->name($row, false, true, false);
+        };
+        if ($this->cache_individual_model ?? false) {
+            $key = $this->cache_key_for_model(array_intersect_key($row, array_flip($this->pk)));
+            $model = Cache::get($key, $cb, $this->cache_model_expire);
+        } else {
+            $model = $cb();
+        }
+
+        if ($readonly) {
+            $model->set_read_only();
+        }
+
+        return $model;
     }
 
     /**
