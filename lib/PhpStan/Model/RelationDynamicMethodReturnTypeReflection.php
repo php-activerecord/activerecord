@@ -3,36 +3,30 @@
 namespace ActiveRecord\PhpStan\Model;
 
 use ActiveRecord\Relation;
-use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Identifier;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Type\ArrayType;
-use PHPStan\Type\Constant\ConstantArrayType;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\Generic\GenericObjectType;
-use PHPStan\Type\IntegerType;
-use PHPStan\Type\NullType;
-use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeWithClassName;
-use PHPStan\Type\UnionType;
 
 class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTypeExtension
 {
+    use RelationReflectionHelper;
+
     public function getClass(): string
     {
-        $res = Relation::class;
-
-        return $res;
+        return Relation::class;
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return in_array($methodReflection->getName(), ['first', 'last', 'find', 'take']);
+        return in_array($methodReflection->getName(), $this->dynamicReturnMethods());
     }
 
-    public function getTypeFromMethodCall(MethodReflection $methodReflection, \PhpParser\Node\Expr\MethodCall $methodCall, Scope $scope): Type
+    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type
     {
         $calledOnType = $scope->getType($methodCall->var);
 
@@ -41,80 +35,15 @@ class RelationDynamicMethodReturnTypeReflection implements DynamicMethodReturnTy
         $genericTypes = $calledOnType->getTypes();
 
         assert($genericTypes[0] instanceof TypeWithClassName);
-        $subclass = $genericTypes[0]->getClassName();
         $args = $methodCall->args;
 
-        $args = array_map(static function ($arg) use ($scope) {
-            assert($arg instanceof Arg);
-            $val = $arg->value;
+        assert($methodCall->name instanceof Identifier);
 
-            return $scope->getType($val);
-        }, $args);
-
-        switch ($methodCall->name) {
-            case 'find':
-                $numArgs = count($args);
-                $single = false;
-                $nullable = false;
-
-                if (1 == $numArgs) {
-                    if (!($args[0] instanceof ConstantArrayType)
-                        || (!$this->isNumericArray($args[0]))) {
-                        $single = true;
-                    }
-                } elseif ($numArgs > 1) {
-                    if (($args[0] instanceof ConstantStringType) && (
-                        'first' === $args[0]->getValue()
-                        || 'last' === $args[0]->getValue()
-                    )) {
-                        $single = true;
-                        $nullable = true;
-                    }
-                }
-
-                if ($single && $nullable) {
-                    return new UnionType([
-                        new ObjectType($subclass),
-                        new NullType()
-                    ]);
-                } elseif ($single) {
-                    return new ObjectType($subclass);
-                }
-
-                return new ArrayType(new IntegerType(), new ObjectType($subclass));
-
-            case 'last':
-            case 'first':
-            case 'take':
-                $numArgs = count($args);
-                if (1 == $numArgs) {
-                    return new ArrayType(
-                        new IntegerType(),
-                        $genericTypes[0]
-                    );
-                }
-
-                return new UnionType([
-                    $genericTypes[0],
-                    new NullType()
-                ]);
-
-            default:
-                throw new \Exception('Unknown method');
-        }
-    }
-
-    protected function isNumericArray(ConstantArrayType $args): bool
-    {
-        $keys = $args->getKeyTypes();
-        $allInt = true;
-        foreach ($keys as $key) {
-            if (!($key instanceof IntegerType)) {
-                $allInt = false;
-                break;
-            }
-        }
-
-        return $allInt;
+        return $this->computeTypeFromArgs(
+            $methodCall->name->toString(),
+            $args,
+            $genericTypes[0],
+            $scope
+        );
     }
 }
