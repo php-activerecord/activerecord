@@ -1593,8 +1593,8 @@ class Model
      * @param string|array<string> $columns
      *
      * @return Relation<static>
-     *@see Relation::select()
      *
+     *@see Relation::select()
      */
     public static function select(string|array $columns='*'): Relation
     {
