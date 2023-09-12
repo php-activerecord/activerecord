@@ -35,7 +35,8 @@ class Relation implements \Iterator
         $this->_pdo = $this->table()->conn->connection;
         $this->options['mapped_names'] = $this->alias_attribute;
         $this->sth = $this->table()->find_to_pdo($this->options, true);
-        $this->_count = $this->table()->conn->query_and_fetch_one("SELECT FOUND_ROWS() AS numitems");
+        $this->_count = $this->sth->rowCount();
+//        $this->_count = $this->table()->conn->query_and_fetch_one("SELECT FOUND_ROWS() AS numitems");
     }
 
     /**
