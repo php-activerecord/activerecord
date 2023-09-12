@@ -8,7 +8,7 @@ use test\models\Venue;
 
 class HasManyThroughTest extends DatabaseTestCase
 {
-    public function testGh101HasManyThrough()
+    public function testHasManyThrough()
     {
         $user = User::find(1);
         $newsletter = Newsletter::find(1);
@@ -25,37 +25,30 @@ class HasManyThroughTest extends DatabaseTestCase
         );
     }
 
-    public function testGh101HasManyThroughInclude()
+    public function testHasManyThroughInclude()
     {
-        $user = User::find(1, [
-            'include' => [
-                'user_newsletters'
-            ]
-        ]);
+        $user = User::include([
+            'user_newsletters'
+        ])->find(1);
 
         $this->assertEquals(1, $user->id);
         $this->assertEquals(1, $user->user_newsletters[0]->id);
     }
 
-    public function testGh107HasManyThroughIncludeEager()
+    public function testHasManyThroughIncludeEager()
     {
-        $venue = Venue::find(1, ['include' => ['events']]);
+        $venue = Venue::include('events')->find(1);
         $this->assertEquals(1, $venue->events[0]->id);
 
-        $venue = Venue::find(1, ['include' => ['hosts']]);
+        $venue = Venue::include('hosts')->find(1);
         $this->assertEquals(1, $venue->hosts[0]->id);
     }
 
-    public function testGh107HasManyThoughIncludeEagerWithNamespace()
+    public function testHasManyThoughIncludeEagerWithNamespace()
     {
-        $user = User::find(1, [
-            'include' => [
-                'newsletters'
-            ]
-        ]);
+        $user = User::include('newsletters')->find(1);
 
         $this->assertEquals(1, $user->id);
         $this->assertEquals(1, $user->newsletters[0]->id);
     }
 }
-// vim: noet ts=4 nobinary

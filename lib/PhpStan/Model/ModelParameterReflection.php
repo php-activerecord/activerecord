@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ActiveRecord\PhpStan;
+namespace ActiveRecord\PhpStan\Model;
 
 use PHPStan\Reflection\ParameterReflection;
 use PHPStan\Reflection\PassedByReference;

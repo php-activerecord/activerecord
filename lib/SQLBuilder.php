@@ -113,35 +113,29 @@ class SQLBuilder
         return $this->where_values;
     }
 
-    public function where(/* (conditions, values) || (hash) */): static
+    /**
+     * @param array<WhereClause>   $clauses
+     * @param array<string,string> $mappedNames
+     *
+     * @throws Exception\ExpressionsException
+     *
+     * @return $this
+     */
+    public function where(array $clauses=[], array $mappedNames=[]): static
     {
-        $args = func_get_args();
-        $num_args = count($args);
-
-        if (1 == $num_args && is_hash($args[0])) {
-            $hash = empty($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
-            $e = new Expressions($this->connection, $hash);
-            $this->where = $e->to_s();
-            $this->where_values = array_flatten($e->values());
-        } elseif ($num_args > 0) {
-            // if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
-            $values = array_slice($args, 1);
-
-            foreach ($values as $name => &$value) {
-                if (is_array($value)) {
-                    $e = new Expressions($this->connection, $args[0]);
-                    $e->bind_values($values);
-                    $this->where = $e->to_s();
-                    $this->where_values = array_flatten($e->values());
-
-                    return $this;
-                }
-            }
-
-            // no nested array so nothing special to do
-            $this->where = $args[0] ?? '';
-            $this->where_values = $values;
+        $values = [];
+        $sql = '';
+        $glue = ' AND ';
+        foreach ($clauses as $idx => $clause) {
+            $expression = $clause->to_s($this->connection, !empty($this->joins) ? $this->table : '', $mappedNames);
+            $values = array_merge($values, array_flatten($clause->values()));
+            $inverse = $clause->negated() ? '!' : '';
+            $wrappedExpression = $inverse || count($clauses) > 1 ? '(' . $expression . ')' : $expression;
+            $sql .=  $inverse . $wrappedExpression . ($idx < (count($clauses) - 1) ? $glue : '');
         }
+
+        $this->where = $sql;
+        $this->where_values = $values;
 
         return $this;
     }
@@ -219,7 +213,7 @@ class SQLBuilder
     }
 
     /**
-     * @param array<string,string>|string $mixed
+     * @param Attributes|string $mixed
      *
      * @throws ActiveRecordException
      */
@@ -231,8 +225,6 @@ class SQLBuilder
             $this->data = $mixed;
         } elseif (is_string($mixed)) {
             $this->update = $mixed;
-        } else {
-            throw new ActiveRecordException('Updating requires a hash or string.');
         }
 
         return $this;
@@ -240,8 +232,11 @@ class SQLBuilder
 
     public function delete(): static
     {
+        $args = func_get_args();
+        $arg = $args[0] ?? null;
+
         $this->operation = 'DELETE';
-        $this->where(...func_get_args());
+        isset($arg) && $this->where([WhereClause::from_arg($arg)], []);
 
         return $this;
     }
@@ -285,55 +280,6 @@ class SQLBuilder
     }
 
     /**
-     * Converts a string like "id_and_name_or_z" into a conditions value like
-     * ["id=? AND name=? OR z=?", values, ...].
-     *
-     * @param string               $name   Underscored string
-     * @param array<mixed>         $values Array of values for the field names. This is used
-     *                                     to determine what kind of bind marker to use: =?, IN(?), IS NULL
-     * @param array<string,string> $map    A hash of "mapped_column_name" => "real_column_name"
-     *
-     * @return array<mixed>
-     */
-    public static function create_conditions_from_underscored_string(Connection $connection, ?string $name, array $values = [], array $map = []): ?array
-    {
-        if (!$name) {
-            return null;
-        }
-
-        $num_values = count((array) $values);
-        $conditions = [''];
-
-        $parts = static::underscored_string_to_parts($name);
-
-        for ($i = 0, $j = 0, $n = count($parts); $i < $n; $i += 2, ++$j) {
-            if ($i >= 2) {
-                $res = preg_replace(['/_and_/i', '/_or_/i'], [' AND ', ' OR '], $parts[$i - 1]);
-                assert(is_string($res));
-                $conditions[0] .= $res;
-            }
-
-            if ($j < $num_values) {
-                if (!is_null($values[$j])) {
-                    $bind = is_array($values[$j]) ? ' IN(?)' : '=?';
-                    $conditions[] = $values[$j];
-                } else {
-                    $bind = ' IS NULL';
-                }
-            } else {
-                $bind = ' IS NULL';
-            }
-
-            // map to correct name if $map was supplied
-            $name = $map && isset($map[$parts[$i]]) ? $map[$parts[$i]] : $parts[$i];
-
-            $conditions[0] .= $connection->quote_name($name) . $bind;
-        }
-
-        return $conditions;
-    }
-
-    /**
      * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
      *
      * @param string               $name   A string containing attribute names connected with _and_ or _or_
@@ -356,27 +302,6 @@ class SQLBuilder
         }
 
         return $hash;
-    }
-
-    /**
-     * Prepends table name to hash of field names to get around ambiguous fields when SQL builder
-     * has joins
-     *
-     * @param array<string,string> $hash
-     *
-     * @return array<string,string> $new
-     */
-    private function prepend_table_name_to_fields(array $hash = [])
-    {
-        $new = [];
-        $table = $this->connection->quote_name($this->table);
-
-        foreach ($hash as $key => $value) {
-            $k = $this->connection->quote_name($key);
-            $new[$table . '.' . $k] = $value;
-        }
-
-        return $new;
     }
 
     private function build_delete(): string
@@ -402,7 +327,6 @@ class SQLBuilder
 
     private function build_insert(): string
     {
-        require_once 'Expressions.php';
         $keys = join(',', $this->quoted_key_names());
 
         if ($this->sequence) {
@@ -413,9 +337,9 @@ class SQLBuilder
             $sql = "INSERT INTO $this->table($keys) VALUES(?)";
         }
 
-        $e = new Expressions($this->connection, $sql, array_values($this->data));
+        $e = new WhereClause($sql, [array_values($this->data)]);
 
-        return $e->to_s();
+        return $e->to_s($this->connection);
     }
 
     private function build_select(): string

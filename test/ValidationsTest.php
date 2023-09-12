@@ -109,7 +109,7 @@ class ValidationsTest extends DatabaseTestCase
         $book = BookValidations::create(['name' => 'bob']);
 
         $this->assertEquals(['Name must be unique'], $book->errors->full_messages());
-        $this->assertEquals(1, BookValidations::count(['conditions' => "name='bob'"]));
+        $this->assertEquals(1, BookValidations::where("name='bob'")->count());
     }
 
     public function testValidatesUniquenessOfExcludesSelf()
@@ -157,7 +157,7 @@ class ValidationsTest extends DatabaseTestCase
         $valuestore = ValuestoreValidations::create(['key' => 'GA_KEY', 'value' => 'UA-1234567-2']);
 
         $this->assertEquals(['Key must be unique'], $valuestore->errors->full_messages());
-        $this->assertEquals(1, ValuestoreValidations::count(['conditions' => "`key`='GA_KEY'"]));
+        $this->assertEquals(1, ValuestoreValidations::where("`key`='GA_KEY'")->count());
     }
 
     public function testGetValidationRules()

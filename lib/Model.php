@@ -98,6 +98,7 @@ use ActiveRecord\Serialize\Serialization;
  * @phpstan-import-type PrimaryKey from Types
  * @phpstan-import-type QueryOptions from Types
  * @phpstan-import-type DelegateOptions from Types
+ * @phpstan-import-type RelationOptions from Types
  *
  * @see BelongsTo
  * @see CallBack
@@ -548,9 +549,6 @@ class Model
         }
 
         foreach (static::$delegate as $key => $item) {
-            if ('processed' == $key) {
-                continue;
-            }
             if ($delegated_name = $this->is_delegated($name, $item)) {
                 $this->{$item['to']}->$delegated_name = $value;
 
@@ -664,9 +662,6 @@ class Model
         $null = null;
 
         foreach (static::$delegate as $delegateName => $item) {
-            if ('processed' == $delegateName) {
-                continue;
-            }
             if ($delegated_name = $this->is_delegated($name, $item)) {
                 $to = $item['to'];
                 if ($this->$to) {
@@ -883,16 +878,6 @@ class Model
     }
 
     /**
-     * Flag model as readonly.
-     *
-     * @param bool $readonly Set to true to put the model into readonly mode
-     */
-    public function readonly(bool $readonly = true): void
-    {
-        $this->__readonly = $readonly;
-    }
-
-    /**
      * Retrieve the connection for this model.
      *
      * @return Connection
@@ -921,7 +906,9 @@ class Model
      */
     public static function table()
     {
-        return Table::load(get_called_class());
+        $table = Table::load(get_called_class());
+
+        return $table;
     }
 
     /**
@@ -1113,7 +1100,7 @@ class Model
         $conditions = $options['conditions'] ?? $options;
 
         if (is_array($conditions) && !is_hash($conditions)) {
-            call_user_func_array([$sql, 'delete'], $conditions);
+            $sql->delete($conditions);
         } else {
             $sql->delete($conditions);
         }
@@ -1164,11 +1151,7 @@ class Model
         isset($options['set']) && $sql->update($options['set']);
 
         if (isset($options['conditions']) && ($conditions = $options['conditions'])) {
-            if (is_array($conditions) && !is_hash($conditions)) {
-                call_user_func_array([$sql, 'where'], $conditions);
-            } else {
-                $sql->where($conditions);
-            }
+            $sql->where([WhereClause::from_arg($conditions)]);
         }
 
         if (isset($options['limit'])) {
@@ -1254,8 +1237,6 @@ class Model
      */
     private function _validate(): bool
     {
-        require_once 'Validations.php';
-
         $validator = new Validations($this);
         $validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
 
@@ -1493,25 +1474,6 @@ class Model
     }
 
     /**
-     * A list of valid finder options.
-     *
-     * @var array<string>
-     */
-    public static array $VALID_OPTIONS = [
-        'conditions',
-        'limit',
-        'offset',
-        'order',
-        'select',
-        'joins',
-        'include',
-        'readonly',
-        'group',
-        'from',
-        'having'
-    ];
-
-    /**
      * Enables the use of dynamic finders.
      *
      * Dynamic finders are just an easy way to do queries quickly without having to
@@ -1521,10 +1483,6 @@ class Model
      * SomeModel::find_by_first_name('Tito');
      * SomeModel::find_by_first_name_and_last_name('Tito','the Grief');
      * SomeModel::find_by_first_name_or_last_name('Tito','the Grief');
-     * SomeModel::find_all_by_last_name('Smith');
-     * SomeModel::count_by_name('Bob')
-     * SomeModel::count_by_name_or_state('Bob','VA')
-     * SomeModel::count_by_name_and_state('Bob','VA')
      * ```
      *
      * You can also create the model if the find call returned no results:
@@ -1553,40 +1511,49 @@ class Model
      */
     public static function __callStatic(string $method, mixed $args): mixed
     {
-        $options = static::extract_and_validate_options($args);
+        /**
+         * @var RelationOptions
+         */
+        $options = [];
         $create = false;
 
-        if ('find_or_create_by' == substr($method, 0, 17)) {
-            $attributes = substr($method, 17);
-
+        if ($attributes = static::extract_dynamic_vars($method, 'find_or_create_by')) {
             // can't take any finders with OR in it when doing a find_or_create_by
             if (false !== strpos($attributes, '_or_')) {
                 throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
             }
             $create = true;
-            $method = 'find_by' . substr($method, 17);
+            $method = 'find_by_' . $attributes;
         }
 
-        if (str_starts_with($method, 'find_by')) {
-            $attributes = substr($method, 8);
-            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
+        $options['conditions'] ??= [];
 
-            if (!($ret = static::find('first', $options)) && $create) {
-                return static::create(SQLBuilder::create_hash_from_underscored_string($attributes, $args, static::$alias_attribute));
+        if ($attributes = static::extract_dynamic_vars($method, 'find_by')) {
+            $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
+
+            $rel = static::Relation($options);
+            if (!($ret = $rel->first()) && $create) {
+                return static::create(SQLBuilder::create_hash_from_underscored_string(
+                    $attributes,
+                    $args,
+                    static::$alias_attribute));
             }
 
             return $ret;
-        } elseif (str_starts_with($method, 'find_all_by')) {
-            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 12), $args, static::$alias_attribute);
-
-            return static::find('all', $options);
-        } elseif ('count_by' === substr($method, 0, 8)) {
-            $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(), substr($method, 9), $args, static::$alias_attribute);
-
-            return static::count($options);
         }
 
         throw new ActiveRecordException("Call to undefined method: $method");
+    }
+
+    public static function extract_dynamic_vars(string $methodName, string $dynamicPart): string
+    {
+        if (str_starts_with($methodName, $dynamicPart)) {
+            $attributes = substr($methodName, strlen($dynamicPart) +1);
+
+            return $attributes;
+        }
+
+        return '';
     }
 
     /**
@@ -1623,23 +1590,163 @@ class Model
     }
 
     /**
-     * Alias for self::find('all').
+     * @param string|array<string> $columns
      *
-     * @see find
+     * @return Relation<static>
      *
-     * @return array<int,static>
+     *@see Relation::select()
      */
-    public static function all(/* ... */): array
+    public static function select(string|array $columns='*'): Relation
     {
-        /* @phpstan-ignore-next-line */
-        return static::find('all', ...func_get_args());
+        return static::Relation()->select($columns);
+    }
+
+    /**
+     * @see Relation::readonly()
+     *
+     * @return Relation<static>
+     */
+    public static function readonly(bool $readonly = true): Relation
+    {
+        return static::Relation()->readonly($readonly);
+    }
+
+    public function set_read_only(bool $readonly = true): void
+    {
+        $this->__readonly = $readonly;
+    }
+
+    /**
+     * @see Relation::joins()
+     *
+     * @param string|array<string> $joins
+     *
+     * @return Relation<static>
+     */
+    public static function joins(string|array $joins): Relation
+    {
+        return static::Relation()->joins($joins);
+    }
+
+    /**
+     * @see Relation::order()
+     *
+     * @return Relation<static>
+     */
+    public static function order(string $order): Relation
+    {
+        return static::Relation()->order($order);
+    }
+
+    /**
+     * @see Relation::group()
+     *
+     * @return Relation<static>
+     */
+    public static function group(string $columns): Relation
+    {
+        return static::Relation()->group($columns);
+    }
+
+    /**
+     * @see Relation::limit()
+     *
+     * @return Relation<static>
+     */
+    public static function limit(int $limit): Relation
+    {
+        return static::Relation()->limit($limit);
+    }
+
+    /**
+     * @see Relation::having()
+     *
+     * @return Relation<static>
+     */
+    public static function offset(int $offset): Relation
+    {
+        return static::Relation()->offset($offset);
+    }
+
+    /**
+     * @see Relation::having()
+     *
+     * @return Relation<static>
+     */
+    public static function having(string $having): Relation
+    {
+        return static::Relation()->having($having);
+    }
+
+    /**
+     * @see Relation::having()
+     *
+     * @return Relation<static>
+     */
+    public static function from(string $from): Relation
+    {
+        return static::Relation()->from($from);
+    }
+
+    /**
+     * @param string|array<string|mixed> $include
+     *
+     * @return Relation<static>
+     */
+    public static function include(string|array $include): Relation
+    {
+        return static::Relation()->include($include);
+    }
+
+    /**
+     * @see Relation::where()
+     *
+     * @return Relation<static>
+     */
+    public static function where(): Relation
+    {
+        return static::Relation()->where(...func_get_args());
+    }
+
+    /**
+     * @see Relation::not()
+     *
+     * @return Relation<static>
+     */
+    public static function not(): Relation
+    {
+        return static::Relation()->not(...func_get_args());
+    }
+
+    /**
+     * @return Relation<static>
+     */
+    public static function all(): Relation
+    {
+        return static::Relation()->all();
+    }
+
+    /**
+     * @param RelationOptions $options
+     *
+     * @return Relation<static>
+     */
+    protected static function Relation(array $options = []): Relation
+    {
+        /**
+         * @var Relation<static> $rel
+         */
+        $rel = new Relation(get_called_class(), static::$alias_attribute, $options);
+
+        return $rel;
     }
 
     /**
      * Get a count of qualifying records.
      *
      * ```
-     * YourModel::count(['conditions' => 'amount > 3.14159265']);
+     * YourModel::count('amount > 3.14159265');
+     * YourModel::count(['name' => 'Tito', 'author_id' => 1]));
      * ```
      *
      * @see find
@@ -1648,69 +1755,41 @@ class Model
      */
     public static function count(/* ... */): int
     {
-        $args = func_get_args();
-        $options = static::extract_and_validate_options($args);
-        $options['select'] = 'COUNT(*)';
-
-        if (!empty($args) && !is_null($args[0]) && !empty($args[0])) {
-            if (is_hash($args[0])) {
-                $options['conditions'] = $args[0];
-            } else {
-                $options['conditions'] = static::pk_conditions(...$args);
-            }
-        }
-
-        $table = static::table();
-        $sql = $table->options_to_sql($options);
-        $values = $sql->get_where_values();
-
-        $res = static::connection()->query_and_fetch_one($sql->to_s(), $values);
-
-        return $res;
+        return static::Relation()->count(...func_get_args());
     }
 
     /**
      * Determine if a record exists.
      *
-     * ```
-     * SomeModel::exists(123);
-     * SomeModel::exists(['conditions' => ['id=? and name=?', 123, 'Tito']]);
-     * SomeModel::exists(['id' => 123, 'name' => 'Tito']);
-     * ```
-     *
-     * @see find
+     * @see Relation::exists()
      */
-    public static function exists(/* ... */): bool
+    public static function exists(mixed $conditions = []): bool
     {
-        return static::count(...func_get_args()) > 0;
+        return static::Relation()->exists($conditions);
     }
 
     /**
-     * Alias for self::find('first').
-     *
-     * @see find
+     * @see Relation::take()
      */
-    public static function first(/* ... */): static|null
+    public static function take(int $limit = null): mixed
     {
-        $res = static::find('first', ...func_get_args());
-        // this is a workaround for what seems to be a PHPStan bug
-        assert($res instanceof static || is_null($res));
-
-        return $res;
+        return static::Relation()->take($limit);
     }
 
     /**
-     * Alias for self::find('last')
-     *
-     * @see find
+     * @see Relation::first()
      */
-    public static function last(/* ... */): static|null
+    public static function first(int $limit = null): mixed
     {
-        $res = static::find('last', ...func_get_args());
-        // this is a workaround for what seems to be a PHPStan bug
-        assert($res instanceof static || is_null($res));
+        return static::Relation()->first($limit);
+    }
 
-        return $res;
+    /**
+     * @see Relation::last()
+     */
+    public static function last(int $limit = null): mixed
+    {
+        return static::Relation()->last($limit);
     }
 
     /**
@@ -1746,27 +1825,9 @@ class Model
      * YourModel::find('all',['name' => 'Tito', 'id' => 1]);
      * ```
      *
-     * An options array can take the following parameters:
-     *
-     * <ul>
-     * <li><b>select:</b> A SQL fragment for what fields to return such as: '*', 'people.*', 'first_name, last_name, id'</li>
-     * <li><b>joins:</b> A SQL join fragment such as: 'JOIN roles ON(roles.user_id=user.id)' or a named association on the model</li>
-     * <li><b>include:</b> TODO not implemented yet</li>
-     * <li><b>conditions:</b> A SQL fragment such as:
-     *   'id=1',
-     *   ['id=1'],
-     *   ['name=? and id=?', 'Tito',1], ['name IN(?)', ['Tito','Bob']],
-     *   ['name' => 'Tito', 'id' => 1]</li>
-     * <li><b>limit:</b> Number of records to limit the query to</li>
-     * <li><b>offset:</b> The row offset to return results from for the query</li>
-     * <li><b>order:</b> A SQL fragment for order such as: 'name asc', 'name asc, id desc'</li>
-     * <li><b>readonly:</b> Return all the models in readonly mode</li>
-     * <li><b>group:</b> A SQL group by fragment</li>
-     * </ul>
-     *
      * @throws RecordNotFound if no options are passed or finding by pk and no records matched
      *
-     * @return static|static[]|null
+     * @return Model|Model[]|null
      *
      * The rules for what gets returned are complex, but predictable:
      *
@@ -1781,136 +1842,9 @@ class Model
      *  ...int|string								static[]			User::find(1, 3, 5, 8);
      *  array<int,int|string>						static[]			User::find([1,3,5,8]);
      */
-    public static function find(/* $type, $options */): static|array|null
+    public static function find(/* $pk */): Model|array|null
     {
-        $class = get_called_class();
-
-        $args = func_get_args();
-        if (0 === count($args)) {
-            throw new RecordNotFound("Couldn't find $class without an ID");
-        }
-        $options = static::extract_and_validate_options($args);
-
-        $num_args = count($args);
-        $single = true;
-
-        if (count($args) > 0 && in_array($args[0], ['all', 'first', 'last'])) {
-            switch ($args[0]) {
-                case 'all':
-                    $single = false;
-                    break;
-
-                case 'last':
-                    if (!array_key_exists('order', $options)) {
-                        $options['order'] = join(' DESC, ', static::table()->pk) . ' DESC';
-                    } else {
-                        $options['order'] = SQLBuilder::reverse_order($options['order']);
-                    }
-
-                    // fall thru
-
-                    // no break
-                case 'first':
-                    $options['limit'] = 1;
-                    $options['offset'] = 0;
-                    break;
-            }
-
-            $args = array_slice($args, 1);
-            --$num_args;
-        }
-
-        // find by pk
-        else {
-            if (1 === $num_args) {
-                $args = $args[0];
-            }
-
-            if (is_array($args) && array_values($args) == $args) {
-                $single = false;
-            }
-        }
-
-        // anything left in $args is a find by pk
-        if ($num_args > 0 && !isset($options['conditions'])) {
-            $list = static::find_by_pk($args, $options, true);
-        } else {
-            $options['mapped_names'] = static::$alias_attribute;
-            $list = static::table()->find($options);
-        }
-
-        return $single ? ($list[0] ?? null) : $list;
-    }
-
-    /**
-     * Will look up a list of primary keys from cache
-     *
-     * @param array<PrimaryKey> $pks An array of primary keys
-     *
-     * @return array<Model>
-     */
-    protected static function get_models_from_cache(array $pks): array
-    {
-        $models = [];
-        $table = static::table();
-
-        foreach ($pks as $pk) {
-            $options = ['conditions' => static::pk_conditions($pk)];
-            $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
-                $res = $table->find($options);
-
-                return $res ? $res[0] : [];
-            }, $table->cache_model_expire);
-        }
-
-        return array_filter($models);
-    }
-
-    /**
-     * Finder method which will find by a single or array of primary keys for this model.
-     *
-     * @see find
-     *
-     * @param PrimaryKey   $values  An array containing values for the pk
-     * @param array<mixed> $options An options array
-     *
-     * @throws RecordNotFound if a record could not be found
-     *
-     * @return Model|Model[]
-     */
-    public static function find_by_pk(array|string|int|null $values, array $options, bool $forceArray = false): Model|array
-    {
-        $single = !is_array($values) && !$forceArray;
-        if (null === $values) {
-            throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
-        }
-
-        $table = static::table();
-
-        if ($table->cache_individual_model ?? false) {
-            $pks = is_array($values) ? $values : [$values];
-            $list = static::get_models_from_cache($pks);
-        } else {
-            // int|string|array<int|string>
-            $options['conditions'] = static::pk_conditions($values);
-            $list = $table->find($options);
-        }
-        $results = count($list);
-
-        if ($results != ($expected = @count((array) $values))) {
-            $class = get_called_class();
-            if (is_array($values)) {
-                $values = join(',', $values);
-            }
-
-            if (1 == $expected) {
-                throw new RecordNotFound("Couldn't find $class with ID=$values");
-            }
-
-            throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
-        }
-
-        return $single ? $list[0] : $list;
+        return static::Relation()->find(...func_get_args());
     }
 
     /**
@@ -1940,79 +1874,6 @@ class Model
     public static function query(string $sql, array $values = []): \PDOStatement
     {
         return static::connection()->query($sql, $values);
-    }
-
-    /**
-     * Determines if the specified array is a valid ActiveRecord options array.
-     *
-     * @param mixed $options An options array
-     * @param bool  $throw   True to throw an exception if not valid
-     *
-     * @throws ActiveRecordException if the array contained any invalid options
-     */
-    public static function is_options_hash(mixed $options, bool $throw = true): bool
-    {
-        if (is_hash($options)) {
-            $keys = array_keys($options);
-            $diff = array_diff($keys, self::$VALID_OPTIONS);
-
-            if (!empty($diff) && $throw) {
-                throw new ActiveRecordException('Unknown key(s): ' . join(', ', $diff));
-            }
-            $intersect = array_intersect($keys, self::$VALID_OPTIONS);
-
-            if (!empty($intersect)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns a hash containing the names => values of the primary key.
-     *
-     * @param PrimaryKey $args Primary key value(s)
-     *
-     * @return array<string, mixed>
-     */
-    public static function pk_conditions(mixed $args): array
-    {
-        $table = static::table();
-        $ret = [$table->pk[0] => $args];
-
-        return $ret;
-    }
-
-    /**
-     * Pulls out the options hash from $array if any.
-     *
-     * @param array<mixed> &$options An array
-     *
-     * @return array<string,mixed> A valid options array
-     *
-     * @TODO Figure out what is going on with the reference on $options and ideally clean it up
-     */
-    public static function extract_and_validate_options(array &$options): array
-    {
-        $res = [];
-        if ($options) {
-            $last = &$options[count($options) - 1];
-
-            try {
-                if (self::is_options_hash($last)) {
-                    array_pop($options);
-                    $res = $last;
-                }
-            } catch (ActiveRecordException $e) {
-                if (!is_hash($last)) {
-                    throw $e;
-                }
-                $res = ['conditions' => $last];
-            }
-        }
-
-        return $res;
     }
 
     /**

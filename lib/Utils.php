@@ -174,28 +174,6 @@ function wrap_values_in_arrays(mixed &$strings): array
  */
 class Utils
 {
-    /**
-     * @param array<string>       $conditions
-     * @param string|array<mixed> $condition
-     *
-     * @return array<mixed>
-     */
-    public static function add_condition(array &$conditions, string|array $condition, string $conjuction = 'AND'): array
-    {
-        if (is_array($condition)) {
-            if (empty($conditions)) {
-                $conditions = array_flatten($condition);
-            } else {
-                $conditions[0] .= " $conjuction " . array_shift($condition);
-                $conditions[] = array_flatten($condition);
-            }
-        } elseif (is_string($condition)) {
-            $conditions[0] .= " $conjuction $condition";
-        }
-
-        return $conditions;
-    }
-
     public static function human_attribute(string $attr): string
     {
         $inflected = Inflector::variablize($attr);

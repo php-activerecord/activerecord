@@ -4,6 +4,7 @@ namespace ActiveRecord\Relationship;
 
 use ActiveRecord\Inflector;
 use ActiveRecord\Model;
+use ActiveRecord\Relation;
 use ActiveRecord\Table;
 use ActiveRecord\Types;
 
@@ -36,6 +37,8 @@ use ActiveRecord\Types;
  *
  * @phpstan-import-type BelongsToOptions from Types
  * @phpstan-import-type Attributes from Model
+ *
+ * @template TModel of Model
  *
  * @see valid_association_options
  */
@@ -77,6 +80,9 @@ class BelongsTo extends AbstractRelationship
         }
     }
 
+    /**
+     * @return TModel|null
+     */
     public function load(Model $model): ?Model
     {
         $keys = [];
@@ -88,11 +94,17 @@ class BelongsTo extends AbstractRelationship
             return null;
         }
 
-        $options = $this->unset_non_finder_options($this->options);
-        $options['conditions'] = $conditions;
+        $options = $this->options;
+        $options['conditions'] = array_merge($conditions, $this->options['conditions'] ?? []);
         $class = $this->class_name;
 
-        return $class::first($options);
+        /**
+         * @var Relation<TModel> $rel
+         */
+        $rel = new Relation($class, [], $options);
+        $first = $rel->first();
+
+        return $first;
     }
 
     /**

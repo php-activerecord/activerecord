@@ -21,63 +21,16 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->options = ['conditions' => 'blah', 'order' => 'blah'];
     }
 
-    public function testOptionsIsNot()
-    {
-        $this->assertFalse(Author::is_options_hash(null));
-        $this->assertFalse(Author::is_options_hash(''));
-        $this->assertFalse(Author::is_options_hash('tito'));
-        $this->assertFalse(Author::is_options_hash([]));
-        $this->assertFalse(Author::is_options_hash([1, 2, 3]));
-    }
-
     public function testOptionsHashWithUnknownKeys()
     {
         $this->expectException(ActiveRecordException::class);
         $this->assertFalse(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
     }
 
-    public function testOptionsIsHash()
-    {
-        $this->assertTrue(Author::is_options_hash($this->options));
-    }
-
-    public function testExtractAndValidateOptions()
-    {
-        $args = ['first', $this->options];
-        $this->assertEquals($this->options, Author::extract_and_validate_options($args));
-        $this->assertEquals(['first'], $args);
-    }
-
-    public function testExtractAndValidateOptionsWithArrayInArgs()
-    {
-        $args = ['first', [1, 2], $this->options];
-        $this->assertEquals($this->options, Author::extract_and_validate_options($args));
-    }
-
-    public function testExtractAndValidateOptionsRemovesOptionsHash()
-    {
-        $args = ['first', $this->options];
-        Author::extract_and_validate_options($args);
-        $this->assertEquals(['first'], $args);
-    }
-
-    public function testExtractAndValidateOptionsNope()
-    {
-        $args = ['first'];
-        $this->assertEquals([], Author::extract_and_validate_options($args));
-        $this->assertEquals(['first'], $args);
-    }
-
-    public function testExtractAndValidateOptionsNopeBecauseWasntAtEnd()
-    {
-        $args = ['first', $this->options, [1, 2]];
-        $this->assertEquals([], Author::extract_and_validate_options($args));
-    }
-
     public function testInvalidAttribute()
     {
         $this->expectException(UndefinedPropertyException::class);
-        $author = Author::find('first', ['conditions' => 'author_id=1']);
+        $author = Author::where('author_id=1')->first();
         $author->some_invalid_field_name;
     }
 
@@ -292,7 +245,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function testReadonlyOnlyHaltOnWriteMethod()
     {
-        $book = Book::first(['readonly' => true]);
+        $book = Book::readonly(true)->first();
         $this->assertTrue($book->is_readonly());
 
         try {

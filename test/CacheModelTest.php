@@ -79,7 +79,7 @@ class CacheModelTest extends DatabaseTestCase
     public function testModelCacheFind()
     {
         $method = $this->set_method_public(Publisher::class, 'cache_key');
-        $publishers = Publisher::all();
+        $publishers = Publisher::all()->to_a();
 
         foreach ($publishers as $publisher) {
             $cache_key = $method->invokeArgs($publisher, []);

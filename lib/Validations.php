@@ -575,7 +575,7 @@ class Validations
 
             $conditions[0] = $sql;
 
-            if ($this->model->exists(['conditions' => $conditions])) {
+            if ($this->model->exists($conditions)) {
                 $this->errors->add($add_record, $options['message'] ?? ValidationErrors::$DEFAULT_ERROR_MESSAGES['unique']);
             }
         }
