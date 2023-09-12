@@ -924,6 +924,38 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertNotNull($book->another_author_name);
     }
 
+    public function testSelectWithString()
+    {
+        $book = Book::select('name')->take();
+        $this->assertEquals('Ancient Art of Main Tanking', $book->name);
+    }
+
+    public function testSelectWithArray()
+    {
+        $book = Book::select([
+            'name',
+            'publisher'
+        ])->take();
+        $this->assertEquals('Ancient Art of Main Tanking', $book->name);
+    }
+
+    public function testMultipleSelectClausesAggregate()
+    {
+        $book = Book::all()
+            ->select('name')
+            ->select('publisher')
+            ->take();
+        $this->assertEquals('Ancient Art of Main Tanking', $book->name);
+        $this->assertEquals('RANDOM HOUSE', $book->publisher);
+    }
+
+    public function testSelectClauseMakesUnselectedPropertiesThrow()
+    {
+        $this->expectException(UndefinedPropertyException::class);
+        $book = Book::select('name')->take();
+        $book->publisher;
+    }
+
     public function testRelationshipsWithJoinsAliasesTableNameInConditions()
     {
         $event = Event::joins(['venue'])->find(1);

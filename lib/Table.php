@@ -213,8 +213,8 @@ class Table
             }
         }
 
-        if (array_key_exists('select', $options)) {
-            $sql->select($options['select']);
+        if (!empty($options['select'])) {
+            $sql->select(implode(', ', $options['select']));
         }
 
         $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);

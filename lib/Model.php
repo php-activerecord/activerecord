@@ -1594,7 +1594,7 @@ class Model
      *
      * @return Relation<static>
      */
-    public static function select(string $columns='*'): Relation
+    public static function select(string|array $columns='*'): Relation
     {
         return static::Relation()->select($columns);
     }

@@ -59,11 +59,14 @@ class Relation
     }
 
     /**
+     * @param string|array<string> $columns
+     *
      * @return Relation<TModel>
      */
-    public function select(string $columns): Relation
+    public function select(string|array $columns): Relation
     {
-        $this->options['select'] = $columns;
+        $this->options['select'] ??= [];
+        $this->options['select'] = array_merge($this->options['select'], (array) $columns);
 
         return $this;
     }
