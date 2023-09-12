@@ -48,7 +48,7 @@ class WhereClause
         $this->values = $values;
     }
 
-    public function inverse(): bool
+    public function negated(): bool
     {
         return $this->inverse;
     }

@@ -129,7 +129,7 @@ class SQLBuilder
         foreach ($clauses as $idx => $clause) {
             $expression = $clause->to_s($this->connection, !empty($this->joins) ? $this->table : '', $mappedNames);
             $values = array_merge($values, array_flatten($clause->values()));
-            $inverse = $clause->inverse() ? '!' : '';
+            $inverse = $clause->negated() ? '!' : '';
             $wrappedExpression = $inverse || count($clauses) > 1 ? '(' . $expression . ')' : $expression;
             $sql .=  $inverse . $wrappedExpression . ($idx < (count($clauses) - 1) ? $glue : '');
         }
