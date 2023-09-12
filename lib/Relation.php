@@ -372,13 +372,8 @@ class Relation
             $this->options['order'] = implode(' ASC, ', $this->table()->pk) . ' ASC';
         }
 
-        if (!isset($limit)) {
-            $models = $this->to_a();
-
-            return $models[0] ?? null;
-        }
-
-        return $this->to_a();
+        $models = $this->to_a();
+        return isset($limit) ? $models : $models[0] ?? null;
     }
 
     /**
