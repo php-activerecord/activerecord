@@ -66,7 +66,7 @@ class Relation
     public function select(string|array $columns): Relation
     {
         $this->options['select'] ??= [];
-        $this->options['select'] = array_merge($this->options['select'], (array) $columns);
+        $this->options['select'] = array_merge((array)$this->options['select'], (array) $columns);
 
         return $this;
     }

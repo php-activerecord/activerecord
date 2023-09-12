@@ -214,7 +214,7 @@ class Table
         }
 
         if (!empty($options['select'])) {
-            $sql->select(implode(', ', $options['select']));
+            $sql->select(implode(', ', (array)$options['select'] ));
         }
 
         $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
