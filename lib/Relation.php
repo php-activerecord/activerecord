@@ -457,6 +457,7 @@ class Relation
      */
     public function count(): int
     {
+        unset($this->options['select']);
         $this->select('COUNT(*)');
 
         $table = $this->table();
@@ -515,7 +516,6 @@ class Relation
             }
         }
 
-        $this->options['select'] = '1';
         $res = $this->count();
 
         return $res > 0;
