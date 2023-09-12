@@ -1707,12 +1707,6 @@ class Model
     }
 
     /**
-     * needle is one of:
-     *
-     * array of primary keys    all([1, 3, 5, 8]) WHERE author_id in (1, 3, 5, 8)
-     * mapping of column names  all(["name"=>"Philip", "publisher"=>"Random House"]) WHERE name=Philip AND publisher=Random House
-     * raw WHERE statement      all(['name = (?) and publisher <> (?)', 'Bill Clinton', 'Random House'])
-     *
      * @return Relation<static>
      */
     public static function all(): Relation
