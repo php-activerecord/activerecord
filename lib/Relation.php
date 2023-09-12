@@ -265,6 +265,65 @@ class Relation
     }
 
     /**
+     * Returns a new relation expressing WHERE !(condition) according to the
+     * conditions in the arguments.
+     *
+     * not accepts conditions as a string, array, or hash. @See Relation::where
+     * for more details on each format.
+     *
+     * User::where()                  // SELECT * FROM users
+     *   ->not("name = 'Jon'")        // WHERE !(name = 'Jon')
+     *
+     * User::where()                  // SELECT * FROM users
+     *   ->not([                      // WHERE !(name = 'Jon')
+     *      "name = ?",
+     *      "Jon"
+     *   ])
+     *
+     * User::where()                  // SELECT * FROM users
+     *   ->not(name: "Jon")           // WHERE name != 'Jon'
+     *
+     * User::where()                  // SELECT * FROM users
+     *   ->not(name: nil)             // WHERE !(name IS NULL)
+     *
+     * User::where()                  // SELECT * FROM users
+     *   ->not([                      // WHERE !(name == 'Jon' AND role == 'admin')
+     *     'name' => "Jon",
+     *     'role' => "admin"
+     *   ])
+     *
+     * If there is a non-nil condition on a nullable column in the hash condition,
+     * the records that have nil values on the nullable column won't be returned.
+     *
+     * User::create( [
+     *   'nullable_country' => null
+     * ])
+     * User::where()->not([             // SELECT * FROM users
+     *   'nullable_country' => "UK"     // WHERE NOT (nullable_country = 'UK')  // => []
+     * ])
+     *
+     * @return Relation<TModel>
+     */
+    public function not(): Relation
+    {
+        $this->options['conditions'] ??= [];
+
+        $args = func_get_args();
+        $numArgs = count($args);
+
+        if (1 != $numArgs) {
+            throw new \ArgumentCountError('`not` requires exactly one argument.');
+        }
+        $arg = $args[0];
+
+        $expression = WhereClause::from_arg($arg, true);
+
+        $this->options['conditions'][] = $expression;
+
+        return $this;
+    }
+
+    /**
      * Sets readonly attributes for the returned relation. If value is true (default),
      * attempting to update a record will result in an error.
      *

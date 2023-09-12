@@ -61,21 +61,21 @@ class SQLBuilderTest extends DatabaseTestCase
             'id' => 1,
             'name' => 'Tito'
         ])]);
-        $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name=?', (string) $this->sql);
+        $this->assert_sql_has('SELECT * FROM authors WHERE id = ? AND name = ?', (string) $this->sql);
         $this->assertEquals([1, 'Tito'], $this->sql->get_where_values());
     }
 
     public function testWhereWithHashAndArray()
     {
         $this->sql->where([new WhereClause(['id' => 1, 'name' => ['Tito', 'Mexican']])]);
-        $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name IN(?,?)', (string) $this->sql);
+        $this->assert_sql_has('SELECT * FROM authors WHERE id = ? AND name IN(?,?)', (string) $this->sql);
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
     }
 
-    public function testGh134WhereWithHashAndNull()
+    public function testWhereWithHashAndNull()
     {
         $this->sql->where([new WhereClause(['id' => 1, 'name' => null])]);
-        $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name IS ?', (string) $this->sql);
+        $this->assert_sql_has('SELECT * FROM authors WHERE id = ? AND name IS ?', (string) $this->sql);
         $this->assertEquals([1, null], $this->sql->get_where_values());
     }
 
@@ -135,7 +135,7 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->sql->order('name');
         $this->sql->group('name');
         $this->sql->where([new WhereClause(['id' => 1])]);
-        $this->assert_sql_has($this->connection->limit("SELECT * FROM authors WHERE id=? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
+        $this->assert_sql_has($this->connection->limit("SELECT * FROM authors WHERE id = ? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
     }
 
     public function testInsertRequiresHash()
@@ -203,7 +203,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function testDeleteWithHash()
     {
         $this->sql->delete(['id' => 1, 'name' => ['Tito', 'Mexican']]);
-        $this->assert_sql_has('DELETE FROM authors WHERE id=? AND name IN(?,?)', $this->sql->to_s());
+        $this->assert_sql_has('DELETE FROM authors WHERE id = ? AND name IN(?,?)', $this->sql->to_s());
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
     }
 
@@ -214,7 +214,7 @@ class SQLBuilderTest extends DatabaseTestCase
         }
 
         $this->sql->delete(['id' => 1])->order('name asc')->limit(1);
-        $this->assert_sql_has('DELETE FROM authors WHERE id=? ORDER BY name asc LIMIT 1', $this->sql->to_s());
+        $this->assert_sql_has('DELETE FROM authors WHERE id = ? ORDER BY name asc LIMIT 1', $this->sql->to_s());
     }
 
     public function testReverseOrder()
@@ -277,6 +277,6 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->sql->joins($joins);
         $this->sql->where([new WhereClause(['id' => 1, 'name' => 'Tito'])]);
 
-        $this->assert_sql_has("SELECT * FROM authors $joins WHERE authors.id=? AND authors.name=?", (string) $this->sql);
+        $this->assert_sql_has("SELECT * FROM authors $joins WHERE authors.id = ? AND authors.name = ?", (string) $this->sql);
     }
 }

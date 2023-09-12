@@ -28,7 +28,7 @@ class WhereClause
      */
     private array|string $expression;
 
-    private bool $inverse = false;
+    private bool $negated = false;
 
     /**
      * @var array<mixed>
@@ -38,19 +38,19 @@ class WhereClause
     /**
      * @param Expression   $expression
      * @param array<mixed> $values
-     * @param bool         $inverse    if true, then this where clause will be a logical
+     * @param bool         $negated    if true, then this where clause will be a logical
      *                                 not when the SQL is generated
      */
-    public function __construct(string|array $expression, array $values=[], bool $inverse = false)
+    public function __construct(string|array $expression, array $values=[], bool $negated = false)
     {
-        $this->inverse = $inverse;
+        $this->negated = $negated;
         $this->expression = $expression;
         $this->values = $values;
     }
 
     public function negated(): bool
     {
-        return $this->inverse;
+        return $this->negated;
     }
 
     /**
@@ -171,13 +171,13 @@ class WhereClause
         return new WhereClause($expression, $conditionValues);
     }
 
-    public static function from_arg(mixed $arg): WhereClause
+    public static function from_arg(mixed $arg, bool $negated=false): WhereClause
     {
         // user passed in a string, a hash, or an array consisting of a string and values
         if (is_string($arg) || is_hash($arg)) {
-            $expression = new WhereClause($arg, []);
+            $expression = new WhereClause($arg, [], $negated);
         } else {
-            $expression = new WhereClause($arg[0], array_slice($arg, 1));
+            $expression = new WhereClause($arg[0], array_slice($arg, 1), $negated);
         }
 
         return $expression;
@@ -229,7 +229,7 @@ class WhereClause
             } elseif (is_null($value)) {
                 $sql .= "$g$name IS ?";
             } else {
-                $sql .= "$g$name=?";
+                $sql .= "$g$name = ?";
             }
 
             $g = $glue;

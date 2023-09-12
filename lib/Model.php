@@ -1709,6 +1709,16 @@ class Model
     }
 
     /**
+     * @see Relation::not()
+     *
+     * @return Relation<static>
+     */
+    public static function not(): Relation
+    {
+        return static::Relation()->not(...func_get_args());
+    }
+
+    /**
      * @return Relation<static>
      */
     public static function all(): Relation

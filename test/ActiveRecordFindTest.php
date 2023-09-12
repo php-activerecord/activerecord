@@ -379,7 +379,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
     public function testFindByPkShouldNotUseLimit()
     {
         Author::find(1);
-        $this->assert_sql_has('SELECT * FROM authors WHERE author_id=?', Author::table()->last_sql);
+        $this->assert_sql_has('SELECT * FROM authors WHERE author_id = ?', Author::table()->last_sql);
     }
 
     public function testFindByDatetime()
