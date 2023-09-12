@@ -255,7 +255,7 @@ class Table
         $sql = $this->options_to_sql($options);
         $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
 
-        if(!empty($options['having']) && empty($options['group'])) {
+        if (!empty($options['having']) && empty($options['group'])) {
             throw new ValidationsArgumentError("You must provide a 'group' value when using 'having'");
         }
 

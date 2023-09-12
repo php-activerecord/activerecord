@@ -230,7 +230,8 @@ class RelationTest extends DatabaseTestCase
         $this->assertInstanceOf(Relation::class, Author::having('length(name) > 2'));
     }
 
-    public function testGroupRequiredWhenUsingHaving() {
+    public function testGroupRequiredWhenUsingHaving()
+    {
         $this->expectException(ValidationsArgumentError::class);
         Author::select('name')
             ->order('name DESC')

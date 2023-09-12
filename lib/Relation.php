@@ -373,6 +373,7 @@ class Relation
         }
 
         $models = $this->to_a();
+
         return isset($limit) ? $models : $models[0] ?? null;
     }
 
