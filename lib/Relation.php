@@ -305,7 +305,6 @@ class Relation
     {
         $args = func_get_args();
         $num_args = count($args);
-        $class = $this->className;
 
         if (0 === $num_args) {
             throw new ValidationsArgumentError('find requires at least one argument');

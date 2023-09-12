@@ -7,6 +7,7 @@ namespace ActiveRecord;
 
 use ActiveRecord\Adapter\PgsqlAdapter;
 use ActiveRecord\Exception\RelationshipException;
+use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Relationship\AbstractRelationship;
 use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
@@ -253,6 +254,10 @@ class Table
     {
         $sql = $this->options_to_sql($options);
         $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
+
+        if(!empty($options['having']) && empty($options['group'])) {
+            throw new ValidationsArgumentError("You must provide a 'group' value when using 'having'");
+        }
 
         return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, (array) ($options['include'] ?? []));
     }
