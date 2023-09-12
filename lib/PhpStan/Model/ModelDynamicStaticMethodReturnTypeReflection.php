@@ -101,14 +101,12 @@ class ModelDynamicStaticMethodReturnTypeReflection implements DynamicStaticMetho
     protected function isNumericArray(ConstantArrayType $args): bool
     {
         $keys = $args->getKeyTypes();
-        $allInt = true;
         foreach ($keys as $key) {
             if (!($key instanceof IntegerType)) {
-                $allInt = false;
-                break;
+                return false;
             }
         }
 
-        return $allInt;
+        return true;
     }
 }
