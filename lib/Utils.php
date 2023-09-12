@@ -72,7 +72,7 @@ function array_flatten(array $array): array
 /**
  * Somewhat naive way to determine if an array is a hash.
  */
-function is_hash(mixed $array): bool
+function is_hash(mixed &$array): bool
 {
     return is_array($array) && !array_is_list($array);
 }

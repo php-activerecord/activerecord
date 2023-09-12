@@ -504,7 +504,7 @@ class Relation
             return false;
         }
 
-        if (is_array($conditions)) {
+        if (is_array($conditions) || is_hash($conditions)) {
             !empty($conditions) && $this->where($conditions);
         } else {
             try {
