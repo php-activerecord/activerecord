@@ -1858,11 +1858,16 @@ class Model
      * @param string       $sql    The raw SELECT query
      * @param array<mixed> $values An array of values for any parameters that needs to be bound
      *
-     * @return array<Model> An array of models
+     * @return array<static> An array of models
      */
-    public static function find_by_sql(string $sql, array $values = null): array
+    public static function find_by_sql(string $sql, array $values = []): array
     {
-        return static::table()->find_by_sql($sql, $values, true);
+        /**
+         * @var array<static> $items
+         */
+        $items = iterator_to_array(static::table()->find_by_sql($sql, $values, true));
+
+        return $items;
     }
 
     /**

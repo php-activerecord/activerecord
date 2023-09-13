@@ -15,8 +15,39 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *
  * @phpstan-import-type RelationOptions from Types
  */
-class Relation
+class Relation implements \Iterator
 {
+    protected \Generator $generator;
+
+    public function rewind(): void
+    {
+        $this->generator = $this->table()->find($this->options);
+        $this->generator->rewind();
+    }
+
+    /**
+     * @return TModel|null
+     */
+    public function current(): ?Model
+    {
+        return $this->generator->current();
+    }
+
+    public function key(): mixed
+    {
+        return $this->generator->key();
+    }
+
+    public function next(): void
+    {
+        $this->generator->next();
+    }
+
+    public function valid(): bool
+    {
+        return $this->generator->valid();
+    }
+
     /**
      * @var array<string>
      */
@@ -249,19 +280,24 @@ class Relation
     {
         $this->options['conditions'] ??= [];
 
-        $args = func_get_args();
-        $numArgs = count($args);
-
-        if (1 != $numArgs) {
-            throw new \ArgumentCountError('`where` requires exactly one argument.');
-        }
-        $arg = $args[0];
-
+        $arg = static::toSingleArg(...func_get_args());
         $expression = WhereClause::from_arg($arg);
 
         $this->options['conditions'][] = $expression;
 
         return $this;
+    }
+
+    public static function toSingleArg(): mixed
+    {
+        $args = func_get_args();
+        if (count($args) > 1) {
+            $arg = $args;
+        } else {
+            $arg = $args[0];
+        }
+
+        return $arg;
     }
 
     /**
@@ -281,10 +317,10 @@ class Relation
      *   ])
      *
      * User::where()                  // SELECT * FROM users
-     *   ->not(name: "Jon")           // WHERE name != 'Jon'
+     *   ->not('name', "Jon")         // WHERE name != 'Jon'
      *
      * User::where()                  // SELECT * FROM users
-     *   ->not(name: nil)             // WHERE !(name IS NULL)
+     *   ->not('name', null)          // WHERE !(name IS NULL)
      *
      * User::where()                  // SELECT * FROM users
      *   ->not([                      // WHERE !(name == 'Jon' AND role == 'admin')
@@ -308,14 +344,7 @@ class Relation
     {
         $this->options['conditions'] ??= [];
 
-        $args = func_get_args();
-        $numArgs = count($args);
-
-        if (1 != $numArgs) {
-            throw new \ArgumentCountError('`not` requires exactly one argument.');
-        }
-        $arg = $args[0];
-
+        $arg = static::toSingleArg(...func_get_args());
         $expression = WhereClause::from_arg($arg, true);
 
         $this->options['conditions'][] = $expression;
@@ -384,7 +413,7 @@ class Relation
         $options['conditions'][] = $this->pk_conditions($args);
         $options['mapped_names'] = $this->alias_attribute;
 
-        $list = $this->table()->find($options);
+        $list = iterator_to_array($this->table()->find($options));
         if (is_array($args) && count($list) != count($args)) {
             throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));
         }
@@ -479,7 +508,7 @@ class Relation
     {
         $this->options['mapped_names'] = $this->alias_attribute;
 
-        return $this->table()->find($this->options);
+        return iterator_to_array($this->table()->find($this->options));
     }
 
     /**
@@ -595,9 +624,9 @@ class Relation
         foreach ($pks as $pk) {
             $options = ['conditions' => [$this->pk_conditions($pk)]];
             $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
-                $res = $table->find($options);
+                $res = iterator_to_array($table->find($options));
 
-                return $res ? $res[0] : null;
+                return $res[0] ?? null;
             }, $table->cache_model_expire);
         }
 

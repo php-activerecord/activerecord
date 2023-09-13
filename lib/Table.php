@@ -248,9 +248,9 @@ class Table
      * @throws Exception\ActiveRecordException
      * @throws RelationshipException
      *
-     * @return array<TModel>
+     * @return \Generator<TModel>
      */
-    public function find(array $options): array
+    public function find(array $options): \Generator
     {
         $sql = $this->options_to_sql($options);
         $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
@@ -275,20 +275,20 @@ class Table
     }
 
     /**
-     * @param array<string,mixed>|null $values
-     * @param array<mixed>             $includes
+     * @param array<string,mixed> $values
+     * @param array<mixed>        $includes
      *
      * @throws RelationshipException
      *
-     * @return array<TModel>
+     * @return \Generator<TModel>
      */
-    public function find_by_sql(string $sql, array $values = null, bool $readonly = false, array $includes = []): array
+    public function find_by_sql(string $sql, array $values = [], bool $readonly = false, array $includes = []): \Generator
     {
         $this->last_sql = $sql;
 
         $collect_attrs_for_includes = !empty($includes);
         $list = $attrs = [];
-        $processedData = $this->process_data($values ?? []);
+        $processedData = $this->process_data($values);
         $sth = $this->conn->query($sql, $processedData);
 
         $self = $this;
@@ -312,13 +312,13 @@ class Table
             }
 
             $list[] = $model;
+
+            yield $model;
         }
 
         if ($collect_attrs_for_includes && !empty($list)) {
             $this->execute_eager_load($list, $attrs, $includes);
         }
-
-        return $list;
     }
 
     /**
