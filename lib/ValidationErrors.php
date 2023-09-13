@@ -79,18 +79,6 @@ class ValidationErrors implements \IteratorAggregate
     }
 
     /**
-     * Adds an error message only if the attribute value is {@link http://www.php.net/empty empty}.
-     *
-     * @param string $attribute Name of an attribute on the model
-     */
-    public function add_on_empty(string $attribute, string $msg = null): void
-    {
-        if (empty($this->model->$attribute)) {
-            $this->add($attribute, $msg ?? self::$DEFAULT_ERROR_MESSAGES['empty']);
-        }
-    }
-
-    /**
      * Adds the error message only if the attribute value was null or an empty string.
      *
      * @param string $attribute Name of an attribute on the model
