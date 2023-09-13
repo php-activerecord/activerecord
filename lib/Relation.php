@@ -625,6 +625,7 @@ class Relation implements \Iterator
             $options = ['conditions' => [$this->pk_conditions($pk)]];
             $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
                 $res = iterator_to_array($table->find($options));
+
                 return $res[0] ?? null;
             }, $table->cache_model_expire);
         }
