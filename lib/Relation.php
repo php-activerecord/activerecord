@@ -610,30 +610,6 @@ class Relation implements \Iterator
     }
 
     /**
-     * Will look up a list of primary keys from cache
-     *
-     * @param array<mixed> $pks An array of primary keys
-     *
-     * @return array<TModel>
-     */
-    public function get_models_from_cache(array $pks): array
-    {
-        $models = [];
-        $table = $this->table();
-
-        foreach ($pks as $pk) {
-            $options = ['conditions' => [$this->pk_conditions($pk)]];
-            $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
-                $res = iterator_to_array($table->find($options));
-
-                return $res[0] ?? null;
-            }, $table->cache_model_expire);
-        }
-
-        return array_filter($models);
-    }
-
-    /**
      * Returns a hash containing the names => values of the primary key.
      *
      * @param int|array<number|string> $args Primary key value(s)

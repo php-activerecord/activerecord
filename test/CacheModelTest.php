@@ -15,6 +15,7 @@ class CacheModelTest extends DatabaseTestCase
         }
         parent::setUp($connection_name);
         ActiveRecord\Config::instance()->set_cache('memcache://localhost');
+        Cache::flush();
     }
 
     protected static function set_method_public($className, $methodName)
