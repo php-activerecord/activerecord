@@ -29,7 +29,6 @@ class SqliteAdapterTest extends AdapterTestCase
         }
     }
 
-
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();

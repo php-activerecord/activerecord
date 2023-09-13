@@ -19,6 +19,7 @@ abstract class DatabaseTestCase extends TestCase
 
         $config = ActiveRecord\Config::instance();
         $connection_name ??= $config->get_default_connection();
+        $config->set_default_connection($connection_name);
 
         $this->original_date_class = $config->get_date_class();
 

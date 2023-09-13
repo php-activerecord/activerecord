@@ -248,9 +248,9 @@ class Table
      * @throws Exception\ActiveRecordException
      * @throws RelationshipException
      *
-     * @return array<TModel>
+     * @return \Generator<TModel>
      */
-    public function find(array $options): array
+    public function find(array $options): \Generator
     {
         $sql = $this->options_to_sql($options);
         $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
@@ -260,14 +260,6 @@ class Table
         }
 
         return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, (array) ($options['include'] ?? []));
-    }
-
-    public function find_to_pdo(array $options): \PDOStatement
-    {
-        $sql = $this->options_to_sql($options);
-        $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
-
-        return $this->find_by_sql_to_pdo($sql->to_s(), $sql->get_where_values(), $readonly, (array) ($options['include'] ?? []));
     }
 
     /**
@@ -282,63 +274,51 @@ class Table
         return $this->class->name . '-' . $pk;
     }
 
-    public function find_by_sql_to_pdo(string $sql, array $values): \PDOStatement
-    {
-        $processedData = $this->process_data($values ?? []);
-
-        return $this->conn->query($sql, $processedData);
-    }
-
     /**
-     * @param array<string,mixed>|null $values
-     * @param array<mixed>             $includes
+     * @param array<string,mixed> $values
+     * @param array<mixed>        $includes
      *
      * @throws RelationshipException
      *
-     * @return array<TModel>
+     * @return \Generator<TModel>
      */
-    public function find_by_sql(string $sql, array $values = [], bool $readonly = false, array $includes = []): array
+    public function find_by_sql(string $sql, array $values = [], bool $readonly = false, array $includes = []): \Generator
     {
         $this->last_sql = $sql;
 
         $collect_attrs_for_includes = !empty($includes);
         $list = $attrs = [];
+        $processedData = $this->process_data($values);
+        $sth = $this->conn->query($sql, $processedData);
 
-        $sth = $this->find_by_sql_to_pdo($sql, $values);
-
+        $self = $this;
         while ($row = $sth->fetch()) {
-            $model = $this->attributesToModel($row);
+            $cb = function () use ($row, $self) {
+                return new $self->class->name($row, false, true, false);
+            };
+            if ($this->cache_individual_model ?? false) {
+                $key = $this->cache_key_for_model(array_intersect_key($row, array_flip($this->pk)));
+                $model = Cache::get($key, $cb, $this->cache_model_expire);
+            } else {
+                $model = $cb();
+            }
+
+            if ($readonly) {
+                $model->set_read_only();
+            }
 
             if ($collect_attrs_for_includes) {
                 $attrs[] = $model->attributes();
             }
 
             $list[] = $model;
+
+            yield $model;
         }
 
         if ($collect_attrs_for_includes && !empty($list)) {
             $this->execute_eager_load($list, $attrs, $includes);
         }
-
-        return $list;
-    }
-
-    public function attributesToModel($row, $readonly=false) {
-        $cb = function () use ($row) {
-            return new $this->class->name($row, false, true, false);
-        };
-        if ($this->cache_individual_model ?? false) {
-            $key = $this->cache_key_for_model(array_intersect_key($row, array_flip($this->pk)));
-            $model = Cache::get($key, $cb, $this->cache_model_expire);
-        } else {
-            $model = $cb();
-        }
-
-        if ($readonly) {
-            $model->set_read_only();
-        }
-
-        return $model;
     }
 
     /**

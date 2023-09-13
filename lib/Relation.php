@@ -7,9 +7,9 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Adapter\SqliteAdapter;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
-use PHPUnit\Event\TypeMap;
 
 /**
  * @template TModel of Model
@@ -18,45 +18,42 @@ use PHPUnit\Event\TypeMap;
  */
 class Relation implements \Iterator
 {
+    protected \Generator $generator;
+
     /**
-     * @var array<TModel>
+     * @var TModel|null
      */
-    private \PDO $pdo;
-    private \PDOStatement $sth;
-    protected int $_count = 0;
-    private int $currentIndex = 0;
+    private Model|null $current;
 
-    public function rewind(): void {
-        $this->currentIndex = 0;
-        $this->loadItems();
-    }
-
-    protected function loadItems(): void {
-        $this->_pdo = $this->table()->conn->connection;
-        $this->options['mapped_names'] = $this->alias_attribute;
-        $this->sth = $this->table()->find_to_pdo($this->options, true);
-        $this->_count = $this->sth->rowCount();
-//        $this->_count = $this->table()->conn->query_and_fetch_one("SELECT FOUND_ROWS() AS numitems");
+    public function rewind(): void
+    {
+        $this->generator = $this->table()->find($this->options);
+        $this->generator->rewind();
+        $this->current = $this->generator->current();
     }
 
     /**
-     * @return TModel
+     * @return TModel|null
      */
-    public function current(): mixed {
-        $row = $this->sth->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $this->currentIndex);
-        return $this->table()->attributesToModel($row);
+    public function current(): ?Model
+    {
+        return $this->current;
     }
 
-    public function key(): mixed {
-        return $this->currentIndex;
+    public function key(): mixed
+    {
+        return $this->generator->key();
     }
 
-    public function next(): void {
-        ++$this->currentIndex;
+    public function next(): void
+    {
+        $this->generator->next();
+        $this->current = $this->generator->current();
     }
 
-    public function valid(): bool {
-        return $this->currentIndex < $this->_count;
+    public function valid(): bool
+    {
+        return $this->generator->valid();
     }
 
     /**
@@ -426,7 +423,7 @@ class Relation implements \Iterator
         $options['conditions'][] = $this->pk_conditions($args);
         $options['mapped_names'] = $this->alias_attribute;
 
-        $list = $this->table()->find($options);
+        $list = iterator_to_array($this->table()->find($options));
         if (is_array($args) && count($list) != count($args)) {
             throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));
         }
@@ -521,7 +518,7 @@ class Relation implements \Iterator
     {
         $this->options['mapped_names'] = $this->alias_attribute;
 
-        return $this->table()->find($this->options);
+        return iterator_to_array($this->table()->find($this->options));
     }
 
     /**
@@ -637,7 +634,7 @@ class Relation implements \Iterator
         foreach ($pks as $pk) {
             $options = ['conditions' => [$this->pk_conditions($pk)]];
             $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
-                $res = $table->find($options);
+                $res = iterator_to_array($table->find($options));
 
                 return $res ? $res[0] : null;
             }, $table->cache_model_expire);
