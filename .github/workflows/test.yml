@@ -66,9 +66,9 @@ jobs:
 
       - name: Create and set permissions on SQLite Database
         run: |
-          touch test.db
+          sqlite3 test.db
           echo $USER:$USER
-          sudo chown $USER:docker test.db
+          sudo chown $USER:$USER test.db
           chmod 777 test.db
 
           # Verify SQLite installation and permissions
