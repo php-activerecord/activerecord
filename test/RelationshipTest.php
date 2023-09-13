@@ -121,11 +121,16 @@ class RelationshipTest extends DatabaseTestCase
         $this->assert_default_has_many($this->get_relationship());
     }
 
-    public function testGh256EagerLoadingThreeLevelsDeep()
+    public function testEagerLoadingThreeLevelsDeep()
     {
         /* Before fix Undefined offset: 0 */
-        $conditions['include'] = ['events'=>['host'=>['events']]];
-        $venue = Venue::find(2, $conditions);
+        $venue = Venue::include([
+            'events'=>[
+                'host'=>[
+                    'events'
+                ]
+            ]
+        ])->find(2);
 
         $events = $venue->events;
         $this->assertEquals(2, count($events));
@@ -143,19 +148,21 @@ class RelationshipTest extends DatabaseTestCase
     public function testJoinsOnModelViaUndeclaredAssociation()
     {
         $this->expectException(RelationshipException::class);
-        JoinBook::first(['joins' => ['undeclared']]);
+        JoinBook::joins(['undeclared'])->first();
     }
 
     public function testJoinsOnlyLoadsGivenModelAttributes()
     {
-        $x = Event::first(['joins' => ['venue']]);
+        $x = Event::joins(['venue'])->first();
         $this->assert_sql_has('SELECT events.*', Event::table()->last_sql);
         $this->assertFalse(array_key_exists('city', $x->attributes()));
     }
 
     public function testJoinsCombinedWithSelectLoadsAllAttributes()
     {
-        $x = Event::first(['select' => 'events.*, venues.city as venue_city', 'joins' => ['venue']]);
+        $x = Event::select('events.*, venues.city as venue_city')
+            ->joins(['venue'])
+            ->first();
         $this->assert_sql_has('SELECT events.*, venues.city as venue_city', Event::table()->last_sql);
         $this->assertTrue(array_key_exists('venue_city', $x->attributes()));
     }
@@ -256,7 +263,7 @@ class RelationshipTest extends DatabaseTestCase
                 'conditions' => "state = 'NY'"
             ]
         ];
-        $event = $this->get_relationship();
+        $event = Event::find(5);
         $this->assertEquals(5, $event->id);
         $this->assertNull($event->venue);
     }
@@ -336,6 +343,13 @@ class RelationshipTest extends DatabaseTestCase
             ]
         ];
         $this->assert_default_has_many($this->get_relationship(), 'explicit_class_name');
+    }
+
+    public function testInvalidRelationship()
+    {
+        $this->expectException(RelationshipException::class);
+        Venue::table()->get_relationship('non_existent_table', true);
+        $this->assert_sql_has($this->connection->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
     }
 
     public function testHasManyWithSelect()
@@ -430,11 +444,11 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals(2, $property->amenities[1]->amenity_id);
     }
 
-    public function testGh16HasManyThroughInsideALoopShouldNotCauseAnException()
+    public function testHasManyThroughInsideALoopShouldNotCauseAnException()
     {
         $count = 0;
 
-        foreach (Venue::all() as $venue) {
+        foreach (Venue::all()->to_a() as $venue) {
             $count += count($venue->hosts);
         }
 
@@ -532,7 +546,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasManyWithJoins()
     {
-        $x = Venue::first(['joins' => ['events']]);
+        $x = Venue::joins(['events'])->first();
         $this->assert_sql_has('INNER JOIN events ON(venues.id = events.venue_id)', Venue::table()->last_sql);
     }
 
@@ -632,7 +646,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasOneWithJoins()
     {
-        $x = Employee::first(['joins' => ['position']]);
+        $x = Employee::joins(['position'])->first();
         $this->assert_sql_has('INNER JOIN positions ON(employees.id = positions.employee_id)', Employee::table()->last_sql);
     }
 
@@ -681,7 +695,7 @@ class RelationshipTest extends DatabaseTestCase
         AuthorWithNonModelRelationship::first()->books;
     }
 
-    public function testGh93AndGh100EagerLoadingRespectsAssociationOptions()
+    public function testEagerLoadingRespectsAssociationOptions()
     {
         Venue::$has_many = [
             'events' => [
@@ -692,15 +706,31 @@ class RelationshipTest extends DatabaseTestCase
                 ]
             ]
         ];
-        $venues = Venue::find([2, 6], ['include' => 'events']);
+        $venues = Venue::include('events')->find([2, 6]);
 
-        $this->assert_sql_has('WHERE length(title) = ? AND venue_id IN(?,?) ORDER BY id asc', ActiveRecord\Table::load(Event::class)->last_sql);
+        $this->assert_sql_has('WHERE (length(title) = ?) AND (venue_id IN(?,?)) ORDER BY id asc', ActiveRecord\Table::load(Event::class)->last_sql);
         $this->assertEquals(1, count($venues[0]->events));
+    }
+
+    public function testEagerLoadingWithThrough()
+    {
+        Venue::$has_many = [
+            'events' => [
+                'order' => 'id asc'
+            ],
+            'hosts' => [
+                'class_name' => 'Host',
+                'through' => 'events',
+                'order' => 'hosts.id asc'
+            ]
+        ];
+        $venues = Venue::include('hosts')->find([2, 6]);
+        $this->assertEquals(2, count($venues));
     }
 
     public function testEagerLoadingHasManyX()
     {
-        $venues = Venue::find([2, 6], ['include' => 'events']);
+        $venues = Venue::include('events')->find([2, 6]);
         $this->assert_sql_has('WHERE venue_id IN(?,?)', ActiveRecord\Table::load(Event::class)->last_sql);
 
         foreach ($venues[0]->events as $event) {
@@ -712,7 +742,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingHasManyWithNoRelatedRows()
     {
-        $venues = Venue::find([7, 8], ['include' => 'events']);
+        $venues = Venue::include('events')->find([7, 8]);
 
         foreach ($venues as $v) {
             $this->assertTrue(empty($v->events));
@@ -728,7 +758,8 @@ class RelationshipTest extends DatabaseTestCase
             'books' => true,
             'awesome_people' => true
         ];
-        $authors = Author::find([1, 2], ['include' => ['books', 'awesome_people']]);
+        $authors = Author::include(['books', 'awesome_people'])
+            ->find([1, 2]);
 
         $assocs = ['books', 'awesome_people'];
 
@@ -751,7 +782,8 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingHasManyNested()
     {
-        $venues = Venue::find([1, 2], ['include' => ['events' => ['host']]]);
+        $venues = Venue::include(['events' => ['host']])
+            ->find([1, 2]);
 
         $this->assertEquals(2, count($venues));
 
@@ -771,7 +803,8 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingBelongsTo()
     {
-        $events = Event::find([1, 2, 3, 5, 7], ['include' => 'venue']);
+        $events = Event::include('venue')
+            ->find([1, 2, 3, 5, 7]);
 
         foreach ($events as $event) {
             $this->assertEquals($event->venue_id, $event->venue->id);
@@ -782,7 +815,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingBelongsToArrayOfIncludes()
     {
-        $events = Event::find([1, 2, 3, 5, 7], ['include' => ['venue', 'host']]);
+        $events = Event::include(['venue', 'host'])->find([1, 2, 3, 5, 7]);
 
         foreach ($events as $event) {
             $this->assertEquals($event->venue_id, $event->venue->id);
@@ -803,13 +836,11 @@ class RelationshipTest extends DatabaseTestCase
             'author' => true
         ];
 
-        $books = Book::find([1, 2], [
-            'include' => [
-                'author' => [
-                    'awesome_people'
-                ]
+        $books = Book::include([
+            'author' => [
+                'awesome_people'
             ]
-        ]);
+        ])->find([1, 2]);
 
         foreach ($books as $book) {
             $this->assertEquals($book->author_id, $book->author->author_id);
@@ -826,7 +857,8 @@ class RelationshipTest extends DatabaseTestCase
         $e1 = Event::create(['venue_id' => 200, 'host_id' => 200, 'title' => 'blah', 'type' => 'Music']);
         $e2 = Event::create(['venue_id' => 200, 'host_id' => 200, 'title' => 'blah2', 'type' => 'Music']);
 
-        $events = Event::find([$e1->id, $e2->id], ['include' => 'venue']);
+        $events = Event::include('venue')
+            ->find([$e1->id, $e2->id]);
 
         foreach ($events as $e) {
             $this->assertNull($e->venue);
@@ -838,7 +870,8 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingClonesRelatedObjects()
     {
-        $events = Event::find([2, 3], ['include' => ['venue']]);
+        $events = Event::include('venue')
+            ->find([2, 3]);
 
         $venue = $events[0]->venue;
         $venue->name = 'new name';
@@ -850,7 +883,8 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingClonesNestedRelatedObjects()
     {
-        $venues = Venue::find([1, 2, 6, 9], ['include' => ['events' => ['host']]]);
+        $venues = Venue::include(['events' => ['host']])
+            ->find([1, 2, 6, 9]);
 
         $unchanged_host = $venues[2]->events[0]->host;
         $changed_host = $venues[3]->events[0]->host;
@@ -881,17 +915,50 @@ class RelationshipTest extends DatabaseTestCase
         $c = ActiveRecord\Table::load(Book::class)->conn;
 
         $select = "books.*, authors.name as to_author_name, {$c->quote_name('from_')}.name as from_author_name, {$c->quote_name('another')}.name as another_author_name";
-        $book = Book::find(2, ['joins' => ['to', 'from_', 'another'],
-            'select' => $select]);
+        $book = Book::joins(['to', 'from_', 'another'])
+            ->select($select)
+            ->find(2);
 
         $this->assertNotNull($book->from_author_name);
         $this->assertNotNull($book->to_author_name);
         $this->assertNotNull($book->another_author_name);
     }
 
-    public function testGh40RelationshipsWithJoinsAliasesTableNameInConditions()
+    public function testSelectWithString()
     {
-        $event = Event::find(1, ['joins' => ['venue']]);
+        $book = Book::select('name')->take();
+        $this->assertEquals('Ancient Art of Main Tanking', $book->name);
+    }
+
+    public function testSelectWithArray()
+    {
+        $book = Book::select([
+            'name',
+            'publisher'
+        ])->take();
+        $this->assertEquals('Ancient Art of Main Tanking', $book->name);
+    }
+
+    public function testMultipleSelectClausesAggregate()
+    {
+        $book = Book::all()
+            ->select('name')
+            ->select('publisher')
+            ->take();
+        $this->assertEquals('Ancient Art of Main Tanking', $book->name);
+        $this->assertEquals('RANDOM HOUSE', $book->publisher);
+    }
+
+    public function testSelectClauseMakesUnselectedPropertiesThrow()
+    {
+        $this->expectException(UndefinedPropertyException::class);
+        $book = Book::select('name')->take();
+        $book->publisher;
+    }
+
+    public function testRelationshipsWithJoinsAliasesTableNameInConditions()
+    {
+        $event = Event::joins(['venue'])->find(1);
 
         $this->assertEquals($event->id, $event->venue->id);
     }

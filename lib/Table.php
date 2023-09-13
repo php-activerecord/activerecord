@@ -7,6 +7,7 @@ namespace ActiveRecord;
 
 use ActiveRecord\Adapter\PgsqlAdapter;
 use ActiveRecord\Exception\RelationshipException;
+use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Relationship\AbstractRelationship;
 use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
@@ -22,6 +23,9 @@ use ActiveRecord\Relationship\HasOne;
  *
  * @phpstan-import-type PrimaryKey from Types
  * @phpstan-import-type Attributes from Types
+ * @phpstan-import-type RelationOptions from Types
+ *
+ * @template TModel of Model
  */
 class Table
 {
@@ -84,6 +88,8 @@ class Table
 
     /**
      * @param class-string $model_class_name
+     *
+     * @return Table<TModel>
      */
     public static function load(string $model_class_name): Table
     {
@@ -187,14 +193,14 @@ class Table
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param RelationOptions $options
      *
      * @throws Exception\ActiveRecordException
      * @throws RelationshipException
      */
     public function options_to_sql(array $options): SQLBuilder
     {
-        $table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
+        $table = $options['from'] ?? $this->get_fully_qualified_table_name();
         $sql = new SQLBuilder($this->conn, $table);
 
         if (array_key_exists('joins', $options)) {
@@ -207,25 +213,11 @@ class Table
             }
         }
 
-        if (array_key_exists('select', $options)) {
-            $sql->select($options['select']);
+        if (!empty($options['select'])) {
+            $sql->select(implode(', ', (array) $options['select']));
         }
 
-        if (array_key_exists('conditions', $options)) {
-            if (!is_hash($options['conditions'])) {
-                if (is_string($options['conditions'])) {
-                    $options['conditions'] = [$options['conditions']];
-                }
-
-                call_user_func_array([$sql, 'where'], $options['conditions']);
-            } else {
-                if (!empty($options['mapped_names'])) {
-                    $options['conditions'] = $this->map_names($options['conditions'], $options['mapped_names']);
-                }
-
-                $sql->where($options['conditions']);
-            }
-        }
+        $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
 
         if (array_key_exists('order', $options)) {
             $sql->order($options['order']);
@@ -251,17 +243,21 @@ class Table
     }
 
     /**
-     * @param array<string, array<string,mixed>> $options
+     * @param RelationOptions $options
      *
      * @throws Exception\ActiveRecordException
      * @throws RelationshipException
      *
-     * @return array<Model>
+     * @return \Generator<TModel>
      */
-    public function find(array $options): array
+    public function find(array $options): \Generator
     {
         $sql = $this->options_to_sql($options);
         $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
+
+        if (!empty($options['having']) && empty($options['group'])) {
+            throw new ValidationsArgumentError("You must provide a 'group' value when using 'having'");
+        }
 
         return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, (array) ($options['include'] ?? []));
     }
@@ -279,20 +275,20 @@ class Table
     }
 
     /**
-     * @param array<string,mixed>|null $values
-     * @param array<mixed>             $includes
+     * @param array<string,mixed> $values
+     * @param array<mixed>        $includes
      *
      * @throws RelationshipException
      *
-     * @return array<Model>
+     * @return \Generator<TModel>
      */
-    public function find_by_sql(string $sql, array $values = null, bool $readonly = false, array $includes = []): array
+    public function find_by_sql(string $sql, array $values = [], bool $readonly = false, array $includes = []): \Generator
     {
         $this->last_sql = $sql;
 
         $collect_attrs_for_includes = !empty($includes);
         $list = $attrs = [];
-        $processedData = $this->process_data($values ?? []);
+        $processedData = $this->process_data($values);
         $sth = $this->conn->query($sql, $processedData);
 
         $self = $this;
@@ -308,7 +304,7 @@ class Table
             }
 
             if ($readonly) {
-                $model->readonly();
+                $model->set_read_only();
             }
 
             if ($collect_attrs_for_includes) {
@@ -316,13 +312,13 @@ class Table
             }
 
             $list[] = $model;
+
+            yield $model;
         }
 
         if ($collect_attrs_for_includes && !empty($list)) {
             $this->execute_eager_load($list, $attrs, $includes);
         }
-
-        return $list;
     }
 
     /**
@@ -429,7 +425,7 @@ class Table
         $data = $this->process_data($data);
 
         $sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
-        $sql->update($data)->where($where);
+        $sql->update($data)->where([new WhereClause($where, [])], []);
 
         $values = $sql->bind_values();
 
@@ -467,29 +463,6 @@ class Table
         $table_name = $this->get_fully_qualified_table_name($quote_name);
         $conn = $this->conn;
         $this->columns = Cache::get("get_meta_data-$table_name", function () use ($conn, $table_name) { return $conn->columns($table_name); });
-    }
-
-    /**
-     * Replaces any aliases used in a hash based condition.
-     *
-     * @param array<string, string> $hash A hash
-     * @param array<string, string> $map  Hash of used_name => real_name
-     *
-     * @return array<string, string> Array with any aliases replaced with their read field name
-     */
-    private function map_names(array &$hash, array &$map): array
-    {
-        $ret = [];
-
-        foreach ($hash as $name => &$value) {
-            if (array_key_exists($name, $map)) {
-                $name = $map[$name];
-            }
-
-            $ret[$name] = $value;
-        }
-
-        return $ret;
     }
 
     /**
@@ -594,6 +567,9 @@ class Table
                         break;
 
                     case 'belongs_to':
+                        /**
+                         * @var BelongsTo<TModel> $relationship
+                         */
                         $relationship = new BelongsTo($attribute, $definition);
                         break;
 

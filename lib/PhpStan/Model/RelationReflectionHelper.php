@@ -1,0 +1,103 @@
+<?php
+
+namespace ActiveRecord\PhpStan\Model;
+
+use PhpParser\Node\Arg;
+use PHPStan\Analyser\Scope;
+use PHPStan\Type\ArrayType;
+use PHPStan\Type\Constant\ConstantArrayType;
+use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\IntegerType;
+use PHPStan\Type\NullType;
+use PHPStan\Type\Type;
+use PHPStan\Type\UnionType;
+
+trait RelationReflectionHelper
+{
+    protected function isNumericArray(ConstantArrayType $args): bool
+    {
+        $keys = $args->getKeyTypes();
+        foreach ($keys as $key) {
+            if (!($key instanceof IntegerType)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function dynamicReturnMethods(): array
+    {
+        return ['first', 'last', 'find', 'take'];
+    }
+
+    /**
+     * @param array<mixed> $args
+     *
+     * @throws \PHPStan\ShouldNotHappenException
+     */
+    protected function computeTypeFromArgs(string $name, array $args, Type $modelType, Scope $scope): Type
+    {
+        $args = array_map(static function ($arg) use ($scope) {
+            assert($arg instanceof Arg);
+            $val = $arg->value;
+
+            return $scope->getType($val);
+        }, $args);
+
+        switch ($name) {
+            case 'find':
+                $numArgs = count($args);
+                $single = false;
+                $nullable = false;
+
+                if (1 == $numArgs) {
+                    if (!($args[0] instanceof ConstantArrayType)
+                        || (!$this->isNumericArray($args[0]))) {
+                        $single = true;
+                    }
+                } elseif ($numArgs > 1) {
+                    if (($args[0] instanceof ConstantStringType) && (
+                        'first' === $args[0]->getValue()
+                        || 'last' === $args[0]->getValue()
+                    )) {
+                        $single = true;
+                        $nullable = true;
+                    }
+                }
+
+                if ($single && $nullable) {
+                    return new UnionType([
+                        $modelType,
+                        new NullType()
+                    ]);
+                } elseif ($single) {
+                    return $modelType;
+                }
+
+                return new ArrayType(new IntegerType(), $modelType);
+
+            case 'first':
+            case 'last':
+            case 'take':
+                $numArgs = count($args);
+                if (1 == $numArgs) {
+                    return new ArrayType(
+                        new IntegerType(),
+                        $modelType
+                    );
+                }
+
+                return new UnionType([
+                    $modelType,
+                    new NullType()
+                ]);
+
+            default:
+                throw new \Exception('Unknown method');
+        }
+    }
+}

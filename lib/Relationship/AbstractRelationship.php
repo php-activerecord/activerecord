@@ -12,9 +12,10 @@ use function ActiveRecord\has_absolute_namespace;
 use ActiveRecord\Inflector;
 use ActiveRecord\Model;
 use ActiveRecord\Reflections;
-use ActiveRecord\SQLBuilder;
+use ActiveRecord\Relation;
 use ActiveRecord\Table;
 use ActiveRecord\Utils;
+use ActiveRecord\WhereClause;
 
 /**
  * Abstract class that all relationships must extend from.
@@ -75,8 +76,9 @@ abstract class AbstractRelationship
         $this->attribute_name = $attribute_name;
         $this->options = $this->merge_association_options($options);
 
-        if (isset($this->options['conditions']) && !is_array($this->options['conditions'])) {
-            $this->options['conditions'] = [$this->options['conditions']];
+        $this->options['conditions'] = [];
+        if (isset($options['conditions'])) {
+            $this->options['conditions'][] = WhereClause::from_arg($options['conditions']);
         }
 
         if (isset($this->options['class_name'])) {
@@ -133,13 +135,8 @@ abstract class AbstractRelationship
         }
 
         $values = [$values];
-        $conditions = SQLBuilder::create_conditions_from_underscored_string($table->conn, $query_key, $values);
-
-        if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1) {
-            Utils::add_condition($options['conditions'], $conditions ?? []);
-        } else {
-            $options['conditions'] = $conditions;
-        }
+        $options['conditions'] ??= [];
+        $options['conditions'][] = WhereClause::from_underscored_string($table->conn, $query_key, $values);
 
         if (!empty($includes)) {
             $options['include'] = $includes;
@@ -161,6 +158,9 @@ abstract class AbstractRelationship
                 $through_table = $class::table();
             } else {
                 $class = $options['class_name'];
+                if (isset($this->options['namespace']) && !class_exists($class)) {
+                    $class = $this->options['namespace'] . '\\' . $class;
+                }
                 $relation = $class::table()->get_relationship($options['through']);
                 $through_table = $relation->get_table();
             }
@@ -173,11 +173,11 @@ abstract class AbstractRelationship
             $this->foreign_key = $fk;
         }
 
-        $options = $this->unset_non_finder_options($options);
-
         $class = $this->class_name;
 
-        $related_models = $class::find('all', $options);
+        $rel = new Relation($class, [], $options);
+
+        $related_models = $rel->to_a();
         $used_models_map = [];
         $related_models_map = [];
         $model_values_key = Inflector::variablize($model_values_key);
@@ -271,22 +271,6 @@ abstract class AbstractRelationship
     }
 
     /**
-     * @param array<string,mixed> $options
-     *
-     * @return array<string,mixed>
-     */
-    protected function unset_non_finder_options(array $options): array
-    {
-        foreach (array_keys($options) as $option) {
-            if (!in_array($option, Model::$VALID_OPTIONS)) {
-                unset($options[$option]);
-            }
-        }
-
-        return $options;
-    }
-
-    /**
      * @return class-string
      */
     protected function inferred_class_name(string $name): string
@@ -337,16 +321,13 @@ abstract class AbstractRelationship
             return null;
         }
 
-        $conditions = SQLBuilder::create_conditions_from_underscored_string(Table::load(get_class($model))->conn, $condition_string, $condition_values);
+        $conditions[] = WhereClause::from_underscored_string(
+            Table::load(get_class($model))->conn,
+            $condition_string,
+            $condition_values
+        );
 
-        // DO NOT CHANGE THE NEXT TWO LINES. add_condition operates on a reference and will screw options array up
-        if (isset($this->options['conditions'])) {
-            $options_conditions = $this->options['conditions'];
-        } else {
-            $options_conditions = [];
-        }
-
-        return Utils::add_condition($options_conditions, $conditions ?? []);
+        return $conditions; // Utils::add_condition($options_conditions, $conditions ?? []);
     }
 
     /**
@@ -361,7 +342,6 @@ abstract class AbstractRelationship
     public function construct_inner_join_sql(Table $from_table, $using_through = false, $alias = null)
     {
         if ($using_through) {
-            $join_table = $from_table;
             $join_table_name = $from_table->get_fully_qualified_table_name();
             $from_table_name = Table::load($this->class_name)->get_fully_qualified_table_name();
         } else {

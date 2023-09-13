@@ -43,8 +43,8 @@ class CallBackTest extends DatabaseTestCase
         $venue->city = 'Awesome City';
         $venue->save();
 
-        $this->assertTrue(VenueAfterCreate::exists(['conditions'=> ['name'=>'changed!']]));
-        $this->assertFalse(VenueAfterCreate::exists(['conditions'=> ['name'=>'change me']]));
+        $this->assertTrue(VenueAfterCreate::exists(['name'=>'changed!']));
+        $this->assertFalse(VenueAfterCreate::exists(['name'=>'change me']));
     }
 
     public function testGenericCallbackWasAutoRegistered()

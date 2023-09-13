@@ -3,15 +3,20 @@
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\SQLBuilder;
 use ActiveRecord\Table;
+use ActiveRecord\WhereClause;
 use test\models\Author;
 
 class SQLBuilderTest extends DatabaseTestCase
 {
-    private $sql;
+    private SQLBuilder $sql;
 
-    protected $table_name = 'authors';
-    protected $class_name = Author::class;
-    protected $table;
+    protected string $table_name = 'authors';
+
+    /**
+     * @var class-string
+     */
+    protected string $class_name = Author::class;
+    protected Table $table;
 
     public function setUp($connection_name=null): void
     {
@@ -20,20 +25,20 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->table = Table::load($this->class_name);
     }
 
-    protected function cond_from_s($name, $values=[], $map=[])
+    protected function cond_from_s($name, $values=[], $map=[]): ?WhereClause
     {
-        return SQLBuilder::create_conditions_from_underscored_string($this->table->conn, $name, $values, $map);
+        return WhereClause::from_underscored_string($this->table->conn, $name, $values, $map);
     }
 
     public function assert_conditions($expected_sql, $values, $underscored_string, $map=[])
     {
-        $cond = SQLBuilder::create_conditions_from_underscored_string($this->table->conn, $underscored_string, $values, $map);
-        $this->assert_sql_has($expected_sql, array_shift($cond));
+        $cond = WhereClause::from_underscored_string($this->table->conn, $underscored_string, $values, $map);
+        $this->assert_sql_has($expected_sql, $cond->expression());
 
         if ($values) {
-            $this->assertEquals(array_values(array_filter($values, function ($s) { return null !== $s; })), array_values($cond));
+            $this->assertEquals(array_values(array_filter($values, function ($s) { return null !== $s; })), $cond->values());
         } else {
-            $this->assertEquals([], $cond);
+            $this->assertEquals([], $cond->values());
         }
     }
 
@@ -44,35 +49,39 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function testWhereWithArray()
     {
-        $this->sql->where('id=? AND name IN(?)', 1, ['Tito', 'Mexican']);
+        $this->sql->where([
+            new WhereClause('id=? AND name IN(?)', [1, ['Tito', 'Mexican']])]);
         $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name IN(?,?)', (string) $this->sql);
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
     }
 
     public function testWhereWithHash()
     {
-        $this->sql->where(['id' => 1, 'name' => 'Tito']);
-        $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name=?', (string) $this->sql);
+        $this->sql->where([new WhereClause([
+            'id' => 1,
+            'name' => 'Tito'
+        ])]);
+        $this->assert_sql_has('SELECT * FROM authors WHERE id = ? AND name = ?', (string) $this->sql);
         $this->assertEquals([1, 'Tito'], $this->sql->get_where_values());
     }
 
     public function testWhereWithHashAndArray()
     {
-        $this->sql->where(['id' => 1, 'name' => ['Tito', 'Mexican']]);
-        $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name IN(?,?)', (string) $this->sql);
+        $this->sql->where([new WhereClause(['id' => 1, 'name' => ['Tito', 'Mexican']])]);
+        $this->assert_sql_has('SELECT * FROM authors WHERE id = ? AND name IN(?,?)', (string) $this->sql);
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
     }
 
-    public function testGh134WhereWithHashAndNull()
+    public function testWhereWithHashAndNull()
     {
-        $this->sql->where(['id' => 1, 'name' => null]);
-        $this->assert_sql_has('SELECT * FROM authors WHERE id=? AND name IS ?', (string) $this->sql);
+        $this->sql->where([new WhereClause(['id' => 1, 'name' => null])]);
+        $this->assert_sql_has('SELECT * FROM authors WHERE id = ? AND name IS ?', (string) $this->sql);
         $this->assertEquals([1, null], $this->sql->get_where_values());
     }
 
-    public function testWhereWithNull()
+    public function testWhereWithEmpty()
     {
-        $this->sql->where(null);
+        $this->sql->where([]);
         $this->assertEquals('SELECT * FROM authors', (string) $this->sql);
     }
 
@@ -125,8 +134,8 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->sql->having("created_at > '2009-01-01'");
         $this->sql->order('name');
         $this->sql->group('name');
-        $this->sql->where(['id' => 1]);
-        $this->assert_sql_has($this->connection->limit("SELECT * FROM authors WHERE id=? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
+        $this->sql->where([new WhereClause(['id' => 1])]);
+        $this->assert_sql_has($this->connection->limit("SELECT * FROM authors WHERE id = ? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
     }
 
     public function testInsertRequiresHash()
@@ -149,7 +158,8 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function testUpdateWithHash()
     {
-        $this->sql->update(['id' => 1, 'name' => 'Tito'])->where('id=1 AND name IN(?)', ['Tito', 'Mexican']);
+        $this->sql->update(['id' => 1, 'name' => 'Tito'])
+            ->where([new WhereClause('id=1 AND name IN(?)', [['Tito', 'Mexican']])]);
         $this->assert_sql_has('UPDATE authors SET id=?, name=? WHERE id=1 AND name IN(?,?)', (string) $this->sql);
         $this->assertEquals([1, 'Tito', 'Tito', 'Mexican'], $this->sql->bind_values());
     }
@@ -172,7 +182,8 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function testUpdateWithNull()
     {
-        $this->sql->update(['id' => 1, 'name' => null])->where('id=1');
+        $this->sql->update(['id' => 1, 'name' => null])
+            ->where([new WhereClause('id=1')]);
         $this->assert_sql_has('UPDATE authors SET id=?, name=? WHERE id=1', $this->sql->to_s());
     }
 
@@ -184,7 +195,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function testDeleteWithWhere()
     {
-        $this->sql->delete('id=? or name in(?)', 1, ['Tito', 'Mexican']);
+        $this->sql->delete(['id=? or name in(?)', 1, ['Tito', 'Mexican']]);
         $this->assertEquals('DELETE FROM authors WHERE id=? or name in(?,?)', $this->sql->to_s());
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->bind_values());
     }
@@ -192,7 +203,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function testDeleteWithHash()
     {
         $this->sql->delete(['id' => 1, 'name' => ['Tito', 'Mexican']]);
-        $this->assert_sql_has('DELETE FROM authors WHERE id=? AND name IN(?,?)', $this->sql->to_s());
+        $this->assert_sql_has('DELETE FROM authors WHERE id = ? AND name IN(?,?)', $this->sql->to_s());
         $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
     }
 
@@ -203,7 +214,7 @@ class SQLBuilderTest extends DatabaseTestCase
         }
 
         $this->sql->delete(['id' => 1])->order('name asc')->limit(1);
-        $this->assert_sql_has('DELETE FROM authors WHERE id=? ORDER BY name asc LIMIT 1', $this->sql->to_s());
+        $this->assert_sql_has('DELETE FROM authors WHERE id = ? ORDER BY name asc LIMIT 1', $this->sql->to_s());
     }
 
     public function testReverseOrder()
@@ -239,12 +250,6 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assert_conditions('id=? AND name IS NULL OR z=?', [1, null, ''], 'id_and_name_or_z');
     }
 
-    public function testCreateConditionsFromUnderscoredStringInvalid()
-    {
-        $this->assertEquals(null, $this->cond_from_s(''));
-        $this->assertEquals(null, $this->cond_from_s(null));
-    }
-
     public function testCreateConditionsFromUnderscoredStringWithMappedColumns()
     {
         $this->assert_conditions('id=? AND name=?', [1, 'Tito'], 'id_and_my_name', ['my_name' => 'name']);
@@ -270,8 +275,8 @@ class SQLBuilderTest extends DatabaseTestCase
         $joins = 'INNER JOIN books ON (books.id = authors.id)';
         // joins needs to be called prior to where
         $this->sql->joins($joins);
-        $this->sql->where(['id' => 1, 'name' => 'Tito']);
+        $this->sql->where([new WhereClause(['id' => 1, 'name' => 'Tito'])]);
 
-        $this->assert_sql_has("SELECT * FROM authors $joins WHERE authors.id=? AND authors.name=?", (string) $this->sql);
+        $this->assert_sql_has("SELECT * FROM authors $joins WHERE authors.id = ? AND authors.name = ?", (string) $this->sql);
     }
 }

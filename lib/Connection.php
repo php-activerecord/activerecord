@@ -11,8 +11,6 @@ require_once 'Column.php';
 use ActiveRecord\Adapter\SqliteAdapter;
 use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
-use Closure;
-use PDO;
 use Psr\Log\LoggerInterface;
 
 /**

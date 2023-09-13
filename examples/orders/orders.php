@@ -38,22 +38,6 @@ $tito->reload();
 
 echo "$tito->name has " . count($tito->orders) . ' orders for: ' . join(', ', ActiveRecord\collect($tito->orders, 'item_name')) . "\n\n";
 
-// get all orders placed by Tito
-foreach (Order::find_all_by_person_id($tito->id) as $order) {
-    echo "Order #$order->id for $order->item_name ($$order->price + $$order->tax tax) ordered by " . $order->person->name . "\n";
-
-    if (count($order->payments) > 0) {
-        // display each payment for this order
-        foreach ($order->payments as $payment) {
-            echo "  payment #$payment->id of $$payment->amount by " . $payment->person->name . "\n";
-        }
-    } else {
-        echo "  no payments\n";
-    }
-
-    echo "\n";
-}
-
 // display summary of all payments made by Tito and Jax
 $conditions = [
     'conditions'    => ['id IN(?)', [$tito->id, $jax->id]],

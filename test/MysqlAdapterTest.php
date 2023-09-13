@@ -1,12 +1,19 @@
 <?php
 
 use ActiveRecord\Column;
+use ActiveRecord\WhereClause;
 
 class MysqlAdapterTest extends AdapterTestCase
 {
     public function setUp($connection_name=null): void
     {
         parent::setUp('mysql');
+    }
+
+    public function testSubstituteEscapesQuotes()
+    {
+        $a = new WhereClause('name = ? or name in( ? )', ["Tito's Guild", [1, "Tito's Guild"]]);
+        $this->assertEquals("name = 'Tito\'s Guild' or name in( 1,'Tito\'s Guild' )", $a->to_s($this->connection, substitute: true));
     }
 
     public function testEnum()

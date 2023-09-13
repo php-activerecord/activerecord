@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ActiveRecord\PhpStan;
+namespace ActiveRecord\PhpStan\Model;
 
 use ActiveRecord\SQLBuilder;
 use PHPStan\Reflection\ClassMemberReflection;
@@ -111,19 +111,7 @@ class ModelStaticMethodReflection implements MethodReflection
      */
     public function getVariants(): array
     {
-        if (str_starts_with($this->name, 'count_by')) {
-            $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 9), 0);
-
-            return [
-                new FunctionVariant(
-                    TemplateTypeMap::createEmpty(),
-                    TemplateTypeMap::createEmpty(),
-                    array_fill(0, count($parts), new ModelParameterReflection()),
-                    false,
-                    new IntegerType()
-                )
-            ];
-        } elseif (str_starts_with($this->name, 'find_by')) {
+        if (str_starts_with($this->name, 'find_by')) {
             $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 8), 0);
 
             return [
