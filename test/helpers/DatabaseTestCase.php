@@ -24,7 +24,7 @@ abstract class DatabaseTestCase extends TestCase
         $this->original_default_connection = $config->get_default_connection();
         $connection_name ??= $this->original_default_connection;
 
-        //        $config->set_default_connection($connection_name);
+        $config->set_default_connection($connection_name);
 
         $this->original_date_class = $config->get_date_class();
 

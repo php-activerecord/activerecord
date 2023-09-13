@@ -13,6 +13,7 @@ class SqliteAdapterTest extends AdapterTestCase
     public function tearDown(): void
     {
         @unlink(self::InvalidDb);
+        parent::tearDown();
     }
 
     public static function tearDownAfterClass(): void
