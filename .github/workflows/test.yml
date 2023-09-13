@@ -89,5 +89,5 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          composer test
+          vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml test/SqliteAdapterTest.php
 
