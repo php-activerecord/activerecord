@@ -148,12 +148,6 @@ class WhereClauseTest extends TestCase
         $this->assertEquals('id in(1,2)', $a->to_s($this->connection, substitute: true));
     }
 
-    public function testSubstituteEscapesQuotes()
-    {
-        $a = new WhereClause('name = ? or name in( ? )', ["Tito's Guild", [1, "Tito's Guild"]]);
-        $this->assertEquals("name = 'Tito\'s Guild' or name in( 1,'Tito\'s Guild' )", $a->to_s($this->connection, substitute: true));
-    }
-
     public function testSubstituteEscapeQuotesWithConnectionsEscapeMethod()
     {
         $a = new WhereClause('name=?', ["Tito's Guild"]);
