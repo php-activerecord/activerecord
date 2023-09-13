@@ -111,6 +111,14 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Uncle Bob', $models[1]->name);
     }
 
+    public function testWhereTooManyArguments()
+    {
+        $models = Author::where('mixedCaseField = ?', 'Bill')->to_a();
+        $this->assertEquals(2, count($models));
+        $this->assertEquals('Bill Clinton', $models[0]->name);
+        $this->assertEquals('Uncle Bob', $models[1]->name);
+    }
+
     public function testWhereArray()
     {
         $authors = Author::where(['name = ?', 'Bill Clinton'])->to_a();
@@ -195,7 +203,7 @@ class RelationTest extends DatabaseTestCase
     {
         $authors = Author::all();
 
-        foreach ($authors as $author) {
+        foreach ($authors as $key => $author) {
             $this->assertInstanceOf(Author::class, $author);
         }
 

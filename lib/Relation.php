@@ -287,19 +287,24 @@ class Relation implements \Iterator
     {
         $this->options['conditions'] ??= [];
 
-        $args = func_get_args();
-        $numArgs = count($args);
-
-        if (1 != $numArgs) {
-            throw new \ArgumentCountError('`where` requires exactly one argument.');
-        }
-        $arg = $args[0];
-
+        $arg = static::toSingleArg(...func_get_args());
         $expression = WhereClause::from_arg($arg);
 
         $this->options['conditions'][] = $expression;
 
         return $this;
+    }
+
+    public static function toSingleArg(): mixed
+    {
+        $args = func_get_args();
+        if (count($args) > 1) {
+            $arg = $args;
+        } else {
+            $arg = $args[0];
+        }
+
+        return $arg;
     }
 
     /**
@@ -346,14 +351,7 @@ class Relation implements \Iterator
     {
         $this->options['conditions'] ??= [];
 
-        $args = func_get_args();
-        $numArgs = count($args);
-
-        if (1 != $numArgs) {
-            throw new \ArgumentCountError('`not` requires exactly one argument.');
-        }
-        $arg = $args[0];
-
+        $arg = static::toSingleArg(...func_get_args());
         $expression = WhereClause::from_arg($arg, true);
 
         $this->options['conditions'][] = $expression;
