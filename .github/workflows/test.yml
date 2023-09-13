@@ -66,7 +66,6 @@ jobs:
 
       - name: Create and set permissions on SQLite Database
         run: |
-          sqlite3 test.db
           echo $USER:$USER
           sudo chown $USER:$USER test.db
           chmod 777 test.db
@@ -91,6 +90,7 @@ jobs:
 
       - name: Run PHPUnit
         run: |
+          whoami
           vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml
 
       - name: Upload coverage reports to Codecov
