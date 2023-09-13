@@ -2,7 +2,6 @@
 
 use ActiveRecord\Connection;
 use ActiveRecord\Exception\ConnectionException;
-use test\models\Author;
 
 class SqliteAdapterTest extends AdapterTestCase
 {
