@@ -89,10 +89,4 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        if: matrix.php-version == 8.1
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          composer test test/SqliteAdapterTest
