@@ -324,10 +324,10 @@ class Relation implements \Iterator
      *   ])
      *
      * User::where()                  // SELECT * FROM users
-     *   ->not(name: "Jon")           // WHERE name != 'Jon'
+     *   ->not('name', "Jon")         // WHERE name != 'Jon'
      *
      * User::where()                  // SELECT * FROM users
-     *   ->not(name: nil)             // WHERE !(name IS NULL)
+     *   ->not('name', null)          // WHERE !(name IS NULL)
      *
      * User::where()                  // SELECT * FROM users
      *   ->not([                      // WHERE !(name == 'Jon' AND role == 'admin')
