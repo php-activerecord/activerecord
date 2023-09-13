@@ -68,7 +68,7 @@ jobs:
         run: |
           touch test.db
           echo $USER:$USER
-          sudo chown $USER:$USER test.db
+          sudo chown $USER:docker test.db
           chmod 777 test.db
 
           # Verify SQLite installation and permissions
