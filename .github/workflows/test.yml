@@ -65,7 +65,11 @@ jobs:
         uses: ramsey/composer-install@v2
 
       - name: Create and set permissions on SQLite Database
-        run: chmod 777 ./
+        run: |
+          chmod 777 ./
+          ls -la ./
+          whoami
+          id -g
 
           # Verify SQLite installation and permissions
 #      - name: Verify SQLite setup
@@ -88,6 +92,8 @@ jobs:
       - name: Run PHPUnit
         run: |
           whoami
+          id -g
+          ls -la ./
           vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml
 
       - name: Upload coverage reports to Codecov
