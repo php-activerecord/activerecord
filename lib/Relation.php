@@ -19,16 +19,10 @@ class Relation implements \Iterator
 {
     protected \Generator $generator;
 
-    /**
-     * @var TModel|null
-     */
-    private Model|null $current;
-
     public function rewind(): void
     {
         $this->generator = $this->table()->find($this->options);
         $this->generator->rewind();
-        $this->current = $this->generator->current();
     }
 
     /**
@@ -36,7 +30,7 @@ class Relation implements \Iterator
      */
     public function current(): ?Model
     {
-        return $this->current;
+        return $this->generator->current();
     }
 
     public function key(): mixed
@@ -47,7 +41,6 @@ class Relation implements \Iterator
     public function next(): void
     {
         $this->generator->next();
-        $this->current = $this->generator->current();
     }
 
     public function valid(): bool
@@ -632,8 +625,7 @@ class Relation implements \Iterator
             $options = ['conditions' => [$this->pk_conditions($pk)]];
             $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
                 $res = iterator_to_array($table->find($options));
-
-                return $res ? $res[0] : null;
+                return $res[0] ?? null;
             }, $table->cache_model_expire);
         }
 
