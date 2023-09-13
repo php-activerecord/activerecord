@@ -7,7 +7,6 @@
 
 namespace ActiveRecord;
 
-use ActiveRecord\Adapter\SqliteAdapter;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
 

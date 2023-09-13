@@ -9,6 +9,8 @@ abstract class DatabaseTestCase extends TestCase
 {
     protected \ActiveRecord\Connection $connection;
     protected string $connection_name;
+
+    protected string $original_default_connection;
     protected $original_date_class;
     public static $log = false;
     public static $db;
@@ -18,7 +20,9 @@ abstract class DatabaseTestCase extends TestCase
         ActiveRecord\Table::clear_cache();
 
         $config = ActiveRecord\Config::instance();
-        $connection_name ??= $config->get_default_connection();
+        $this->original_default_connection = $config->get_default_connection();
+        $connection_name ??= $this->original_default_connection;
+
         $config->set_default_connection($connection_name);
 
         $this->original_date_class = $config->get_date_class();
@@ -49,6 +53,7 @@ abstract class DatabaseTestCase extends TestCase
     public function tearDown(): void
     {
         ActiveRecord\Config::instance()->set_date_class($this->original_date_class);
+        ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
     }
 
     public function assert_exception_message_contains($contains, $closure)
