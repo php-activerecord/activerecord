@@ -78,6 +78,8 @@ jobs:
           ls -la test.db
           sqlite3 test.db "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name TEXT);"
           ls -la test.db
+          pwd
+          ls -la
 
       - name: Verify MySQL
         run: |
