@@ -89,4 +89,4 @@ jobs:
 
       - name: Run PHPUnit
         run: |
-          composer test test/SqliteAdapterTest
+          composer test
