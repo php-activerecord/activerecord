@@ -8,6 +8,7 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
 /**
@@ -90,14 +91,62 @@ class Relation implements \Iterator
     }
 
     /**
+     * Allows for calling functions without brackets, eg) $this->last
+     *
+     * @param string $propertyName Supports only first|last|take
+     *
+     * @throws UndefinedPropertyException if $propertyName is not in supported list
+     *
+     * @return TModel|null
+     */
+    public function __get(string $propertyName): Model|null
+    {
+        switch ($propertyName) {
+            case 'first':
+                $models = $this->firstImpl();
+                break;
+            case 'last':
+                $models = $this->lastImpl();
+                break;
+            case 'take':
+                $models = $this->takeImpl();
+                break;
+            default:
+                throw new UndefinedPropertyException(get_called_class(), $propertyName);
+        }
+
+        return $models[0] ?? null;
+    }
+
+    /**
+     * Selects columns in a table
+     *
+     * The following three statements will all generate the same SQL
+     * Author::select('A,B,C,D')->find(2)
+     * Author::select('A,B')->select('C,D')->find(2)
+     * Author::select('A,A,B,C')->select('B,C,D')->find(2)
+     * will generate:
+     *
+     * SELECT A,B,C,D
+     * FROM Author
+     * WHERE ID = 2
+     *
      * @param string|array<string> $columns
      *
      * @return Relation<TModel>
      */
-    public function select(string|array $columns): Relation
+    public function select(string|array $columns = '*'): Relation
     {
         $this->options['select'] ??= [];
-        $this->options['select'] = array_merge((array) $this->options['select'], (array) $columns);
+
+        if (!is_array($columns)) {
+            $columns = explode(',', $columns);
+        }
+
+        $this->options['select'] = array_unique(array_merge((array) $this->options['select'], (array) $columns));
+        if (in_array('*', $this->options['select'])) {
+            $this->options['select'] = ['*'];
+        }
 
         return $this;
     }
@@ -432,14 +481,19 @@ class Relation implements \Iterator
      *
      * @return TModel|array<TModel>|null
      */
-    public function take(int $limit = null): mixed
+    public function take(int $limit = null): Model|array|null
+    {
+        $models = $this->takeImpl($limit);
+
+        return isset($limit) ? $models : $models[0] ?? null;
+    }
+
+    /**
+     * @return array<TModel>
+     */
+    private function takeImpl(int $limit = null): array
     {
         $this->limit($limit ?? 1);
-        if (!isset($limit)) {
-            $models = $this->to_a();
-
-            return $models[0] ?? null;
-        }
 
         return $this->to_a();
     }
@@ -453,8 +507,20 @@ class Relation implements \Iterator
      * Person::where(["user_name = :u", { u: user_name }])->first()
      * Person::order("created_on DESC")->offset(5).first()
      * Person.first(3) // returns the first three objects fetched by SELECT * FROM people ORDER BY people.id LIMIT 3
+     *
+     * @return TModel|array<TModel>|null
      */
-    public function first(int $limit = null): mixed
+    public function first(int $limit = null): Model|array|null
+    {
+        $models = $this->firstImpl($limit);
+
+        return isset($limit) ? $models : $models[0] ?? null;
+    }
+
+    /**
+     * @return array<TModel>
+     */
+    private function firstImpl(int $limit = null): array
     {
         $this->limit($limit ?? 1);
 
@@ -463,9 +529,7 @@ class Relation implements \Iterator
             $this->options['order'] = implode(' ASC, ', $this->table()->pk) . ' ASC';
         }
 
-        $models = $this->to_a();
-
-        return isset($limit) ? $models : $models[0] ?? null;
+        return $this->to_a();
     }
 
     /**
@@ -482,7 +546,17 @@ class Relation implements \Iterator
      *
      * @return TModel|array<TModel>|null
      */
-    public function last(int $limit = null): mixed
+    public function last(int $limit = null): Model|array|null
+    {
+        $models = $this->lastImpl($limit);
+
+        return isset($limit) ? $models : $models[0] ?? null;
+    }
+
+    /**
+     * @return array<TModel>
+     */
+    private function lastImpl(int $limit = null): array
     {
         $this->limit($limit ?? 1);
 
@@ -494,9 +568,7 @@ class Relation implements \Iterator
             $this->options['order'] = implode(' DESC, ', $this->table()->pk) . ' DESC';
         }
 
-        $models = $this->to_a();
-
-        return isset($limit) ? $models : $models[0] ?? null;
+        return $this->to_a();
     }
 
     /**

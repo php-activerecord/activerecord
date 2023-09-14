@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Relation;
 use test\models\Author;
@@ -50,9 +51,18 @@ class RelationTest extends DatabaseTestCase
 
     public function testLast()
     {
-        $authors = Author::all()->to_a();
         $author = Author::last();
         $this->assertInstanceOf(Author::class, $author);
+
+        $author2 = Author::last(1);
+        $this->assertIsArray($author2);
+        $this->assertEquals($author2[0], $author);
+
+        $author3 = Author::all()->last;
+        $this->assertInstanceOf(Author::class, $author3);
+        $this->assertEquals($author3, $author);
+
+        $authors = Author::all()->to_a();
         $this->assertEquals($author, $authors[count($authors)-1]);
     }
 
@@ -71,6 +81,33 @@ class RelationTest extends DatabaseTestCase
         $authors = Author::limit(1)->last(2);
         $this->assertIsArray($authors);
         $this->assertEquals(2, count($authors));
+    }
+
+    public function testLastNull()
+    {
+        $query = Author::where(['mixedCaseField' => 'Does not exist'])->last();
+        $this->assertEquals(null, $query);
+    }
+
+    public function testMagicGetters()
+    {
+        $author = Author::first();
+        $author2 = Author::all()->first;
+        $this->assertEquals($author, $author2);
+
+        $author = Author::last();
+        $author2 = Author::all()->last;
+        $this->assertEquals($author, $author2);
+
+        $author = Author::take();
+        $author2 = Author::all()->take;
+        $this->assertEquals($author, $author2);
+    }
+
+    public function testMagicGettersUndefinedFunction()
+    {
+        $this->expectException(UndefinedPropertyException::class);
+        $author = Author::all()->functionDoesNotExist;
     }
 
     public function testFindSingleArrayElementNotFound()
@@ -131,6 +168,26 @@ class RelationTest extends DatabaseTestCase
         $authors = Author::where(['name' => 'Bill Clinton'])->to_a();
         $this->assertEquals(1, count($authors));
         $this->assertEquals('Bill Clinton', $authors[0]->name);
+    }
+
+    public function testSelect()
+    {
+        $relation = Author::select('name')->where("mixedCaseField = 'Bill'")->last;
+        $this->assertEquals('Uncle Bob', $relation->name);
+
+        $this->expectException(UndefinedPropertyException::class);
+        $columnNotInSelectList = $relation->parent_author_id;
+    }
+
+    public function testSelectChainedSelects()
+    {
+        $relation = Author::select('name,name')->select('author_id');
+        $options = $this->getPrivateVariable($relation, 'options');
+        $this->assertEquals(['name', 'author_id'], $options['select']);
+
+        $relation = Author::select('name')->select('*');
+        $options = $this->getPrivateVariable($relation, 'options');
+        $this->assertEquals(['*'], $options['select']);
     }
 
     public function testWhereOrder()

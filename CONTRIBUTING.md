@@ -94,10 +94,6 @@ If Docker is not available to you, or you would simply not use it, you will have
 ```sh
 composer style-check
 ```
-and fix it with:
-```sh
-composer style-fix
-```
 
 #### Static analysis
 
