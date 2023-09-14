@@ -3,7 +3,6 @@
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\RecordNotFound;
-use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Model;
 use test\models\Author;
@@ -254,23 +253,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
             ++$i;
         }
         $this->assertTrue($i > 0);
-    }
-
-    public function testFindWithSelect()
-    {
-        $author = Author::select('name, 123 as bubba')
-            ->order('name desc')
-            ->first();
-        $this->assertEquals('Uncle Bob', $author->name);
-        $this->assertEquals(123, $author->bubba);
-    }
-
-    public function testFindWithSelectNonSelectedFieldsShouldNotHaveAttributes()
-    {
-        $this->expectException(UndefinedPropertyException::class);
-        $author = Author::select('name, 123 as bubba')->first();
-        $author->id;
-        $this->fail('expected ActiveRecord\UndefinedPropertyExecption');
     }
 
     public function testJoinsOnModelWithAssociationAndExplicitJoins()

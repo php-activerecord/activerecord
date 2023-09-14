@@ -8,6 +8,7 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
 /**
@@ -90,14 +91,53 @@ class Relation implements \Iterator
     }
 
     /**
-     * @param string|array<string> $columns
+     * Modifies the SELECT statement for the query so that only certain
+     * fields are retrieved.
+     *
+     * // string
+     * Book::select("name")->take();  // SELECT name FROM `books`
+     *                                // ORDER BY book_id ASC LIMIT 1
+     *
+     * // array
+     * Book::select([                 // SELECT name, publisher FROM `books`
+     *   "name",                      // ORDER BY book_id ASC LIMIT 1
+     *   "publisher"
+     * ])
+     *
+     * // list of strings
+     * Book::select(                  // SELECT name, publisher FROM `books`
+     *   "name",                      // ORDER BY book_id ASC LIMIT 1
+     *   "publisher"
+     * )
+     *
+     * You can also use one or more strings, which will be used unchanged as SELECT fields:
+     *
+     * Book::select([                 // SELECT name as title, 123 as ISBN
+     *   'name AS title',             // FROM `authors` ORDER BY title desc LIMIT 1
+     *   '123 AS ISBN'
+     * ])
+     *
+     * If an alias was specified, it will be accessible from the resulting objects:
+     *
+     * Book::select('name AS title')
+     *   ->first()
+     *   ->title
+     *
+     * Accessing attributes of an object that do not have fields retrieved by a select
+     * except +id+ will throw ActiveRecord::UndefinedPropertyException:
+     *
+     * Book::select("name")->first()->publisher
+     * => ActiveRecord::UndefinedPropertyException: missing attribute: publisher
+     *
+     * @see UndefinedPropertyException
      *
      * @return Relation<TModel>
      */
-    public function select(string|array $columns): Relation
+    public function select(): Relation
     {
+        $arg = static::toSingleArg(...func_get_args());
         $this->options['select'] ??= [];
-        $this->options['select'] = array_merge((array) $this->options['select'], (array) $columns);
+        $this->options['select'] = array_merge((array) $this->options['select'], (array) $arg);
 
         return $this;
     }
