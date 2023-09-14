@@ -140,7 +140,7 @@ class Relation implements \Iterator
         $this->options['select'] ??= [];
 
         if (!is_array($columns)) {
-            $columns = explode(',', $columns);
+            $columns = array_map('trim', explode(',', $columns));
         }
 
         $this->options['select'] = array_unique(array_merge((array) $this->options['select'], (array) $columns));
