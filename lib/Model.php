@@ -1590,15 +1590,13 @@ class Model
     }
 
     /**
-     * @param string|array<string> $columns
-     *
      * @return Relation<static>
      *
      *@see Relation::select()
      */
-    public static function select(string|array $columns='*'): Relation
+    public static function select(): Relation
     {
-        return static::Relation()->select($columns);
+        return static::Relation()->select(...func_get_args());
     }
 
     /**
