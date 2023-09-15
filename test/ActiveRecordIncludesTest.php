@@ -2,9 +2,6 @@
 
 namespace test;
 
-use ActiveRecord\Exception\UndefinedPropertyException;
-use test\models\Author;
-use test\models\Book;
 use test\models\Venue;
 
 class ActiveRecordIncludesTest extends \DatabaseTestCase
