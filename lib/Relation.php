@@ -247,13 +247,39 @@ class Relation implements \Iterator
     }
 
     /**
-     * @param string|array<string|mixed> $include
+     * The purpose of includes is to solve N+1 problems in relational situations.
+     * Let's say you have an Author, and authors write many Books. You would
+     * ordinarily need to execute one query (+1) to retrieve the Author,
+     * then one query for each of his books (N).
+     *
+     * You can avoid this problem by specifying relationships to be included in the
+     * result set. For example:
+     *
+     * $users = User::includes('address');
+     *  foreach($users as $user) {
+     *    $user->address->city
+     *  }
+     *
+     * ...allows you to access the address attribute of the User model without
+     * firing an additional query. This will often result in a performance
+     * improvement over a simple join.  You can also specify multiple
+     * relationships, like this:
+     *
+     * $users = User::includes('address', 'friends');
+     *
+     * Loading nested relationships is possible using a Hash:
+     *
+     * $users = User::includes(
+     *   'address',
+     *   'friends' => ['address', 'followers']
+     * )
      *
      * @return Relation<TModel>
      */
-    public function include(string|array $include): Relation
+    public function includes(): Relation
     {
-        $this->options['include'] = $include;
+        $includes = static::toSingleArg(...func_get_args());
+        $this->options['include'] = $includes;
 
         return $this;
     }
