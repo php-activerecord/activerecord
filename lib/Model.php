@@ -1766,24 +1766,30 @@ class Model
 
     /**
      * @see Relation::take()
+     *
+     * @return static|array<static>|null
      */
-    public static function take(int $limit = null): mixed
+    public static function take(int $limit = null): Model|array|null
     {
         return static::Relation()->take($limit);
     }
 
     /**
      * @see Relation::first()
+     *
+     * @return static|array<static>|null
      */
-    public static function first(int $limit = null): mixed
+    public static function first(int $limit = null): Model|array|null
     {
         return static::Relation()->first($limit);
     }
 
     /**
      * @see Relation::last()
+     *
+     * @return static|array<static>|null
      */
-    public static function last(int $limit = null): mixed
+    public static function last(int $limit = null): Model|array|null
     {
         return static::Relation()->last($limit);
     }
