@@ -170,26 +170,6 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Bill Clinton', $authors[0]->name);
     }
 
-    public function testSelect()
-    {
-        $relation = Author::select('name')->where("mixedCaseField = 'Bill'")->last;
-        $this->assertEquals('Uncle Bob', $relation->name);
-
-        $this->expectException(UndefinedPropertyException::class);
-        $columnNotInSelectList = $relation->parent_author_id;
-    }
-
-    public function testSelectChainedSelects()
-    {
-        $relation = Author::select('name,name')->select('author_id');
-        $options = $this->getPrivateVariable($relation, 'options');
-        $this->assertEquals(['name', 'author_id'], $options['select']);
-
-        $relation = Author::select('name')->select('*');
-        $options = $this->getPrivateVariable($relation, 'options');
-        $this->assertEquals(['*'], $options['select']);
-    }
-
     public function testWhereOrder()
     {
         $relation = Author::select('name')->where("mixedCaseField = 'Bill'");
