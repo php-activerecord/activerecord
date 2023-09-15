@@ -731,6 +731,21 @@ class Relation implements \Iterator
     }
 
     /**
+     * Returns sql statement for the relation.
+     *
+     * User::where([            // SELECT "users".* FROM "users"
+     *   'name' => 'Oscar'      // WHERE "users"."name" = 'Oscar'
+     * ])->to_sql()
+     *
+     * @throws Exception\ActiveRecordException
+     * @throws Exception\RelationshipException
+     */
+    public function to_sql(): string {
+        $this->options['mapped_names'] = $this->alias_attribute;
+        return $this->table()->options_to_sql($this->options);
+    }
+
+    /**
      * Returns a hash containing the names => values of the primary key.
      *
      * @param int|array<number|string> $args Primary key value(s)

@@ -200,6 +200,10 @@ class Table
      */
     public function options_to_sql(array $options): SQLBuilder
     {
+        if (!empty($options['having']) && empty($options['group'])) {
+            throw new ValidationsArgumentError("You must provide a 'group' value when using 'having'");
+        }
+
         $table = $options['from'] ?? $this->get_fully_qualified_table_name();
         $sql = new SQLBuilder($this->conn, $table);
 
@@ -253,11 +257,7 @@ class Table
     public function find(array $options): \Generator
     {
         $sql = $this->options_to_sql($options);
-        $readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
-
-        if (!empty($options['having']) && empty($options['group'])) {
-            throw new ValidationsArgumentError("You must provide a 'group' value when using 'having'");
-        }
+        $readonly = array_key_exists('readonly', $options) && $options['readonly'];
 
         return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, (array) ($options['include'] ?? []));
     }
