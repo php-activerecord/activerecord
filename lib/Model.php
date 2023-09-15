@@ -1600,6 +1600,16 @@ class Model
     }
 
     /**
+     * @return Relation<static>
+     *
+     *@see Relation::reselect()
+     */
+    public static function reselect(): Relation
+    {
+        return static::Relation()->reselect(...func_get_args());
+    }
+
+    /**
      * @see Relation::readonly()
      *
      * @return Relation<static>
@@ -1715,11 +1725,23 @@ class Model
     }
 
     /**
+     * @see Relation::all()
+     *
      * @return Relation<static>
      */
     public static function all(): Relation
     {
         return static::Relation()->all();
+    }
+
+    /**
+     * @see Relation::none()
+     *
+     * @return Relation<static>
+     */
+    public static function none(): Relation
+    {
+        return static::Relation()->none();
     }
 
     /**
@@ -1743,6 +1765,7 @@ class Model
      * ```
      * YourModel::count('amount > 3.14159265');
      * YourModel::count(['name' => 'Tito', 'author_id' => 1]));
+     * YourModel::count();
      * ```
      *
      * @see find
@@ -1751,7 +1774,14 @@ class Model
      */
     public static function count(/* ... */): int
     {
-        return static::Relation()->count(...func_get_args());
+        $relation = static::Relation();
+
+        $arg = Relation::toSingleArg(...func_get_args());
+        if (null != $arg && count($arg) > 0) {
+            $relation = $relation->where($arg);
+        }
+
+        return $relation->count();
     }
 
     /**
@@ -1765,11 +1795,31 @@ class Model
     }
 
     /**
+     * @see Relation::pluck()
+     *
+     * @return array<static>
+     */
+    public static function pluck(): array
+    {
+        return static::Relation()->pluck(...func_get_args());
+    }
+
+    /**
+     * @see Relation::ids()
+     *
+     * @return array<static>
+     */
+    public static function ids(): array
+    {
+        return static::Relation()->ids();
+    }
+
+    /**
      * @see Relation::take()
      *
      * @return static|array<static>|null
      */
-    public static function take(int $limit = null): Model|array|null
+    public static function take(int $limit = null): static|array|null
     {
         return static::Relation()->take($limit);
     }
@@ -1779,7 +1829,7 @@ class Model
      *
      * @return static|array<static>|null
      */
-    public static function first(int $limit = null): Model|array|null
+    public static function first(int $limit = null): static|array|null
     {
         return static::Relation()->first($limit);
     }
@@ -1789,7 +1839,7 @@ class Model
      *
      * @return static|array<static>|null
      */
-    public static function last(int $limit = null): Model|array|null
+    public static function last(int $limit = null): static|array|null
     {
         return static::Relation()->last($limit);
     }

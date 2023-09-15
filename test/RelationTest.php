@@ -96,6 +96,21 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Bill Clinton', $model->name);
     }
 
+    public function testReverseOrder()
+    {
+        $relation = Author::where(['mixedCaseField' => 'Bill']);
+
+        $authors = $relation->to_a();
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Bill Clinton', $authors[0]->name);
+        $this->assertEquals('Uncle Bob', $authors[1]->name);
+
+        $authors = $relation->reverse_order();
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Uncle Bob', $authors[0]->name);
+        $this->assertEquals('Bill Clinton', $authors[1]->name);
+    }
+
     public function testAllNoParameters()
     {
         $authors = Author::all()->to_a();

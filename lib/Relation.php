@@ -8,7 +8,6 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
-use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
 /**
@@ -67,6 +66,11 @@ class Relation implements \Iterator
     private array $options = [];
 
     /**
+     * @var bool Whether $this->none() was ever called
+     */
+    private bool $isNone = false;
+
+    /**
      * @param class-string    $className
      * @param array<string>   $alias_attribute
      * @param RelationOptions $options
@@ -91,35 +95,72 @@ class Relation implements \Iterator
     }
 
     /**
-     * Allows for calling functions without brackets, eg) $this->last
-     *
-     * @param string $propertyName Supports only first|last|take
-     *
-     * @throws UndefinedPropertyException if $propertyName is not in supported list
-     *
-     * @return TModel|null
+     * Returns a blank Relation and fires no queries. Any subsequent call to find(), to_a(), last(), first() returns []
      */
-    public function __get(string $propertyName): Model|null
+    public function none(): Relation
     {
-        switch ($propertyName) {
-            case 'first':
-                $models = $this->firstImpl();
-                break;
-            case 'last':
-                $models = $this->lastImpl();
-                break;
-            case 'take':
-                $models = $this->takeImpl();
-                break;
-            default:
-                throw new UndefinedPropertyException(get_called_class(), $propertyName);
-        }
+        $this->isNone = true;
 
-        return $models[0] ?? null;
+        return $this;
     }
 
     /**
-     * Selects columns in a table
+     * Plucks the columns from the table, returning an column_value[] rather than a Model[]
+     *
+     * $this->where(['name' => 'Bill'])->pluck('id') // returns [1]
+     * $this->where(['age' => 42])->pluck('id', 'name') // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
+     * $this->where(['age' => 42])->pluck('id, name') // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
+     * $this->where(['age' => 42])->pluck(['id', 'name']) // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
+     *
+     * @return array<mixed>
+     */
+    public function pluck(): array
+    {
+        $columns = $this->possibleListToArray(...func_get_args());
+        if (0 === count($columns)) {
+            throw new ValidationsArgumentError('pluck requires at least one argument');
+        }
+
+        $oldSelect = array_key_exists('select', $this->options) ? $this->options['select'] : null;
+        $this->reselect($columns);
+
+        $models = $this->to_a();
+
+        if (null === $oldSelect) {
+            unset($this->options['select']);
+        } else {
+            $this->options['select'] = $oldSelect;
+        }
+
+        $retValue = [];
+        foreach ($models as $model) {
+            $row = [];
+            foreach ($columns as $column) {
+                array_push($row, $model->$column);
+            }
+            if (1 === count($row)) {
+                $row = $row[0];
+            }
+            array_push($retValue, $row);
+        }
+
+        return $retValue;
+    }
+
+    /**
+     * Plucks the primary keys from the table
+     *
+     * @return array<mixed>
+     */
+    public function ids(): array
+    {
+        $pk = $this->table()->pk;
+
+        return $this->pluck(1 === count($pk) ? $pk[0] : $pk);
+    }
+
+    /**
+     * Selects columns in a table, anding previous calls to select()
      *
      * The following three statements will all generate the same SQL
      * Author::select('A,B,C,D')->find(2)
@@ -131,25 +172,47 @@ class Relation implements \Iterator
      * FROM Author
      * WHERE ID = 2
      *
-     * @param string|array<string> $columns
+     * @return Relation<TModel>
+     */
+    public function select(): Relation
+    {
+        $columns = $this->possibleListToArray(...func_get_args());
+        $this->options['select'] ??= [];
+        $columns = array_merge((array) $this->options['select'], $columns);
+
+        return $this->reselect($columns);
+    }
+
+    /**
+     * Selects columns in a table, overriding previous calls to select()
      *
      * @return Relation<TModel>
      */
-    public function select(string|array $columns = '*'): Relation
+    public function reselect(): Relation
     {
-        $arg = static::toSingleArg(...func_get_args());
-        $this->options['select'] ??= [];
+        $columns = array_unique($this->possibleListToArray(...func_get_args()));
 
-        if (!is_array($columns)) {
-            $columns = array_map('trim', explode(',', $columns));
+        if (in_array('*', $columns)) {
+            $columns = ['*'];
         }
-
-        $this->options['select'] = array_unique(array_merge((array) $this->options['select'], (array) $columns));
-        if (in_array('*', $this->options['select'])) {
-            $this->options['select'] = ['*'];
-        }
+        $this->options['select'] = $columns;
 
         return $this;
+    }
+
+    /**
+     * Converts "name,id" to ["name", "id"] if necessary
+     *
+     * @return array<string>
+     */
+    private function possibleListToArray(): array
+    {
+        $args = static::toSingleArg(...func_get_args());
+        if (!is_array($args)) {
+            $args = array_map('trim', explode(',', $args));
+        }
+
+        return $args;
     }
 
     /**
@@ -224,7 +287,7 @@ class Relation implements \Iterator
      * User::group("name")      // SELECT "users".*
      *                          // FROM "users" GROUP BY name
      *
-     * Returns an array with distinct records based on the group attribute:
+     * Returns an array with records based on the group attribute:
      *
      * User::select(["id", "name"])             // [
      *                                          //      <User id: 1, name: "Oscar">,
@@ -422,13 +485,11 @@ class Relation implements \Iterator
     public static function toSingleArg(): mixed
     {
         $args = func_get_args();
-        if (count($args) > 1) {
-            $arg = $args;
-        } else {
-            $arg = $args[0];
+        if (1 === count($args)) {
+            $args = $args[0];
         }
 
-        return $arg;
+        return $args;
     }
 
     /**
@@ -523,8 +584,12 @@ class Relation implements \Iterator
      *
      * @return Model|array<Model>
      */
-    public function find()
+    public function find(): Model|array
     {
+        if ($this->isNone) {
+            throw new RecordNotFound('tbd');
+        }
+
         $args = func_get_args();
         $num_args = count($args);
 
@@ -565,19 +630,10 @@ class Relation implements \Iterator
      */
     public function take(int $limit = null): Model|array|null
     {
-        $models = $this->takeImpl($limit);
+        $this->limit($limit ?? 1);
+        $models = $this->to_a();
 
         return isset($limit) ? $models : $models[0] ?? null;
-    }
-
-    /**
-     * @return array<TModel>
-     */
-    private function takeImpl(int $limit = null): array
-    {
-        $this->limit($limit ?? 1);
-
-        return $this->to_a();
     }
 
     /**
@@ -594,24 +650,9 @@ class Relation implements \Iterator
      */
     public function first(int $limit = null): Model|array|null
     {
-        $models = $this->firstImpl($limit);
+        $models = $this->firstOrLast($limit, true);
 
         return isset($limit) ? $models : $models[0] ?? null;
-    }
-
-    /**
-     * @return array<TModel>
-     */
-    private function firstImpl(int $limit = null): array
-    {
-        $this->limit($limit ?? 1);
-
-        $pk = $this->table()->pk;
-        if (!empty($pk) && !array_key_exists('order', $this->options) && !array_key_exists('group', $this->options)) {
-            $this->options['order'] = implode(' ASC, ', $this->table()->pk) . ' ASC';
-        }
-
-        return $this->to_a();
     }
 
     /**
@@ -630,24 +671,50 @@ class Relation implements \Iterator
      */
     public function last(int $limit = null): Model|array|null
     {
-        $models = $this->lastImpl($limit);
+        $models = $this->firstOrLast($limit, false);
 
         return isset($limit) ? $models : $models[0] ?? null;
     }
 
     /**
+     * Reverses the ordering clause if specified; otherwise, sorts in descending order by primary key
+     * as returning in ascending order is the default
+     *
      * @return array<TModel>
      */
-    private function lastImpl(int $limit = null): array
+    public function reverse_order(): Model|array|null
+    {
+        $pk = $this->table()->pk;
+        if (!empty($pk)) {
+            if (array_key_exists('order', $this->options)) {
+                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+            } else {
+                $this->options['order'] = implode(' DESC, ', $this->table()->pk) . ' DESC';
+            }
+        }
+
+        return $this->to_a();
+    }
+
+    /**
+     * @return array<TModel>
+     */
+    private function firstOrLast(int $limit = null, bool $isAscending): array
     {
         $this->limit($limit ?? 1);
 
-        if (array_key_exists('order', $this->options)) {
-            if (str_contains($this->options['order'], implode(' ASC, ', $this->table()->pk) . ' ASC')) {
-                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+        $pk = $this->table()->pk;
+        if (!empty($pk)) {
+            if (array_key_exists('order', $this->options)) {
+                $reverseCommand = $isAscending ? 'DESC' : 'ASC';
+
+                if (str_contains($this->options['order'], implode(" {$reverseCommand}, ", $this->table()->pk) . " {$reverseCommand}")) {
+                    $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+                }
+            } else {
+                $command = $isAscending ? 'ASC' : 'DESC';
+                $this->options['order'] = implode(" {$command}, ", $this->table()->pk) . " {$command}";
             }
-        } else {
-            $this->options['order'] = implode(' DESC, ', $this->table()->pk) . ' DESC';
         }
 
         return $this->to_a();
@@ -660,6 +727,10 @@ class Relation implements \Iterator
      */
     public function to_a(): array
     {
+        if ($this->isNone) {
+            return [];
+        }
+
         $this->options['mapped_names'] = $this->alias_attribute;
 
         return iterator_to_array($this->table()->find($this->options));
@@ -687,9 +758,9 @@ class Relation implements \Iterator
      * Get a count of qualifying records.
      *
      * ```
-     * People::count() // all
-     * People::count('name'); // SELECT COUNT("people"."age") FROM "people"
-     * People::count(['conditions' => "age > 30"])
+     * People::count() // Return the number of records in table
+     * People::count('title'); // Return the number of people who have a title
+     * People::where('name' => 'Bill').count() // Return the number of people whose name is Bill
      *
      * ```
      *
@@ -699,12 +770,22 @@ class Relation implements \Iterator
      */
     public function count(): int
     {
-        unset($this->options['select']);
-        $this->select('COUNT(*)');
+        if ($this->isNone) {
+            return 0;
+        }
+
+        $oldSelect = array_key_exists('select', $this->options) ? $this->options['select'] : null;
+        $this->reselect('COUNT(*)');
 
         $table = $this->table();
         $sql = $table->options_to_sql($this->options);
         $values = $sql->get_where_values();
+
+        if (null === $oldSelect) {
+            unset($this->options['select']);
+        } else {
+            $this->options['select'] = $oldSelect;
+        }
 
         return $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
     }
