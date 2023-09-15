@@ -260,7 +260,7 @@ class Relation implements \Iterator
      *    $user->address->city
      *  }
      *
-     * allows you to access the address attribute of the User model without
+     * ...allows you to access the address attribute of the User model without
      * firing an additional query. This will often result in a performance
      * improvement over a simple join.  You can also specify multiple
      * relationships, like this:
