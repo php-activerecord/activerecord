@@ -5,21 +5,30 @@ namespace test;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use test\models\Author;
 
-class ActiveRecordFirstTest extends \DatabaseTestCase
+class ActiveRecordFirstLastTest extends \DatabaseTestCase
 {
     public function testFirstNoArguments()
     {
         $author = Author::first();
+        $this->assertInstanceOf(Author::class, $author);
         $this->assertEquals(1, $author->author_id);
         $this->assertEquals('Tito', $author->name);
     }
 
     public function testFirstSingleArgument()
     {
-        $authors = Author::first(1);
+        $authors = Author::first(2);
         $this->assertIsArray($authors);
+        $this->assertEquals(2, count($authors));
         $this->assertEquals(1, $authors[0]->author_id);
         $this->assertEquals('Tito', $authors[0]->name);
+    }
+
+    public function testFirstWithCountOverridesLimit()
+    {
+        $authors = Author::limit(1)->first(2);
+        $this->assertIsArray($authors);
+        $this->assertEquals(2, count($authors));
     }
 
     public function testFirstChainedFromWhere()
@@ -65,5 +74,41 @@ class ActiveRecordFirstTest extends \DatabaseTestCase
         $author = Author::select('name, 123 as bubba')->first();
         $author->id;
         $this->fail('expected ActiveRecord\UndefinedPropertyExecption');
+    }
+
+    public function testLast()
+    {
+        $author = Author::last();
+        $this->assertInstanceOf(Author::class, $author);
+
+        $author2 = Author::last(1);
+        $this->assertIsArray($author2);
+        $this->assertEquals($author2[0], $author);
+
+        $authors = Author::all()->to_a();
+        $this->assertEquals($author, $authors[count($authors)-1]);
+    }
+
+    public function testLastWithCount()
+    {
+        $allAuthors = Author::all()->to_a();
+        $authors = Author::last(2);
+        $this->assertIsArray($authors);
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals($allAuthors[count($allAuthors)-1], $authors[0]);
+        $this->assertEquals($allAuthors[count($allAuthors)-2], $authors[1]);
+    }
+
+    public function testLastWithCountOverridesLimit()
+    {
+        $authors = Author::limit(1)->last(2);
+        $this->assertIsArray($authors);
+        $this->assertEquals(2, count($authors));
+    }
+
+    public function testLastNull()
+    {
+        $query = Author::where(['mixedCaseField' => 'Does not exist'])->last();
+        $this->assertEquals(null, $query);
     }
 }
