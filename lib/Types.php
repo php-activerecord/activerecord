@@ -12,11 +12,11 @@ namespace ActiveRecord;
  *  set?: string|array<string, mixed>
  * }
  * @phpstan-type HasManyOptions array{
+ *  group?: string,
  *  limit?: int,
  *  offset?: int,
- *  primary_key?: string|array<string>,
- *  group?: string,
  *  order?: string,
+ *  primary_key?: string|array<string>,
  *  through?: string
  * }
  * @phpstan-type HasAndBelongsToManyOptions array{

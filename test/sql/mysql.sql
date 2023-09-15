@@ -116,3 +116,19 @@ CREATE TABLE valuestore (
   `key` varchar(20) NOT NULL DEFAULT '',
   `value` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB;
+
+CREATE TABLE students (
+  student_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE courses (
+  course_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE courses_students(
+  `course_id` int(11) NOT NULL DEFAULT '0',
+  `student_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY(course_id, student_id)
+);

@@ -13,7 +13,6 @@ use ActiveRecord\Types;
  *
  * @phpstan-import-type HasAndBelongsToManyOptions from Types
  *
- * @see http://www.phpactiverecord.org/guides/associations
  */
 class HasAndBelongsToMany extends AbstractRelationship
 {
