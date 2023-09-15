@@ -202,15 +202,20 @@ class ConfigTest extends TestCase
             ->method('info');
 
         Config::instance()->set_logger($loggerMock);
-        Config::instance()->set_logging($oldLogging);
+        Config::instance()->set_logging(true);
 
         \test\models\Book::find(1);
 
+        $loggerMock = $this->createMock(TestLogger::class);
         $loggerMock
             ->expects($this->exactly(0))
             ->method('info');
+        Config::instance()->set_logger($loggerMock);
+        Config::instance()->set_logging(false);
 
-        $this->config->set_logging(false);
+        \test\models\Book::find(1);
+
+        Config::instance()->set_logging($oldLogging);
         Config::instance()->set_logger($oldLogger);
     }
 
