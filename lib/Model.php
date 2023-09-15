@@ -1691,9 +1691,9 @@ class Model
      *
      * @return Relation<static>
      */
-    public static function include(string|array $include): Relation
+    public static function includes(): Relation
     {
-        return static::Relation()->include($include);
+        return static::Relation()->includes(...func_get_args());
     }
 
     /**
