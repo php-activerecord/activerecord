@@ -36,8 +36,8 @@ class RelationTester
     /**
      * @return Relation<Book>
      */
-    public function include(): Relation
+    public function includes(): Relation
     {
-        return Book::include([]);
+        return Book::includes([]);
     }
 }

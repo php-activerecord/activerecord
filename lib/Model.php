@@ -1590,15 +1590,13 @@ class Model
     }
 
     /**
-     * @param string|array<string> $columns
-     *
      * @return Relation<static>
      *
      *@see Relation::select()
      */
-    public static function select(string|array $columns='*'): Relation
+    public static function select(): Relation
     {
-        return static::Relation()->select($columns);
+        return static::Relation()->select(...func_get_args());
     }
 
     /**
@@ -1643,9 +1641,9 @@ class Model
      *
      * @return Relation<static>
      */
-    public static function group(string $columns): Relation
+    public static function group(): Relation
     {
-        return static::Relation()->group($columns);
+        return static::Relation()->group(...func_get_args());
     }
 
     /**
@@ -1689,13 +1687,11 @@ class Model
     }
 
     /**
-     * @param string|array<string|mixed> $include
-     *
      * @return Relation<static>
      */
-    public static function include(string|array $include): Relation
+    public static function includes(): Relation
     {
-        return static::Relation()->include($include);
+        return static::Relation()->includes(...func_get_args());
     }
 
     /**
@@ -1771,7 +1767,7 @@ class Model
     /**
      * @see Relation::take()
      *
-     * @return Model|array<Model>|null
+     * @return static|array<static>|null
      */
     public static function take(int $limit = null): Model|array|null
     {
@@ -1781,7 +1777,7 @@ class Model
     /**
      * @see Relation::first()
      *
-     * @return Model|Model[]|null
+     * @return static|array<static>|null
      */
     public static function first(int $limit = null): Model|array|null
     {
@@ -1791,7 +1787,7 @@ class Model
     /**
      * @see Relation::last()
      *
-     * @return Model|Model[]|null
+     * @return static|array<static>|null
      */
     public static function last(int $limit = null): Model|array|null
     {

@@ -301,11 +301,20 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Uncle Bob', $authors[0]->name);
     }
 
-    public function testModelToRelation()
+    public function testModelToRelation(): void
     {
         $this->assertInstanceOf(Relation::class, Author::offset(0));
         $this->assertInstanceOf(Relation::class, Author::group('name'));
         $this->assertInstanceOf(Relation::class, Author::having('length(name) > 2'));
+    }
+
+    public function testToSql(): void
+    {
+        $this->assertEquals(
+            'SELECT * FROM `books` WHERE name = ? ORDER BY name',
+            \test\models\Book::where('name = ?', 'The Art of Main Tanking')
+                ->order('name')->to_sql()
+        );
     }
 
     public function testGroupRequiredWhenUsingHaving()
