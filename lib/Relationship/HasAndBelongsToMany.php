@@ -12,12 +12,10 @@ use ActiveRecord\Types;
  * @package ActiveRecord
  *
  * @phpstan-import-type HasAndBelongsToManyOptions from Types
- *
  */
 class HasAndBelongsToMany extends AbstractRelationship
 {
     /**
-     * @param string $attribute
      * @param HasAndBelongsToManyOptions $options
      */
     public function __construct(string $attribute, array $options = [])

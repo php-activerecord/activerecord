@@ -15,7 +15,6 @@ use test\models\Host;
 use test\models\JoinBook;
 use test\models\Position;
 use test\models\Property;
-use test\models\Student;
 use test\models\Venue;
 
 class NotModel

@@ -26,7 +26,6 @@ namespace ActiveRecord;
  *  uniq?: bool,
  *  validate?: bool
  * }
-
  * @phpstan-type BelongsToOptions array{
  *  conditions?: array<mixed>,
  *  foreign_key?: string,
