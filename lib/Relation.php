@@ -8,6 +8,7 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
+use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
 /**
@@ -90,14 +91,53 @@ class Relation implements \Iterator
     }
 
     /**
-     * @param string|array<string> $columns
+     * Modifies the SELECT statement for the query so that only certain
+     * fields are retrieved.
+     *
+     * // string
+     * Book::select("name")->take();  // SELECT name FROM `books`
+     *                                // ORDER BY book_id ASC LIMIT 1
+     *
+     * // array
+     * Book::select([                 // SELECT name, publisher FROM `books`
+     *   "name",                      // ORDER BY book_id ASC LIMIT 1
+     *   "publisher"
+     * ])
+     *
+     * // list of strings
+     * Book::select(                  // SELECT name, publisher FROM `books`
+     *   "name",                      // ORDER BY book_id ASC LIMIT 1
+     *   "publisher"
+     * )
+     *
+     * You can also use one or more strings, which will be used unchanged as SELECT fields:
+     *
+     * Book::select([                 // SELECT name as title, 123 as ISBN
+     *   'name AS title',             // FROM `authors` ORDER BY title desc LIMIT 1
+     *   '123 AS ISBN'
+     * ])
+     *
+     * If an alias was specified, it will be accessible from the resulting objects:
+     *
+     * Book::select('name AS title')
+     *   ->first()
+     *   ->title
+     *
+     * Accessing attributes of an object that do not have fields retrieved by a select
+     * except +id+ will throw ActiveRecord::UndefinedPropertyException:
+     *
+     * Book::select("name")->first()->publisher
+     * => ActiveRecord::UndefinedPropertyException: missing attribute: publisher
+     *
+     * @see UndefinedPropertyException
      *
      * @return Relation<TModel>
      */
-    public function select(string|array $columns): Relation
+    public function select(): Relation
     {
+        $arg = static::toSingleArg(...func_get_args());
         $this->options['select'] ??= [];
-        $this->options['select'] = array_merge((array) $this->options['select'], (array) $columns);
+        $this->options['select'] = array_merge((array) $this->options['select'], (array) $arg);
 
         return $this;
     }
@@ -129,6 +169,21 @@ class Relation implements \Iterator
     }
 
     /**
+     * Applies an ```ORDER BY``` clause to a query.
+     *
+     * This could be a source of SQL injection, so only strings composed of plain
+     * column names and simple ```function(column_name)``` expressions
+     * with optional ASC/DESC modifiers are allowed.
+     *
+     * User::order('name')              // SELECT "users".*
+     *                                  // FROM "users" ORDER BY name
+     *
+     * User::order('name DESC')         // SELECT "users".*
+     *                                  // FROM "users" ORDER BY name DESC
+     *
+     * User::order('name DESC, email')  // SELECT "users".*
+     *                                  // FROM "users" ORDER BY name DESC, email
+     *
      * @return Relation<TModel>
      */
     public function order(string $order): Relation
@@ -154,11 +209,51 @@ class Relation implements \Iterator
     }
 
     /**
+     * Allows to specify a group attribute:
+     *
+     * User::group("name")      // SELECT "users".*
+     *                          // FROM "users" GROUP BY name
+     *
+     * Returns an array with distinct records based on the group attribute:
+     *
+     * User::select(["id", "name"])             // [
+     *                                          //      <User id: 1, name: "Oscar">,
+     *                                          //      <User id: 2, name: "Oscar">,
+     *                                          //      <User id: 3, name: "Foo">
+     *                                          // ]
+     *
+     * User::group('name')                      // [
+     *                                          //      <User id: 3, name: "Foo", ...>,
+     *                                          //      <User id: 2, name: "Oscar", ...>
+     *                                          // ]
+     *
+     * User::group('name AS grouped_name, age') // [
+     *                                          //      <User id: 3, name: "Foo", age: 21, ...>,
+     *                                          //      <User id: 2, name: "Oscar", age: 21, ...>,
+     *                                          //      <User id: 5, name: "Foo", age: 23, ...>
+     *                                          // ]
+     *
+     * Passing in an array of attributes to group by is also supported.
+     *
+     * User::select(['id', 'first_name'])       // [
+     *  ->group(['id', 'first_name'])           //      <User id: 1, first_name: "Bill">
+     *  ->first(3)                              //      <User id: 2, first_name: "Earl">,
+     *                                          //      <User id: 3, first_name: "Beto">
+     *                                          // ]
+     *
+     * A list of arguments is also supported.
+     *
+     * User::select('id', 'first_name')         // [
+     *  ->group('id', 'first_name')             //      <User id: 1, first_name: "Bill">
+     *  ->first(3)                              //      <User id: 2, first_name: "Earl">,
+     *                                          //      <User id: 3, first_name: "Beto">
+     *                                          // ]
+     *
      * @return Relation<TModel>
      */
-    public function group(string $columns): Relation
+    public function group(): Relation
     {
-        $this->options['group'] = $columns;
+        $this->options['group'] = static::toSingleArg(...func_get_args());
 
         return $this;
     }
@@ -207,13 +302,39 @@ class Relation implements \Iterator
     }
 
     /**
-     * @param string|array<string|mixed> $include
+     * The purpose of includes is to solve N+1 problems in relational situations.
+     * Let's say you have an Author, and authors write many Books. You would
+     * ordinarily need to execute one query (+1) to retrieve the Author,
+     * then one query for each of his books (N).
+     *
+     * You can avoid this problem by specifying relationships to be included in the
+     * result set. For example:
+     *
+     * $users = User::includes('address');
+     *  foreach($users as $user) {
+     *    $user->address->city
+     *  }
+     *
+     * ...allows you to access the address attribute of the User model without
+     * firing an additional query. This will often result in a performance
+     * improvement over a simple join.  You can also specify multiple
+     * relationships, like this:
+     *
+     * $users = User::includes('address', 'friends');
+     *
+     * Loading nested relationships is possible using a Hash:
+     *
+     * $users = User::includes(
+     *   'address',
+     *   'friends' => ['address', 'followers']
+     * )
      *
      * @return Relation<TModel>
      */
-    public function include(string|array $include): Relation
+    public function includes(): Relation
     {
-        $this->options['include'] = $include;
+        $includes = static::toSingleArg(...func_get_args());
+        $this->options['include'] = $includes;
 
         return $this;
     }
@@ -235,7 +356,7 @@ class Relation implements \Iterator
      * database type where needed. Elements are inserted into the string
      * in the order in which they appear.
      *
-     * User.where([
+     * User::where([
      *   "name = ? and email = ?",
      *   "Joe",
      *   "joe@example.com"
@@ -246,7 +367,7 @@ class Relation implements \Iterator
      * a hash as the second element of the array. The names in the template
      * are replaced with the corresponding values from the hash.
      *
-     * User.where([
+     * User::where([
      *   "name = :name and email = :email", [
      *     name => "Joe",
      *     email => "joe@example.com"
@@ -256,7 +377,7 @@ class Relation implements \Iterator
      * If where is called with multiple arguments, these are treated as
      * if they were passed as the elements of a single array.
      *
-     * User.where("name = :name and email = :email", [
+     * User::where("name = :name and email = :email", [
      *   name => "Joe",
      *   email => "joe@example.com"
      * ])
@@ -268,7 +389,7 @@ class Relation implements \Iterator
      *
      * Fields can be symbols or strings. Values can be single values, arrays, or ranges.
      *
-     * User.where([
+     * User::where([
      *   'name' => "Joe",
      *   'email' => "joe@example.com"
      * ])
@@ -304,7 +425,7 @@ class Relation implements \Iterator
      * Returns a new relation expressing WHERE !(condition) according to the
      * conditions in the arguments.
      *
-     * not accepts conditions as a string, array, or hash. @See Relation::where
+     * {@link not()} accepts conditions as a string, array, or hash. @See Relation::where
      * for more details on each format.
      *
      * User::where()                  // SELECT * FROM users
@@ -607,6 +728,23 @@ class Relation implements \Iterator
         $res = $this->count();
 
         return $res > 0;
+    }
+
+    /**
+     * Returns sql statement for the relation.
+     *
+     * User::where([            // SELECT "users".* FROM "users"
+     *   'name' => 'Oscar'      // WHERE "users"."name" = 'Oscar'
+     * ])->to_sql()
+     *
+     * @throws Exception\ActiveRecordException
+     * @throws Exception\RelationshipException
+     */
+    public function to_sql(): string
+    {
+        $this->options['mapped_names'] = $this->alias_attribute;
+
+        return $this->table()->options_to_sql($this->options);
     }
 
     /**

@@ -124,7 +124,7 @@ class RelationshipTest extends DatabaseTestCase
     public function testEagerLoadingThreeLevelsDeep()
     {
         /* Before fix Undefined offset: 0 */
-        $venue = Venue::include([
+        $venue = Venue::includes([
             'events'=>[
                 'host'=>[
                     'events'
@@ -706,7 +706,7 @@ class RelationshipTest extends DatabaseTestCase
                 ]
             ]
         ];
-        $venues = Venue::include('events')->find([2, 6]);
+        $venues = Venue::includes('events')->find([2, 6]);
 
         $this->assert_sql_has('WHERE (length(title) = ?) AND (venue_id IN(?,?)) ORDER BY id asc', ActiveRecord\Table::load(Event::class)->last_sql);
         $this->assertEquals(1, count($venues[0]->events));
@@ -724,13 +724,13 @@ class RelationshipTest extends DatabaseTestCase
                 'order' => 'hosts.id asc'
             ]
         ];
-        $venues = Venue::include('hosts')->find([2, 6]);
+        $venues = Venue::includes('hosts')->find([2, 6]);
         $this->assertEquals(2, count($venues));
     }
 
     public function testEagerLoadingHasManyX()
     {
-        $venues = Venue::include('events')->find([2, 6]);
+        $venues = Venue::includes('events')->find([2, 6]);
         $this->assert_sql_has('WHERE venue_id IN(?,?)', ActiveRecord\Table::load(Event::class)->last_sql);
 
         foreach ($venues[0]->events as $event) {
@@ -742,7 +742,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingHasManyWithNoRelatedRows()
     {
-        $venues = Venue::include('events')->find([7, 8]);
+        $venues = Venue::includes('events')->find([7, 8]);
 
         foreach ($venues as $v) {
             $this->assertTrue(empty($v->events));
@@ -758,7 +758,7 @@ class RelationshipTest extends DatabaseTestCase
             'books' => true,
             'awesome_people' => true
         ];
-        $authors = Author::include(['books', 'awesome_people'])
+        $authors = Author::includes(['books', 'awesome_people'])
             ->find([1, 2]);
 
         $assocs = ['books', 'awesome_people'];
@@ -782,7 +782,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingHasManyNested()
     {
-        $venues = Venue::include(['events' => ['host']])
+        $venues = Venue::includes(['events' => ['host']])
             ->find([1, 2]);
 
         $this->assertEquals(2, count($venues));
@@ -803,7 +803,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingBelongsTo()
     {
-        $events = Event::include('venue')
+        $events = Event::includes('venue')
             ->find([1, 2, 3, 5, 7]);
 
         foreach ($events as $event) {
@@ -815,7 +815,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingBelongsToArrayOfIncludes()
     {
-        $events = Event::include(['venue', 'host'])->find([1, 2, 3, 5, 7]);
+        $events = Event::includes(['venue', 'host'])->find([1, 2, 3, 5, 7]);
 
         foreach ($events as $event) {
             $this->assertEquals($event->venue_id, $event->venue->id);
@@ -836,7 +836,7 @@ class RelationshipTest extends DatabaseTestCase
             'author' => true
         ];
 
-        $books = Book::include([
+        $books = Book::includes([
             'author' => [
                 'awesome_people'
             ]
@@ -857,7 +857,7 @@ class RelationshipTest extends DatabaseTestCase
         $e1 = Event::create(['venue_id' => 200, 'host_id' => 200, 'title' => 'blah', 'type' => 'Music']);
         $e2 = Event::create(['venue_id' => 200, 'host_id' => 200, 'title' => 'blah2', 'type' => 'Music']);
 
-        $events = Event::include('venue')
+        $events = Event::includes('venue')
             ->find([$e1->id, $e2->id]);
 
         foreach ($events as $e) {
@@ -870,7 +870,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingClonesRelatedObjects()
     {
-        $events = Event::include('venue')
+        $events = Event::includes('venue')
             ->find([2, 3]);
 
         $venue = $events[0]->venue;
@@ -883,7 +883,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testEagerLoadingClonesNestedRelatedObjects()
     {
-        $venues = Venue::include(['events' => ['host']])
+        $venues = Venue::includes(['events' => ['host']])
             ->find([1, 2, 6, 9]);
 
         $unchanged_host = $venues[2]->events[0]->host;

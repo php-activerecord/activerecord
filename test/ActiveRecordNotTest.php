@@ -40,4 +40,10 @@ class ActiveRecordNotTest extends \DatabaseTestCase
         Book::not($condition)->to_a();
         $this->assertStringContainsString($expectedNotWhere, Book::table()->last_sql);
     }
+
+    public function testListOfArguments()
+    {
+        $book = Book::where('name = ?', 'Another Book')->take();
+        $this->assertEquals('Another Book', $book->name);
+    }
 }
