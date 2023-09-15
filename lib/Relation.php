@@ -740,8 +740,10 @@ class Relation implements \Iterator
      * @throws Exception\ActiveRecordException
      * @throws Exception\RelationshipException
      */
-    public function to_sql(): string {
+    public function to_sql(): string
+    {
         $this->options['mapped_names'] = $this->alias_attribute;
+
         return $this->table()->options_to_sql($this->options);
     }
 
