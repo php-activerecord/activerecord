@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Config;
+use ActiveRecord\Connection;
 use ActiveRecord\Exception\ConfigException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -204,7 +205,7 @@ class ConfigTest extends TestCase
         Config::instance()->set_logger($loggerMock);
         Config::instance()->set_logging(true);
 
-        \test\models\Book::find(1);
+        Connection::instance()->query('select * from books');
 
         $loggerMock = $this->createMock(TestLogger::class);
         $loggerMock
@@ -213,7 +214,7 @@ class ConfigTest extends TestCase
         Config::instance()->set_logger($loggerMock);
         Config::instance()->set_logging(false);
 
-        \test\models\Book::find(1);
+        Connection::instance()->query('select * from books');
 
         Config::instance()->set_logging($oldLogging);
         Config::instance()->set_logger($oldLogger);
