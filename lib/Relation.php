@@ -211,9 +211,9 @@ class Relation implements \Iterator
     /**
      * @return Relation<TModel>
      */
-    public function group(string $columns): Relation
+    public function group(): Relation
     {
-        $this->options['group'] = $columns;
+        $this->options['group'] = static::toSingleArg(...func_get_args());
 
         return $this;
     }
