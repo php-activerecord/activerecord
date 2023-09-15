@@ -370,7 +370,7 @@ class Relation implements \Iterator
      * Returns a new relation expressing WHERE !(condition) according to the
      * conditions in the arguments.
      *
-     * not accepts conditions as a string, array, or hash. @See Relation::where
+     * {@link not()} accepts conditions as a string, array, or hash. @See Relation::where
      * for more details on each format.
      *
      * User::where()                  // SELECT * FROM users
