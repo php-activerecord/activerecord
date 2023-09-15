@@ -83,6 +83,7 @@ use ActiveRecord\Serialize\Serialization;
  * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
  *
  * @phpstan-import-type HasManyOptions from Types
+ * @phpstan-import-type HasAndBelongsToManyOptions from Types
  * @phpstan-import-type BelongsToOptions from Types
  * @phpstan-import-type SerializeOptions from Serialize\Serialization
  * @phpstan-import-type ValidationOptions from Validations
@@ -224,6 +225,11 @@ class Model
      * @var array<string,HasManyOptions>
      */
     public static array $has_many;
+
+    /**
+     * @var array<string, HasAndBelongsToManyOptions>
+     */
+    public static array $has_and_belongs_to_many;
 
     /**
      * @var array<string,HasManyOptions>

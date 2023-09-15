@@ -582,7 +582,7 @@ class Table
                         break;
 
                     case 'has_and_belongs_to_many':
-                        $relationship = new HasAndBelongsToMany($definition);
+                        $relationship = new HasAndBelongsToMany($attribute, $definition);
                         break;
                 }
 

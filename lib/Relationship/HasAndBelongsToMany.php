@@ -4,17 +4,24 @@ namespace ActiveRecord\Relationship;
 
 use ActiveRecord\Model;
 use ActiveRecord\Table;
+use ActiveRecord\Types;
 
 /**
  * @todo implement me
  *
  * @package ActiveRecord
  *
+ * @phpstan-import-type HasAndBelongsToManyOptions from Types
+ *
  * @see http://www.phpactiverecord.org/guides/associations
  */
 class HasAndBelongsToMany extends AbstractRelationship
 {
-    public function __construct($options = [])
+    /**
+     * @param string $attribute
+     * @param HasAndBelongsToManyOptions $options
+     */
+    public function __construct(string $attribute, array $options = [])
     {
         /* options =>
          *   join_table - name of the join table if not in lexical order
@@ -23,7 +30,7 @@ class HasAndBelongsToMany extends AbstractRelationship
          *   uniq - if true duplicate assoc objects will be ignored
          *   validate
          */
-        parent::__construct($options[0], $options);
+        parent::__construct($attribute, $options);
     }
 
     public function is_poly(): bool

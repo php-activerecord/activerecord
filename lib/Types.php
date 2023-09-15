@@ -19,6 +19,14 @@ namespace ActiveRecord;
  *  order?: string,
  *  through?: string
  * }
+ * @phpstan-type HasAndBelongsToManyOptions array{
+ *  join_table?: string,
+ *  foreign_key?: string,
+ *  association_foreign_key?: string,
+ *  uniq?: bool,
+ *  validate?: bool
+ * }
+
  * @phpstan-type BelongsToOptions array{
  *  conditions?: array<mixed>,
  *  foreign_key?: string,
