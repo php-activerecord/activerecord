@@ -27,7 +27,7 @@ class HasManyThroughTest extends DatabaseTestCase
 
     public function testHasManyThroughInclude()
     {
-        $user = User::include([
+        $user = User::includes([
             'user_newsletters'
         ])->find(1);
 
@@ -37,16 +37,16 @@ class HasManyThroughTest extends DatabaseTestCase
 
     public function testHasManyThroughIncludeEager()
     {
-        $venue = Venue::include('events')->find(1);
+        $venue = Venue::includes('events')->find(1);
         $this->assertEquals(1, $venue->events[0]->id);
 
-        $venue = Venue::include('hosts')->find(1);
+        $venue = Venue::includes('hosts')->find(1);
         $this->assertEquals(1, $venue->hosts[0]->id);
     }
 
     public function testHasManyThoughIncludeEagerWithNamespace()
     {
-        $user = User::include('newsletters')->find(1);
+        $user = User::includes('newsletters')->find(1);
 
         $this->assertEquals(1, $user->id);
         $this->assertEquals(1, $user->newsletters[0]->id);

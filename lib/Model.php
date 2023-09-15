@@ -1687,8 +1687,6 @@ class Model
     }
 
     /**
-     * @param string|array<string|mixed> $include
-     *
      * @return Relation<static>
      */
     public static function includes(): Relation
