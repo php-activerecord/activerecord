@@ -301,7 +301,7 @@ class Relation implements \Iterator
      * database type where needed. Elements are inserted into the string
      * in the order in which they appear.
      *
-     * User.where([
+     * User::where([
      *   "name = ? and email = ?",
      *   "Joe",
      *   "joe@example.com"
@@ -312,7 +312,7 @@ class Relation implements \Iterator
      * a hash as the second element of the array. The names in the template
      * are replaced with the corresponding values from the hash.
      *
-     * User.where([
+     * User::where([
      *   "name = :name and email = :email", [
      *     name => "Joe",
      *     email => "joe@example.com"
@@ -322,7 +322,7 @@ class Relation implements \Iterator
      * If where is called with multiple arguments, these are treated as
      * if they were passed as the elements of a single array.
      *
-     * User.where("name = :name and email = :email", [
+     * User::where("name = :name and email = :email", [
      *   name => "Joe",
      *   email => "joe@example.com"
      * ])
@@ -334,7 +334,7 @@ class Relation implements \Iterator
      *
      * Fields can be symbols or strings. Values can be single values, arrays, or ranges.
      *
-     * User.where([
+     * User::where([
      *   'name' => "Joe",
      *   'email' => "joe@example.com"
      * ])
