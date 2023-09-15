@@ -169,6 +169,21 @@ class Relation implements \Iterator
     }
 
     /**
+     * Applies an ```ORDER BY``` clause to a query.
+     *
+     * This could be a source of SQL injection, so only strings composed of plain
+     * column names and simple ```function(column_name)``` expressions
+     * with optional ASC/DESC modifiers are allowed.
+     *
+     * User::order('name')              // SELECT "users".*
+     *                                  // FROM "users" ORDER BY name
+     *
+     * User::order('name DESC')         // SELECT "users".*
+     *                                  // FROM "users" ORDER BY name DESC
+     *
+     * User::order('name DESC, email')  // SELECT "users".*
+     *                                  // FROM "users" ORDER BY name DESC, email
+     *
      * @return Relation<TModel>
      */
     public function order(string $order): Relation
