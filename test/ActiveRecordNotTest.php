@@ -43,7 +43,7 @@ class ActiveRecordNotTest extends \DatabaseTestCase
 
     public function testListOfArguments()
     {
-        $book = Book::where("name = ?", "Another Book")->take();
-        $this->assertEquals("Another Book", $book->name);
+        $book = Book::where('name = ?', 'Another Book')->take();
+        $this->assertEquals('Another Book', $book->name);
     }
 }
