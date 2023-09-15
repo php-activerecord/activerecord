@@ -249,8 +249,8 @@ class Relation implements \Iterator
     /**
      * The purpose of includes is to solve N+1 problems in relational situations.
      * Let's say you have an Author, and authors write many Books. You would
-     * ordinarily need to execute one query (+1) to retrieve the Author, then one query to
-     * get each of his books (N).
+     * ordinarily need to execute one query (+1) to retrieve the Author,
+     * then one query for each of his books (N).
      *
      * You can avoid this problem by specifying relationships to be included in the
      * result set. For example:
