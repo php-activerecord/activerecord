@@ -1641,9 +1641,9 @@ class Model
      *
      * @return Relation<static>
      */
-    public static function group(string $columns): Relation
+    public static function group(): Relation
     {
-        return static::Relation()->group($columns);
+        return static::Relation()->group(...func_get_args());
     }
 
     /**

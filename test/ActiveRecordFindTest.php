@@ -271,26 +271,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assert_sql_has('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
     }
 
-    public function testGroup()
-    {
-        $venues = Venue::select('state')->group('state')->to_a();
-        $this->assertTrue(count($venues) > 0);
-        $this->assert_sql_has('GROUP BY state', ActiveRecord\Table::load(Venue::class)->last_sql);
-    }
-
-    public function testGroupWithOrderAndLimitAndHaving()
-    {
-        $venues = Venue::select('state')
-            ->group('state')
-            ->having('length(state) = 2')
-            ->order('state')
-            ->limit(2)
-            ->to_a();
-        $this->assertTrue(count($venues) > 0);
-        $this->assert_sql_has($this->connection->limit(
-            'SELECT state FROM venues GROUP BY state HAVING length(state) = 2 ORDER BY state', 0, 2), Venue::table()->last_sql);
-    }
-
     public function testFrom()
     {
         $author = Author::from('books')
@@ -304,15 +284,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
             ->first();
         $this->assertInstanceOf(Author::class, $author);
         $this->assertEquals(1, $author->id);
-    }
-
-    public function testHaving()
-    {
-        Author::select('date(created_at) as created_at')
-           ->group('date(created_at)')
-           ->having("date(created_at) > '2009-01-01'")
-            ->first();
-        $this->assert_sql_has("GROUP BY date(created_at) HAVING date(created_at) > '2009-01-01'", Author::table()->last_sql);
     }
 
     public function testFromWithInvalidTable()

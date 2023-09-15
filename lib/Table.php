@@ -232,7 +232,7 @@ class Table
         }
 
         if (array_key_exists('group', $options)) {
-            $sql->group($options['group']);
+            $sql->group(implode(', ', (array) $options['group']));
         }
 
         if (array_key_exists('having', $options)) {

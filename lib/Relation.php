@@ -209,11 +209,51 @@ class Relation implements \Iterator
     }
 
     /**
+     * Allows to specify a group attribute:
+     *
+     * User::group("name")      // SELECT "users".*
+     *                          // FROM "users" GROUP BY name
+     *
+     * Returns an array with distinct records based on the group attribute:
+     *
+     * User::select(["id", "name"])             // [
+     *                                          //      <User id: 1, name: "Oscar">,
+     *                                          //      <User id: 2, name: "Oscar">,
+     *                                          //      <User id: 3, name: "Foo">
+     *                                          // ]
+     *
+     * User::group('name')                      // [
+     *                                          //      <User id: 3, name: "Foo", ...>,
+     *                                          //      <User id: 2, name: "Oscar", ...>
+     *                                          // ]
+     *
+     * User::group('name AS grouped_name, age') // [
+     *                                          //      <User id: 3, name: "Foo", age: 21, ...>,
+     *                                          //      <User id: 2, name: "Oscar", age: 21, ...>,
+     *                                          //      <User id: 5, name: "Foo", age: 23, ...>
+     *                                          // ]
+     *
+     * Passing in an array of attributes to group by is also supported.
+     *
+     * User::select(['id', 'first_name'])       // [
+     *  ->group(['id', 'first_name'])           //      <User id: 1, first_name: "Bill">
+     *  ->first(3)                              //      <User id: 2, first_name: "Earl">,
+     *                                          //      <User id: 3, first_name: "Beto">
+     *                                          // ]
+     *
+     * A list of arguments is also supported.
+     *
+     * User::select('id', 'first_name')         // [
+     *  ->group('id', 'first_name')             //      <User id: 1, first_name: "Bill">
+     *  ->first(3)                              //      <User id: 2, first_name: "Earl">,
+     *                                          //      <User id: 3, first_name: "Beto">
+     *                                          // ]
+     *
      * @return Relation<TModel>
      */
-    public function group(string $columns): Relation
+    public function group(): Relation
     {
-        $this->options['group'] = $columns;
+        $this->options['group'] = static::toSingleArg(...func_get_args());
 
         return $this;
     }
