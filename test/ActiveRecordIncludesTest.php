@@ -35,14 +35,6 @@ class ActiveRecordIncludesTest extends \DatabaseTestCase
         $this->assertEquals('David Letterman', $venue->hosts[0]->name);
     }
 
-    public function testListSimpleStrings(): void
-    {
-        $venue = Venue::includes('events', 'hosts')
-            ->first();
-        $this->assertEquals('Monday Night Music Club feat. The Shivers', $venue->events[0]->title);
-        $this->assertEquals('David Letterman', $venue->hosts[0]->name);
-    }
-
     public function testListOfSimpleStrings(): void
     {
         $venue = Venue::includes('events', 'hosts')

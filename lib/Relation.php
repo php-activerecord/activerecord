@@ -274,31 +274,6 @@ class Relation implements \Iterator
      *   'friends' => ['address', 'followers']
      * )
      *
-     * Conditions
-     * If you want to add string conditions to your included models,
-     * you'll have to explicitly reference them. For example:
-     *
-     * User::includes('posts')->where('posts.name = ?', 'example')
-     *
-     * Will throw an error, but this will work:
-     *
-     * User::includes('posts')
-     *   ->where('posts.name = ?', 'example')
-     *   ->references('posts')
-     *
-     * Note that includes works with association names while
-     * references needs the actual table name.  If you pass
-     * the conditions via hash, you don't need to call
-     * references explicitly, as where references the tables for you.
-     * For example, this will work correctly:
-     *
-     * User::includes('posts')
-     *   ->where([
-     *     'posts' => [
-     *       'name' => 'example'
-     *     ]
-     * ])
-     *
      * @return Relation<TModel>
      */
     public function includes(): Relation
