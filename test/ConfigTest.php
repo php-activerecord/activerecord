@@ -193,6 +193,7 @@ class ConfigTest extends TestCase
     public function testSetLogging()
     {
         $oldLogger = Config::instance()->get_logger();
+        $oldLogging = Config::instance()->get_logging();
         Config::instance()->set_logging(true);
 
         $loggerMock = $this->createMock(TestLogger::class);
@@ -201,6 +202,7 @@ class ConfigTest extends TestCase
             ->method('info');
 
         Config::instance()->set_logger($loggerMock);
+        Config::instance()->set_logging($oldLogging);
 
         \test\models\Book::find(1);
 
