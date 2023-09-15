@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Config;
+use ActiveRecord\Connection;
 use ActiveRecord\Exception\ConfigException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -188,6 +189,35 @@ class ConfigTest extends TestCase
     {
         $this->expectException(ConfigException::class);
         $this->config->set_date_class('TestLogger');
+    }
+
+    public function testSetLogging()
+    {
+        $oldLogger = Config::instance()->get_logger();
+        $oldLogging = Config::instance()->get_logging();
+        Config::instance()->set_logging(true);
+
+        $loggerMock = $this->createMock(TestLogger::class);
+        $loggerMock
+            ->expects($this->atLeast(1))
+            ->method('info');
+
+        Config::instance()->set_logger($loggerMock);
+        Config::instance()->set_logging(true);
+
+        Connection::instance()->query('select * from books');
+
+        $loggerMock = $this->createMock(TestLogger::class);
+        $loggerMock
+            ->expects($this->exactly(0))
+            ->method('info');
+        Config::instance()->set_logger($loggerMock);
+        Config::instance()->set_logging(false);
+
+        Connection::instance()->query('select * from books');
+
+        Config::instance()->set_logging($oldLogging);
+        Config::instance()->set_logger($oldLogger);
     }
 
     public function testSetDateClassWhenClassDoesntHaveCreatefromformat()
