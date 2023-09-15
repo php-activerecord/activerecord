@@ -190,6 +190,28 @@ class ConfigTest extends TestCase
         $this->config->set_date_class('TestLogger');
     }
 
+    public function testSetLogging()
+    {
+        $oldLogger = Config::instance()->get_logger();
+        Config::instance()->set_logging(true);
+
+        $loggerMock = $this->createMock(TestLogger::class);
+        $loggerMock
+            ->expects($this->atLeast(1))
+            ->method('info');
+
+        Config::instance()->set_logger($loggerMock);
+
+        \test\models\Book::find(1);
+
+        $loggerMock
+            ->expects($this->exactly(0))
+            ->method('info');
+
+        $this->config->set_logging(false);
+        Config::instance()->set_logger($oldLogger);
+    }
+
     public function testSetDateClassWhenClassDoesntHaveCreatefromformat()
     {
         $this->expectException(ConfigException::class);
