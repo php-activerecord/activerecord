@@ -3,6 +3,9 @@
 [![codecov](https://codecov.io/github/php-activerecord/activerecord/graph/badge.svg?token=IJBKNRHVOC)](https://codecov.io/github/php-activerecord/activerecord)
 [![Latest Stable Version](https://poser.pugx.org/php-patterns/activerecord/version)](https://packagist.org/packages/php-patterns/activerecord)
 
+![logo_large](https://github.com/php-activerecord/activerecord/assets/773172/01732546-a438-4a27-bdff-d6653af7d7a2)
+
+
 **We encourage pull requests, and issues will be dealt with thoroughly and in a timely manner.**
 
 This is a badly-needed relaunch of the project originally created by Kien La and Jacques Fuentes. Both authors and the current maintainers have lost interest in PHP, moved onto other languages, and no longer review pull requests or issues. Some of us still depend on the project and want to see it move forward, so we've moved it here under new ownership. 
