@@ -43,9 +43,4 @@ class ActiveRecordCountTest extends \DatabaseTestCase
     {
         $this->assertEquals(1, Author::where(['author_id = ?', 1])->count());
     }
-
-    public function testWhereInCountForBackwardsCompatibility()
-    {
-        $this->assertEquals(1, Author::count('author_id=1'));
-    }
 }

@@ -1772,16 +1772,9 @@ class Model
      *
      * @return int Number of records that matched the query
      */
-    public static function count(/* ... */): int
+    public static function count(): int
     {
-        $relation = static::Relation();
-
-        $arg = Relation::toSingleArg(...func_get_args());
-        if (null != $arg) {
-            $relation = $relation->where($arg);
-        }
-
-        return $relation->count();
+        return static::Relation()->count();
     }
 
     /**

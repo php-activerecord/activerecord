@@ -754,7 +754,6 @@ class Relation implements \Iterator
      *
      * ```
      * People::count() // Return the number of records in table
-     * People::count('title'); // Return the number of people who have a title
      * People::where('name' => 'Bill').count() // Return the number of people whose name is Bill
      *
      * ```
