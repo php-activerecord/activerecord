@@ -107,12 +107,32 @@ class Relation implements \Iterator
     }
 
     /**
-     * Plucks the columns from the table, returning an column_value[] rather than a Model[]
+     * Use pluck as a shortcut to select one or more attributes without
+     * loading an entire record object per row.
      *
-     * $this->where(['name' => 'Bill'])->pluck('id') // returns [1]
-     * $this->where(['age' => 42])->pluck('id', 'name') // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
-     * $this->where(['age' => 42])->pluck('id, name') // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
-     * $this->where(['age' => 42])->pluck(['id', 'name']) // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
+     * $names = Person::pluck('name');
+     *
+     * instead of
+     *
+     * $names = array_map(fn($person) =>$person->name, Person::all()->to_a());
+     *
+     * Pluck returns an Array of attribute values type-casted to match
+     * the plucked column names, if they can be deduced.
+     *
+     * Person::pluck('name')                // SELECT people.name FROM people
+     *  => ['David', 'Jeremy', 'Jose']
+     *
+     * Person::pluck('id', 'name');         // SELECT people.id, people.name FROM people
+     *  => [[1, 'David'], [2, 'Jeremy'], [3, 'Jose']]
+     *
+     * Person::distinct()->pluck('role');   // SELECT DISTINCT role FROM people
+     *  => ['admin', 'member', 'guest']
+     *
+     * Person::where(['age' => 21])         // SELECT people.id FROM people WHERE people.age = 21 LIMIT 5
+     *  ->limit(5).pluck('id')
+     * => [2, 3]
+     *
+     * @see Relation::ids()
      *
      * @return array<mixed>
      */
