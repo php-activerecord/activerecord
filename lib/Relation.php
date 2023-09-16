@@ -174,6 +174,7 @@ class Relation implements \Iterator
     public function select(): Relation
     {
         $this->options['select'] ??= [];
+        assert(is_array($this->options['select']));
         $this->options['select'][] = static::toSingleArg(...func_get_args());
 
         return $this;
