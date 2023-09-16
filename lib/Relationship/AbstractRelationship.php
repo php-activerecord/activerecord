@@ -220,7 +220,7 @@ abstract class AbstractRelationship
         $class_name = $this->class_name;
 
         $model = new $class_name($attributes, $guard_attributes);
-        assert($model instanceof Model);
+        assert($model instanceof $class_name);
 
         return $model;
     }
