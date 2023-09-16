@@ -222,6 +222,9 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals('Tito', $row['name']);
 
         $row = $sth->fetch();
+        $this->assertEquals('Tito', $row['name']);
+
+        $row = $sth->fetch();
         $this->assertEquals('Bill Clinton', $row['name']);
 
         $row = $sth->fetch();
@@ -292,9 +295,8 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     private function limit(int $offset = 0, int $limit = 0)
     {
-        $ret = [];
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
-        $this->connection->query_and_fetch($this->connection->limit($sql, $offset, $limit), function ($row) use (&$ret) { $ret[] = $row; });
+        $ret = iterator_to_array($this->connection->query_and_fetch($this->connection->limit($sql, $offset, $limit)));
 
         return ActiveRecord\collect($ret, 'author_id');
     }

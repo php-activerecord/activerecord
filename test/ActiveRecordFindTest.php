@@ -234,8 +234,8 @@ class ActiveRecordFindTest extends DatabaseTestCase
     public function testFindLast()
     {
         $author = Author::last();
-        $this->assertEquals(4, $author->author_id);
-        $this->assertEquals('Uncle Bob', $author->name);
+        $this->assertEquals(5, $author->author_id);
+        $this->assertEquals('Tito', $author->name);
     }
 
     public function testFindLastUsingStringCondition()
@@ -316,7 +316,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
     {
         $this->assertNotNull(Author::where(['name' => 'Tito'])->first());
         $this->assertNull(Author::where(['name' => 'Mortimer'])->first());
-        $this->assertEquals(1, count(Author::where(['name' => 'Tito'])->to_a()));
+        $this->assertEquals(2, count(Author::where(['name' => 'Tito'])->to_a()));
     }
 
     public function testFindOrCreateByOnExistingRecord()

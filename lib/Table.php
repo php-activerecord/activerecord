@@ -223,7 +223,10 @@ class Table
                 $tokens = array_merge($tokens, array_map('trim', explode(',', $select)));
             }
 
-            $sql->select(array_search('*', $tokens) ? '*' : implode(', ', array_unique($tokens)));
+            $sql->select(
+                array_search('*', $tokens) ? '*' : implode(', ', array_unique($tokens)),
+                !empty($options['distinct'])
+            );
         }
 
         $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);

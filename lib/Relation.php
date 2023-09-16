@@ -107,46 +107,52 @@ class Relation implements \Iterator
     }
 
     /**
-     * Plucks the columns from the table, returning an column_value[] rather than a Model[]
+     * Use pluck as a shortcut to select one or more attributes without
+     * loading an entire record object per row.
      *
-     * $this->where(['name' => 'Bill'])->pluck('id') // returns [1]
-     * $this->where(['age' => 42])->pluck('id', 'name') // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
-     * $this->where(['age' => 42])->pluck('id, name') // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
-     * $this->where(['age' => 42])->pluck(['id', 'name']) // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
+     * $names = Person::pluck('name');
+     *
+     * instead of
+     *
+     * $names = array_map(fn($person) =>$person->name, Person::all()->to_a());
+     *
+     * Pluck returns an Array of attribute values type-casted to match
+     * the plucked column names, if they can be deduced.
+     *
+     * Person::pluck('name')                // SELECT people.name FROM people
+     *  => ['David', 'Jeremy', 'Jose']
+     *
+     * Person::pluck('id', 'name');         // SELECT people.id, people.name FROM people
+     *  => [[1, 'David'], [2, 'Jeremy'], [3, 'Jose']]
+     *
+     * Person::distinct()->pluck('role');   // SELECT DISTINCT role FROM people
+     *  => ['admin', 'member', 'guest']
+     *
+     * Person::where(['age' => 21])         // SELECT people.id FROM people WHERE people.age = 21 LIMIT 5
+     *  ->limit(5).pluck('id')
+     * => [2, 3]
+     *
+     * @see Relation::ids()
      *
      * @return array<mixed>
      */
     public function pluck(): array
     {
-        $columns = $this->possibleListToArray(...func_get_args());
-        if (0 === count($columns)) {
+        $args = func_get_args();
+        if (0 === count($args)) {
             throw new ValidationsArgumentError('pluck requires at least one argument');
         }
 
-        $oldSelect = array_key_exists('select', $this->options) ? $this->options['select'] : null;
-        $this->reselect($columns);
+        $options = array_merge($this->options, ['select' => [static::toSingleArg(...$args)]]);
+        $table = $this->table();
+        $sql = $table->options_to_sql($options);
+        $retValue = iterator_to_array(
+            $table->conn->query_and_fetch($sql->to_s(), $sql->get_where_values(), \PDO::FETCH_NUM)
+        );
 
-        $models = $this->to_a();
-
-        if (null === $oldSelect) {
-            unset($this->options['select']);
-        } else {
-            $this->options['select'] = $oldSelect;
-        }
-
-        $retValue = [];
-        foreach ($models as $model) {
-            $row = [];
-            foreach ($columns as $column) {
-                array_push($row, $model->$column);
-            }
-            if (1 === count($row)) {
-                $row = $row[0];
-            }
-            array_push($retValue, $row);
-        }
-
-        return $retValue;
+        return array_map(static function ($row) {
+            return 1 == count($row) ? $row[0] : $row;
+        }, $retValue);
     }
 
     /**
@@ -190,21 +196,6 @@ class Relation implements \Iterator
         $this->options['select'] = [static::toSingleArg(...func_get_args())];
 
         return $this;
-    }
-
-    /**
-     * Converts "name,id" to ["name", "id"] if necessary
-     *
-     * @return array<string>
-     */
-    private function possibleListToArray(): array
-    {
-        $args = static::toSingleArg(...func_get_args());
-        if (!is_array($args)) {
-            $args = array_map('trim', explode(',', $args));
-        }
-
-        return $args;
     }
 
     /**
@@ -546,6 +537,24 @@ class Relation implements \Iterator
     public function readonly(bool $readonly): Relation
     {
         $this->options['readonly'] = $readonly;
+
+        return $this;
+    }
+
+    /**
+     * Specifies whether the records should be unique or not. For example:
+     *
+     * User::select('name') // Might return two records with the same name
+     *
+     * User::select('name')->distinct() // Returns 1 record per distinct name
+     *
+     * User::select('name')->distinct()->distinct(false) // You can also remove the uniqueness
+     *
+     * @return Relation<TModel>
+     */
+    public function distinct(bool $distinct=true): Relation
+    {
+        $this->options['distinct'] = $distinct;
 
         return $this;
     }

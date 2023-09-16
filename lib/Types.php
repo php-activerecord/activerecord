@@ -42,6 +42,7 @@ namespace ActiveRecord;
  *  offset?: int,
  *  order?: string,
  *  readonly?: bool,
+ *  distinct?: bool,
  *  select?: string|array<string>,
  * }
  */

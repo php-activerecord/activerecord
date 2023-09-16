@@ -1602,6 +1602,16 @@ class Model
     /**
      * @return Relation<static>
      *
+     *@see Relation::distinct()
+     */
+    public static function distinct(bool $distinct = true): Relation
+    {
+        return static::Relation()->distinct($distinct);
+    }
+
+    /**
+     * @return Relation<static>
+     *
      *@see Relation::reselect()
      */
     public static function reselect(): Relation

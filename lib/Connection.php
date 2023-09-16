@@ -391,15 +391,15 @@ abstract class Connection
     /**
      * Execute a raw SQL query and fetch the results.
      *
-     * @param string   $sql     raw SQL string to execute
-     * @param \Closure $handler closure that will be passed the fetched results
+     * @param string       $sql    raw SQL string to execute
+     * @param array<mixed> $values
      */
-    public function query_and_fetch(string $sql, \Closure $handler): void
+    public function query_and_fetch(string $sql, array $values = [], int $method = \PDO::FETCH_ASSOC): \Generator
     {
-        $sth = $this->query($sql);
+        $sth = $this->query($sql, $values);
 
-        while ($row = $sth->fetch(\PDO::FETCH_ASSOC)) {
-            $handler($row);
+        while ($row = $sth->fetch($method)) {
+            yield $row;
         }
     }
 
