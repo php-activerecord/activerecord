@@ -187,6 +187,7 @@ class Relation implements \Iterator
     public function reselect(): Relation
     {
         $this->options['select'] = [static::toSingleArg(...func_get_args())];
+
         return $this;
     }
 
