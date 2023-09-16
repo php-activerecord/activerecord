@@ -17,15 +17,29 @@ class ActiveRecordPluckTest extends \DatabaseTestCase
     public function testSingleArgument()
     {
         $authors = Author::pluck('name');
+        $this->assertEquals(5, count($authors));
+        $this->assertEquals('Tito', $authors[0]);
+        $this->assertEquals('George W. Bush', $authors[1]);
+    }
+
+    public function testSingleArgumentWithDistinct()
+    {
+        $authors = Author::distinct()->pluck('name');
         $this->assertEquals(4, count($authors));
         $this->assertEquals('Tito', $authors[0]);
         $this->assertEquals('George W. Bush', $authors[1]);
     }
 
+    public function testSingleArgumentWithRemoveDistinct()
+    {
+        $authors = Author::distinct()->distinct(false)->pluck('name');
+        $this->assertEquals(5, count($authors));
+    }
+
     public function testMultipleArguments()
     {
         $authors = Author::pluck('name', 'author_id');
-        $this->assertEquals(4, count($authors));
+        $this->assertEquals(5, count($authors));
         $this->assertEquals('Tito', $authors[0][0]);
         $this->assertEquals(1, $authors[0][1]);
         $this->assertEquals('George W. Bush', $authors[1][0]);
@@ -73,6 +87,6 @@ class ActiveRecordPluckTest extends \DatabaseTestCase
     public function testIdsAll()
     {
         $authors = Author::ids();
-        $this->assertEquals(4, count($authors));
+        $this->assertEquals(5, count($authors));
     }
 }

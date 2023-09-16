@@ -146,7 +146,9 @@ class Relation implements \Iterator
         $options = array_merge($this->options, ['select' => [static::toSingleArg(...$args)]]);
         $table = $this->table();
         $sql = $table->options_to_sql($options);
-        $retValue = iterator_to_array($table->conn->query_and_fetch($sql->to_s(), $sql->get_where_values(), \PDO::FETCH_NUM));
+        $retValue = iterator_to_array(
+            $table->conn->query_and_fetch($sql->to_s(), $sql->get_where_values(), \PDO::FETCH_NUM)
+        );
 
         return array_map(static function ($row) {
             return 1 == count($row) ? $row[0] : $row;
@@ -535,6 +537,24 @@ class Relation implements \Iterator
     public function readonly(bool $readonly): Relation
     {
         $this->options['readonly'] = $readonly;
+
+        return $this;
+    }
+
+    /**
+     * Specifies whether the records should be unique or not. For example:
+     *
+     * User::select('name') // Might return two records with the same name
+     *
+     * User::select('name')->distinct() // Returns 1 record per distinct name
+     *
+     * User::select('name')->distinct()->distinct(false) // You can also remove the uniqueness
+     *
+     * @return Relation<TModel>
+     */
+    public function distinct(bool $distinct=true): Relation
+    {
+        $this->options['distinct'] = $distinct;
 
         return $this;
     }

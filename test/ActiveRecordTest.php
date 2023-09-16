@@ -478,6 +478,6 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertTrue($row['n'] > 1);
 
         $row = Author::query('SELECT COUNT(*) AS n FROM authors WHERE name=?', ['Tito'])->fetch();
-        $this->assertEquals(['n' => 1], $row);
+        $this->assertEquals(['n' => 2], $row);
     }
 }

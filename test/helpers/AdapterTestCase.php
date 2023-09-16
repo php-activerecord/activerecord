@@ -222,6 +222,9 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals('Tito', $row['name']);
 
         $row = $sth->fetch();
+        $this->assertEquals('Tito', $row['name']);
+
+        $row = $sth->fetch();
         $this->assertEquals('Bill Clinton', $row['name']);
 
         $row = $sth->fetch();

@@ -388,14 +388,13 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testUpdateAllWithSetAsString()
     {
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2']);
-        $this->assertEquals(2, $num_affected);
-        //        $this->assertEquals(4, Author::count_by_parent_author_id(2));
+        $this->assertEquals(3, $num_affected);
     }
 
     public function testUpdateAllWithSetAsHash()
     {
         $num_affected = Author::update_all(['set' => ['parent_author_id' => 2]]);
-        $this->assertEquals(2, $num_affected);
+        $this->assertEquals(3, $num_affected);
     }
 
     /**
@@ -404,19 +403,19 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testUpdateAllWithConditionsAsString()
     {
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => 'name = "Tito"']);
-        $this->assertEquals(1, $num_affected);
+        $this->assertEquals(2, $num_affected);
     }
 
     public function testUpdateAllWithConditionsAsHash()
     {
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => ['name' => 'Tito']]);
-        $this->assertEquals(1, $num_affected);
+        $this->assertEquals(2, $num_affected);
     }
 
     public function testUpdateAllWithConditionsAsArray()
     {
         $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => ['name = ?', 'Tito']]);
-        $this->assertEquals(1, $num_affected);
+        $this->assertEquals(2, $num_affected);
     }
 
     public function testUpdateAllWithLimitAndOrder()
