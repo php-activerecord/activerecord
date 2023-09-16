@@ -1807,7 +1807,7 @@ class Model
     /**
      * @see Relation::ids()
      *
-     * @return array<static>
+     * @return array<mixed>
      */
     public static function ids(): array
     {
