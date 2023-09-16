@@ -95,7 +95,9 @@ class Relation implements \Iterator
     }
 
     /**
-     * Returns a blank Relation and fires no queries. Any subsequent call to find(), to_a(), last(), first() returns []
+     * Returns a blank Relation and fires no queries.
+     *
+     * @returns Relation<TModel>
      */
     public function none(): Relation
     {
@@ -171,11 +173,11 @@ class Relation implements \Iterator
      */
     public function select(): Relation
     {
-        $columns = $this->possibleListToArray(...func_get_args());
         $this->options['select'] ??= [];
-        $columns = array_merge((array) $this->options['select'], $columns);
+        assert(is_array($this->options['select']));
+        $this->options['select'][] = static::toSingleArg(...func_get_args());
 
-        return $this->reselect($columns);
+        return $this;
     }
 
     /**
@@ -185,12 +187,7 @@ class Relation implements \Iterator
      */
     public function reselect(): Relation
     {
-        $columns = array_unique($this->possibleListToArray(...func_get_args()));
-
-        if (in_array('*', $columns)) {
-            $columns = ['*'];
-        }
-        $this->options['select'] = $columns;
+        $this->options['select'] = [static::toSingleArg(...func_get_args())];
 
         return $this;
     }
@@ -768,7 +765,7 @@ class Relation implements \Iterator
             return 0;
         }
         $table = $this->table();
-        $options = array_merge($this->options, ['select' => 'COUNT(*)']);
+        $options = array_merge($this->options, ['select' => ['COUNT(*)']]);
         $sql = $table->options_to_sql($options);
         $values = $sql->get_where_values();
 
