@@ -45,6 +45,26 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assertInstanceOf(Author::class, $author);
     }
 
+    public function testFindReturnContents()
+    {
+        $rel = Author::all();
+
+        $author = $rel->find(1);
+        $this->assertEquals('Tito', $author->name);
+        $this->assertEquals(['sharks' => 'lasers'], $author->return_something());
+
+        $author = $rel->find('1');
+        $this->assertEquals('Tito', $author->name);
+        $authors = $rel->find([1, 2]);
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Tito', $authors[0]->name);
+        $this->assertEquals('George W. Bush', $authors[1]->name);
+
+        $authors = $rel->find([1]);
+        $this->assertEquals(1, count($authors));
+        $this->assertEquals('Tito', $authors[0]->name);
+    }
+
     public function testFindReturnsArrayOfModels()
     {
         $authors = Author::all()->to_a();
@@ -321,6 +341,12 @@ class ActiveRecordFindTest extends DatabaseTestCase
     {
         $this->expectException(RecordNotFound::class);
         Author::find(0);
+    }
+
+    public function testFindWrongType()
+    {
+        $this->expectException(TypeError::class);
+        Author::select('name')->find('not a number');
     }
 
     public function testFindByNull()

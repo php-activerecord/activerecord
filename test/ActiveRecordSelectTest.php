@@ -46,6 +46,18 @@ class ActiveRecordSelectTest extends \DatabaseTestCase
         ], $book->attributes());
     }
 
+    public function testRemoveRepeatedColumnNames()
+    {
+        $relation = Author::select('name,name')->select('name, author_id');
+        $this->assertEquals('SELECT name, author_id FROM `authors`', $relation->to_sql());
+    }
+
+    public function testStarRemovesAllOtherColumnNames()
+    {
+        $relation = Author::select('name')->select('*');
+        $this->assertEquals('SELECT * FROM `authors`', $relation->to_sql());
+    }
+
     public function testAlias()
     {
         $book = Author::select('name as title, 123 as bubba')
@@ -65,6 +77,15 @@ class ActiveRecordSelectTest extends \DatabaseTestCase
         $this->expectException(UndefinedPropertyException::class);
         $author = Author::select('name, 123 as bubba')->first();
         $author->id;
-        $this->fail('expected ActiveRecord\UndefinedPropertyExecption');
+    }
+
+    public function testReselect()
+    {
+        $author = Author::reselect('name')->first();
+        $this->assertEquals('Tito', $author->name);
+
+        $this->expectException(UndefinedPropertyException::class);
+        $author = Author::select('name')->reselect('author_id')->first();
+        $author->name;
     }
 }

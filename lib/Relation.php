@@ -8,7 +8,6 @@
 namespace ActiveRecord;
 
 use ActiveRecord\Exception\RecordNotFound;
-use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
 /**
@@ -67,6 +66,11 @@ class Relation implements \Iterator
     private array $options = [];
 
     /**
+     * @var bool Whether $this->none() was ever called
+     */
+    private bool $isNone = false;
+
+    /**
      * @param class-string    $className
      * @param array<string>   $alias_attribute
      * @param RelationOptions $options
@@ -91,40 +95,74 @@ class Relation implements \Iterator
     }
 
     /**
-     * Modifies the SELECT statement for the query so that only certain
-     * fields are retrieved.
+     * Returns a blank Relation and fires no queries.
      *
-     * // string
-     * Book::select("name")->take();  // SELECT name FROM `books`
-     *                                // ORDER BY book_id ASC LIMIT 1
+     * @returns Relation<TModel>
+     */
+    public function none(): Relation
+    {
+        $this->isNone = true;
+
+        return $this;
+    }
+
+    /**
+     * Plucks the columns from the table, returning an column_value[] rather than a Model[]
      *
-     * // array
-     * Book::select([                 // SELECT name, publisher FROM `books`
-     *   "name",                      // ORDER BY book_id ASC LIMIT 1
-     *   "publisher"
-     * ])
+     * $this->where(['name' => 'Bill'])->pluck('id') // returns [1]
+     * $this->where(['age' => 42])->pluck('id', 'name') // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
+     * $this->where(['age' => 42])->pluck('id, name') // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
+     * $this->where(['age' => 42])->pluck(['id', 'name']) // returns [[1, "David"], [2, "Fran"], [3, "Jose"]]
      *
-     * // list of strings
-     * Book::select(                  // SELECT name, publisher FROM `books`
-     *   "name",                      // ORDER BY book_id ASC LIMIT 1
-     *   "publisher"
-     * )
+     * @return array<mixed>
+     */
+    public function pluck(): array
+    {
+        $columns = $this->possibleListToArray(...func_get_args());
+        if (0 === count($columns)) {
+            throw new ValidationsArgumentError('pluck requires at least one argument');
+        }
+
+        $oldSelect = array_key_exists('select', $this->options) ? $this->options['select'] : null;
+        $this->reselect($columns);
+
+        $models = $this->to_a();
+
+        if (null === $oldSelect) {
+            unset($this->options['select']);
+        } else {
+            $this->options['select'] = $oldSelect;
+        }
+
+        $retValue = [];
+        foreach ($models as $model) {
+            $row = [];
+            foreach ($columns as $column) {
+                array_push($row, $model->$column);
+            }
+            if (1 === count($row)) {
+                $row = $row[0];
+            }
+            array_push($retValue, $row);
+        }
+
+        return $retValue;
+    }
+
+    /**
+     * Plucks the primary keys from the table
      *
-     * You can also use one or more strings, which will be used unchanged as SELECT fields:
-     *
-     * Book::select([                 // SELECT name as title, 123 as ISBN
-     *   'name AS title',             // FROM `authors` ORDER BY title desc LIMIT 1
-     *   '123 AS ISBN'
-     * ])
-     *
-     * If an alias was specified, it will be accessible from the resulting objects:
-     *
-     * Book::select('name AS title')
-     *   ->first()
-     *   ->title
-     *
-     * Accessing attributes of an object that do not have fields retrieved by a select
-     * except +id+ will throw ActiveRecord::UndefinedPropertyException:
+     * @return array<mixed>
+     */
+    public function ids(): array
+    {
+        $pk = $this->table()->pk;
+
+        return $this->pluck(1 === count($pk) ? $pk[0] : $pk);
+    }
+
+    /**
+     * Selects columns in a table, anding previous calls to select()
      *
      * Book::select("name")->first()->publisher
      * => ActiveRecord::UndefinedPropertyException: missing attribute: publisher
@@ -135,11 +173,38 @@ class Relation implements \Iterator
      */
     public function select(): Relation
     {
-        $arg = static::toSingleArg(...func_get_args());
         $this->options['select'] ??= [];
-        $this->options['select'] = array_merge((array) $this->options['select'], (array) $arg);
+        assert(is_array($this->options['select']));
+        $this->options['select'][] = static::toSingleArg(...func_get_args());
 
         return $this;
+    }
+
+    /**
+     * Selects columns in a table, overriding previous calls to select()
+     *
+     * @return Relation<TModel>
+     */
+    public function reselect(): Relation
+    {
+        $this->options['select'] = [static::toSingleArg(...func_get_args())];
+
+        return $this;
+    }
+
+    /**
+     * Converts "name,id" to ["name", "id"] if necessary
+     *
+     * @return array<string>
+     */
+    private function possibleListToArray(): array
+    {
+        $args = static::toSingleArg(...func_get_args());
+        if (!is_array($args)) {
+            $args = array_map('trim', explode(',', $args));
+        }
+
+        return $args;
     }
 
     /**
@@ -214,7 +279,7 @@ class Relation implements \Iterator
      * User::group("name")      // SELECT "users".*
      *                          // FROM "users" GROUP BY name
      *
-     * Returns an array with distinct records based on the group attribute:
+     * Returns an array with records based on the group attribute:
      *
      * User::select(["id", "name"])             // [
      *                                          //      <User id: 1, name: "Oscar">,
@@ -412,13 +477,11 @@ class Relation implements \Iterator
     public static function toSingleArg(): mixed
     {
         $args = func_get_args();
-        if (count($args) > 1) {
-            $arg = $args;
-        } else {
-            $arg = $args[0];
+        if (1 === count($args)) {
+            $args = $args[0];
         }
 
-        return $arg;
+        return $args;
     }
 
     /**
@@ -511,10 +574,14 @@ class Relation implements \Iterator
      *
      * @throws RecordNotFound if any of the records cannot be found
      *
-     * @return Model|array<Model>
+     * @return TModel|array<TModel>
      */
-    public function find()
+    public function find(): Model|array
     {
+        if ($this->isNone) {
+            throw new RecordNotFound('tbd');
+        }
+
         $args = func_get_args();
         $num_args = count($args);
 
@@ -553,16 +620,12 @@ class Relation implements \Iterator
      *
      * @return TModel|array<TModel>|null
      */
-    public function take(int $limit = null): mixed
+    public function take(int $limit = null): Model|array|null
     {
         $this->limit($limit ?? 1);
-        if (!isset($limit)) {
-            $models = $this->to_a();
+        $models = $this->to_a();
 
-            return $models[0] ?? null;
-        }
-
-        return $this->to_a();
+        return isset($limit) ? $models : $models[0] ?? null;
     }
 
     /**
@@ -574,17 +637,12 @@ class Relation implements \Iterator
      * Person::where(["user_name = :u", { u: user_name }])->first()
      * Person::order("created_on DESC")->offset(5).first()
      * Person.first(3) // returns the first three objects fetched by SELECT * FROM people ORDER BY people.id LIMIT 3
+     *
+     * @return TModel|array<TModel>|null
      */
-    public function first(int $limit = null): mixed
+    public function first(int $limit = null): Model|array|null
     {
-        $this->limit($limit ?? 1);
-
-        $pk = $this->table()->pk;
-        if (!empty($pk) && !array_key_exists('order', $this->options) && !array_key_exists('group', $this->options)) {
-            $this->options['order'] = implode(' ASC, ', $this->table()->pk) . ' ASC';
-        }
-
-        $models = $this->to_a();
+        $models = $this->firstOrLast($limit, true);
 
         return isset($limit) ? $models : $models[0] ?? null;
     }
@@ -603,21 +661,55 @@ class Relation implements \Iterator
      *
      * @return TModel|array<TModel>|null
      */
-    public function last(int $limit = null): mixed
+    public function last(int $limit = null): Model|array|null
+    {
+        $models = $this->firstOrLast($limit, false);
+
+        return isset($limit) ? $models : $models[0] ?? null;
+    }
+
+    /**
+     * Reverses the ordering clause if specified; otherwise, sorts in descending order by primary key
+     * as returning in ascending order is the default
+     *
+     * @return array<TModel>
+     */
+    public function reverse_order(): array
+    {
+        $pk = $this->table()->pk;
+        if (!empty($pk)) {
+            if (array_key_exists('order', $this->options)) {
+                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+            } else {
+                $this->options['order'] = implode(' DESC, ', $this->table()->pk) . ' DESC';
+            }
+        }
+
+        return $this->to_a();
+    }
+
+    /**
+     * @return array<TModel>
+     */
+    private function firstOrLast(int $limit = null, bool $isAscending): array
     {
         $this->limit($limit ?? 1);
 
-        if (array_key_exists('order', $this->options)) {
-            if (str_contains($this->options['order'], implode(' ASC, ', $this->table()->pk) . ' ASC')) {
-                $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+        $pk = $this->table()->pk;
+        if (!empty($pk)) {
+            if (array_key_exists('order', $this->options)) {
+                $reverseCommand = $isAscending ? 'DESC' : 'ASC';
+
+                if (str_contains($this->options['order'], implode(" {$reverseCommand}, ", $this->table()->pk) . " {$reverseCommand}")) {
+                    $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+                }
+            } elseif (!array_key_exists('having', $this->options)) {
+                $command = $isAscending ? 'ASC' : 'DESC';
+                $this->options['order'] = implode(" {$command}, ", $this->table()->pk) . " {$command}";
             }
-        } else {
-            $this->options['order'] = implode(' DESC, ', $this->table()->pk) . ' DESC';
         }
 
-        $models = $this->to_a();
-
-        return isset($limit) ? $models : $models[0] ?? null;
+        return $this->to_a();
     }
 
     /**
@@ -627,6 +719,10 @@ class Relation implements \Iterator
      */
     public function to_a(): array
     {
+        if ($this->isNone) {
+            return [];
+        }
+
         $this->options['mapped_names'] = $this->alias_attribute;
 
         return iterator_to_array($this->table()->find($this->options));
@@ -654,9 +750,8 @@ class Relation implements \Iterator
      * Get a count of qualifying records.
      *
      * ```
-     * People::count() // all
-     * People::count('name'); // SELECT COUNT("people"."age") FROM "people"
-     * People::count(['conditions' => "age > 30"])
+     * People::count() // Return the number of records in table
+     * People::where('name' => 'Bill').count() // Return the number of people whose name is Bill
      *
      * ```
      *
@@ -666,14 +761,15 @@ class Relation implements \Iterator
      */
     public function count(): int
     {
-        unset($this->options['select']);
-        $this->select('COUNT(*)');
-
+        if ($this->isNone) {
+            return 0;
+        }
         $table = $this->table();
-        $sql = $table->options_to_sql($this->options);
+        $options = array_merge($this->options, ['select' => ['COUNT(*)']]);
+        $sql = $table->options_to_sql($options);
         $values = $sql->get_where_values();
 
-        return $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
+        return $table->conn->query_and_fetch_one($sql->to_s(), $values);
     }
 
     /**
