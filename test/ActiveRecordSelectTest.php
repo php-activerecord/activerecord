@@ -55,8 +55,6 @@ class ActiveRecordSelectTest extends \DatabaseTestCase
     public function testStarRemovesAllOtherColumnNames()
     {
         $relation = Author::select('name')->select('*');
-        $options = $this->getPrivateVariable($relation, 'options');
-        $this->assertEquals(['*'], $options['select']);
         $this->assertEquals('SELECT * FROM `authors`', $relation->to_sql());
     }
 
@@ -79,7 +77,6 @@ class ActiveRecordSelectTest extends \DatabaseTestCase
         $this->expectException(UndefinedPropertyException::class);
         $author = Author::select('name, 123 as bubba')->first();
         $author->id;
-        $this->fail('expected ActiveRecord\UndefinedPropertyExecption');
     }
 
     public function testReselect()
@@ -90,6 +87,5 @@ class ActiveRecordSelectTest extends \DatabaseTestCase
         $this->expectException(UndefinedPropertyException::class);
         $author = Author::select('name')->reselect('author_id')->first();
         $author->name;
-        $this->fail('expected ActiveRecord\UndefinedPropertyExecption');
     }
 }

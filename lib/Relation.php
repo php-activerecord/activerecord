@@ -96,6 +96,8 @@ class Relation implements \Iterator
 
     /**
      * Returns a blank Relation and fires no queries. Any subsequent call to find(), to_a(), last(), first() returns []
+     * 
+     * @return Relation
      */
     public function none(): Relation
     {
@@ -162,15 +164,10 @@ class Relation implements \Iterator
     /**
      * Selects columns in a table, anding previous calls to select()
      *
-     * The following three statements will all generate the same SQL
-     * Author::select('A,B,C,D')->find(2)
-     * Author::select('A,B')->select('C,D')->find(2)
-     * Author::select('A,A,B,C')->select('B,C,D')->find(2)
-     * will generate:
-     *
-     * SELECT A,B,C,D
-     * FROM Author
-     * WHERE ID = 2
+     * Book::select("name")->first()->publisher
+     * => ActiveRecord::UndefinedPropertyException: missing attribute: publisher
+     * 
+     * @see UndefinedPropertyException
      *
      * @return Relation<TModel>
      */
@@ -582,7 +579,7 @@ class Relation implements \Iterator
      *
      * @throws RecordNotFound if any of the records cannot be found
      *
-     * @return Model|array<Model>
+     * @return TModel|array<TModel>
      */
     public function find(): Model|array
     {
