@@ -109,6 +109,11 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals(2, count($authors));
         $this->assertEquals('Uncle Bob', $authors[0]->name);
         $this->assertEquals('Bill Clinton', $authors[1]->name);
+
+        $authors = $relation->reverse_order();
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Bill Clinton', $authors[0]->name);
+        $this->assertEquals('Uncle Bob', $authors[1]->name);
     }
 
     public function testAllNoParameters()

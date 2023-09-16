@@ -23,7 +23,7 @@ class ActiveRecordCountTest extends \DatabaseTestCase
         $this->assertEquals(1, Author::where('author_id=1')->count());
     }
 
-    public function testSelectDoesNotClobberedByCount()
+    public function testSelectIsNotClobberedByCount()
     {
         $authors = Author::select('name')->where('author_id=1');
         $this->assertEquals(1, $authors->count());
@@ -42,5 +42,10 @@ class ActiveRecordCountTest extends \DatabaseTestCase
     public function testWithArrayCondition()
     {
         $this->assertEquals(1, Author::where(['author_id = ?', 1])->count());
+    }
+
+    public function testWhereInCountForBackwardsCompatibility()
+    {
+        $this->assertEquals(1, Author::count('author_id=1'));
     }
 }

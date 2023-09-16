@@ -84,6 +84,9 @@ class ActiveRecordSelectTest extends \DatabaseTestCase
 
     public function testReselect()
     {
+        $author = Author::reselect('name')->first();
+        $this->assertEquals('Tito', $author->name);
+
         $this->expectException(UndefinedPropertyException::class);
         $author = Author::select('name')->reselect('author_id')->first();
         $author->name;
