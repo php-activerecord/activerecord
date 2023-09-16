@@ -73,7 +73,6 @@ class ActiveRecordFirstLastTest extends \DatabaseTestCase
         $this->expectException(UndefinedPropertyException::class);
         $author = Author::select('name, 123 as bubba')->first();
         $author->id;
-        $this->fail('expected ActiveRecord\UndefinedPropertyExecption');
     }
 
     public function testLast()
