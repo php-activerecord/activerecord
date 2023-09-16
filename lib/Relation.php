@@ -711,7 +711,7 @@ class Relation implements \Iterator
                 if (str_contains($this->options['order'], implode(" {$reverseCommand}, ", $this->table()->pk) . " {$reverseCommand}")) {
                     $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
                 }
-            } else if (!array_key_exists('having', $this->options)) {
+            } elseif (!array_key_exists('having', $this->options)) {
                 $command = $isAscending ? 'ASC' : 'DESC';
                 $this->options['order'] = implode(" {$command}, ", $this->table()->pk) . " {$command}";
             }
