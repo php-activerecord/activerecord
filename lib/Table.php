@@ -13,6 +13,7 @@ use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Relationship\HasOne;
+use function PHPStan\dumpType;
 
 /**
  * Manages reading and writing to a database table.
@@ -213,12 +214,24 @@ class Table
 
             // by default, an inner join will not fetch the fields from the joined table
             if (!array_key_exists('select', $options)) {
-                $options['select'] = $this->get_fully_qualified_table_name() . '.*';
+                $options['select'] = [$this->get_fully_qualified_table_name() . '.*'];
             }
         }
 
-        if (!empty($options['select'])) {
-            $sql->select(implode(', ', (array) $options['select']));
+        if (!empty($selects = $options['select'])) {
+            $tokens = [];
+            foreach (array_flatten($selects) as $select) {
+                $tokens = array_merge(
+                    $tokens,
+                    array_map('trim', explode(',', $select))
+                );
+            }
+
+            $sql->select(
+                array_search('*', $tokens) ?
+                    '*' :
+                    implode(', ', array_unique($tokens))
+            );
         }
 
         $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
