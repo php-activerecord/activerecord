@@ -677,7 +677,7 @@ class Relation implements \Iterator
      *
      * @return array<TModel>
      */
-    public function reverse_order(): Model|array|null
+    public function reverse_order(): array
     {
         $pk = $this->table()->pk;
         if (!empty($pk)) {
