@@ -13,7 +13,6 @@ use ActiveRecord\Relationship\BelongsTo;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
 use ActiveRecord\Relationship\HasMany;
 use ActiveRecord\Relationship\HasOne;
-use function PHPStan\dumpType;
 
 /**
  * Manages reading and writing to a database table.
@@ -218,20 +217,13 @@ class Table
             }
         }
 
-        if (!empty($selects = $options['select'])) {
+        if (!empty($options['select'])) {
             $tokens = [];
-            foreach (array_flatten($selects) as $select) {
-                $tokens = array_merge(
-                    $tokens,
-                    array_map('trim', explode(',', $select))
-                );
+            foreach (array_flatten($options['select']) as $select) {
+                $tokens = array_merge($tokens, array_map('trim', explode(',', $select)));
             }
 
-            $sql->select(
-                array_search('*', $tokens) ?
-                    '*' :
-                    implode(', ', array_unique($tokens))
-            );
+            $sql->select(array_search('*', $tokens) ? '*' : implode(', ', array_unique($tokens)));
         }
 
         $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
