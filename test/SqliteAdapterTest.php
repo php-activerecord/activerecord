@@ -35,14 +35,13 @@ class SqliteAdapterTest extends AdapterTestCase
 
     public function testLimitWith0OffsetDoesNotContainOffset()
     {
-        $ret = [];
-        $sql = 'SELECT * FROM authors ORDER BY name ASC';
-        $this->connection->query_and_fetch($this->connection->limit($sql, 0, 1), function ($row) use (&$ret) { $ret[] = $row; });
+        $sql = $this->connection->limit('SELECT * FROM authors ORDER BY name ASC', 0, 1);
+        iterator_to_array($this->connection->query_and_fetch($sql));
 
         $this->assertTrue(false !== strpos($this->connection->last_query, 'LIMIT 1'));
     }
 
-    public function testGh183SqliteadapterAutoincrement()
+    public function testSqliteAdapterAutoincrement()
     {
         // defined in lowercase: id integer not null primary key
         $columns = $this->connection->columns('awesome_people');

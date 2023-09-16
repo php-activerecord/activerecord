@@ -118,35 +118,19 @@ class Relation implements \Iterator
      */
     public function pluck(): array
     {
-        $columns = $this->possibleListToArray(...func_get_args());
-        if (0 === count($columns)) {
+        $args = func_get_args();
+        if (0 === count($args)) {
             throw new ValidationsArgumentError('pluck requires at least one argument');
         }
 
-        $oldSelect = array_key_exists('select', $this->options) ? $this->options['select'] : null;
-        $this->reselect($columns);
+        $options = array_merge($this->options, ['select' => [static::toSingleArg(...$args)]]);
+        $table = $this->table();
+        $sql = $table->options_to_sql($options);
+        $retValue = iterator_to_array($table->conn->query_and_fetch($sql->to_s(), $sql->get_where_values(), \PDO::FETCH_NUM));
 
-        $models = $this->to_a();
-
-        if (null === $oldSelect) {
-            unset($this->options['select']);
-        } else {
-            $this->options['select'] = $oldSelect;
-        }
-
-        $retValue = [];
-        foreach ($models as $model) {
-            $row = [];
-            foreach ($columns as $column) {
-                array_push($row, $model->$column);
-            }
-            if (1 === count($row)) {
-                $row = $row[0];
-            }
-            array_push($retValue, $row);
-        }
-
-        return $retValue;
+        return array_map(static function ($row) {
+            return 1 == count($row) ? $row[0] : $row;
+        }, $retValue);
     }
 
     /**
@@ -190,21 +174,6 @@ class Relation implements \Iterator
         $this->options['select'] = [static::toSingleArg(...func_get_args())];
 
         return $this;
-    }
-
-    /**
-     * Converts "name,id" to ["name", "id"] if necessary
-     *
-     * @return array<string>
-     */
-    private function possibleListToArray(): array
-    {
-        $args = static::toSingleArg(...func_get_args());
-        if (!is_array($args)) {
-            $args = array_map('trim', explode(',', $args));
-        }
-
-        return $args;
     }
 
     /**

@@ -11,21 +11,25 @@ class ActiveRecordPluckTest extends \DatabaseTestCase
     public function testNoArguments()
     {
         $this->expectException(ValidationsArgumentError::class);
-        $author = Author::pluck();
+        Author::pluck();
     }
 
     public function testSingleArgument()
     {
-        $authors = Author::where(['mixedCaseField' => 'Bill'])->pluck('name');
-        $this->assertEquals(2, count($authors));
-        $this->assertEquals('Bill Clinton', $authors[0]);
-        $this->assertEquals('Uncle Bob', $authors[1]);
+        $authors = Author::pluck('name');
+        $this->assertEquals(4, count($authors));
+        $this->assertEquals('Tito', $authors[0]);
+        $this->assertEquals('George W. Bush', $authors[1]);
     }
 
     public function testMultipleArguments()
     {
-        $authors = Author::where(['mixedCaseField' => 'Bill'])->pluck('name', 'author_id');
-        $this->assertMultipleArgumentsResult($authors);
+        $authors = Author::pluck('name', 'author_id');
+        $this->assertEquals(4, count($authors));
+        $this->assertEquals('Tito', $authors[0][0]);
+        $this->assertEquals(1, $authors[0][1]);
+        $this->assertEquals('George W. Bush', $authors[1][0]);
+        $this->assertEquals(2, $authors[1][1]);
     }
 
     public function testCommaDelimitedString()
