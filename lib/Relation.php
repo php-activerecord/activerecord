@@ -767,21 +767,12 @@ class Relation implements \Iterator
         if ($this->isNone) {
             return 0;
         }
-
-        $oldSelect = array_key_exists('select', $this->options) ? $this->options['select'] : null;
-        $this->reselect('COUNT(*)');
-
         $table = $this->table();
-        $sql = $table->options_to_sql($this->options);
+        $options = array_merge($this->options, ['select' => 'COUNT(*)']);
+        $sql = $table->options_to_sql($options);
         $values = $sql->get_where_values();
 
-        if (null === $oldSelect) {
-            unset($this->options['select']);
-        } else {
-            $this->options['select'] = $oldSelect;
-        }
-
-        return $this->table()->conn->query_and_fetch_one($sql->to_s(), $values);
+        return $table->conn->query_and_fetch_one($sql->to_s(), $values);
     }
 
     /**
