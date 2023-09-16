@@ -9,12 +9,14 @@ use test\models\Author;
 use test\models\AuthorAttrAccessible;
 use test\models\AwesomePerson;
 use test\models\Book;
+use test\models\Course;
 use test\models\Employee;
 use test\models\Event;
 use test\models\Host;
 use test\models\JoinBook;
 use test\models\Position;
 use test\models\Property;
+use test\models\Student;
 use test\models\Venue;
 
 class NotModel
@@ -264,7 +266,13 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasAndBelongsToMany()
     {
-        $this->expectNotToPerformAssertions();
+        $student = Student::find(1);
+        $courses = $student->courses;
+        $this->assertEquals(2, count($courses));
+
+        $course = Course::find(3);
+        $students = $course->students;
+        $this->assertEquals(1, count($students));
     }
 
     public function testBelongsToCreateAssociation()

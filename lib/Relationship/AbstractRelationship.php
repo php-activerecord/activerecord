@@ -58,10 +58,12 @@ abstract class AbstractRelationship
      * @var array<string>
      */
     protected static $valid_association_options = [
+        'association_foreign_key',
         'class_name',
         'foreign_key',
         'conditions',
         'select',
+        'join_table',
         'readonly',
         'namespace'
     ];
