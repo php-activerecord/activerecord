@@ -91,4 +91,21 @@ abstract class DatabaseTestCase extends TestCase
 
         return $this->assertStringNotContainsString($needle, $haystack);
     }
+
+    /**
+     * Exposes non-public variables for inspection
+     *
+     * @param $obj  The instantianted object who has the private variable you want access to
+     * @param $name The name of the private or protected variable you want access to
+     *
+     * @return The private variable of $obj
+     */
+    protected function getPrivateVariable($obj, $name): mixed
+    {
+        $reflectionClass = new ReflectionClass($obj);
+        $reflectionProperty = $reflectionClass->getProperty($name);
+        $reflectionProperty->setAccessible(true);
+
+        return $reflectionProperty->getValue($obj);
+    }
 }

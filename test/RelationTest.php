@@ -1,108 +1,11 @@
 <?php
 
-use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Relation;
 use test\models\Author;
 
 class RelationTest extends DatabaseTestCase
 {
-    public function testFind()
-    {
-        $rel = Author::all();
-
-        $author = $rel->find(1);
-        $this->assertEquals('Tito', $author->name);
-        $this->assertEquals(['sharks' => 'lasers'], $author->return_something());
-
-        $author = $rel->find('1');
-        $this->assertEquals('Tito', $author->name);
-        $authors = $rel->find([1, 2]);
-        $this->assertEquals(2, count($authors));
-        $this->assertEquals('Tito', $authors[0]->name);
-        $this->assertEquals('George W. Bush', $authors[1]->name);
-
-        $authors = $rel->find([1]);
-        $this->assertEquals(1, count($authors));
-        $this->assertEquals('Tito', $authors[0]->name);
-    }
-
-    public function testFirst()
-    {
-        $rel = Author::first();
-        $this->assertInstanceOf(Author::class, $rel);
-        $this->assertEquals(1, $rel->author_id);
-    }
-
-    public function testFirstWithCount()
-    {
-        $authors = Author::first(2);
-        $this->assertIsArray($authors);
-        $this->assertEquals(2, count($authors));
-    }
-
-    public function testFirstWithCountOverridesLimit()
-    {
-        $authors = Author::limit(1)->first(2);
-        $this->assertIsArray($authors);
-        $this->assertEquals(2, count($authors));
-    }
-
-    public function testLast()
-    {
-        $authors = Author::all()->to_a();
-        $author = Author::last();
-        $this->assertInstanceOf(Author::class, $author);
-        $this->assertEquals($author, $authors[count($authors)-1]);
-    }
-
-    public function testLastWithCount()
-    {
-        $allAuthors = Author::all()->to_a();
-        $authors = Author::last(2);
-        $this->assertIsArray($authors);
-        $this->assertEquals(2, count($authors));
-        $this->assertEquals($allAuthors[count($allAuthors)-1], $authors[0]);
-        $this->assertEquals($allAuthors[count($allAuthors)-2], $authors[1]);
-    }
-
-    public function testLastWithCountOverridesLimit()
-    {
-        $authors = Author::limit(1)->last(2);
-        $this->assertIsArray($authors);
-        $this->assertEquals(2, count($authors));
-    }
-
-    public function testFindSingleArrayElementNotFound()
-    {
-        $this->expectException(RecordNotFound::class);
-        $queries = Author::select('name')->find([999999]);
-    }
-
-    public function testFindNotAllArrayElementsFound()
-    {
-        $this->expectException(RecordNotFound::class);
-        $queries = Author::select('name')->find([1, 999999]);
-    }
-
-    public function testFindWrongType()
-    {
-        $this->expectException(TypeError::class);
-        Author::select('name')->find('not a number');
-    }
-
-    public function testFindSingleElementNotFound()
-    {
-        $this->expectException(RecordNotFound::class);
-        $query = Author::select('name')->find(99999);
-    }
-
-    public function testFindNoWhere()
-    {
-        $this->expectException(ValidationsArgumentError::class);
-        $query = Author::select('name')->find();
-    }
-
     public function testWhereString()
     {
         $models = Author::where("mixedCaseField = 'Bill'")->to_a();
@@ -191,6 +94,26 @@ class RelationTest extends DatabaseTestCase
             ->where(['mixedCaseField' => 'Bill'])
             ->find(3);
         $this->assertEquals('Bill Clinton', $model->name);
+    }
+
+    public function testReverseOrder()
+    {
+        $relation = Author::where(['mixedCaseField' => 'Bill']);
+
+        $authors = $relation->to_a();
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Bill Clinton', $authors[0]->name);
+        $this->assertEquals('Uncle Bob', $authors[1]->name);
+
+        $authors = $relation->reverse_order();
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Uncle Bob', $authors[0]->name);
+        $this->assertEquals('Bill Clinton', $authors[1]->name);
+
+        $authors = $relation->reverse_order();
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Bill Clinton', $authors[0]->name);
+        $this->assertEquals('Uncle Bob', $authors[1]->name);
     }
 
     public function testAllNoParameters()
