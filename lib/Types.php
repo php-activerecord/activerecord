@@ -42,7 +42,7 @@ namespace ActiveRecord;
  *  offset?: int,
  *  order?: string,
  *  readonly?: bool,
- *  select?: array<string>,
+ *  select?: string|array<string>,
  * }
  */
 abstract class Types

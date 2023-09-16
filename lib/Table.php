@@ -219,7 +219,7 @@ class Table
 
         if (!empty($options['select'])) {
             $tokens = [];
-            foreach (array_flatten($options['select']) as $select) {
+            foreach (array_flatten((array)($options['select'])) as $select) {
                 $tokens = array_merge($tokens, array_map('trim', explode(',', $select)));
             }
 
