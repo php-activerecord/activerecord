@@ -58,10 +58,12 @@ abstract class AbstractRelationship
      * @var array<string>
      */
     protected static $valid_association_options = [
+        'association_foreign_key',
         'class_name',
         'foreign_key',
         'conditions',
         'select',
+        'join_table',
         'readonly',
         'namespace'
     ];
@@ -339,7 +341,7 @@ abstract class AbstractRelationship
      *
      * @return string SQL INNER JOIN fragment
      */
-    public function construct_inner_join_sql(Table $from_table, $using_through = false, $alias = null)
+    public function construct_inner_join_sql(Table $from_table, bool $using_through = false, string $alias = null)
     {
         if ($using_through) {
             $join_table_name = $from_table->get_fully_qualified_table_name();

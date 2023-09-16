@@ -116,5 +116,21 @@ CREATE TABLE valuestore (
   value varchar(255) NOT NULL DEFAULT ''
 );
 
+CREATE TABLE students (
+  student_id serial primary key,
+  first_name varchar(255) NOT NULL
+);
+
+CREATE TABLE courses (
+  course_id serial primary key,
+  title varchar(255) NOT NULL
+);
+
+CREATE TABLE courses_students(
+  course_id int not null,
+  student_id int not null,
+  PRIMARY KEY(course_id, student_id)
+);
+
 -- reproduces issue GH-96 for testing
 CREATE INDEX user_newsletters_id_and_user_id_idx ON user_newsletters USING btree(id, user_id);
