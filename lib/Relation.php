@@ -95,7 +95,9 @@ class Relation implements \Iterator
     }
 
     /**
-     * Returns a blank Relation and fires no queries. Any subsequent call to find(), to_a(), last(), first() returns []
+     * Returns a blank Relation and fires no queries.
+     *
+     * @returns Relation<TModel>
      */
     public function none(): Relation
     {
