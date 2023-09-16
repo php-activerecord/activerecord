@@ -1777,7 +1777,7 @@ class Model
         $relation = static::Relation();
 
         $arg = Relation::toSingleArg(...func_get_args());
-        if (null != $arg && count($arg) > 0) {
+        if (null != $arg && (!is_array($arg) || count($arg) > 0)) {
             $relation = $relation->where($arg);
         }
 
