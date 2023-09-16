@@ -96,8 +96,6 @@ class Relation implements \Iterator
 
     /**
      * Returns a blank Relation and fires no queries. Any subsequent call to find(), to_a(), last(), first() returns []
-     * 
-     * @return Relation
      */
     public function none(): Relation
     {
@@ -166,7 +164,7 @@ class Relation implements \Iterator
      *
      * Book::select("name")->first()->publisher
      * => ActiveRecord::UndefinedPropertyException: missing attribute: publisher
-     * 
+     *
      * @see UndefinedPropertyException
      *
      * @return Relation<TModel>
