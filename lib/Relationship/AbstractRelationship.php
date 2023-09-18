@@ -98,7 +98,7 @@ abstract class AbstractRelationship
     }
 
     /**
-     * @param array<Model>      $models     of model objects
+     * @param list<Model>      $models     of model objects
      * @param array<Attributes> $attributes of attributes from $models
      * @param array<mixed>      $includes   of eager load directives
      */
