@@ -2,6 +2,8 @@
 
 namespace test;
 
+use ActiveRecord\Exception\DatabaseException;
+use test\models\Author;
 use test\models\Venue;
 
 class ActiveRecordFromTest extends \DatabaseTestCase
