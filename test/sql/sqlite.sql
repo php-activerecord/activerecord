@@ -115,3 +115,19 @@ CREATE TABLE valuestore (
   `key` varchar(20) NOT NULL DEFAULT '',
   `value` varchar(255) NOT NULL DEFAULT ''
 );
+
+CREATE TABLE students (
+    student_id INTEGER NOT NULL PRIMARY KEY,
+    first_name varchar(255) NOT NULL DEFAULT ''
+);
+
+CREATE TABLE courses (
+     course_id INTEGER NOT NULL PRIMARY KEY,
+     title varchar(255) NOT NULL DEFAULT ''
+);
+
+CREATE TABLE courses_students(
+     course_id int not null,
+     student_id int not null,
+     PRIMARY KEY(course_id, student_id)
+);

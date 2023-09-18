@@ -147,7 +147,7 @@ class Table
     }
 
     /**
-     * @param array<string>|string $joins
+     * @param list<string>|string $joins
      *
      * @throws RelationshipException
      */
@@ -223,7 +223,10 @@ class Table
                 $tokens = array_merge($tokens, array_map('trim', explode(',', $select)));
             }
 
-            $sql->select(array_search('*', $tokens) ? '*' : implode(', ', array_unique($tokens)));
+            $sql->select(
+                array_search('*', $tokens) ? '*' : implode(', ', array_unique($tokens)),
+                !empty($options['distinct'])
+            );
         }
 
         $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
@@ -579,7 +582,9 @@ class Table
                         break;
 
                     case 'has_and_belongs_to_many':
-                        $relationship = new HasAndBelongsToMany($definition);
+                        $definition['join_table'] ??= HasAndBelongsToMany::inferJoiningTableName($this->table, $attribute);
+                        $definition['foreign_key'] ??= $this->pk[0];
+                        $relationship = new HasAndBelongsToMany($attribute, $definition);
                         break;
                 }
 

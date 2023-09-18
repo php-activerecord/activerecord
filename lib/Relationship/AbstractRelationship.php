@@ -55,13 +55,15 @@ abstract class AbstractRelationship
     /**
      * List of valid options for relationships.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected static $valid_association_options = [
+        'association_foreign_key',
         'class_name',
         'foreign_key',
         'conditions',
         'select',
+        'join_table',
         'readonly',
         'namespace'
     ];
@@ -96,9 +98,9 @@ abstract class AbstractRelationship
     }
 
     /**
-     * @param array<Model>      $models     of model objects
-     * @param array<Attributes> $attributes of attributes from $models
-     * @param array<mixed>      $includes   of eager load directives
+     * @param list<Model>      $models     of model objects
+     * @param list<Attributes> $attributes of attributes from $models
+     * @param list<mixed>      $includes   of eager load directives
      */
     abstract public function load_eagerly(array $models, array $attributes, array $includes, Table $table): void;
 
@@ -117,11 +119,11 @@ abstract class AbstractRelationship
      * the related table by PK/FK and attaches the array of returned relationships to the appropriately named relationship on
      * $models.
      *
-     * @param array<Model>      $models            of model objects
-     * @param array<Attributes> $attributes        of attributes from $models
-     * @param array<mixed>      $includes          of eager load directives
-     * @param array<string>     $query_keys        -> key(s) to be queried for on included/related table
-     * @param array<string>     $model_values_keys -> key(s)/value(s) to be used in query from model which is including
+     * @param list<Model>      $models            of model objects
+     * @param list<Attributes> $attributes        of attributes from $models
+     * @param array<mixed>     $includes          of eager load directives
+     * @param list<string>     $query_keys        -> key(s) to be queried for on included/related table
+     * @param list<string>     $model_values_keys -> key(s)/value(s) to be used in query from model which is including
      */
     protected function query_and_attach_related_models_eagerly(Table $table, array $models, array $attributes, array $includes = [], array $query_keys = [], array $model_values_keys = []): void
     {
@@ -130,7 +132,7 @@ abstract class AbstractRelationship
         $query_key = $query_keys[0];
         $model_values_key = $model_values_keys[0];
 
-        foreach ($attributes as $column => $value) {
+        foreach ($attributes as $value) {
             $values[] = $value[Inflector::variablize($model_values_key)];
         }
 
@@ -306,10 +308,10 @@ abstract class AbstractRelationship
     }
 
     /**
-     * @param array<string> $condition_keys
-     * @param array<string> $value_keys
+     * @param list<string> $condition_keys
+     * @param list<string> $value_keys
      *
-     * @return array<mixed>
+     * @return list<mixed>
      */
     protected function create_conditions_from_keys(Model $model, array $condition_keys = [], array $value_keys = []): ?array
     {
@@ -339,7 +341,7 @@ abstract class AbstractRelationship
      *
      * @return string SQL INNER JOIN fragment
      */
-    public function construct_inner_join_sql(Table $from_table, $using_through = false, $alias = null)
+    public function construct_inner_join_sql(Table $from_table, bool $using_through = false, string $alias = null)
     {
         if ($using_through) {
             $join_table_name = $from_table->get_fully_qualified_table_name();

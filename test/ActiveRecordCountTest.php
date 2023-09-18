@@ -9,7 +9,7 @@ class ActiveRecordCountTest extends \DatabaseTestCase
 {
     public function testNoArguments()
     {
-        $this->assertEquals(4, Author::count());
+        $this->assertEquals(5, Author::count());
     }
 
     public function testColumnNameAsArgument()

@@ -18,6 +18,8 @@ class SQLBuilder
 {
     private Connection $connection;
     private string $operation = 'SELECT';
+
+    private bool $distinct = false;
     private string $table;
     private string $select = '*';
 
@@ -45,7 +47,7 @@ class SQLBuilder
     private array $data = [];
 
     /**
-     * @var array<string>
+     * @var list<string>
      */
     private array $sequence = [];
 
@@ -114,7 +116,7 @@ class SQLBuilder
     }
 
     /**
-     * @param array<WhereClause>   $clauses
+     * @param list<WhereClause>    $clauses
      * @param array<string,string> $mappedNames
      *
      * @throws Exception\ExpressionsException
@@ -175,8 +177,9 @@ class SQLBuilder
         return $this;
     }
 
-    public function select(string $select): static
+    public function select(string $select, bool $distinct = false): static
     {
+        $this->distinct = $distinct;
         $this->operation = 'SELECT';
         $this->select = $select;
 
@@ -344,7 +347,7 @@ class SQLBuilder
 
     private function build_select(): string
     {
-        $sql = "SELECT $this->select FROM $this->table";
+        $sql = 'SELECT ' . ($this->distinct ? 'DISTINCT ' : '') . "$this->select FROM $this->table";
 
         if (!empty($this->joins)) {
             $sql .= ' ' . $this->joins;
@@ -401,7 +404,7 @@ class SQLBuilder
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     private function quoted_key_names(): array
     {

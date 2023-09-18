@@ -119,7 +119,7 @@ class RelationTest extends DatabaseTestCase
     public function testAllNoParameters()
     {
         $authors = Author::all()->to_a();
-        $this->assertEquals(4, count($authors));
+        $this->assertEquals(5, count($authors));
     }
 
     public function testCanIterate()

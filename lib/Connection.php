@@ -72,7 +72,7 @@ abstract class Connection
     /**
      * Default PDO options to set for each connection.
      *
-     * @var array<mixed>
+     * @var list<int|bool>
      */
     public static array $PDO_OPTIONS = [
         \PDO::ATTR_CASE => \PDO::CASE_LOWER,
@@ -292,7 +292,7 @@ abstract class Connection
      *
      * @param string $table Name of a table
      *
-     * @return array<Column> an array of {@link Column} objects
+     * @return array<string,Column> an array of {@link Column} objects
      */
     public function columns(string $table): array
     {
@@ -332,8 +332,8 @@ abstract class Connection
     /**
      * Execute a raw SQL query on the database.
      *
-     * @param string       $sql     raw SQL string to execute
-     * @param array<mixed> &$values Optional array of bind values
+     * @param string      $sql     raw SQL string to execute
+     * @param list<mixed> &$values Optional array of bind values
      *
      * @return mixed A result set object
      */
@@ -391,22 +391,22 @@ abstract class Connection
     /**
      * Execute a raw SQL query and fetch the results.
      *
-     * @param string   $sql     raw SQL string to execute
-     * @param \Closure $handler closure that will be passed the fetched results
+     * @param string      $sql    raw SQL string to execute
+     * @param list<mixed> $values
      */
-    public function query_and_fetch(string $sql, \Closure $handler): void
+    public function query_and_fetch(string $sql, array $values = [], int $method = \PDO::FETCH_ASSOC): \Generator
     {
-        $sth = $this->query($sql);
+        $sth = $this->query($sql, $values);
 
-        while ($row = $sth->fetch(\PDO::FETCH_ASSOC)) {
-            $handler($row);
+        while ($row = $sth->fetch($method)) {
+            yield $row;
         }
     }
 
     /**
      * Returns all tables for the current database.
      *
-     * @return array<string> array containing table names
+     * @return list<string> array containing table names
      */
     public function tables(): array
     {

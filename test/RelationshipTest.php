@@ -9,12 +9,14 @@ use test\models\Author;
 use test\models\AuthorAttrAccessible;
 use test\models\AwesomePerson;
 use test\models\Book;
+use test\models\Course;
 use test\models\Employee;
 use test\models\Event;
 use test\models\Host;
 use test\models\JoinBook;
 use test\models\Position;
 use test\models\Property;
+use test\models\Student;
 use test\models\Venue;
 
 class NotModel
@@ -34,9 +36,6 @@ class AuthorWithNonModelRelationship extends ActiveRecord\Model
 
 class RelationshipTest extends DatabaseTestCase
 {
-    protected $relationship_name;
-    protected $relationship_names = ['HasMany', 'BelongsTo', 'HasOne'];
-
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
@@ -63,35 +62,6 @@ class RelationshipTest extends DatabaseTestCase
                 'order' => 'id asc'
             ]
         ];
-
-        foreach ($this->relationship_names as $name) {
-            if (preg_match("/$name/", $this->name(), $match)) {
-                $this->relationship_name = $match[0];
-            }
-        }
-    }
-
-    protected function get_relationship($type=null)
-    {
-        if (!$type) {
-            $type = $this->relationship_name;
-        }
-
-        switch ($type) {
-            case 'BelongsTo':
-                $ret = Event::find(5);
-                break;
-
-            case 'HasOne':
-                $ret = Employee::find(1);
-                break;
-
-            case 'HasMany':
-                $ret = Venue::find(2);
-                break;
-        }
-
-        return $ret;
     }
 
     protected function assert_default_belongs_to($event, $association_name='venue')
@@ -118,7 +88,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasManyBasic()
     {
-        $this->assert_default_has_many($this->get_relationship());
+        $this->assert_default_has_many(Venue::find(2));
     }
 
     public function testEagerLoadingThreeLevelsDeep()
@@ -169,7 +139,7 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testBelongsToBasic()
     {
-        $this->assert_default_belongs_to($this->get_relationship());
+        $this->assert_default_belongs_to(Event::find(5));
     }
 
     public function testBelongsToReturnsNullWhenNoRecord()
@@ -191,7 +161,7 @@ class RelationshipTest extends DatabaseTestCase
                 'class_name' => 'Venue'
             ]
         ];
-        $this->assert_default_belongs_to($this->get_relationship(), 'explicit_class_name');
+        $this->assert_default_belongs_to(Event::find(5), 'explicit_class_name');
     }
 
     public function testBelongsToWithExplicitForeignKey()
@@ -215,7 +185,7 @@ class RelationshipTest extends DatabaseTestCase
                 'select' => 'id, city'
             ]
         ];
-        $event = $this->get_relationship();
+        $event = Event::find(5);
         $this->assert_default_belongs_to($event);
 
         try {
@@ -233,7 +203,7 @@ class RelationshipTest extends DatabaseTestCase
                 'readonly' => true
             ]
         ];
-        $event = $this->get_relationship();
+        $event = Event::find(5);
         $this->assert_default_belongs_to($event);
 
         try {
@@ -253,7 +223,7 @@ class RelationshipTest extends DatabaseTestCase
                 'class_name' => 'Venue'
             ]
         ];
-        $this->assert_default_belongs_to($this->get_relationship(), 'venues');
+        $this->assert_default_belongs_to(Event::find(5), 'venues');
     }
 
     public function testBelongsToWithConditionsAndNonQualifyingRecord()
@@ -275,12 +245,12 @@ class RelationshipTest extends DatabaseTestCase
                 'conditions' => "state = 'PA'"
             ]
         ];
-        $this->assert_default_belongs_to($this->get_relationship());
+        $this->assert_default_belongs_to(Event::find(5));
     }
 
     public function testBelongsToBuildAssociation()
     {
-        $event = $this->get_relationship();
+        $event = Event::find(5);
         $values = ['city' => 'Richmond', 'state' => 'VA'];
         $venue = $event->build_venue($values);
         $this->assertEquals($values, array_intersect_key($values, $venue->attributes()));
@@ -289,13 +259,25 @@ class RelationshipTest extends DatabaseTestCase
     public function testHasManyBuildAssociation()
     {
         $author = Author::first();
+        $author->build_book();
         $this->assertEquals($author->id, $author->build_books()->author_id);
         $this->assertEquals($author->id, $author->build_book()->author_id);
     }
 
+    public function testHasAndBelongsToMany()
+    {
+        $student = Student::find(1);
+        $courses = $student->courses;
+        $this->assertEquals(2, count($courses));
+
+        $course = Course::find(3);
+        $students = $course->students;
+        $this->assertEquals(1, count($students));
+    }
+
     public function testBelongsToCreateAssociation()
     {
-        $event = $this->get_relationship();
+        $event = Event::find(5);
         $values = ['city' => 'Richmond', 'state' => 'VA', 'name' => 'Club 54', 'address' => '123 street'];
         $venue = $event->create_venue($values);
         $this->assertNotNull($venue->id);
@@ -342,7 +324,7 @@ class RelationshipTest extends DatabaseTestCase
                 'order' => 'id asc'
             ]
         ];
-        $this->assert_default_has_many($this->get_relationship(), 'explicit_class_name');
+        $this->assert_default_has_many(Venue::find(2), 'explicit_class_name');
     }
 
     public function testInvalidRelationship()
@@ -360,7 +342,7 @@ class RelationshipTest extends DatabaseTestCase
             ]
         ];
 
-        $venue = $this->get_relationship();
+        $venue = Venue::find(2);
         $this->assert_default_has_many($venue);
 
         try {
@@ -378,7 +360,7 @@ class RelationshipTest extends DatabaseTestCase
                 'readonly' => true
             ]
         ];
-        $venue = $this->get_relationship();
+        $venue = Venue::find(2);
         $this->assert_default_has_many($venue);
 
         try {
@@ -399,7 +381,7 @@ class RelationshipTest extends DatabaseTestCase
                 'order' => 'id asc'
             ]
         ];
-        $this->assert_default_has_many($this->get_relationship(), 'event');
+        $this->assert_default_has_many(Venue::find(2), 'event');
     }
 
     public function testHasManyWithConditionsAndQualifyingRecord()
@@ -409,7 +391,7 @@ class RelationshipTest extends DatabaseTestCase
                 'conditions' => "title = 'Yeah Yeah Yeahs'"
             ]
         ];
-        $venue = $this->get_relationship();
+        $venue = Venue::find(2);
         $this->assertEquals(2, $venue->id);
         $this->assertEquals($venue->events[0]->title, 'Yeah Yeah Yeahs');
     }
@@ -467,7 +449,7 @@ class RelationshipTest extends DatabaseTestCase
             ]
         ];
 
-        $venue = $this->get_relationship();
+        $venue = Venue::find(2);
         $n = $venue->hosts;
         $this->assertTrue(count($n) > 0);
     }
@@ -484,7 +466,7 @@ class RelationshipTest extends DatabaseTestCase
             ]
         ];
 
-        $venue = $this->get_relationship();
+        $venue = Venue::find(2);
         $this->assertTrue(count($venue->hosts) > 0);
         $this->assertNotNull($venue->hosts[0]->title);
     }
@@ -504,7 +486,7 @@ class RelationshipTest extends DatabaseTestCase
             ]
         ];
 
-        $venue = $this->get_relationship();
+        $venue = Venue::find(2);
         $this->assertTrue(1 === count($venue->hosts));
         $this->assert_sql_has('events.title !=', ActiveRecord\Table::load(Host::class)->last_sql);
     }
@@ -522,7 +504,7 @@ class RelationshipTest extends DatabaseTestCase
             ]
         ];
 
-        $venue = $this->get_relationship();
+        $venue = Venue::find(2);
         $this->assertTrue(count($venue->hostess) > 0);
     }
 
@@ -541,7 +523,7 @@ class RelationshipTest extends DatabaseTestCase
             ]
         ];
 
-        $this->get_relationship()->hosts;
+        Venue::find(2)->hosts;
     }
 
     public function testHasManyWithJoins()
@@ -580,14 +562,13 @@ class RelationshipTest extends DatabaseTestCase
                 'class_name' => 'Position'
             ]
         ];
-        $this->assert_default_has_one($this->get_relationship(), 'explicit_class_name');
+        $this->assert_default_has_one(Employee::find(1), 'explicit_class_name');
     }
 
     public function testHasOneWithSelect()
     {
-        $ho = Employee::$has_one;
         Employee::$has_one['position']['select'] = 'title';
-        $employee = $this->get_relationship();
+        $employee = Employee::find(1);
         $this->assert_default_has_one($employee);
 
         try {
@@ -601,7 +582,7 @@ class RelationshipTest extends DatabaseTestCase
     public function testHasOneWithOrder()
     {
         Employee::$has_one['position']['order'] = 'title';
-        $employee = $this->get_relationship();
+        $employee = Employee::find(1);
         $this->assert_default_has_one($employee);
         $this->assert_sql_has('ORDER BY title', Position::table()->last_sql);
     }
@@ -609,7 +590,7 @@ class RelationshipTest extends DatabaseTestCase
     public function testHasOneWithConditionsAndNonQualifyingRecord()
     {
         Employee::$has_one['position']['conditions'] = "title = 'programmer'";
-        $employee = $this->get_relationship();
+        $employee = Employee::find(1);
         $this->assertEquals(1, $employee->id);
         $this->assertNull($employee->position);
     }
@@ -617,13 +598,13 @@ class RelationshipTest extends DatabaseTestCase
     public function testHasOneWithConditionsAndQualifyingRecord()
     {
         Employee::$has_one['position']['conditions'] = "title = 'physicist'";
-        $this->assert_default_has_one($this->get_relationship());
+        $this->assert_default_has_one(Employee::find(1));
     }
 
     public function testHasOneWithReadonly()
     {
         Employee::$has_one['position']['readonly'] = true;
-        $employee = $this->get_relationship();
+        $employee = Employee::find(1);
         $this->assert_default_has_one($employee);
 
         try {

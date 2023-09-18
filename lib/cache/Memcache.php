@@ -41,7 +41,7 @@ class Memcache
     }
 
     /**
-     * @param array<string>|string $key
+     * @param list<string>|string $key
      */
     public function read(array|string $key): mixed
     {
