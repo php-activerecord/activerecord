@@ -2,6 +2,7 @@
 
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
+use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use test\models\Author;
 use test\models\AwesomePerson;
@@ -53,6 +54,13 @@ class ActiveRecordTest extends DatabaseTestCase
             $author = new Author();
             $author->this_better_not_exist;
         });
+    }
+
+    public function testUnknownRelationship()
+    {
+        $this->expectException(RelationshipException::class);
+        $author = new Author();
+        $author->set_relationship_from_eager_load(null, 'unknown');
     }
 
     public function testMassAssignmentUndefinedPropertyExceptionIncludesModelName()
@@ -238,6 +246,9 @@ class ActiveRecordTest extends DatabaseTestCase
         $book = new Book();
         $this->assertTrue(isset($book->name));
         $this->assertFalse(isset($book->sharks));
+
+        $venue = new Venue();
+        $this->assertTrue(isset($venue->customState));
 
         $author = Author::find(1);
         $this->assertTrue(isset($author->awesome_person));

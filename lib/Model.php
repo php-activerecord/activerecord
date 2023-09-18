@@ -688,16 +688,15 @@ class Model
      *
      * @return Model|array<Model>|null
      */
-    protected function initRelationships(string $name): mixed
+    protected function initRelationships(string $name): Model|array|null
     {
         $table = static::table();
-        if ($relationship = $table->get_relationship($name)) {
+        $relationship = $table->get_relationship($name);
+        if (null !== $relationship) {
             $this->__relationships[$name] = $relationship->load($this);
-
-            return $this->__relationships[$name];
         }
 
-        return null;
+        return array_key_exists($name, $this->__relationships) ? $this->__relationships[$name] : null;
     }
 
     /**
