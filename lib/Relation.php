@@ -740,7 +740,6 @@ class Relation implements \Iterator
      */
     public function take(int $limit = null): Model|array|null
     {
-        $options = $this->options;
         $options = array_merge($this->options, ['limit' => $limit ?? 1]);
         $models = $this->to_a_withOptions($options);
 
