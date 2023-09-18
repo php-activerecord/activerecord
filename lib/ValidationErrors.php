@@ -19,7 +19,7 @@ class ValidationErrors implements \IteratorAggregate
     private array $errors;
 
     /**
-     * @var array<string>
+     * @var array<string,string>
      */
     public static array $DEFAULT_ERROR_MESSAGES = [
         'inclusion' => 'is not included in the list',

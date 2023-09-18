@@ -49,7 +49,7 @@ class Config extends Singleton
     /**
      * Contains the list of database connection strings.
      *
-     * @var array<string>
+     * @var array<string,string>
      */
     private array $connections = [];
 

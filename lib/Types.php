@@ -16,7 +16,7 @@ namespace ActiveRecord;
  *  limit?: int,
  *  offset?: int,
  *  order?: string,
- *  primary_key?: string|array<string>,
+ *  primary_key?: string|list<string>,
  *  through?: string
  * }
  * @phpstan-type HasAndBelongsToManyOptions array{
@@ -35,22 +35,22 @@ namespace ActiveRecord;
  * @phpstan-type DelegateOptions array{
  *  to: string,
  *  prefix?: string,
- *  delegate: array<string>
+ *  delegate: list<string>
  * }
  * @phpstan-type RelationOptions array{
- *  conditions?: array<WhereClause>,
+ *  conditions?: list<WhereClause>,
  *  from?: string,
  *  group?: string,
  *  having?: string,
- *  include?: string|array<string>,
- *  joins?: string|array<string>,
+ *  include?: string|list<string>,
+ *  joins?: string|list<string>,
  *  limit?: int,
  *  mapped_names?: array<string, string>,
  *  offset?: int,
  *  order?: string,
  *  readonly?: bool,
  *  distinct?: bool,
- *  select?: string|array<string>,
+ *  select?: string|list<string>,
  * }
  */
 abstract class Types

@@ -50,12 +50,12 @@ class BelongsTo extends AbstractRelationship
     public string $class_name;
 
     /**
-     * @var array<string>
+     * @var list<string>
      */
     private array $primary_key;
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function primary_key(): array
     {
@@ -108,9 +108,9 @@ class BelongsTo extends AbstractRelationship
     }
 
     /**
-     * @param array<Model>      $models
-     * @param array<Attributes> $attributes
-     * @param array<mixed>      $includes
+     * @param list<Model>      $models
+     * @param list<Attributes> $attributes
+     * @param array<mixed>     $includes
      */
     public function load_eagerly(array $models, array $attributes, array $includes, Table $table): void
     {

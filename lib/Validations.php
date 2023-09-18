@@ -78,8 +78,8 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * }
  * @phpstan-type ValidateInclusionOptions array{
  *  message?: string|null,
- *  in?: array<string>,
- *  within?: array<string>
+ *  in?: list<string>,
+ *  within?: list<string>
  * }
  * @phpstan-type ValidateFormatOptions array{
  *  with: string,
@@ -116,7 +116,7 @@ class Validations
     ];
 
     /**
-     * @var array<string>
+     * @var list<string>
      */
     private static array $ALL_RANGE_OPTIONS = [
         'is',

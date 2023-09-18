@@ -67,7 +67,7 @@ class CallBack
     /**
      * List of available callbacks.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected static array $VALID_CALLBACKS = [
         'after_construct',
@@ -95,7 +95,7 @@ class CallBack
     private \ReflectionClass $klass;
 
     /**
-     * @var array<string>
+     * @var list<string>
      */
     private array $publicMethods;
 
@@ -141,7 +141,7 @@ class CallBack
      *
      * @param $name string Name of a callback (see {@link VALID_CALLBACKS $VALID_CALLBACKS})
      *
-     * @return array<\Closure|string> array of callbacks or empty array if invalid callback name
+     * @return list<\Closure|string> array of callbacks or empty array if invalid callback name
      */
     public function get_callbacks(string $name): array
     {

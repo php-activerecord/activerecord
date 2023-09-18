@@ -283,7 +283,7 @@ class Model
      * echo $person->id; # => null
      * ```
      *
-     * @var array<string>
+     * @var list<string>
      */
     public static array $attr_accessible = [];
 
@@ -804,7 +804,7 @@ class Model
     /**
      * Returns an associative array containing values for all the attributes in $attributes
      *
-     * @param array<string> $attributes Array containing attribute names
+     * @param list<string> $attributes Array containing attribute names
      *
      * @return Attributes A hash containing $name => $value
      */
@@ -1901,7 +1901,7 @@ class Model
      * 	"last"										static|null			User::find("last", ["name"=>"William"]);
      *  "all"										static[]			User::find("all", ["name"=>"Stephen"]
      *  ...int|string								static[]			User::find(1, 3, 5, 8);
-     *  array<int,int|string>						static[]			User::find([1,3,5,8]);
+     *  list<int|string>						    static[]			User::find([1,3,5,8]);
      */
     public static function find(/* $pk */): Model|array|null
     {
