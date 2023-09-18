@@ -23,10 +23,23 @@ class ActiveRecordFindByTest extends \DatabaseTestCase
 
     public function testFindBy()
     {
+        $author = Author::find_by_name('Tito');
+        $this->assertInstanceOf(Author::class, $author);
         $this->assertEquals('Tito', Author::find_by_name('Tito')->name);
+
         $this->assertEquals('Tito', Author::find_by_author_id_and_name(1, 'Tito')->name);
         $this->assertEquals('George W. Bush', Author::find_by_author_id_or_name(2, 'Barney')->name);
         $this->assertEquals('Tito', Author::find_by_name(['Tito', 'George W. Bush'])->name);
+    }
+
+    public function testFindBySelect()
+    {
+        $author = Author::select('author_id')->find_by_name('Tito');
+        $this->assertInstanceOf(Author::class, $author);
+        $this->assertEquals(1, $author->author_id);
+
+        $this->expectException(ActiveRecordException::class);
+        $author->name;
     }
 
     public function testFindByNoResults()
@@ -44,5 +57,23 @@ class ActiveRecordFindByTest extends \DatabaseTestCase
     public function testDynamicFinderUsingAlias()
     {
         $this->assertNotNull(Venue::find_by_marquee('Warner Theatre'));
+    }
+
+    public function testFindOrCreateByOnExistingRecord()
+    {
+        $this->assertNotNull(Author::find_or_create_by_name('Tito'));
+    }
+
+    public function testFindOrCreateByCreatesNewRecord()
+    {
+        $author = Author::find_or_create_by_name_and_encrypted_password('New Guy', 'pencil');
+        $this->assertEquals(Author::last()->author_id, $author->author_id);
+        $this->assertEquals('pencil', $author->encrypted_password);
+    }
+
+    public function testFindOrCreateByThrowsExceptionWhenUsingOr()
+    {
+        $this->expectException(ActiveRecordException::class);
+        Author::find_or_create_by_name_or_encrypted_password('New Guy', 'pencil');
     }
 }

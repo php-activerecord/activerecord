@@ -1,6 +1,5 @@
 <?php
 
-use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
@@ -25,12 +24,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
         $author = Author::find('3');
         $this->assertInstanceOf(Model::class, $author);
-
-        $authors = Author::where(['name'=>'Bill Clinton'])->to_a();
-        $this->assertIsArray($authors);
-
-        $author = Author::find_by_name('Bill Clinton');
-        $this->assertInstanceOf(Author::class, $author);
 
         $author = Author::first();
         $this->assertInstanceOf(Author::class, $author);
@@ -67,8 +60,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindReturnsArrayOfModels()
     {
-        $authors = Author::all()->to_a();
-        $this->assertIsArray($authors);
+        $this->assertEquals(2, count(Author::where(['name' => 'Tito'])->to_a()));
 
         $authors = Author::find(1, 2, 3);
         $this->assertIsArray($authors);
@@ -291,53 +283,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assert_sql_has('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
     }
 
-    public function testFrom()
-    {
-        $author = Author::from('books')
-            ->order('author_id asc')
-            ->first();
-        $this->assertInstanceOf(Author::class, $author);
-        $this->assertNotNull($author->book_id);
-
-        $author = Author::from('authors')
-            ->order('author_id asc')
-            ->first();
-        $this->assertInstanceOf(Author::class, $author);
-        $this->assertEquals(1, $author->id);
-    }
-
-    public function testFromWithInvalidTable()
-    {
-        $this->expectException(DatabaseException::class);
-        Author::from('wrong_authors_table')->first();
-    }
-
-    public function testFindWithHash()
-    {
-        $this->assertNotNull(Author::where(['name' => 'Tito'])->first());
-        $this->assertNull(Author::where(['name' => 'Mortimer'])->first());
-        $this->assertEquals(2, count(Author::where(['name' => 'Tito'])->to_a()));
-    }
-
-    public function testFindOrCreateByOnExistingRecord()
-    {
-        $this->assertNotNull(Author::find_or_create_by_name('Tito'));
-    }
-
-    public function testFindOrCreateByCreatesNewRecord()
-    {
-        $author = Author::find_or_create_by_name_and_encrypted_password('New Guy', 'pencil');
-        $this->assertTrue($author->author_id > 0);
-        $this->assertEquals('pencil', $author->encrypted_password);
-    }
-
-    public function testFindOrCreateByThrowsExceptionWhenUsingOr()
-    {
-        $this->expectException(ActiveRecordException::class);
-        Author::find_or_create_by_name_or_encrypted_password('New Guy', 'pencil');
-    }
-
-    public function testFindByZero()
+    public function testFindNonExistentPrimaryKey()
     {
         $this->expectException(RecordNotFound::class);
         Author::find(0);
@@ -361,7 +307,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $this->assert_sql_has('SELECT * FROM authors WHERE author_id = ?', Author::table()->last_sql);
     }
 
-    public function testFindByDatetime()
+    public function testFindsDatetime()
     {
         $now = new DateTime();
         $arnow = new ActiveRecord\DateTime();
