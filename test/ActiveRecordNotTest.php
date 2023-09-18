@@ -27,7 +27,7 @@ class ActiveRecordNotTest extends \DatabaseTestCase
                 'WHERE !(`name` = ?)'
             ],
             'in' => [[
-                'book_id in (?)', [1,2],
+                'book_id in (?)', [1, 2],
               ],
               'WHERE book_id in (?,?)',
               'WHERE !(book_id in (?,?))',
