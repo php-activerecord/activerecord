@@ -72,7 +72,7 @@ abstract class Connection
     /**
      * Default PDO options to set for each connection.
      *
-     * @var array<int,int|bool>
+     * @var list<int|bool>
      */
     public static array $PDO_OPTIONS = [
         \PDO::ATTR_CASE => \PDO::CASE_LOWER,
@@ -333,7 +333,7 @@ abstract class Connection
      * Execute a raw SQL query on the database.
      *
      * @param string       $sql     raw SQL string to execute
-     * @param array<mixed> &$values Optional array of bind values
+     * @param list<mixed> &$values Optional array of bind values
      *
      * @return mixed A result set object
      */
@@ -392,7 +392,7 @@ abstract class Connection
      * Execute a raw SQL query and fetch the results.
      *
      * @param string       $sql    raw SQL string to execute
-     * @param array<mixed> $values
+     * @param list<mixed> $values
      */
     public function query_and_fetch(string $sql, array $values = [], int $method = \PDO::FETCH_ASSOC): \Generator
     {

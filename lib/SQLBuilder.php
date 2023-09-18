@@ -47,7 +47,7 @@ class SQLBuilder
     private array $data = [];
 
     /**
-     * @var array<string>
+     * @var list<string>
      */
     private array $sequence = [];
 
@@ -116,7 +116,7 @@ class SQLBuilder
     }
 
     /**
-     * @param array<WhereClause>   $clauses
+     * @param list<WhereClause>   $clauses
      * @param array<string,string> $mappedNames
      *
      * @throws Exception\ExpressionsException
@@ -404,7 +404,7 @@ class SQLBuilder
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     private function quoted_key_names(): array
     {

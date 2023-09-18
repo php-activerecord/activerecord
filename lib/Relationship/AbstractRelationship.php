@@ -120,10 +120,10 @@ abstract class AbstractRelationship
      * $models.
      *
      * @param list<Model>      $models            of model objects
-     * @param array<Attributes> $attributes        of attributes from $models
-     * @param array<mixed>      $includes          of eager load directives
-     * @param array<string>     $query_keys        -> key(s) to be queried for on included/related table
-     * @param array<string>     $model_values_keys -> key(s)/value(s) to be used in query from model which is including
+     * @param list<Attributes> $attributes        of attributes from $models
+     * @param array<mixed>     $includes          of eager load directives
+     * @param list<string>     $query_keys        -> key(s) to be queried for on included/related table
+     * @param list<string>     $model_values_keys -> key(s)/value(s) to be used in query from model which is including
      */
     protected function query_and_attach_related_models_eagerly(Table $table, array $models, array $attributes, array $includes = [], array $query_keys = [], array $model_values_keys = []): void
     {
@@ -132,7 +132,7 @@ abstract class AbstractRelationship
         $query_key = $query_keys[0];
         $model_values_key = $model_values_keys[0];
 
-        foreach ($attributes as $column => $value) {
+        foreach ($attributes as $value) {
             $values[] = $value[Inflector::variablize($model_values_key)];
         }
 

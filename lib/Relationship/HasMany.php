@@ -249,7 +249,13 @@ class HasMany extends AbstractRelationship
         return $record;
     }
 
-    public function load_eagerly($models, $attributes, $includes, Table $table): void
+    /**
+     * @param list<Model> $models
+     * @param list<Attributes> $attributes
+     * @param array<mixed> $includes
+     * @param Table $table
+     */
+    public function load_eagerly(array $models, array $attributes, array $includes, Table $table): void
     {
         $this->set_keys($table->class->name);
         $this->query_and_attach_related_models_eagerly($table, $models, $attributes, $includes, $this->foreign_key, $table->pk);
