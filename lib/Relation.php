@@ -348,6 +348,25 @@ class Relation implements \Iterator
     }
 
     /**
+     * Specifies the table from which the records will be fetched. For example:
+     *
+     * Topic::select('title')           // SELECT title FROM posts
+     *   ->from('posts');
+     *
+     * Aliases are permitted:
+     *
+     * Topic::()
+     *   ->from('topics as old_topics');  // SELECT * FROM posts as old_topics
+     *
+     * As are subqueries:
+     *
+     * Topic::()
+     *   ->from('SELECT * FROM (SELECT * from posts where title="Greetings, all" as friendly_posts');
+     *
+     *
+     * Be cautious when using this method, as it can make the
+     * query more difficult to understand and maintain.
+     *
      * @return Relation<TModel>
      */
     public function from(string $from): Relation
