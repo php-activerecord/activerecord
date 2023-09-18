@@ -696,7 +696,7 @@ class Model
             $this->__relationships[$name] = $relationship->load($this);
         }
 
-        return array_key_exists($name, $this->__relationships) ? $this->__relationships[$name] : null;
+        return $this->__relationships[$name] ?? null;
     }
 
     /**
@@ -1480,37 +1480,6 @@ class Model
 
     /**
      * Enables the use of dynamic finders.
-     *
-     * Dynamic finders are just an easy way to do queries quickly without having to
-     * specify an options array with conditions in it.
-     *
-     * ```
-     * SomeModel::find_by_first_name('Tito');
-     * SomeModel::find_by_first_name_and_last_name('Tito','the Grief');
-     * SomeModel::find_by_first_name_or_last_name('Tito','the Grief');
-     * ```
-     *
-     * You can also create the model if the find call returned no results:
-     *
-     * ```
-     * Person::find_or_create_by_name('Tito');
-     *
-     * # would be the equivalent of
-     * if (!Person::find_by_name('Tito'))
-     *   Person::create(['Tito']);
-     * ```
-     *
-     * Some other examples of find_or_create_by:
-     *
-     * ```
-     * Person::find_or_create_by_name_and_id('Tito',1);
-     * Person::find_or_create_by_name_and_id(['name' => 'Tito', 'id' => 1]);
-     * ```
-     *
-     * @param $method Name of method
-     * @param $args   Method args
-     *
-     * @throws ActiveRecordException
      *
      * @see Relation->__call()
      */
