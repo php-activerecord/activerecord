@@ -99,8 +99,8 @@ abstract class AbstractRelationship
 
     /**
      * @param list<Model>      $models     of model objects
-     * @param array<Attributes> $attributes of attributes from $models
-     * @param array<mixed>      $includes   of eager load directives
+     * @param list<Attributes> $attributes of attributes from $models
+     * @param list<mixed>      $includes   of eager load directives
      */
     abstract public function load_eagerly(array $models, array $attributes, array $includes, Table $table): void;
 
