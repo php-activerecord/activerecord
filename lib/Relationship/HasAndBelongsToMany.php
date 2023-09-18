@@ -38,7 +38,7 @@ class HasAndBelongsToMany extends AbstractRelationship
     }
 
     /**
-     * @return array<TModel>
+     * @return list<TModel>
      */
     public function load(Model $model): mixed
     {

@@ -59,7 +59,7 @@ class HasMany extends AbstractRelationship
     /**
      * Valid options to use for a {@link HasMany} relationship.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected static $valid_association_options = [
         'primary_key',
@@ -73,7 +73,7 @@ class HasMany extends AbstractRelationship
     ];
 
     /**
-     * @var array<string>
+     * @var list<string>
      */
     protected array $primary_key;
 
@@ -129,7 +129,7 @@ class HasMany extends AbstractRelationship
      * @throws HasManyThroughAssociationException
      * @throws \ActiveRecord\Exception\RelationshipException
      *
-     * @return Model|array<Model>|null
+     * @return Model|list<Model>|null
      */
     public function load(Model $model): mixed
     {

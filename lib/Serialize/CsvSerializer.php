@@ -2,8 +2,12 @@
 
 namespace ActiveRecord\Serialize;
 
+use ActiveRecord\Types;
+
 /**
  * CSV serializer.
+ *
+ * @phpstan-import-type Attributes from Types
  */
 class CsvSerializer extends Serialization
 {

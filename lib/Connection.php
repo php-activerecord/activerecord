@@ -72,7 +72,7 @@ abstract class Connection
     /**
      * Default PDO options to set for each connection.
      *
-     * @var array<mixed>
+     * @var array<int,int|bool>
      */
     public static array $PDO_OPTIONS = [
         \PDO::ATTR_CASE => \PDO::CASE_LOWER,
@@ -292,7 +292,7 @@ abstract class Connection
      *
      * @param string $table Name of a table
      *
-     * @return array<Column> an array of {@link Column} objects
+     * @return array<string,Column> an array of {@link Column} objects
      */
     public function columns(string $table): array
     {
@@ -406,7 +406,7 @@ abstract class Connection
     /**
      * Returns all tables for the current database.
      *
-     * @return array<string> array containing table names
+     * @return list<string> array containing table names
      */
     public function tables(): array
     {

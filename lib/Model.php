@@ -1901,7 +1901,7 @@ class Model
      * 	"last"										static|null			User::find("last", ["name"=>"William"]);
      *  "all"										static[]			User::find("all", ["name"=>"Stephen"]
      *  ...int|string								static[]			User::find(1, 3, 5, 8);
-     *  array<int,int|string>						static[]			User::find([1,3,5,8]);
+     *  list<int|string>						    static[]			User::find([1,3,5,8]);
      */
     public static function find(/* $pk */): Model|array|null
     {

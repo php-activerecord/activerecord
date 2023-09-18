@@ -55,7 +55,7 @@ class BelongsTo extends AbstractRelationship
     private array $primary_key;
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function primary_key(): array
     {

@@ -15,7 +15,7 @@ class ConnectionManager extends Singleton
     /**
      * Array of {@link Connection} objects.
      *
-     * @var array<Connection>
+     * @var array<string,Connection>
      */
     private static array $connections = [];
 

@@ -55,7 +55,7 @@ abstract class AbstractRelationship
     /**
      * List of valid options for relationships.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected static $valid_association_options = [
         'association_foreign_key',
@@ -119,7 +119,7 @@ abstract class AbstractRelationship
      * the related table by PK/FK and attaches the array of returned relationships to the appropriately named relationship on
      * $models.
      *
-     * @param array<Model>      $models            of model objects
+     * @param list<Model>      $models            of model objects
      * @param array<Attributes> $attributes        of attributes from $models
      * @param array<mixed>      $includes          of eager load directives
      * @param array<string>     $query_keys        -> key(s) to be queried for on included/related table
