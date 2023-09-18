@@ -114,9 +114,10 @@ class Relation implements \Iterator
      * specify an options array with conditions in it.
      *
      * ```
-     * SomeModel::select('author_id')->find_by_first_name('Tito');
-     * SomeModel::select('author_id')->find_by_first_name_and_last_name('Tito','the Grief');
-     * SomeModel::select('author_id')->find_by_first_name_or_last_name('Tito','the Grief');
+     * Person::select('id')->find_by_first_name('Tito');
+     * Person::select('id')->order('last_name DESC')->find_by_first_name('Tito');
+     * Person::select('id')->find_by_first_name_and_last_name('Tito','the Grief');
+     * Person::select('id')->find_by_first_name_or_last_name('Tito','the Grief');
      * ```
      *
      * You can also create the model if the find call returned no results:
@@ -125,7 +126,7 @@ class Relation implements \Iterator
      * Person::find_or_create_by_name('Tito');
      *
      * # would be the equivalent of
-     * if (!Person::select('author_id')->find_by_name('Tito'))
+     * if (!Person::find_by_name('Tito'))
      *   Person::create(['Tito']);
      * ```
      *
@@ -133,17 +134,19 @@ class Relation implements \Iterator
      *
      * ```
      * Person::select('id')->find_or_create_by_name_and_id('Tito',1);
-     * Person::select('id')->find_or_create_by_name_and_id(['name' => 'Tito', 'id' => 1]);
+     * Person::find_or_create_by_name_and_id(['name' => 'Tito', 'id' => 1]);
      * ```
      *
      * @param $method Name of method
      * @param $args   Method args
      *
-     * @throws ActiveRecordException
+     * @throws ActiveRecordException If the method name does not start with the find_by or find_or_create_by templates
      *
      * @see find
+     *
+     * @return Model|null The first model that meets the find by criteria, or null if no row meets that criteria
      */
-    public function __call(string $method, mixed $args): mixed
+    public function __call(string $method, mixed $args): Model|null
     {
         $create = false;
 
@@ -164,7 +167,15 @@ class Relation implements \Iterator
         $this->options['conditions'] ??= [];
         $this->options['conditions'][] = WhereClause::from_underscored_string($this->table()->conn, $attributes, $args, $this->alias_attribute);
 
-        $ret = $this->firstOrLast(1, true);
+        $oldLimit = $this->options['limit'] ?? null;
+        $ret = $this->limit(1)->to_a();
+
+        if (null === $oldLimit) {
+            unset($this->options['limit']);
+        } else {
+            $this->options['limit'] = $oldLimit;
+        }
+
         if (0 === count($ret)) {
             if ($create) {
                 return $this->className::create(SQLBuilder::create_hash_from_underscored_string(
@@ -182,7 +193,7 @@ class Relation implements \Iterator
     private function extract_dynamic_vars(string $methodName, string $dynamicPart): string
     {
         if (str_starts_with($methodName, $dynamicPart)) {
-            $attributes = substr($methodName, strlen($dynamicPart) +1);
+            $attributes = substr($methodName, strlen($dynamicPart) + 1);
 
             return $attributes;
         }

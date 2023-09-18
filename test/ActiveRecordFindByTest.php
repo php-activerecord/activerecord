@@ -32,14 +32,29 @@ class ActiveRecordFindByTest extends \DatabaseTestCase
         $this->assertEquals('Tito', Author::find_by_name(['Tito', 'George W. Bush'])->name);
     }
 
-    public function testFindBySelect()
+    public function testFindByChained()
     {
         $author = Author::select('author_id')->find_by_name('Tito');
         $this->assertInstanceOf(Author::class, $author);
         $this->assertEquals(1, $author->author_id);
 
+        $author = Author::select('author_id')->order('author_id DESC')->find_by_name('Tito');
+        $this->assertEquals(5, $author->author_id);
+
         $this->expectException(ActiveRecordException::class);
         $author->name;
+    }
+
+    public function testFindByDoesNotClobberOldLimit()
+    {
+        $rel = Author::where(['mixedCaseField' => 'Bill'])->limit(2);
+        $authors = $rel->to_a();
+        $this->assertEquals(2, count($authors));
+
+        $author = $rel->find_by_mixedCaseField('Bill');
+        $this->assertInstanceOf(Author::class, $author);
+
+        $this->assertEquals($authors, $rel->to_a());
     }
 
     public function testFindByNoResults()
