@@ -218,7 +218,7 @@ class Utils
     ];
 
     /**
-     * @var array<string>
+     * @var array<string,string>
      */
     private static array $singular = [
         '/(quiz)zes$/i'             => '$1',

@@ -804,7 +804,7 @@ class Model
     /**
      * Returns an associative array containing values for all the attributes in $attributes
      *
-     * @param array<string> $attributes Array containing attribute names
+     * @param list<string> $attributes Array containing attribute names
      *
      * @return Attributes A hash containing $name => $value
      */
