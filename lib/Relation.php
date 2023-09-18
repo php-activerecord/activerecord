@@ -361,7 +361,7 @@ class Relation implements \Iterator
      * As are subqueries:
      *
      * Topic::()
-     *   ->from('SELECT * FROM (SELECT * from posts where title="Greetings, all"');
+     *   ->from('SELECT * FROM (SELECT * from posts where title="Greetings, all" as friendly_posts');
      *
      *
      * Be cautious when using this method, as it can make the
