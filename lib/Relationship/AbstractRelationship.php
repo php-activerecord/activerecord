@@ -308,10 +308,10 @@ abstract class AbstractRelationship
     }
 
     /**
-     * @param array<string> $condition_keys
-     * @param array<string> $value_keys
+     * @param list<string> $condition_keys
+     * @param list<string> $value_keys
      *
-     * @return array<mixed>
+     * @return list<mixed>
      */
     protected function create_conditions_from_keys(Model $model, array $condition_keys = [], array $value_keys = []): ?array
     {

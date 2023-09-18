@@ -283,7 +283,7 @@ class Model
      * echo $person->id; # => null
      * ```
      *
-     * @var array<string>
+     * @var list<string>
      */
     public static array $attr_accessible = [];
 

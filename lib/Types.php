@@ -35,14 +35,14 @@ namespace ActiveRecord;
  * @phpstan-type DelegateOptions array{
  *  to: string,
  *  prefix?: string,
- *  delegate: array<string>
+ *  delegate: list<string>
  * }
  * @phpstan-type RelationOptions array{
- *  conditions?: array<WhereClause>,
+ *  conditions?: list<WhereClause>,
  *  from?: string,
  *  group?: string,
  *  having?: string,
- *  include?: string|array<string>,
+ *  include?: string|list<string>,
  *  joins?: string|list<string>,
  *  limit?: int,
  *  mapped_names?: array<string, string>,
