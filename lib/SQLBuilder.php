@@ -116,7 +116,7 @@ class SQLBuilder
     }
 
     /**
-     * @param list<WhereClause>   $clauses
+     * @param list<WhereClause>    $clauses
      * @param array<string,string> $mappedNames
      *
      * @throws Exception\ExpressionsException

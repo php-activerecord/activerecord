@@ -332,7 +332,7 @@ abstract class Connection
     /**
      * Execute a raw SQL query on the database.
      *
-     * @param string       $sql     raw SQL string to execute
+     * @param string      $sql     raw SQL string to execute
      * @param list<mixed> &$values Optional array of bind values
      *
      * @return mixed A result set object
@@ -391,7 +391,7 @@ abstract class Connection
     /**
      * Execute a raw SQL query and fetch the results.
      *
-     * @param string       $sql    raw SQL string to execute
+     * @param string      $sql    raw SQL string to execute
      * @param list<mixed> $values
      */
     public function query_and_fetch(string $sql, array $values = [], int $method = \PDO::FETCH_ASSOC): \Generator

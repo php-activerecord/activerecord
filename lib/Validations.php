@@ -116,7 +116,7 @@ class Validations
     ];
 
     /**
-     * @var array<string>
+     * @var list<string>
      */
     private static array $ALL_RANGE_OPTIONS = [
         'is',

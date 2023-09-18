@@ -110,7 +110,7 @@ class BelongsTo extends AbstractRelationship
     /**
      * @param list<Model>      $models
      * @param list<Attributes> $attributes
-     * @param array<mixed>      $includes
+     * @param array<mixed>     $includes
      */
     public function load_eagerly(array $models, array $attributes, array $includes, Table $table): void
     {
