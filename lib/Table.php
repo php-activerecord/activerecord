@@ -147,7 +147,7 @@ class Table
     }
 
     /**
-     * @param array<string>|string $joins
+     * @param list<string>|string $joins
      *
      * @throws RelationshipException
      */
