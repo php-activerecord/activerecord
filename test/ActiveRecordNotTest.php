@@ -25,7 +25,13 @@ class ActiveRecordNotTest extends \DatabaseTestCase
                 ],
                 'WHERE `name` = ?',
                 'WHERE !(`name` = ?)'
-            ]
+            ],
+            'in' => [[
+                'book_id in (?)', [1,2],
+              ],
+              'WHERE book_id in (?,?)',
+              'WHERE !(book_id in (?,?))',
+           ],
         ];
     }
 
@@ -45,5 +51,12 @@ class ActiveRecordNotTest extends \DatabaseTestCase
     {
         $book = Book::where('name = ?', 'Another Book')->take();
         $this->assertEquals('Another Book', $book->name);
+    }
+
+    public function testIn()
+    {
+        $books = Book::not('book_id in (?)', [1])->to_a();
+        $this->assertEquals(1, count($books));
+        $this->assertEquals('Another Book', $books[0]->name);
     }
 }
