@@ -164,17 +164,13 @@ class Relation implements \Iterator
             throw new ActiveRecordException("Call to undefined method: $method");
         }
 
-        $this->options['conditions'] ??= [];
-        $this->options['conditions'][] = WhereClause::from_underscored_string($this->table()->conn, $attributes, $args, $this->alias_attribute);
+        $options = $this->options;
 
-        $oldLimit = $this->options['limit'] ?? null;
-        $ret = $this->limit(1)->to_a();
+        $options['conditions'] ??= [];
+        $options['conditions'][] = WhereClause::from_underscored_string($this->table()->conn, $attributes, $args, $this->alias_attribute);
 
-        if (null === $oldLimit) {
-            unset($this->options['limit']);
-        } else {
-            $this->options['limit'] = $oldLimit;
-        }
+        $options['limit'] = 1;
+        $ret = $this->to_a_withOptions($options);
 
         if (0 === count($ret)) {
             if ($create) {
@@ -722,9 +718,8 @@ class Relation implements \Iterator
         $options = $this->options;
         $options['conditions'] ??= [];
         $options['conditions'][] = $this->pk_conditions($args);
-        $options['mapped_names'] = $this->alias_attribute;
 
-        $list = iterator_to_array($this->table()->find($options));
+        $list = $this->to_a_withOptions($options);
         if (is_array($args) && count($list) != count($args)) {
             throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));
         }
@@ -745,8 +740,9 @@ class Relation implements \Iterator
      */
     public function take(int $limit = null): Model|array|null
     {
-        $this->limit($limit ?? 1);
-        $models = $this->to_a();
+        $options = $this->options;
+        $options = array_merge($this->options, ['limit' => $limit ?? 1]);
+        $models = $this->to_a_withOptions($options);
 
         return isset($limit) ? $models : $models[0] ?? null;
     }
@@ -816,39 +812,51 @@ class Relation implements \Iterator
      */
     private function firstOrLast(int $limit = null, bool $isAscending): array
     {
-        $this->limit($limit ?? 1);
+        $options = array_merge($this->options, ['limit' => $limit ?? 1]);
 
         $pk = $this->table()->pk;
         if (!empty($pk)) {
-            if (array_key_exists('order', $this->options)) {
+            if (array_key_exists('order', $options)) {
                 $reverseCommand = $isAscending ? 'DESC' : 'ASC';
 
-                if (str_contains($this->options['order'], implode(" {$reverseCommand}, ", $this->table()->pk) . " {$reverseCommand}")) {
-                    $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+                if (str_contains($options['order'], implode(" {$reverseCommand}, ", $this->table()->pk) . " {$reverseCommand}")) {
+                    $options['order'] = SQLBuilder::reverse_order((string) $options['order']);
                 }
-            } elseif (!array_key_exists('having', $this->options)) {
+            } elseif (!array_key_exists('having', $options)) {
                 $command = $isAscending ? 'ASC' : 'DESC';
-                $this->options['order'] = implode(" {$command}, ", $this->table()->pk) . " {$command}";
+                $options['order'] = implode(" {$command}, ", $this->table()->pk) . " {$command}";
             }
         }
 
-        return $this->to_a();
+        return $this->to_a_withOptions($options);
     }
 
     /**
-     * Converts relation objects to array.
+     * Converts relation objects to array with the currently set of options.
      *
      * @return array<TModel> All the rows that matches query. If no rows match, returns []
      */
     public function to_a(): array
     {
+        return $this->to_a_withOptions($this->options);
+    }
+
+    /**
+     * Converts relation objects to array with a given options.
+     *
+     * @param RelationOptions $options
+     *
+     * @return array<TModel> All the rows that matches query. If no rows match, returns []
+     */
+    private function to_a_withOptions(array $options): array
+    {
         if ($this->isNone) {
             return [];
         }
 
-        $this->options['mapped_names'] = $this->alias_attribute;
+        $options['mapped_names'] = $this->alias_attribute;
 
-        return iterator_to_array($this->table()->find($this->options));
+        return iterator_to_array($this->table()->find($options));
     }
 
     /**

@@ -55,6 +55,11 @@ class ActiveRecordFindByTest extends \DatabaseTestCase
         $this->assertInstanceOf(Author::class, $author);
 
         $this->assertEquals($authors, $rel->to_a());
+
+        $author = $rel->find_by_name('Bill Clinton');
+        $this->assertInstanceOf(Author::class, $author);
+
+        $this->assertEquals($authors, $rel->to_a());
     }
 
     public function testFindByNoResults()

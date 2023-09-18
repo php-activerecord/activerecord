@@ -65,4 +65,16 @@ class ActiveRecordTakeTest extends \DatabaseTestCase
         $author = Author::select('name, 123 as bubba')->take();
         $author->id;
     }
+
+    public function testDoesNotClobberOldLimit()
+    {
+        $rel = Author::limit(2);
+        $authors = $rel->to_a();
+        $this->assertEquals(2, count($authors));
+
+        $author = $rel->take();
+        $this->assertInstanceOf(Author::class, $author);
+
+        $this->assertEquals($authors, $rel->to_a());
+    }
 }
