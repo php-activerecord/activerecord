@@ -79,7 +79,7 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * @phpstan-type ValidateInclusionOptions array{
  *  message?: string|null,
  *  in?: array<string>,
- *  within?: array<string>
+ *  within?: list<string>
  * }
  * @phpstan-type ValidateFormatOptions array{
  *  with: string,
