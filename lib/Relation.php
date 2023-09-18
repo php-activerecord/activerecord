@@ -7,6 +7,7 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
@@ -104,6 +105,89 @@ class Relation implements \Iterator
         $this->isNone = true;
 
         return $this;
+    }
+
+    /**
+     * Enables the use of dynamic finders.
+     *
+     * Dynamic finders are just an easy way to do queries quickly without having to
+     * specify an options array with conditions in it.
+     *
+     * ```
+     * SomeModel::select('author_id')->find_by_first_name('Tito');
+     * SomeModel::select('author_id')->find_by_first_name_and_last_name('Tito','the Grief');
+     * SomeModel::select('author_id')->find_by_first_name_or_last_name('Tito','the Grief');
+     * ```
+     *
+     * You can also create the model if the find call returned no results:
+     *
+     * ```
+     * Person::find_or_create_by_name('Tito');
+     *
+     * # would be the equivalent of
+     * if (!Person::select('author_id')->find_by_name('Tito'))
+     *   Person::create(['Tito']);
+     * ```
+     *
+     * Some other examples of find_or_create_by:
+     *
+     * ```
+     * Person::select('id')->find_or_create_by_name_and_id('Tito',1);
+     * Person::select('id')->find_or_create_by_name_and_id(['name' => 'Tito', 'id' => 1]);
+     * ```
+     *
+     * @param $method Name of method
+     * @param $args   Method args
+     *
+     * @throws ActiveRecordException
+     *
+     * @see find
+     */
+    public function __call(string $method, mixed $args): mixed
+    {
+        $create = false;
+
+        if ($attributes = $this->extract_dynamic_vars($method, 'find_or_create_by')) {
+            // can't take any finders with OR in it when doing a find_or_create_by
+            if (false !== strpos($attributes, '_or_')) {
+                throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
+            }
+            $create = true;
+            $method = 'find_by_' . $attributes;
+        }
+
+        $attributes = $this->extract_dynamic_vars($method, 'find_by');
+        if ('' === $attributes) {
+            throw new ActiveRecordException("Call to undefined method: $method");
+        }
+
+        $this->options['conditions'] ??= [];
+        $this->options['conditions'][] = WhereClause::from_underscored_string($this->table()->conn, $attributes, $args, $this->alias_attribute);
+
+        $ret = $this->firstOrLast(1, true);
+        if (0 === count($ret)) {
+            if ($create) {
+                return $this->className::create(SQLBuilder::create_hash_from_underscored_string(
+                    $attributes,
+                    $args,
+                    $this->alias_attribute));
+            }
+
+            return null;
+        }
+
+        return $ret[0];
+    }
+
+    private function extract_dynamic_vars(string $methodName, string $dynamicPart): string
+    {
+        if (str_starts_with($methodName, $dynamicPart)) {
+            $attributes = substr($methodName, strlen($dynamicPart) +1);
+
+            return $attributes;
+        }
+
+        return '';
     }
 
     /**

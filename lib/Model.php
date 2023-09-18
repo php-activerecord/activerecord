@@ -1513,53 +1513,11 @@ class Model
      *
      * @throws ActiveRecordException
      *
-     * @see find
+     * @see Relation->__call()
      */
-    public static function __callStatic(string $method, mixed $args): mixed
+    public static function __callStatic(string $method, mixed $args): static|null
     {
-        /**
-         * @var RelationOptions
-         */
-        $options = [];
-        $create = false;
-
-        if ($attributes = static::extract_dynamic_vars($method, 'find_or_create_by')) {
-            // can't take any finders with OR in it when doing a find_or_create_by
-            if (false !== strpos($attributes, '_or_')) {
-                throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
-            }
-            $create = true;
-            $method = 'find_by_' . $attributes;
-        }
-
-        $options['conditions'] ??= [];
-
-        if ($attributes = static::extract_dynamic_vars($method, 'find_by')) {
-            $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
-
-            $rel = static::Relation($options);
-            if (!($ret = $rel->first()) && $create) {
-                return static::create(SQLBuilder::create_hash_from_underscored_string(
-                    $attributes,
-                    $args,
-                    static::$alias_attribute));
-            }
-
-            return $ret;
-        }
-
-        throw new ActiveRecordException("Call to undefined method: $method");
-    }
-
-    public static function extract_dynamic_vars(string $methodName, string $dynamicPart): string
-    {
-        if (str_starts_with($methodName, $dynamicPart)) {
-            $attributes = substr($methodName, strlen($dynamicPart) +1);
-
-            return $attributes;
-        }
-
-        return '';
+        return static::Relation()->$method(...$args);
     }
 
     /**
