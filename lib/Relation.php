@@ -170,7 +170,7 @@ class Relation implements \Iterator
         $options['conditions'][] = WhereClause::from_underscored_string($this->table()->conn, $attributes, $args, $this->alias_attribute);
 
         $options['limit'] = 1;
-        $ret = $this->to_a_withOptions($options);
+        $ret = $this->_to_a($options);
 
         if (0 === count($ret)) {
             if ($create) {
@@ -719,7 +719,7 @@ class Relation implements \Iterator
         $options['conditions'] ??= [];
         $options['conditions'][] = $this->pk_conditions($args);
 
-        $list = $this->to_a_withOptions($options);
+        $list = $this->_to_a($options);
         if (is_array($args) && count($list) != count($args)) {
             throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));
         }
@@ -741,7 +741,7 @@ class Relation implements \Iterator
     public function take(int $limit = null): Model|array|null
     {
         $options = array_merge($this->options, ['limit' => $limit ?? 1]);
-        $models = $this->to_a_withOptions($options);
+        $models = $this->_to_a($options);
 
         return isset($limit) ? $models : $models[0] ?? null;
     }
@@ -827,7 +827,7 @@ class Relation implements \Iterator
             }
         }
 
-        return $this->to_a_withOptions($options);
+        return $this->_to_a($options);
     }
 
     /**
@@ -837,17 +837,17 @@ class Relation implements \Iterator
      */
     public function to_a(): array
     {
-        return $this->to_a_withOptions($this->options);
+        return $this->_to_a($this->options);
     }
 
     /**
-     * Converts relation objects to array with a given options.
-     *
      * @param RelationOptions $options
+     * @throws ActiveRecordException
+     * @throws Exception\RelationshipException
      *
      * @return array<TModel> All the rows that matches query. If no rows match, returns []
      */
-    private function to_a_withOptions(array $options): array
+    protected function _to_a(array $options): array
     {
         if ($this->isNone) {
             return [];
