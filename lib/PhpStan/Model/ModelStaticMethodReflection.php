@@ -10,9 +10,7 @@ use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\FunctionVariant;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\TrinaryLogic;
-use PHPStan\Type\ArrayType;
 use PHPStan\Type\Generic\TemplateTypeMap;
-use PHPStan\Type\IntegerType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\UnionType;
@@ -124,21 +122,6 @@ class ModelStaticMethodReflection implements MethodReflection
                         new ObjectType($this->classReflection->getDisplayName()),
                         new NullType()
                     ])
-                )
-            ];
-        } elseif (str_starts_with($this->name, 'find_all')) {
-            $parts = SQLBuilder::underscored_string_to_parts(substr($this->name, 9), 0);
-
-            return [
-                new FunctionVariant(
-                    TemplateTypeMap::createEmpty(),
-                    TemplateTypeMap::createEmpty(),
-                    array_fill(0, count($parts), new ModelParameterReflection()),
-                    false,
-                    new ArrayType(
-                        new IntegerType(),
-                        new ObjectType($this->classReflection->getDisplayName()),
-                    )
                 )
             ];
         } elseif (preg_match('/_set$/', $this->name)) {

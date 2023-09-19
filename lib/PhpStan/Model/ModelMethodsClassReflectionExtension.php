@@ -3,6 +3,7 @@
 namespace ActiveRecord\PhpStan\Model;
 
 use ActiveRecord\Model;
+use ActiveRecord\Relation;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\MethodsClassReflectionExtension;
@@ -11,7 +12,7 @@ class ModelMethodsClassReflectionExtension implements MethodsClassReflectionExte
 {
     public function hasMethod(ClassReflection $classReflection, string $methodName): bool
     {
-        if ($classReflection->isSubclassOf(Model::class)) {
+        if ($classReflection->isSubclassOf(Model::class) || $classReflection->is(Relation::class)) {
             if (preg_match('/\bfind_by_/', $methodName)) {
                 return true;
             }

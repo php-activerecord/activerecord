@@ -3,6 +3,7 @@
 namespace ActiveRecord\PhpStan\Model;
 
 use ActiveRecord\Model;
+use ActiveRecord\PhpStan\Relation\RelationReflectionHelper;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
