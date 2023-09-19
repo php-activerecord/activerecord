@@ -115,6 +115,12 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Bill Clinton', $model->name);
     }
 
+    public function testAndRelationThrowsError()
+    {
+        $this->expectException(ValidationsArgumentError::class);
+        Author::where(Author::where("mixedCaseField = 'Bill'"));
+    }
+
     public function testReverseOrder()
     {
         $relation = Author::where(['mixedCaseField' => 'Bill']);
