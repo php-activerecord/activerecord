@@ -11,8 +11,8 @@ class RelationTest extends DatabaseTestCase
 
     public function setUp(string $connection_name = null): void
     {
-        if (parent::connect("pgsql")) {
-            parent::setUp("pgsql");
+        if (parent::connect('pgsql')) {
+            parent::setUp('pgsql');
             $this->books = '"books"';
             $this->mixedCaseField = '"mixedCaseField"';
         } else {

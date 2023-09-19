@@ -53,6 +53,7 @@ abstract class DatabaseTestCase extends TestCase
         try {
             $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
             $this->connection_name = $connection_name;
+
             return true;
         } catch (Exception $e) {
             return false;
