@@ -589,26 +589,23 @@ class Relation implements \Iterator
      * Returns a new relation expressing WHERE !(condition) according to the
      * conditions in the arguments.
      *
-     * {@link not()} accepts conditions as a string, array, or hash. @See Relation::where
+     * {@link not()} accepts conditions as a Relation, string, array, or hash. @See Relation::where
      * for more details on each format.
      *
-     * User::where()                  // SELECT * FROM users
-     *   ->not("name = 'Jon'")        // WHERE !(name = 'Jon')
+     * User::not(User::where("name = (?), 'Jon')->where("id = 4"))  // WHERE !((name = 'Jon') AND (id = 4))
      *
-     * User::where()                  // SELECT * FROM users
-     *   ->not([                      // WHERE !(name = 'Jon')
+     * User::not("name = 'Jon'")        // WHERE !(name = 'Jon')
+     *
+     * User::not([                      // WHERE !(name = 'Jon')
      *      "name = ?",
      *      "Jon"
      *   ])
      *
-     * User::where()                  // SELECT * FROM users
-     *   ->not('name', "Jon")         // WHERE name != 'Jon'
+     * User::not('name', "Jon")         // WHERE name != 'Jon'
      *
-     * User::where()                  // SELECT * FROM users
-     *   ->not('name', null)          // WHERE !(name IS NULL)
+     * User::not('name', null)          // WHERE !(name IS NULL)
      *
-     * User::where()                  // SELECT * FROM users
-     *   ->not([                      // WHERE !(name == 'Jon' AND role == 'admin')
+     * User::not([                      // WHERE !(name == 'Jon' AND role == 'admin')
      *     'name' => "Jon",
      *     'role' => "admin"
      *   ])
@@ -630,11 +627,17 @@ class Relation implements \Iterator
         $this->options['conditions'] ??= [];
 
         $arg = static::toSingleArg(...func_get_args());
-        $expression = WhereClause::from_arg($arg, true);
-
-        $this->options['conditions'][] = $expression;
+        $this->options['conditions'][] = WhereClause::from_arg($arg, true);
 
         return $this;
+    }
+
+    /**
+     * @return array<WhereClause>
+     */
+    public function getWhereConditions(): array
+    {
+        return $this->options['conditions'] ??= [];
     }
 
     /**

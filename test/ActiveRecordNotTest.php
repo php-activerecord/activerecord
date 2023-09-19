@@ -59,4 +59,18 @@ class ActiveRecordNotTest extends \DatabaseTestCase
         $this->assertEquals(1, count($books));
         $this->assertEquals('Another Book', $books[0]->name);
     }
+
+    public function testRelation()
+    {
+        $books = Book::not(Book::where('book_id in (?)', [1]))->to_a();
+        $this->assertEquals(1, count($books));
+        $this->assertEquals('Another Book', $books[0]->name);
+    }
+
+    public function testRelationAndNot()
+    {
+        $books = Book::not(Book::where('book_id in (?)', [1])->where('name = ?', 'Ancient Art of Main Tanking'))->to_a();
+        $this->assertEquals(1, count($books));
+        $this->assertEquals('Another Book', $books[0]->name);
+    }
 }
