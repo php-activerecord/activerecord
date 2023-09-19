@@ -565,6 +565,21 @@ class Relation implements \Iterator
      */
     public function where(): Relation
     {
+        $arg = static::toSingleArg(...func_get_args());
+        if ($arg instanceof Relation) {
+            throw new ValidationsArgumentError('where does not support Relations. Use and() instead');
+        }
+
+        return $this->and($arg);
+    }
+
+    /**
+     * Alias for where() that also supports Relation
+     *
+     * @see where()
+     */
+    public function and(): Relation
+    {
         $this->options['conditions'] ??= [];
 
         $arg = static::toSingleArg(...func_get_args());
