@@ -23,8 +23,8 @@ class ActiveRecordNotTest extends \DatabaseTestCase
             'hash' => [[
                     'name' => 'Another Book',
                 ],
-                'WHERE `name` = ?',
-                'WHERE !(`name` = ?)'
+                'WHERE name = ?',
+                'WHERE !(name = ?)'
             ],
             'in' => [[
                 'book_id in (?)', [1, 2],
