@@ -37,7 +37,7 @@ class ActiveRecordPHPStanTest extends \DatabaseTestCase
         //                    '--debug',
         //                    '-c',
         //                    './phpstan.neon.dist',
-        //                    'lib',
+        //                    'test/phpstan',
         //                ]
         //            )
         //        );

@@ -1,6 +1,6 @@
 <?php
 
-namespace ActiveRecord\PhpStan\Model;
+namespace ActiveRecord\PhpStan\Relation;
 
 use ActiveRecord\Relation;
 use PhpParser\Node\Expr\MethodCall;
