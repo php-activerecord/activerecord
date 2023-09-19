@@ -842,6 +842,7 @@ class Relation implements \Iterator
 
     /**
      * @param RelationOptions $options
+     *
      * @throws ActiveRecordException
      * @throws Exception\RelationshipException
      *
