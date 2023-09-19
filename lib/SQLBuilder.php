@@ -162,7 +162,7 @@ class SQLBuilder
         $quoteChar = $className::$QUOTE_CHARACTER;
 
         foreach ($escapedNames as $column) {
-            $expression = str_replace($column, $this->connection->escape($column), $expression);
+            $expression = str_replace($column, "{$quoteChar}$column{$quoteChar}", $expression);
         }
 
         return str_replace('""', '"', $expression);
