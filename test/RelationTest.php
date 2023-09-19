@@ -6,9 +6,25 @@ use test\models\Author;
 
 class RelationTest extends DatabaseTestCase
 {
+    private string $books;
+    private string $mixedCaseField;
+
+    public function setUp(string $connection_name = null): void
+    {
+        if (parent::connect("pgsql")) {
+            parent::setUp("pgsql");
+            $this->books = '"books"';
+            $this->mixedCaseField = '"mixedCaseField"';
+        } else {
+            parent::setUp();
+            $this->books = '`books`';
+            $this->mixedCaseField = 'mixedCaseField';
+        }
+    }
+
     public function testWhereString()
     {
-        $models = Author::where("mixedCaseField = 'Bill'")->to_a();
+        $models = Author::where("{$this->mixedCaseField} = 'Bill'")->to_a();
         $this->assertEquals(2, count($models));
         $this->assertEquals('Bill Clinton', $models[0]->name);
         $this->assertEquals('Uncle Bob', $models[1]->name);
@@ -16,7 +32,7 @@ class RelationTest extends DatabaseTestCase
 
     public function testWhereTooManyArguments()
     {
-        $models = Author::where('mixedCaseField = ?', 'Bill')->to_a();
+        $models = Author::where("{$this->mixedCaseField} = ?", 'Bill')->to_a();
         $this->assertEquals(2, count($models));
         $this->assertEquals('Bill Clinton', $models[0]->name);
         $this->assertEquals('Uncle Bob', $models[1]->name);
@@ -38,7 +54,7 @@ class RelationTest extends DatabaseTestCase
 
     public function testWhereOrder()
     {
-        $relation = Author::select('name')->where("mixedCaseField = 'Bill'");
+        $relation = Author::select('name')->where("{$this->mixedCaseField} = 'Bill'");
 
         $authors = $relation->last(1);
         $this->assertEquals(1, count($authors));
@@ -49,7 +65,7 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Uncle Bob', $authors[0]->name);
         $this->assertEquals('Bill Clinton', $authors[1]->name);
 
-        $queries = Author::order('parent_author_id DESC')->where(['mixedCaseField'=>'Bill'])->to_a();
+        $queries = Author::order('parent_author_id DESC')->where(["{$this->mixedCaseField}"=>'Bill'])->to_a();
         $this->assertEquals(2, count($queries));
         $this->assertEquals('Uncle Bob', $queries[0]->name);
         $this->assertEquals('Bill Clinton', $queries[1]->name);
@@ -58,30 +74,30 @@ class RelationTest extends DatabaseTestCase
     public function testWhereAnd()
     {
         $authors = Author::select('name')
-            ->where(['mixedCaseField'=>'Bill', 'parent_author_id'=>1])
+            ->where(["{$this->mixedCaseField}"=>'Bill', 'parent_author_id'=>1])
             ->to_a();
         $this->assertEquals('Bill Clinton', $authors[0]->name);
 
         $authors = Author::select('name')
             ->where([
-                'mixedCaseField'=>'Bill',
+                "{$this->mixedCaseField}"=>'Bill',
                 'parent_author_id'=>2]
             )->to_a();
         $this->assertEquals('Uncle Bob', $authors[0]->name);
 
         $authors = Author::select('name')
             ->where([
-                'mixedCaseField = (?) and parent_author_id <> (?)',
+                "{$this->mixedCaseField} = (?) and parent_author_id <> (?)",
                 'Bill',
                 1])
             ->to_a();
         $this->assertEquals('Uncle Bob', $authors[0]->name);
 
         $authors = Author::select('name')
-            ->where(['mixedCaseField = (?)', 'Bill'])
+            ->where(["{$this->mixedCaseField} = (?)", 'Bill'])
             ->where(['parent_author_id = (?)', 1])
             ->where("author_id = '3'")
-            ->where(['mixedCaseField'=>'Bill', 'name'=>'Bill Clinton'])
+            ->where(["{$this->mixedCaseField}"=>'Bill', 'name'=>'Bill Clinton'])
             ->to_a();
         $this->assertEquals(1, count($authors));
         $this->assertEquals('Bill Clinton', $authors[0]->name);
@@ -91,14 +107,14 @@ class RelationTest extends DatabaseTestCase
     {
         $model = Author::select('name')
             ->where(['name' => 'Bill Clinton'])
-            ->where(['mixedCaseField' => 'Bill'])
+            ->where(["{$this->mixedCaseField}" => 'Bill'])
             ->find(3);
         $this->assertEquals('Bill Clinton', $model->name);
     }
 
     public function testReverseOrder()
     {
-        $relation = Author::where(['mixedCaseField' => 'Bill']);
+        $relation = Author::where(["{$this->mixedCaseField}" => 'Bill']);
 
         $authors = $relation->to_a();
         $this->assertEquals(2, count($authors));
@@ -146,12 +162,12 @@ class RelationTest extends DatabaseTestCase
 
     public function testAllAnd()
     {
-        $queries = Author::all()->where(['mixedCaseField'=>'Bill', 'parent_author_id'=>1])->to_a();
+        $queries = Author::all()->where(["{$this->mixedCaseField}"=>'Bill', 'parent_author_id'=>1])->to_a();
         $this->assertEquals(1, count($queries));
         $this->assertEquals('Bill Clinton', $queries[0]->name);
 
         $authors = Author::all()->where([
-            'mixedCaseField'=>'Bill',
+            "{$this->mixedCaseField}"=>'Bill',
             'parent_author_id'=>2]
         )->to_a();
         $this->assertEquals(1, count($authors));
@@ -159,7 +175,7 @@ class RelationTest extends DatabaseTestCase
 
         $authors = Author::all()
             ->where([
-                'mixedCaseField = (?) and parent_author_id <> (?)', 'Bill',
+                "{$this->mixedCaseField} = (?) and parent_author_id <> (?)", 'Bill',
                 1
             ])
             ->to_a();
@@ -177,7 +193,7 @@ class RelationTest extends DatabaseTestCase
     public function testToSql(): void
     {
         $this->assertEquals(
-            'SELECT * FROM `books` WHERE name = ? ORDER BY name',
+            "SELECT * FROM {$this->books} WHERE name = ? ORDER BY name",
             \test\models\Book::where('name = ?', 'The Art of Main Tanking')
                 ->order('name')->to_sql()
         );

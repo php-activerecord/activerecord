@@ -34,10 +34,7 @@ abstract class DatabaseTestCase extends TestCase
             new SQLite3(static::$db);
         }
 
-        try {
-            $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
-            $this->connection_name = $connection_name;
-        } catch (Exception $e) {
+        if (!$this->connect($connection_name)) {
             $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
 
@@ -48,6 +45,17 @@ abstract class DatabaseTestCase extends TestCase
 
         if (self::$log) {
             $GLOBALS['ACTIVERECORD_LOG'] = true;
+        }
+    }
+
+    protected function connect(string $connection_name): bool
+    {
+        try {
+            $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
+            $this->connection_name = $connection_name;
+            return true;
+        } catch (Exception $e) {
+            return false;
         }
     }
 
