@@ -22,7 +22,8 @@ abstract class DatabaseTestCase extends TestCase
 
         $config = ActiveRecord\Config::instance();
         $this->original_default_connection = $config->get_default_connection();
-        $connection_name ??= $this->original_default_connection;
+        $envDatabase = getenv('DATABASE');
+        $connection_name ??= $envDatabase != false ? $envDatabase : $this->original_default_connection;
 
         $config->set_default_connection($connection_name);
 
