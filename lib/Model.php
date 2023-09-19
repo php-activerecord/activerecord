@@ -1481,7 +1481,7 @@ class Model
     /**
      * Enables the use of dynamic finders.
      *
-     * @see Relation->__call()
+     * @see Relation::__call()
      */
     public static function __callStatic(string $method, mixed $args): static|null
     {
