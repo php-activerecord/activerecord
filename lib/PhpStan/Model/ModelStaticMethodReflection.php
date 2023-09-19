@@ -10,9 +10,7 @@ use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\FunctionVariant;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\TrinaryLogic;
-use PHPStan\Type\ArrayType;
 use PHPStan\Type\Generic\TemplateTypeMap;
-use PHPStan\Type\IntegerType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\UnionType;
@@ -126,8 +124,7 @@ class ModelStaticMethodReflection implements MethodReflection
                     ])
                 )
             ];
-        }
-        elseif (preg_match('/_set$/', $this->name)) {
+        } elseif (preg_match('/_set$/', $this->name)) {
             return [
                 new FunctionVariant(
                     TemplateTypeMap::createEmpty(),

@@ -22,10 +22,6 @@ services:
         class: ActiveRecord\PhpStan\Model\ModelMethodsClassReflectionExtension
         tags:
           - phpstan.broker.methodsClassReflectionExtension
-    -
-        class: ActiveRecord\PhpStan\Relation\RelationMethodsClassReflectionExtension
-        tags:
-          - phpstan.broker.methodsClassReflectionExtension
 
 includes:
 	- vendor/phpstan/phpstan-phpunit/extension.neon

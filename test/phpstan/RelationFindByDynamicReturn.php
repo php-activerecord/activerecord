@@ -9,7 +9,6 @@
  */
 
 use test\models\Book;
-use function PHPStan\dumpType;
 
 $book = Book::all()->find_by_name('Walden');
 assert($book instanceof Book);
