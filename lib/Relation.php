@@ -817,7 +817,7 @@ class Relation implements \Iterator
         if (!empty($pk)) {
             if (array_key_exists('order', $options)) {
                 if (!$isAscending) {
-                    if (str_contains($options['order'], implode(" DESC, ", $this->table()->pk) . " DESC")) {
+                    if (str_contains($options['order'], implode(' DESC, ', $this->table()->pk) . ' DESC')) {
                         $options['order'] = SQLBuilder::reverse_order((string) $options['order']);
                     }
                 }
