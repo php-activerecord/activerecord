@@ -108,7 +108,8 @@ class ActiveRecordFirstLastTest extends \DatabaseTestCase
     public function testDoesNotClobberOrderOrLimit()
     {
         $rel = Author::limit(2)->order('author_id DESC');
-        $this->assertEquals(1, $rel->first()->author_id);
+        $this->assertEquals(Author::last(), $rel->first());
+        $this->assertEquals(Author::first(), $rel->last());
 
         $authors = $rel->to_a();
         $this->assertEquals(2, count($authors));

@@ -816,10 +816,10 @@ class Relation implements \Iterator
         $pk = $this->table()->pk;
         if (!empty($pk)) {
             if (array_key_exists('order', $options)) {
-                $reverseCommand = $isAscending ? 'DESC' : 'ASC';
-
-                if (str_contains($options['order'], implode(" {$reverseCommand}, ", $this->table()->pk) . " {$reverseCommand}")) {
-                    $options['order'] = SQLBuilder::reverse_order((string) $options['order']);
+                if (!$isAscending) {
+                    if (str_contains($options['order'], implode(' DESC, ', $this->table()->pk) . ' DESC')) {
+                        $options['order'] = SQLBuilder::reverse_order((string) $options['order']);
+                    }
                 }
             } elseif (!array_key_exists('having', $options)) {
                 $command = $isAscending ? 'ASC' : 'DESC';
