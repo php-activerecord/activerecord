@@ -40,4 +40,11 @@ class Venue extends Model
 
         return $this->assign_attribute('state', $value);
     }
+
+    public function get_customState()
+    {
+        static::$use_custom_get_state_getter = true;
+
+        return $this->get_state();
+    }
 }

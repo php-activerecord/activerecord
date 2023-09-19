@@ -7,6 +7,7 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
 
@@ -104,6 +105,96 @@ class Relation implements \Iterator
         $this->isNone = true;
 
         return $this;
+    }
+
+    /**
+     * Enables the use of dynamic finders.
+     *
+     * Dynamic finders are just an easy way to do queries quickly without having to
+     * specify an options array with conditions in it.
+     *
+     * ```
+     * Person::select('id')->find_by_first_name('Tito');
+     * Person::select('id')->order('last_name DESC')->find_by_first_name('Tito');
+     * Person::select('id')->find_by_first_name_and_last_name('Tito','the Grief');
+     * Person::select('id')->find_by_first_name_or_last_name('Tito','the Grief');
+     * ```
+     *
+     * You can also create the model if the find call returned no results:
+     *
+     * ```
+     * Person::find_or_create_by_name('Tito');
+     *
+     * # would be the equivalent of
+     * if (!Person::find_by_name('Tito'))
+     *   Person::create(['Tito']);
+     * ```
+     *
+     * Some other examples of find_or_create_by:
+     *
+     * ```
+     * Person::select('id')->find_or_create_by_name_and_id('Tito',1);
+     * Person::find_or_create_by_name_and_id(['name' => 'Tito', 'id' => 1]);
+     * ```
+     *
+     * @param $method Name of method
+     * @param $args   Method args
+     *
+     * @throws ActiveRecordException If the method name does not start with the find_by or find_or_create_by templates
+     *
+     * @see find
+     *
+     * @return Model|null The first model that meets the find by criteria, or null if no row meets that criteria
+     */
+    public function __call(string $method, mixed $args): Model|null
+    {
+        $create = false;
+
+        if ($attributes = $this->extract_dynamic_vars($method, 'find_or_create_by')) {
+            // can't take any finders with OR in it when doing a find_or_create_by
+            if (false !== strpos($attributes, '_or_')) {
+                throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
+            }
+            $create = true;
+            $method = 'find_by_' . $attributes;
+        }
+
+        $attributes = $this->extract_dynamic_vars($method, 'find_by');
+        if ('' === $attributes) {
+            throw new ActiveRecordException("Call to undefined method: $method");
+        }
+
+        $options = $this->options;
+
+        $options['conditions'] ??= [];
+        $options['conditions'][] = WhereClause::from_underscored_string($this->table()->conn, $attributes, $args, $this->alias_attribute);
+
+        $options['limit'] = 1;
+        $ret = $this->to_a_withOptions($options);
+
+        if (0 === count($ret)) {
+            if ($create) {
+                return $this->className::create(SQLBuilder::create_hash_from_underscored_string(
+                    $attributes,
+                    $args,
+                    $this->alias_attribute));
+            }
+
+            return null;
+        }
+
+        return $ret[0];
+    }
+
+    private function extract_dynamic_vars(string $methodName, string $dynamicPart): string
+    {
+        if (str_starts_with($methodName, $dynamicPart)) {
+            $attributes = substr($methodName, strlen($dynamicPart) + 1);
+
+            return $attributes;
+        }
+
+        return '';
     }
 
     /**
@@ -627,9 +718,8 @@ class Relation implements \Iterator
         $options = $this->options;
         $options['conditions'] ??= [];
         $options['conditions'][] = $this->pk_conditions($args);
-        $options['mapped_names'] = $this->alias_attribute;
 
-        $list = iterator_to_array($this->table()->find($options));
+        $list = $this->to_a_withOptions($options);
         if (is_array($args) && count($list) != count($args)) {
             throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));
         }
@@ -650,8 +740,8 @@ class Relation implements \Iterator
      */
     public function take(int $limit = null): Model|array|null
     {
-        $this->limit($limit ?? 1);
-        $models = $this->to_a();
+        $options = array_merge($this->options, ['limit' => $limit ?? 1]);
+        $models = $this->to_a_withOptions($options);
 
         return isset($limit) ? $models : $models[0] ?? null;
     }
@@ -721,39 +811,51 @@ class Relation implements \Iterator
      */
     private function firstOrLast(int $limit = null, bool $isAscending): array
     {
-        $this->limit($limit ?? 1);
+        $options = array_merge($this->options, ['limit' => $limit ?? 1]);
 
         $pk = $this->table()->pk;
         if (!empty($pk)) {
-            if (array_key_exists('order', $this->options)) {
+            if (array_key_exists('order', $options)) {
                 $reverseCommand = $isAscending ? 'DESC' : 'ASC';
 
-                if (str_contains($this->options['order'], implode(" {$reverseCommand}, ", $this->table()->pk) . " {$reverseCommand}")) {
-                    $this->options['order'] = SQLBuilder::reverse_order((string) $this->options['order']);
+                if (str_contains($options['order'], implode(" {$reverseCommand}, ", $this->table()->pk) . " {$reverseCommand}")) {
+                    $options['order'] = SQLBuilder::reverse_order((string) $options['order']);
                 }
-            } elseif (!array_key_exists('having', $this->options)) {
+            } elseif (!array_key_exists('having', $options)) {
                 $command = $isAscending ? 'ASC' : 'DESC';
-                $this->options['order'] = implode(" {$command}, ", $this->table()->pk) . " {$command}";
+                $options['order'] = implode(" {$command}, ", $this->table()->pk) . " {$command}";
             }
         }
 
-        return $this->to_a();
+        return $this->to_a_withOptions($options);
     }
 
     /**
-     * Converts relation objects to array.
+     * Converts relation objects to array with the currently set of options.
      *
      * @return array<TModel> All the rows that matches query. If no rows match, returns []
      */
     public function to_a(): array
     {
+        return $this->to_a_withOptions($this->options);
+    }
+
+    /**
+     * Converts relation objects to array with a given options.
+     *
+     * @param RelationOptions $options
+     *
+     * @return array<TModel> All the rows that matches query. If no rows match, returns []
+     */
+    private function to_a_withOptions(array $options): array
+    {
         if ($this->isNone) {
             return [];
         }
 
-        $this->options['mapped_names'] = $this->alias_attribute;
+        $options['mapped_names'] = $this->alias_attribute;
 
-        return iterator_to_array($this->table()->find($this->options));
+        return iterator_to_array($this->table()->find($options));
     }
 
     /**
