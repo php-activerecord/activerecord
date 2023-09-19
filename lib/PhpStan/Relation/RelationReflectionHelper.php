@@ -1,6 +1,6 @@
 <?php
 
-namespace ActiveRecord\PhpStan\Model;
+namespace ActiveRecord\PhpStan\Relation;
 
 use PhpParser\Node\Arg;
 use PHPStan\Analyser\Scope;
