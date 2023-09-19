@@ -135,4 +135,24 @@ SQL;
     {
         $this->query("SET NAMES '$charset'");
     }
+
+    /**
+     * Postgres requires camel case column names to be quoted
+     *
+     * @param array<string> $columns The columns of the table
+     *
+     * @return array<string>
+     */
+    public function determineColumnsThatNeedEscaping(array $columns): array
+    {
+        $ret = [];
+
+        foreach ($columns as $column) {
+            if ($column !== strtolower($column)) {
+                $ret[] = $column;
+            }
+        }
+
+        return $ret;
+    }
 }

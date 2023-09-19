@@ -494,6 +494,18 @@ abstract class Connection
             $string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
     }
 
+    /**
+     * Determine which of the columns need escaping
+     *
+     * @param array<string> $columns The columns of the table
+     *
+     * @return array<string> Returns [] if no columns need escaping
+     */
+    public function determineColumnsThatNeedEscaping(array $columns): array
+    {
+        return [];
+    }
+
     public function date_string(\DateTimeInterface $datetime): string
     {
         return $datetime->format(static::$date_format);
