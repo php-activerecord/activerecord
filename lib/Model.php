@@ -688,16 +688,15 @@ class Model
      *
      * @return Model|array<Model>|null
      */
-    protected function initRelationships(string $name): mixed
+    protected function initRelationships(string $name): Model|array|null
     {
         $table = static::table();
-        if ($relationship = $table->get_relationship($name)) {
+        $relationship = $table->get_relationship($name);
+        if (null !== $relationship) {
             $this->__relationships[$name] = $relationship->load($this);
-
-            return $this->__relationships[$name];
         }
 
-        return null;
+        return $this->__relationships[$name] ?? null;
     }
 
     /**
@@ -1482,84 +1481,11 @@ class Model
     /**
      * Enables the use of dynamic finders.
      *
-     * Dynamic finders are just an easy way to do queries quickly without having to
-     * specify an options array with conditions in it.
-     *
-     * ```
-     * SomeModel::find_by_first_name('Tito');
-     * SomeModel::find_by_first_name_and_last_name('Tito','the Grief');
-     * SomeModel::find_by_first_name_or_last_name('Tito','the Grief');
-     * ```
-     *
-     * You can also create the model if the find call returned no results:
-     *
-     * ```
-     * Person::find_or_create_by_name('Tito');
-     *
-     * # would be the equivalent of
-     * if (!Person::find_by_name('Tito'))
-     *   Person::create(['Tito']);
-     * ```
-     *
-     * Some other examples of find_or_create_by:
-     *
-     * ```
-     * Person::find_or_create_by_name_and_id('Tito',1);
-     * Person::find_or_create_by_name_and_id(['name' => 'Tito', 'id' => 1]);
-     * ```
-     *
-     * @param $method Name of method
-     * @param $args   Method args
-     *
-     * @throws ActiveRecordException
-     *
-     * @see find
+     * @see Relation->__call()
      */
-    public static function __callStatic(string $method, mixed $args): mixed
+    public static function __callStatic(string $method, mixed $args): static|null
     {
-        /**
-         * @var RelationOptions
-         */
-        $options = [];
-        $create = false;
-
-        if ($attributes = static::extract_dynamic_vars($method, 'find_or_create_by')) {
-            // can't take any finders with OR in it when doing a find_or_create_by
-            if (false !== strpos($attributes, '_or_')) {
-                throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
-            }
-            $create = true;
-            $method = 'find_by_' . $attributes;
-        }
-
-        $options['conditions'] ??= [];
-
-        if ($attributes = static::extract_dynamic_vars($method, 'find_by')) {
-            $options['conditions'][] = WhereClause::from_underscored_string(static::connection(), $attributes, $args, static::$alias_attribute);
-
-            $rel = static::Relation($options);
-            if (!($ret = $rel->first()) && $create) {
-                return static::create(SQLBuilder::create_hash_from_underscored_string(
-                    $attributes,
-                    $args,
-                    static::$alias_attribute));
-            }
-
-            return $ret;
-        }
-
-        throw new ActiveRecordException("Call to undefined method: $method");
-    }
-
-    public static function extract_dynamic_vars(string $methodName, string $dynamicPart): string
-    {
-        if (str_starts_with($methodName, $dynamicPart)) {
-            $attributes = substr($methodName, strlen($dynamicPart) +1);
-
-            return $attributes;
-        }
-
-        return '';
+        return static::Relation()->$method(...$args);
     }
 
     /**

@@ -105,6 +105,18 @@ class ActiveRecordFirstLastTest extends \DatabaseTestCase
         $this->assertEquals(2, count($authors));
     }
 
+    public function testDoesNotClobberOrderOrLimit()
+    {
+        $rel = Author::limit(2)->order('author_id DESC');
+        $this->assertEquals(Author::last(), $rel->first());
+        $this->assertEquals(Author::first(), $rel->last());
+
+        $authors = $rel->to_a();
+        $this->assertEquals(2, count($authors));
+        $this->assertEquals('Tito', $authors[0]->name);
+        $this->assertEquals('Uncle Bob', $authors[1]->name);
+    }
+
     public function testLastNull()
     {
         $query = Author::where(['mixedCaseField' => 'Does not exist'])->last();
