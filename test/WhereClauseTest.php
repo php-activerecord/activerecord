@@ -5,22 +5,6 @@ use ActiveRecord\WhereClause;
 
 class WhereClauseTest extends DatabaseTestCase
 {
-    private string $id;
-    private string $name;
-
-    public function setUp(string $connection_name = null): void
-    {
-        if (parent::connect('pgsql')) {
-            parent::setUp('pgsql');
-            $this->id = '"id"';
-            $this->name = '"name"';
-        } else {
-            parent::setUp();
-            $this->id = '`id`';
-            $this->name = '`name`';
-        }
-    }
-
     public function testValues()
     {
         $c = new WhereClause('a=? and b=?', [1, 2]);
@@ -135,7 +119,7 @@ class WhereClauseTest extends DatabaseTestCase
     public function testSubstituteOnHash(): void
     {
         $a = new WhereClause(['name' => 'Tito', 'id'=> 1]);
-        $this->assertEquals("{$this->name} = 'Tito' AND {$this->id} = 1", $a->to_s($this->connection, substitute: true));
+        $this->assertEquals("name = 'Tito' AND id = 1", $a->to_s($this->connection, substitute: true));
     }
 
     public function testSubstituteQuotesScalarsButNotOthers(): void
@@ -200,7 +184,7 @@ class WhereClauseTest extends DatabaseTestCase
     public function testHashWithDefaultGlue(): void
     {
         $a = new WhereClause(['id' => 1, 'name' => 'Tito']);
-        $this->assertEquals("{$this->id} = ? AND {$this->name} = ?", $a->to_s($this->connection));
+        $this->assertEquals('id = ? AND name = ?', $a->to_s($this->connection));
     }
 
     public function testHashWithGlue(): void
@@ -209,7 +193,7 @@ class WhereClauseTest extends DatabaseTestCase
             'id' => 1,
             'name' => 'Tito'
         ]);
-        $this->assertEquals("{$this->id} = ?, {$this->name} = ?", $a->to_s($this->connection, glue: ', '));
+        $this->assertEquals('id = ?, name = ?', $a->to_s($this->connection, glue: ', '));
     }
 
     public function testHashWithArray(): void
@@ -218,6 +202,6 @@ class WhereClauseTest extends DatabaseTestCase
             'id' => 1,
             'name' => ['Tito', 'Mexican']
         ]);
-        $this->assertEquals("{$this->id} = ? AND {$this->name} IN(?,?)", $a->to_s($this->connection));
+        $this->assertEquals('id = ? AND name IN(?,?)', $a->to_s($this->connection));
     }
 }
