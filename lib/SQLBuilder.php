@@ -241,7 +241,7 @@ class SQLBuilder
         $arg = $args[0] ?? null;
 
         $this->operation = 'DELETE';
-        isset($arg) && $this->where([WhereClause::from_arg($arg)], []);
+        isset($arg) && $this->where([WhereClause::from_arg($arg, [], $this->connection, $this->table)]);
 
         return $this;
     }

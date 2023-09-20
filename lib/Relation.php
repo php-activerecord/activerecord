@@ -585,7 +585,7 @@ class Relation implements \Iterator
         $this->options['conditions'] ??= [];
 
         $arg = static::toSingleArg(...func_get_args());
-        $expression = WhereClause::from_arg($arg);
+        $expression = WhereClause::from_arg($arg, $this->options, $this->table()->conn, $this->table()->table);
 
         $this->options['conditions'][] = $expression;
 
@@ -644,7 +644,7 @@ class Relation implements \Iterator
         $this->options['conditions'] ??= [];
 
         $arg = static::toSingleArg(...func_get_args());
-        $this->options['conditions'][] = WhereClause::from_arg($arg, true);
+        $this->options['conditions'][] = WhereClause::from_arg($arg, $this->options, $this->table()->conn, $this->table()->table, true);
 
         return $this;
     }

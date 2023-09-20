@@ -1156,7 +1156,7 @@ class Model
         isset($options['set']) && $sql->update($options['set']);
 
         if (isset($options['conditions']) && ($conditions = $options['conditions'])) {
-            $sql->where([WhereClause::from_arg($conditions)]);
+            $sql->where([WhereClause::from_arg($conditions, $options, $conn, $table->table)]);
         }
 
         if (isset($options['limit'])) {

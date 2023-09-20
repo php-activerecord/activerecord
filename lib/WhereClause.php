@@ -95,8 +95,8 @@ class WhereClause
         $values = $values ?? $this->values;
         $expression = $this->expression;
         if (is_hash($expression)) {
-            $hash = $this->map_names($expression, $mappedNames);
-            list($expression, $values) = $this->build_sql_from_hash($connection, $hash, $prependTableName, $glue);
+            $hash = self::map_names($expression, $mappedNames);
+            list($expression, $values) = self::build_sql_from_hash($connection, $hash, $prependTableName, $glue);
         }
 
         $ret = '';
@@ -171,10 +171,13 @@ class WhereClause
         return new WhereClause($expression, $conditionValues);
     }
 
-    public static function from_arg(mixed $arg, bool $negated=false): WhereClause
+    /**
+     * @param array<mixed> $options
+     */
+    public static function from_arg(mixed $arg, array $options, Connection $connection = null, string $table = '', bool $negated=false, bool $isOr=false): WhereClause
     {
         if ($arg instanceof Relation) {
-            [$template, $values] = self::andWhereClauses($arg);
+            [$template, $values] = self::glueWhereClauses($arg, $connection, $table, $options, $isOr ? ' AND ' : ' OR ');
 
             return new WhereClause($template, $values, $negated);
         }
@@ -188,9 +191,11 @@ class WhereClause
     }
 
     /**
+     * @param array<mixed> $options
+     *
      * @return array<mixed>
      */
-    private static function andWhereClauses(Relation $arg): array
+    private static function glueWhereClauses(Relation $arg, ?Connection $connection, string $table, array $options, string $glue): array
     {
         $clauses = $arg->getWhereConditions();
 
@@ -198,20 +203,22 @@ class WhereClause
         $values = [];
 
         foreach ($clauses as $clause) {
-            $negated = $clause->negated ? '!(' : '';
-            $negatedEnd = $clause->negated ? ')' : '';
-
-            if (is_array($clause->expression)) {
-                $expression = implode(' AND ', $clause->expression);
+            if (is_hash($clause->expression)) {
+                $mappedNames = $options['mapped_names'] ?? [];
+                $hash = self::map_names($expression, $mappedNames);
+                list($expression, $values) = self::build_sql_from_hash($connection, $hash, !empty($options['joins']) ? $table : '', ' AND ');
             } else {
                 $expression = $clause->expression;
             }
+
+            $negated = $clause->negated ? '!(' : '';
+            $negatedEnd = $clause->negated ? ')' : '';
             $expressions[] = "{$negated}{$expression}{$negatedEnd}";
             $values = array_merge($values, $clause->values);
         }
 
         if (count($expressions) > 1) {
-            $expression = '((' . implode(') AND (', $expressions) . '))';
+            $expression = '((' . implode("){$glue}(", $expressions) . '))';
         } else {
             $expression = (0 === count($expressions)) ? '' : $expressions[0];
         }
@@ -227,7 +234,7 @@ class WhereClause
      *
      * @return array<string, string> Array with any aliases replaced with their read field name
      */
-    private function map_names(array &$hash, array &$map): array
+    private static function map_names(array &$hash, array &$map): array
     {
         $ret = [];
 
@@ -247,11 +254,11 @@ class WhereClause
      *
      * @return array<mixed>
      */
-    private function build_sql_from_hash(Connection $connection, array $hash, string $prependTableName, string $glue = ' AND '): array
+    private static function build_sql_from_hash(?Connection $connection, array $hash, string $prependTableName, string $glue = ' AND '): array
     {
         $sql = $g = '';
 
-        $table = !empty($prependTableName) ? $connection->quote_name($prependTableName) : '';
+        $table = !empty($prependTableName) && $connection != null ? $connection->quote_name($prependTableName) : '';
 
         foreach ($hash as $name => $value) {
             if (!empty($prependTableName)) {

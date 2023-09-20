@@ -80,7 +80,7 @@ abstract class AbstractRelationship
 
         $this->options['conditions'] = [];
         if (isset($options['conditions'])) {
-            $this->options['conditions'][] = WhereClause::from_arg($options['conditions']);
+            $this->options['conditions'][] = WhereClause::from_arg($options['conditions'], $options);
         }
 
         if (isset($this->options['class_name'])) {

@@ -20,7 +20,7 @@ class PgsqlAdapter extends Connection
     /**
      * @var array<array<string>>
      */
-    private array $columnLookup = [];
+    private array $cachedQuotedColumns = [];
 
     public function supports_sequences(): bool
     {
@@ -151,18 +151,18 @@ SQL;
     private function determineColumnsThatNeedEscaping(array $columns): array
     {
         $hash = implode(',', $columns);
-        $ret = $this->columnLookup[$hash] ?? null;
+        $ret = $this->cachedQuotedColumns[$hash] ?? null;
 
         if (null === $ret) {
             $ret = [];
 
             foreach ($columns as $column) {
                 if ($column !== strtolower($column)) {
-                    $ret[] = $column;
+                    $ret[$column] = $this->quote_name($column);
                 }
             }
 
-            $this->columnLookup[$hash] = $ret;
+            $this->cachedQuotedColumns[$hash] = $ret;
         }
 
         return $ret;
@@ -177,14 +177,7 @@ SQL;
     public function escapeColumns(string $expression, array $columns): string
     {
         $columns = $this->determineColumnsThatNeedEscaping($columns);
-        if (0 === count($columns)) {
-            return $expression;
-        }
 
-        foreach ($columns as $column) {
-            $expression = str_replace($column, $this->quote_name($column), $expression);
-        }
-
-        return $expression;
+        return str_replace(array_keys($columns), array_values($columns), $expression);
     }
 }
