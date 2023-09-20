@@ -142,33 +142,6 @@ SQL;
     }
 
     /**
-     * Postgres requires camel case column names to be quoted
-     *
-     * @param array<string> $columns The columns of the table
-     *
-     * @return array<string>
-     */
-    private function determineColumnsThatNeedEscaping(array $columns): array
-    {
-        $hash = implode(',', $columns);
-        $ret = $this->columnLookup[$hash] ?? null;
-
-        if (null === $ret) {
-            $ret = [];
-
-            foreach ($columns as $column) {
-                if ($column !== strtolower($column)) {
-                    $ret[] = $column;
-                }
-            }
-
-            $this->columnLookup[$hash] = $ret;
-        }
-
-        return $ret;
-    }
-
-    /**
      * @see Connection::escapeColumns()
      *
      * @param string        $expression The where clause to be escaped
@@ -176,13 +149,12 @@ SQL;
      */
     public function escapeColumns(string $expression, array $columns): string
     {
-        $columns = $this->determineColumnsThatNeedEscaping($columns);
-        if (0 === count($columns)) {
-            return $expression;
-        }
-
+        static $quotedNames = [];
         foreach ($columns as $column) {
-            $expression = str_replace($column, $this->quote_name($column), $expression);
+            if ($column !== strtolower($column)) {
+                $quotedNames[$column] ??= $this->quote_name($column);
+                $expression = str_replace($column, $this->quote_name($column), $expression);
+            }
         }
 
         return $expression;
