@@ -561,8 +561,6 @@ class Relation implements \Iterator
      * ])
      * # SELECT * FROM users WHERE name = 'Joe' AND email = 'joe@example.com'
      *
-     * @throws ValidationsArgumentError If you pass in a Relation. Relation::and() supports relations
-     *
      * @return Relation<TModel>
      */
     public function where(): Relation
