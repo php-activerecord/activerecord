@@ -466,8 +466,7 @@ class Table
         $table_name = $this->table;
         $conn = $this->conn;
         $this->columns = Cache::get("get_meta_data-$table_name",
-            static fn () =>
-                $conn->columns($table_name));
+            static fn () => $conn->columns($table_name));
     }
 
     /**
