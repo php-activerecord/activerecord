@@ -496,7 +496,7 @@ abstract class Connection
      * Escape the column names in the where phrases
      *
      * @param string        $expression The where clause to be escaped
-     * @param array<string> $columns    The columns of the table
+     * @param list<string> $columns    The columns of the table
      */
     public function escapeColumns(string $expression, array $columns): string
     {
