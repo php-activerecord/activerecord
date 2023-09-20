@@ -13,6 +13,15 @@ class PgsqlAdapterTest extends AdapterTestCase
         $this->assertTrue($this->connection->insert_id('authors_author_id_seq') > 0);
     }
 
+    public function testToSql(): void
+    {
+        $this->assertEquals(
+            'SELECT * FROM "authors" WHERE "mixedCaseField" = ? ORDER BY name',
+            \test\models\Author::where('mixedCaseField = ?', 'The Art of Main Tanking')
+                ->order('name')->to_sql()
+        );
+    }
+
     public function testInsertIdWithParams()
     {
         $x = ['name'];

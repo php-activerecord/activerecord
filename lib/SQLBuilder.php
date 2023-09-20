@@ -118,18 +118,20 @@ class SQLBuilder
     /**
      * @param list<WhereClause>    $clauses
      * @param array<string,string> $mappedNames
+     * @param array<string>        $columns     Table column names
      *
      * @throws Exception\ExpressionsException
      *
      * @return $this
      */
-    public function where(array $clauses=[], array $mappedNames=[]): static
+    public function where(array $clauses=[], array $mappedNames=[], array $columns=[]): static
     {
         $values = [];
         $sql = '';
         $glue = ' AND ';
         foreach ($clauses as $idx => $clause) {
             $expression = $clause->to_s($this->connection, !empty($this->joins) ? $this->table : '', $mappedNames);
+            $expression = $this->connection->escapeColumns($expression, $columns);
             $values = array_merge($values, array_flatten($clause->values()));
             $inverse = $clause->negated() ? '!' : '';
             $wrappedExpression = $inverse || count($clauses) > 1 ? '(' . $expression . ')' : $expression;

@@ -229,7 +229,7 @@ class Table
             );
         }
 
-        $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? []);
+        $sql->where($options['conditions'] ?? [], $options['mapped_names'] ?? [], array_keys($this->columns));
 
         if (array_key_exists('order', $options)) {
             $sql->order($options['order']);

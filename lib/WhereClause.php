@@ -218,8 +218,6 @@ class WhereClause
         $table = !empty($prependTableName) ? $connection->quote_name($prependTableName) : '';
 
         foreach ($hash as $name => $value) {
-            $name = $connection->quote_name($name);
-
             if (!empty($prependTableName)) {
                 $name = $table . '.' . $name;
             }

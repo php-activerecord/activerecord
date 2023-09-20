@@ -64,7 +64,7 @@ Simply run:
 docker-compose up -d
 ```
 
-Then, the necessary services will be available and the tests should pass (although you may need to install PHP memcache extensions in a separate step, see below ).
+Then, the necessary services will be available and the tests should pass (although you may need to install PHP memcache extensions in a separate step, see below).
 
 When you're done, you can take it down with:
 ```sh
