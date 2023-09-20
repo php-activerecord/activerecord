@@ -1,5 +1,6 @@
 <?php
 
+use ActiveRecord\ConnectionManager;
 use ActiveRecord\Exception\HasManyThroughAssociationException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
@@ -408,7 +409,8 @@ class RelationshipTest extends DatabaseTestCase
         ];
 
         Venue::first()->events;
-        $this->assert_sql_has(ConnectionManager::get_connection()->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
+        $this->assert_sql_has(ConnectionManager::get_connection()
+            ->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
     }
 
     public function testHasManyThrough()

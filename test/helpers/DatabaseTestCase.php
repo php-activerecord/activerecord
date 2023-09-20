@@ -45,12 +45,15 @@ abstract class DatabaseTestCase extends TestCase
 
         $GLOBALS['ACTIVERECORD_LOG'] = false;
 
-        $loader = new DatabaseLoader(ConnectionManager::get_connection());
-        $loader->reset_table_data();
-
         if (self::$log) {
             $GLOBALS['ACTIVERECORD_LOG'] = true;
         }
+    }
+
+    public static function setUpBeforeClass(): void
+    {
+        $loader = new DatabaseLoader(ConnectionManager::get_connection());
+        $loader->reset_table_data();
     }
 
     public function tearDown(): void
