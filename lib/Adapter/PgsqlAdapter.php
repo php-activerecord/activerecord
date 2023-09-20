@@ -17,11 +17,6 @@ class PgsqlAdapter extends Connection
     public static string $QUOTE_CHARACTER = '"';
     public static int $DEFAULT_PORT = 5432;
 
-    /**
-     * @var array<array<string>>
-     */
-    private array $columnLookup = [];
-
     public function supports_sequences(): bool
     {
         return true;
