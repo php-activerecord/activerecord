@@ -6,19 +6,6 @@ use test\models\Author;
 
 class RelationTest extends DatabaseTestCase
 {
-    private string $books;
-
-    public function setUp(string $connection_name = null): void
-    {
-        if (parent::connect('pgsql')) {
-            parent::setUp('pgsql');
-            $this->books = '"books"';
-        } else {
-            parent::setUp();
-            $this->books = '`books`';
-        }
-    }
-
     public function testWhereString()
     {
         $models = Author::where("mixedCaseField = 'Bill'")->to_a();
@@ -190,7 +177,7 @@ class RelationTest extends DatabaseTestCase
     public function testToSql(): void
     {
         $this->assertEquals(
-            "SELECT * FROM {$this->books} WHERE name = ? ORDER BY name",
+            "SELECT * FROM `books` WHERE name = ? ORDER BY name",
             \test\models\Book::where('name = ?', 'The Art of Main Tanking')
                 ->order('name')->to_sql()
         );
