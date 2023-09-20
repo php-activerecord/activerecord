@@ -33,15 +33,15 @@ class ActiveRecordGroupTest extends \DatabaseTestCase
 
     public function testGroupWithOrderAndLimitAndHaving(): void
     {
-        $venues = Venue::select('state')
+        $relation = Venue::select('state')
             ->group('state')
             ->having('length(state) = 2')
             ->order('state')
-            ->limit(2)
-            ->to_a();
+            ->limit(2);
+
+        $venues = $relation->to_a();
         $this->assertTrue(count($venues) > 0);
-        $this->assert_sql_has($this->connection->limit(
-            'SELECT state FROM venues GROUP BY state HAVING length(state) = 2 ORDER BY state', 0, 2), Venue::table()->last_sql);
+        $this->assert_sql_has('SELECT state FROM venues GROUP BY state HAVING length(state) = 2 ORDER BY state', Venue::table()->last_sql);
     }
 
     public function testHaving(): void

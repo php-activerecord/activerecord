@@ -9,8 +9,8 @@ class PgsqlAdapterTest extends AdapterTestCase
 
     public function testInsertId()
     {
-        $this->connection->query("INSERT INTO authors(author_id,name) VALUES(nextval('authors_author_id_seq'),'name')");
-        $this->assertTrue($this->connection->insert_id('authors_author_id_seq') > 0);
+        ConnectionManager::get_connection()->query("INSERT INTO authors(author_id,name) VALUES(nextval('authors_author_id_seq'),'name')");
+        $this->assertTrue(ConnectionManager::get_connection()->insert_id('authors_author_id_seq') > 0);
     }
 
     public function testToSql(): void
@@ -25,25 +25,25 @@ class PgsqlAdapterTest extends AdapterTestCase
     public function testInsertIdWithParams()
     {
         $x = ['name'];
-        $this->connection->query("INSERT INTO authors(author_id,name) VALUES(nextval('authors_author_id_seq'),?)", $x);
-        $this->assertTrue($this->connection->insert_id('authors_author_id_seq') > 0);
+        ConnectionManager::get_connection()->query("INSERT INTO authors(author_id,name) VALUES(nextval('authors_author_id_seq'),?)", $x);
+        $this->assertTrue(ConnectionManager::get_connection()->insert_id('authors_author_id_seq') > 0);
     }
 
     public function testInsertIdShouldReturnExplicitlyInsertedId()
     {
-        $this->connection->query('INSERT INTO authors(author_id,name) VALUES(99,\'name\')');
-        $this->assertTrue($this->connection->insert_id('authors_author_id_seq') > 0);
+        ConnectionManager::get_connection()->query('INSERT INTO authors(author_id,name) VALUES(99,\'name\')');
+        $this->assertTrue(ConnectionManager::get_connection()->insert_id('authors_author_id_seq') > 0);
     }
 
     public function testSetCharset()
     {
-        $connection_string = ActiveRecord\Config::instance()->get_connection($this->connection_name);
+        $connection_string = ActiveRecord\Config::instance()->get_default_connection_string();
         $conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
         $this->assertEquals("SET NAMES 'utf8'", $conn->last_query);
     }
 
     public function testGh96ColumnsNotDuplicatedByIndex()
     {
-        $this->assertEquals(3, $this->connection->query_column_info('user_newsletters')->rowCount());
+        $this->assertEquals(3, ConnectionManager::get_connection()->query_column_info('user_newsletters')->rowCount());
     }
 }

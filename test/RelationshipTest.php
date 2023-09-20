@@ -331,7 +331,7 @@ class RelationshipTest extends DatabaseTestCase
     {
         $this->expectException(RelationshipException::class);
         Venue::table()->get_relationship('non_existent_table', true);
-        $this->assert_sql_has($this->connection->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
+        $this->assert_sql_has(ConnectionManager::get_connection()->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
     }
 
     public function testHasManyWithSelect()
@@ -408,7 +408,7 @@ class RelationshipTest extends DatabaseTestCase
         ];
 
         Venue::first()->events;
-        $this->assert_sql_has($this->connection->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
+        $this->assert_sql_has(ConnectionManager::get_connection()->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
     }
 
     public function testHasManyThrough()
@@ -650,7 +650,7 @@ class RelationshipTest extends DatabaseTestCase
     {
         $event = new Event();
         $event->venue;
-        $this->assert_sql_doesnt_has($this->connection->last_query, 'is IS NULL');
+        $this->assert_sql_doesnt_has(ConnectionManager::get_connection()->last_query, 'is IS NULL');
     }
 
     public function testRelationshipOnTableWithUnderscores()

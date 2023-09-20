@@ -2,6 +2,7 @@
 
 use ActiveRecord\Cache;
 use ActiveRecord\Connection;
+use ActiveRecord\ConnectionManager;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use PHPUnit\Framework\TestCase;
 
@@ -10,7 +11,6 @@ require_once __DIR__ . '/DatabaseLoader.php';
 abstract class DatabaseTestCase extends TestCase
 {
     protected Connection $connection;
-    protected string $connection_name;
 
     protected string $original_default_connection;
     protected $original_date_class;
@@ -38,15 +38,14 @@ abstract class DatabaseTestCase extends TestCase
         }
 
         try {
-            $this->connection = ActiveRecord\ConnectionManager::get_connection($connection_name);
-            $this->connection_name = $connection_name;
+            ActiveRecord\ConnectionManager::get_connection($connection_name);
         } catch (Exception $e) {
             $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }
 
         $GLOBALS['ACTIVERECORD_LOG'] = false;
 
-        $loader = new DatabaseLoader($this->connection);
+        $loader = new DatabaseLoader(ConnectionManager::get_connection());
         $loader->reset_table_data();
 
         if (self::$log) {

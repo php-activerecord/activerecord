@@ -344,7 +344,7 @@ class SQLBuilder
 
         $e = new WhereClause($sql, [array_values($this->data)]);
 
-        return $e->to_s($this->connection);
+        return $e->to_s(ConnectionManager::get_connection());
     }
 
     private function build_select(): string

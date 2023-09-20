@@ -1,5 +1,6 @@
 <?php
 
+use ActiveRecord\ConnectionManager;
 use ActiveRecord\DateTime;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
@@ -63,7 +64,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testInsertWithNoSequenceDefined()
     {
         $this->expectException(DatabaseException::class);
-        if (!$this->connection->supports_sequences()) {
+        if (!ConnectionManager::get_connection()->supports_sequences()) {
             throw new DatabaseException('');
         }
         AuthorWithoutSequence::create(['name' => 'Bob!']);
@@ -85,8 +86,8 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testSequenceWasSet()
     {
-        if ($this->connection->supports_sequences()) {
-            $this->assertEquals($this->connection->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
+        if (ConnectionManager::get_connection()->supports_sequences()) {
+            $this->assertEquals(ConnectionManager::get_connection()->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
         } else {
             $this->assertNull(Author::table()->sequence);
         }
@@ -94,7 +95,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testSequenceWasExplicitlySet()
     {
-        if ($this->connection->supports_sequences()) {
+        if (ConnectionManager::get_connection()->supports_sequences()) {
             $this->assertEquals(AuthorExplicitSequence::$sequence, AuthorExplicitSequence::table()->sequence);
         } else {
             $this->assertNull(Author::table()->sequence);
@@ -376,7 +377,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testDeleteAllWithLimitAndOrder()
     {
-        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
+        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 
@@ -420,7 +421,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testUpdateAllWithLimitAndOrder()
     {
-        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
+        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 

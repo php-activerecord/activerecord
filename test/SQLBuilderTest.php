@@ -21,7 +21,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function setUp($connection_name=null): void
     {
         parent::setUp($connection_name);
-        $this->sql = new SQLBuilder($this->connection, $this->table_name);
+        $this->sql = new SQLBuilder(ConnectionManager::get_connection(), $this->table_name);
         $this->table = Table::load($this->class_name);
     }
 
@@ -100,7 +100,7 @@ class SQLBuilderTest extends DatabaseTestCase
     public function testLimit()
     {
         $this->sql->limit(10)->offset(1);
-        $this->assertEquals($this->connection->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
+        $this->assertEquals(ConnectionManager::get_connection()->limit('SELECT * FROM authors', 1, 10), (string) $this->sql);
     }
 
     public function testSelect()
@@ -135,7 +135,7 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->sql->order('name');
         $this->sql->group('name');
         $this->sql->where([new WhereClause(['id' => 1])]);
-        $this->assert_sql_has($this->connection->limit("SELECT * FROM authors WHERE id = ? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
+        $this->assert_sql_has(ConnectionManager::get_connection()->limit("SELECT * FROM authors WHERE id = ? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name", 1, 10), (string) $this->sql);
     }
 
     public function testInsertRequiresHash()
@@ -166,7 +166,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function testUpdateWithLimitAndOrder()
     {
-        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
+        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE operation');
         }
 
@@ -209,7 +209,7 @@ class SQLBuilderTest extends DatabaseTestCase
 
     public function testDeleteWithLimitAndOrder()
     {
-        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
+        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
         }
 
