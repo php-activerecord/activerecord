@@ -173,50 +173,14 @@ class WhereClause
 
     public static function from_arg(mixed $arg, bool $negated=false): WhereClause
     {
-        if ($arg instanceof Relation) {
-            [$template, $values] = self::andWhereClauses($arg);
-
-            return new WhereClause($template, $values, $negated);
-        }
-
         // user passed in a string, a hash, or an array consisting of a string and values
         if (is_string($arg) || is_hash($arg)) {
-            return new WhereClause($arg, [], $negated);
-        }
-
-        return new WhereClause($arg[0], array_slice($arg, 1), $negated);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    private static function andWhereClauses(Relation $arg): array
-    {
-        $clauses = $arg->getWhereConditions();
-
-        $expressions = [];
-        $values = [];
-
-        foreach ($clauses as $clause) {
-            $negated = $clause->negated ? '!(' : '';
-            $negatedEnd = $clause->negated ? ')' : '';
-
-            if (is_array($clause->expression)) {
-                $expression = implode(' AND ', $clause->expression);
-            } else {
-                $expression = $clause->expression;
-            }
-            $expressions[] = "{$negated}{$expression}{$negatedEnd}";
-            $values = array_merge($values, $clause->values);
-        }
-
-        if (count($expressions) > 1) {
-            $expression = '((' . implode(') AND (', $expressions) . '))';
+            $expression = new WhereClause($arg, [], $negated);
         } else {
-            $expression = (0 === count($expressions)) ? '' : $expressions[0];
+            $expression = new WhereClause($arg[0], array_slice($arg, 1), $negated);
         }
 
-        return [$expression, array_flatten($values)];
+        return $expression;
     }
 
     /**
