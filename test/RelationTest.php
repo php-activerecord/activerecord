@@ -177,7 +177,7 @@ class RelationTest extends DatabaseTestCase
     public function testToSql(): void
     {
         $this->assertEquals(
-            "SELECT * FROM `books` WHERE name = ? ORDER BY name",
+            'SELECT * FROM `books` WHERE name = ? ORDER BY name',
             \test\models\Book::where('name = ?', 'The Art of Main Tanking')
                 ->order('name')->to_sql()
         );
