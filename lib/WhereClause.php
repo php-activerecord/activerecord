@@ -205,16 +205,17 @@ class WhereClause
         foreach ($clauses as $clause) {
             if (is_hash($clause->expression)) {
                 $mappedNames = $options['mapped_names'] ?? [];
-                $hash = self::map_names($expression, $mappedNames);
-                list($expression, $values) = self::build_sql_from_hash($connection, $hash, !empty($options['joins']) ? $table : '', ' AND ');
+                $hash = self::map_names($clause->expression, $mappedNames);
+                list($expression, $temp) = self::build_sql_from_hash($connection, $hash, !empty($options['joins']) ? $table : '', ' AND ');
             } else {
                 $expression = $clause->expression;
+                $temp = $clause->values;
             }
 
             $negated = $clause->negated ? '!(' : '';
             $negatedEnd = $clause->negated ? ')' : '';
             $expressions[] = "{$negated}{$expression}{$negatedEnd}";
-            $values = array_merge($values, $clause->values);
+            $values = array_merge($values, $temp);
         }
 
         if (count($expressions) > 1) {

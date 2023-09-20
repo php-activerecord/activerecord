@@ -111,7 +111,7 @@ class RelationTest extends DatabaseTestCase
 
     public function testAnd()
     {
-        $model = Author::where(['name' => 'Bill Clinton'])->and("mixedCaseField = 'Bill'")->and(['mixedCaseField' => 'Bill'])->find(3);
+        $model = Author::where(['name' => 'Bill Clinton'])->and(Author::where("mixedCaseField = 'Bill'")->and(['mixedCaseField' => 'Bill']))->find(3);
         $this->assertEquals('Bill Clinton', $model->name);
     }
 
