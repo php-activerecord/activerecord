@@ -418,7 +418,7 @@ class RelationshipTest extends DatabaseTestCase
         $this->assertEquals(3, $hosts[1]->id);
     }
 
-    public function testGh27HasManyThroughWithExplicitKeys()
+    public function testHasManyThroughWithExplicitKeys()
     {
         $property = Property::first();
 

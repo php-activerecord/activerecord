@@ -296,6 +296,7 @@ abstract class Connection
      */
     public function columns(string $table): array
     {
+        $table = $this->quote_table_name($table);
         $columns = [];
         $sth = $this->query_column_info($table);
 
@@ -305,6 +306,11 @@ abstract class Connection
         }
 
         return $columns;
+    }
+
+    public function quote_table_name(string $table): string
+    {
+        return $this->quote_name($table);
     }
 
     /**

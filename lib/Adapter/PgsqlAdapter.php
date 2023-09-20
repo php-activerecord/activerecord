@@ -136,6 +136,11 @@ SQL;
         $this->query("SET NAMES '$charset'");
     }
 
+    public function quote_table_name(string $table): string
+    {
+        return $table;
+    }
+
     /**
      * @see Connection::escapeColumns()
      *

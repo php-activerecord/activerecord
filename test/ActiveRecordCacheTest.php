@@ -39,7 +39,7 @@ class ActiveRecordCacheTest extends DatabaseTestCase
     {
         Author::first();
 
-        $table_name = Author::table()->get_fully_qualified_table_name(!($this->connection instanceof ActiveRecord\PgsqlAdapter));
+        $table_name = Author::table()->table;
         $value = Cache::$adapter->read("get_meta_data-$table_name");
         $this->assertTrue(is_array($value));
     }

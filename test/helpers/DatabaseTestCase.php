@@ -1,5 +1,6 @@
 <?php
 
+use ActiveRecord\Cache;
 use ActiveRecord\Connection;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,7 @@ abstract class DatabaseTestCase extends TestCase
     public function setUp(string $connection_name=null): void
     {
         ActiveRecord\Table::clear_cache();
+        Cache::flush();
 
         $config = ActiveRecord\Config::instance();
         $this->original_default_connection = $config->get_default_connection();
