@@ -139,7 +139,7 @@ SQL;
     /**
      * @see Connection::escapeColumns()
      *
-     * @param string        $expression The where clause to be escaped
+     * @param string       $expression The where clause to be escaped
      * @param list<string> $columns    The columns of the table
      */
     public function escapeColumns(string $expression, array $columns): string
