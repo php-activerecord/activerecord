@@ -258,7 +258,7 @@ class WhereClause
     {
         $sql = $g = '';
 
-        $table = !empty($prependTableName) && $connection != null ? $connection->quote_name($prependTableName) : '';
+        $table = !empty($prependTableName) && null != $connection ? $connection->quote_name($prependTableName) : '';
 
         foreach ($hash as $name => $value) {
             if (!empty($prependTableName)) {
