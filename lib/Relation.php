@@ -582,11 +582,32 @@ class Relation implements \Iterator
      */
     public function and(): Relation
     {
-        $this->options['conditions'] ??= [];
-
         $arg = static::toSingleArg(...func_get_args());
-        $expression = WhereClause::from_arg($arg, $this->options, $this->table()->conn, $this->table()->table);
 
+        return $this->andOr($arg, false);
+    }
+
+    /**
+     * Alias for where() that also supports Relation
+     *
+     * @see where()
+     */
+    public function or(): Relation
+    {
+        $arg = static::toSingleArg(...func_get_args());
+
+        return $this->andOr($arg, true);
+    }
+
+    /**
+     * Analog of and(), but doing an or() instead
+     *
+     * @see where()
+     */
+    private function andOr(mixed $arg, bool $isOr): Relation
+    {
+        $this->options['conditions'] ??= [];
+        $expression = WhereClause::from_arg($arg, $this->options, $this->table()->conn, $this->table()->table, false, $isOr);
         $this->options['conditions'][] = $expression;
 
         return $this;

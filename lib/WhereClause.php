@@ -28,7 +28,8 @@ class WhereClause
      */
     private array|string $expression;
 
-    private bool $negated = false;
+    private bool $isOr;
+    private bool $negated;
 
     /**
      * @var array<mixed>
@@ -40,10 +41,12 @@ class WhereClause
      * @param array<mixed> $values
      * @param bool         $negated    if true, then this where clause will be a logical
      *                                 not when the SQL is generated
+     * @param bool         $isOr       if true, or the where clause; otherwise, and it
      */
-    public function __construct(string|array $expression, array $values=[], bool $negated = false)
+    public function __construct(string|array $expression, array $values=[], bool $negated = false, bool $isOr = false)
     {
         $this->negated = $negated;
+        $this->isOr = $isOr;
         $this->expression = $expression;
         $this->values = $values;
     }
@@ -51,6 +54,11 @@ class WhereClause
     public function negated(): bool
     {
         return $this->negated;
+    }
+
+    public function isOr(): bool
+    {
+        return $this->isOr;
     }
 
     /**
@@ -177,17 +185,17 @@ class WhereClause
     public static function from_arg(mixed $arg, array $options, Connection $connection = null, string $table = '', bool $negated=false, bool $isOr=false): WhereClause
     {
         if ($arg instanceof Relation) {
-            [$template, $values] = self::glueWhereClauses($arg, $connection, $table, $options, $isOr ? ' AND ' : ' OR ');
+            [$template, $values] = self::glueWhereClauses($arg, $connection, $table, $options);
 
-            return new WhereClause($template, $values, $negated);
+            return new WhereClause($template, $values, $negated, $isOr);
         }
 
         // user passed in a string, a hash, or an array consisting of a string and values
         if (is_string($arg) || is_hash($arg)) {
-            return new WhereClause($arg, [], $negated);
+            return new WhereClause($arg, [], $negated, $isOr);
         }
 
-        return new WhereClause($arg[0], array_slice($arg, 1), $negated);
+        return new WhereClause($arg[0], array_slice($arg, 1), $negated, $isOr);
     }
 
     /**
@@ -195,33 +203,33 @@ class WhereClause
      *
      * @return array<mixed>
      */
-    private static function glueWhereClauses(Relation $arg, ?Connection $connection, string $table, array $options, string $glue): array
+    private static function glueWhereClauses(Relation $arg, ?Connection $connection, string $table, array $options): array
     {
         $clauses = $arg->getWhereConditions();
 
-        $expressions = [];
+        $expression = '';
         $values = [];
 
-        foreach ($clauses as $clause) {
+        foreach ($clauses as $idx => $clause) {
             if (is_hash($clause->expression)) {
                 $mappedNames = $options['mapped_names'] ?? [];
                 $hash = self::map_names($clause->expression, $mappedNames);
-                list($expression, $temp) = self::build_sql_from_hash($connection, $hash, !empty($options['joins']) ? $table : '', ' AND ');
+                list($clauseExpression, $temp) = self::build_sql_from_hash($connection, $hash, !empty($options['joins']) ? $table : '', ' AND ');
             } else {
-                $expression = $clause->expression;
+                $clauseExpression = $clause->expression;
                 $temp = $clause->values;
             }
 
             $negated = $clause->negated ? '!(' : '';
             $negatedEnd = $clause->negated ? ')' : '';
-            $expressions[] = "{$negated}{$expression}{$negatedEnd}";
+
+            $glue = ($idx < (count($clauses) - 1)) ? ($clauses[$idx + 1]->isOr() ? ') OR (' : ') AND (') : '';
+            $expression .= "{$negated}{$clauseExpression}{$negatedEnd}{$glue}";
             $values = array_merge($values, $temp);
         }
 
-        if (count($expressions) > 1) {
-            $expression = '((' . implode("){$glue}(", $expressions) . '))';
-        } else {
-            $expression = (0 === count($expressions)) ? '' : $expressions[0];
+        if (count($clauses) > 1) {
+            $expression = "($expression)";
         }
 
         return [$expression, array_flatten($values)];

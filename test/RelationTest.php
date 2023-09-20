@@ -115,6 +115,18 @@ class RelationTest extends DatabaseTestCase
         $this->assertEquals('Bill Clinton', $model->name);
     }
 
+    public function testOr()
+    {
+        $relation = Author::where(['name' => 'Tito'])->or(['name' => 'George W. Bush']);
+        $this->assertEquals(3, count($relation->to_a()));
+
+        $relation = Author::where("mixedCaseField = 'Bill'")->and($relation);
+        $this->assertEquals(0, count($relation->to_a()));
+
+        $authors = Author::where(['name' => 'Bill Clinton'])->or($relation)->to_a();
+        $this->assertEquals(1, count($authors));
+    }
+
     public function testAndRelationThrowsError()
     {
         $this->expectException(ValidationsArgumentError::class);

@@ -128,14 +128,15 @@ class SQLBuilder
     {
         $values = [];
         $sql = '';
-        $glue = ' AND ';
         foreach ($clauses as $idx => $clause) {
             $expression = $clause->to_s($this->connection, !empty($this->joins) ? $this->table : '', $mappedNames);
             $expression = $this->connection->escapeColumns($expression, $columns);
             $values = array_merge($values, array_flatten($clause->values()));
             $inverse = $clause->negated() ? '!' : '';
             $wrappedExpression = $inverse || count($clauses) > 1 ? '(' . $expression . ')' : $expression;
-            $sql .=  $inverse . $wrappedExpression . ($idx < (count($clauses) - 1) ? $glue : '');
+
+            $glue = ($idx < (count($clauses) - 1)) ? ($clauses[$idx + 1]->isOr() ? ' OR ' : ' AND ') : '';
+            $sql .= "{$inverse}{$wrappedExpression}{$glue}";
         }
 
         $this->where = $sql;
