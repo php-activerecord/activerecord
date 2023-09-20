@@ -485,25 +485,22 @@ abstract class Connection
      * Quote a name like table names and field names.
      *
      * @param string $string string to quote
-     *
-     * @return string
      */
-    public function quote_name($string)
+    public function quote_name($string): string
     {
         return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string) - 1] === static::$QUOTE_CHARACTER ?
             $string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
     }
 
     /**
-     * Determine which of the columns need escaping
+     * Escape the column names in the where phrases
      *
-     * @param array<string> $columns The columns of the table
-     *
-     * @return array<string> Returns [] if no columns need escaping
+     * @param string        $expression The where clause to be escaped
+     * @param array<string> $columns    The columns of the table
      */
-    public function determineColumnsThatNeedEscaping(array $columns): array
+    public function escapeColumns(string $expression, array $columns): string
     {
-        return [];
+        return $expression;
     }
 
     public function date_string(\DateTimeInterface $datetime): string

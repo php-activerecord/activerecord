@@ -126,14 +126,12 @@ class SQLBuilder
      */
     public function where(array $clauses=[], array $mappedNames=[], array $columns=[]): static
     {
-        $escapedNames = $this->connection->determineColumnsThatNeedEscaping($columns);
-
         $values = [];
         $sql = '';
         $glue = ' AND ';
         foreach ($clauses as $idx => $clause) {
             $expression = $clause->to_s($this->connection, !empty($this->joins) ? $this->table : '', $mappedNames);
-            $expression = $this->escapeColumns($expression, $escapedNames);
+            $expression = $this->connection->escapeColumns($expression, $columns);
             $values = array_merge($values, array_flatten($clause->values()));
             $inverse = $clause->negated() ? '!' : '';
             $wrappedExpression = $inverse || count($clauses) > 1 ? '(' . $expression . ')' : $expression;
@@ -144,28 +142,6 @@ class SQLBuilder
         $this->where_values = $values;
 
         return $this;
-    }
-
-    /**
-     * Escape the column names in the where phrases
-     *
-     * @param string        $expression   The where clause to be escaped
-     * @param array<string> $escapedNames The columns of the table that need to be escaped
-     */
-    public function escapeColumns(string $expression, array $escapedNames): string
-    {
-        if (0 === count($escapedNames)) {
-            return $expression;
-        }
-
-        $className = get_class($this->connection);
-        $quoteChar = $className::$QUOTE_CHARACTER;
-
-        foreach ($escapedNames as $column) {
-            $expression = str_replace($column, "{$quoteChar}$column{$quoteChar}", $expression);
-        }
-
-        return str_replace('""', '"', $expression);
     }
 
     public function order(string $order): static

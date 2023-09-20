@@ -17,6 +17,11 @@ class PgsqlAdapter extends Connection
     public static string $QUOTE_CHARACTER = '"';
     public static int $DEFAULT_PORT = 5432;
 
+    /**
+     * @var array<array<string>>
+     */
+    private array $columnLookup = [];
+
     public function supports_sequences(): bool
     {
         return true;
@@ -143,16 +148,43 @@ SQL;
      *
      * @return array<string>
      */
-    public function determineColumnsThatNeedEscaping(array $columns): array
+    private function determineColumnsThatNeedEscaping(array $columns): array
     {
-        $ret = [];
+        $hash = implode(',', $columns);
+        $ret = $this->columnLookup[$hash] ?? null;
 
-        foreach ($columns as $column) {
-            if ($column !== strtolower($column)) {
-                $ret[] = $column;
+        if (null === $ret) {
+            $ret = [];
+
+            foreach ($columns as $column) {
+                if ($column !== strtolower($column)) {
+                    $ret[] = $column;
+                }
             }
+
+            $this->columnLookup[$hash] = $ret;
         }
 
         return $ret;
+    }
+
+    /**
+     * @see Connection::escapeColumns()
+     *
+     * @param string        $expression The where clause to be escaped
+     * @param array<string> $columns    The columns of the table
+     */
+    public function escapeColumns(string $expression, array $columns): string
+    {
+        $columns = $this->determineColumnsThatNeedEscaping($columns);
+        if (0 === count($columns)) {
+            return $expression;
+        }
+
+        foreach ($columns as $column) {
+            $expression = str_replace($column, $this->quote_name($column), $expression);
+        }
+
+        return $expression;
     }
 }
