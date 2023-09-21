@@ -394,14 +394,20 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testUpdateAllWithSetAsString()
     {
-        $num_affected = Author::update_all(['set' => 'parent_author_id = 2']);
-        $this->assertEquals(3, $num_affected);
+        Author::update_all(['set' => 'parent_author_id = 2']);
+        $ids = Author::pluck('parent_author_id');
+        foreach ($ids as $id) {
+            $this->assertEquals(2, $id);
+        }
     }
 
     public function testUpdateAllWithSetAsHash()
     {
-        $num_affected = Author::update_all(['set' => ['parent_author_id' => 2]]);
-        $this->assertEquals(3, $num_affected);
+        Author::update_all(['set' => ['parent_author_id' => 2]]);
+        $ids = Author::pluck('parent_author_id');
+        foreach ($ids as $id) {
+            $this->assertEquals(2, $id);
+        }
     }
 
     /**

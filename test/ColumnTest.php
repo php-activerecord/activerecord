@@ -2,9 +2,7 @@
 
 use ActiveRecord\Column;
 use ActiveRecord\ConnectionManager;
-use ActiveRecord\DatabaseException;
 use ActiveRecord\DateTime;
-use PHPUnit\Framework\TestCase;
 
 class ColumnTest extends DatabaseTestCase
 {
