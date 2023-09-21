@@ -18,11 +18,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         }
 
         parent::setUp($connection_name);
-    }
-
-    public static function setUpBeforeClass(): void
-    {
-        // override to allow database reset
+        static::setUpBeforeClass();
     }
 
     public function testIHasADefaultPortUnlessImSqlite()
