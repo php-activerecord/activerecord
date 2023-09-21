@@ -39,7 +39,7 @@ ActiveRecord\Config::initialize(function ($cfg) {
         'pgsql'  => getenv('PHPAR_PGSQL') ?: 'pgsql://test:test@127.0.0.1:5432/test',
         'sqlite' => getenv('PHPAR_SQLITE') ?: 'sqlite://test.db']);
 
-    $cfg->set_default_connection('pgsql');
+    $cfg->set_default_connection('mysql');
 
     for ($i=0; $i<count($GLOBALS['argv']); ++$i) {
         if ('--adapter' == $GLOBALS['argv'][$i]) {
