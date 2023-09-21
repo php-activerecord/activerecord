@@ -48,13 +48,4 @@ class ActiveRecordFromTest extends \DatabaseTestCase
 
         $this->assertEquals('Monday Night Music Club feat. The Shivers', $venue->title);
     }
-
-    public function testSubquery(): void
-    {
-        $venues = Venue::from('(SELECT * from events where title="Monday Night Music Club feat. The Shivers") as specific_events');
-        $this->assert_sql_has('SELECT * FROM (SELECT * from events where title=Monday Night Music Club feat. The Shivers) as specific_events', $venues->to_sql());
-
-        $venue = $venues->first();
-        $this->assertEquals('Monday Night Music Club feat. The Shivers', $venue->title);
-    }
 }

@@ -133,7 +133,7 @@ class SQLBuilder
             $expression = $clause->to_s($this->connection, !empty($this->joins) ? $this->table : '', $mappedNames);
             $expression = $this->connection->escapeColumns($expression, $columns);
             $values = array_merge($values, array_flatten($clause->values()));
-            $inverse = $clause->negated() ? '!' : '';
+            $inverse = $clause->negated() ? $this->connection->not() : '';
             $wrappedExpression = $inverse || count($clauses) > 1 ? '(' . $expression . ')' : $expression;
             $sql .=  $inverse . $wrappedExpression . ($idx < (count($clauses) - 1) ? $glue : '');
         }

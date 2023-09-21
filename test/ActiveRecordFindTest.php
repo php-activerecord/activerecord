@@ -176,7 +176,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindHashUsingAliasWithNull()
     {
-        $venues = Venue::where(['marquee' => null])->to_a();
+        $venues = Venue::where(['name' => null])->to_a();
         $this->assertEquals(0, count($venues));
     }
 

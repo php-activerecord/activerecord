@@ -364,7 +364,7 @@ class Model
         // initialize attributes applying defaults
         if (!$instantiating_via_find) {
             foreach (static::table()->columns as $name => $meta) {
-                $this->attributes[$meta->inflected_name] = $meta->default;
+                $this->attributes[$meta->inflected_name] = $meta->default ?? null;
             }
         }
 

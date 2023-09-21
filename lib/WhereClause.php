@@ -165,7 +165,7 @@ class WhereClause
             // map to correct name if $map was supplied
             $name = $map && isset($map[$parts[$i]]) ? $map[$parts[$i]] : $parts[$i];
 
-            $expression .= $connection->quote_name($name) . $bind;
+            $expression .= $name . $bind;
         }
 
         return new WhereClause($expression, $conditionValues);
@@ -222,13 +222,7 @@ class WhereClause
                 $name = $table . '.' . $name;
             }
 
-            if (is_array($value)) {
-                $sql .= "$g$name IN(?)";
-            } elseif (is_null($value)) {
-                $sql .= "$g$name IS ?";
-            } else {
-                $sql .= "$g$name = ?";
-            }
+            $sql .=  "$g$name " . $connection->eqToken($value);
 
             $g = $glue;
         }

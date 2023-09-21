@@ -335,6 +335,17 @@ abstract class Connection
         return (int) $this->connection->lastInsertId($sequence);
     }
 
+    public function eqToken(mixed $value): string
+    {
+        if (is_array($value)) {
+            return 'IN(?)';
+        } elseif (is_null($value)) {
+            return 'IS ?';
+        }
+
+        return '= ?';
+    }
+
     /**
      * Execute a raw SQL query on the database.
      *
@@ -378,6 +389,10 @@ abstract class Connection
         }
 
         return $sth;
+    }
+
+    public function not(): string {
+        return "!";
     }
 
     /**

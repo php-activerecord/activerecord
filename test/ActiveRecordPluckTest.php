@@ -24,9 +24,9 @@ class ActiveRecordPluckTest extends \DatabaseTestCase
 
     public function testSingleArgumentWithDistinct()
     {
-        $authors = Author::distinct()->pluck('name');
+        $authors = Author::distinct()->order('name')->pluck('name');
         $this->assertEquals(4, count($authors));
-        $this->assertEquals('Tito', $authors[0]);
+        $this->assertEquals('Bill Clinton', $authors[0]);
         $this->assertEquals('George W. Bush', $authors[1]);
     }
 
