@@ -88,8 +88,6 @@ jobs:
           echo "PostgreSQL Connection String: postgres://test:test@localhost:5432/test"
 
       - name: Run PHPUnit
-        env:
-          DATABASE: ${{ matrix.database }}
         run: |
           vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml
 
