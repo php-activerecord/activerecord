@@ -11,12 +11,6 @@ class DelegateTest extends \DatabaseTestCase
 {
     private $options;
 
-    public function setUp($connection_name = null): void
-    {
-        parent::setUp($connection_name);
-        $this->options = ['conditions' => 'blah', 'order' => 'blah'];
-    }
-
     public function testOptionsHashWithUnknownKeys()
     {
         $this->expectException(ActiveRecordException::class);

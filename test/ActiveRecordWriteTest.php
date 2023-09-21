@@ -37,8 +37,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function setUp(string $connection_name=null): void
     {
         parent::setUp($connection_name);
-        $loader = new DatabaseLoader(ConnectionManager::get_connection());
-        $loader->reset_table_data();
+        static::resetTableData();
     }
 
     private function make_new_book_and($save=true)
