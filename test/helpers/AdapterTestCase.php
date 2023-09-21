@@ -71,13 +71,13 @@ abstract class AdapterTestCase extends DatabaseTestCase
     public function testConnectionFailed()
     {
         $this->expectException(ConnectionException::class);
-        ActiveRecord\Connection::instance('{ConnectionManager::get_connection()->protocol}://baduser:badpass@127.0.0.1/db');
+        ActiveRecord\Connection::instance(ConnectionManager::get_connection()->protocol . '://baduser:badpass@127.0.0.1/db');
     }
 
     public function testConnectFailed()
     {
         $this->expectException(ConnectionException::class);
-        ActiveRecord\Connection::instance('{ConnectionManager::get_connection()->protocol}://zzz:zzz@127.0.0.1/test');
+        ActiveRecord\Connection::instance(ConnectionManager::get_connection()->protocol . '://zzz:zzz@127.0.0.1/test');
     }
 
     public function testConnectWithPort()
