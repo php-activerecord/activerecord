@@ -85,7 +85,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->expectNotToPerformAssertions();
         $config = ActiveRecord\Config::instance();
         $name = $config->get_default_connection_string();
-        $url = parse_url($config->get_connection($name));
+        $url = parse_url($name);
         $conn = ConnectionManager::get_connection();
         $port = $conn::$DEFAULT_PORT;
 
@@ -104,7 +104,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
     public function testConnectToInvalidDatabase()
     {
         $this->expectException(ConnectionException::class);
-        ActiveRecord\Connection::instance('{ConnectionManager::get_connection()->protocol}://test:test@127.0.0.1/' . self::InvalidDb);
+        ActiveRecord\Connection::instance(ConnectionManager::get_connection()->protocol . '://test:test@127.0.0.1/' . self::InvalidDb);
     }
 
     public function testDateTimeType()
@@ -234,6 +234,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function testInsertIdShouldReturnExplicitlyInsertedId()
     {
+        static::resetTableData();
         ConnectionManager::get_connection()->query('INSERT INTO authors(author_id,name) VALUES(99,\'name\')');
         $this->assertTrue(ConnectionManager::get_connection()->insert_id() > 0);
     }
@@ -296,6 +297,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     private function limit(int $offset = 0, int $limit = 0)
     {
+        static::resetTableData();
         $sql = 'SELECT * FROM authors ORDER BY name ASC';
         $ret = iterator_to_array(ConnectionManager::get_connection()->query_and_fetch(ConnectionManager::get_connection()->limit($sql, $offset, $limit)));
 
@@ -314,6 +316,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function testLimitToLastRecord()
     {
+        static::resetTableData();
         $this->assertEquals([1], $this->limit(2, 1));
     }
 
@@ -367,6 +370,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function testTransactionRollback()
     {
+        static::resetTableData();
         $original = ConnectionManager::get_connection()->query_and_fetch_one('select count(*) from authors');
 
         ConnectionManager::get_connection()->transaction();

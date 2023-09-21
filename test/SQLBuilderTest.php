@@ -1,5 +1,6 @@
 <?php
 
+use ActiveRecord\ConnectionManager;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\SQLBuilder;
 use ActiveRecord\Table;

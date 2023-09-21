@@ -52,8 +52,14 @@ abstract class DatabaseTestCase extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        static::resetTableData();
+    }
+
+    public static function resetTableData(): void
+    {
         $loader = new DatabaseLoader(ConnectionManager::get_connection());
         $loader->reset_table_data();
+
     }
 
     public function tearDown(): void

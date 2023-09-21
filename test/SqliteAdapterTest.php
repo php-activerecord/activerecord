@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Connection;
+use ActiveRecord\ConnectionManager;
 use ActiveRecord\Exception\ConnectionException;
 
 class SqliteAdapterTest extends AdapterTestCase
