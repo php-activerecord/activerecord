@@ -59,7 +59,6 @@ abstract class DatabaseTestCase extends TestCase
     {
         $loader = new DatabaseLoader(ConnectionManager::get_connection());
         $loader->reset_table_data();
-
     }
 
     public function tearDown(): void
