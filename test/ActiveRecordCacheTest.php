@@ -38,6 +38,7 @@ class ActiveRecordCacheTest extends DatabaseTestCase
 
     public function testCachesColumnMetaData()
     {
+        static::resetTableData();
         Author::first();
 
         $table_name = Author::table()->table;
