@@ -181,7 +181,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
         $this->assertEquals(Column::TIME, $author_columns['some_time']->type);
     }
 
-    public function testQuery()
+    public function testQuery(): void
     {
         $sth = ConnectionManager::get_connection()->query('SELECT * FROM authors');
 
