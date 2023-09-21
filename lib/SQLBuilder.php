@@ -120,8 +120,6 @@ class SQLBuilder
      * @param array<string,string> $mappedNames
      * @param array<string>        $columns     Table column names
      *
-     * @throws Exception\ExpressionsException
-     *
      * @return $this
      */
     public function where(array $clauses=[], array $mappedNames=[], array $columns=[]): static

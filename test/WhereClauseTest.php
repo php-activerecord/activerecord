@@ -1,8 +1,9 @@
 <?php
 
 use ActiveRecord\ConnectionManager;
-use ActiveRecord\Exception\ExpressionsException;
+use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\WhereClause;
+use test\models\Author;
 
 class WhereClauseTest extends DatabaseTestCase
 {
@@ -53,7 +54,7 @@ class WhereClauseTest extends DatabaseTestCase
 
     public function testInsufficientVariables()
     {
-        $this->expectException(ExpressionsException::class);
+        $this->expectException(DatabaseException::class);
         $c = new WhereClause('name=? and id=?', ['Tito']);
         $c->to_s(ConnectionManager::get_connection());
     }
@@ -77,20 +78,6 @@ class WhereClauseTest extends DatabaseTestCase
         $a = new WhereClause('name=?', [0]);
         $this->assertEquals('name=?', $a->to_s(ConnectionManager::get_connection()));
         $this->assertEquals([0], $a->values());
-    }
-
-    public function testEmptyArrayVariable(): void
-    {
-        $a = new WhereClause('id IN(?)', [[]]);
-        $this->assertEquals('id IN(?)', $a->to_s(ConnectionManager::get_connection()));
-        $this->assertEquals([[]], $a->values());
-    }
-
-    public function testEmptyArrayVariableSubstitute(): void
-    {
-        $a = new WhereClause('id IN(?)', [[]]);
-        $this->assertEquals('id IN(NULL)', $a->to_s(ConnectionManager::get_connection(), substitute: true));
-        $this->assertEquals([[]], $a->values());
     }
 
     public function testIgnoreInvalidParameterMarker(): void
@@ -148,25 +135,10 @@ class WhereClauseTest extends DatabaseTestCase
         $this->assertEquals("name=$escaped", $a->to_s(ConnectionManager::get_connection(), substitute: true));
     }
 
-    public function testBind(): void
+    public function testBindInvalidParameterNumberArrayWithIn()
     {
-        $a = new WhereClause('name=? and id=?', ['Tito']);
-        $a->bind(2, 1);
-        $this->assertEquals(['Tito', 1], $a->values());
-    }
-
-    public function testBindOverwriteExisting(): void
-    {
-        $a = new WhereClause('name=? and id=?', ['Tito', 1]);
-        $a->bind(2, 99);
-        $this->assertEquals(['Tito', 99], $a->values());
-    }
-
-    public function testBindInvalidParameterNumber(): void
-    {
-        $this->expectException(ExpressionsException::class);
-        $a = new WhereClause('name=?');
-        $a->bind(0, 99);
+        $this->expectException(DatabaseException::class);
+        Author::where(['author_id IN(?)', []])->to_a();
     }
 
     public function testSubstituteUsingAlternateValues(): void

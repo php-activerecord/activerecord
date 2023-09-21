@@ -162,6 +162,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
     public function testFindAllWithEmptyArrayBindValueThrowsException()
     {
         $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('No bound parameter for index 0');
         Author::where(['author_id IN(?)', []])->to_a();
     }
 
