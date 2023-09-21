@@ -140,8 +140,9 @@ SQL;
         return '= ?';
     }
 
-    public function not(): string {
-        return "NOT ";
+    public function not(): string
+    {
+        return 'NOT ';
     }
 
     public function set_encoding(string $charset): void

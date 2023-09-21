@@ -484,8 +484,7 @@ class Table
                 } else {
                     $hash[$name] = $this->conn->datetime_string($value);
                 }
-            }
-            else {
+            } else {
                 $hash[$name] = $value;
             }
         }

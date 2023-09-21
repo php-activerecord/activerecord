@@ -37,7 +37,7 @@ class ActiveRecordNotTest extends \DatabaseTestCase
      */
     public function testString($condition, $cb)
     {
-        foreach(Book::where($condition) as $book) {
+        foreach (Book::where($condition) as $book) {
             $this->assertTrue($cb($book));
         }
     }

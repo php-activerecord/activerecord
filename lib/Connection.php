@@ -391,8 +391,9 @@ abstract class Connection
         return $sth;
     }
 
-    public function not(): string {
-        return "!";
+    public function not(): string
+    {
+        return '!';
     }
 
     /**
