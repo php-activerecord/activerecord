@@ -134,6 +134,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindByPkArray()
     {
+        static::resetTableData();
         $authors = Author::find(1, '2');
         $this->assertEquals(2, count($authors));
         $this->assertEquals(1, $authors[0]->id);
