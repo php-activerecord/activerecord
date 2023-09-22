@@ -119,9 +119,9 @@ abstract class AdapterTestCase extends DatabaseTestCase
     public function testDate()
     {
         $columns = ConnectionManager::get_connection()->columns('authors');
-        $this->assertEquals('date', $columns['some_Date']->raw_type);
-        $this->assertEquals(Column::DATE, $columns['some_Date']->type);
-        $this->assertTrue($columns['some_Date']->length >= 7);
+        $this->assertEquals('date', $columns['some_date']->raw_type);
+        $this->assertEquals(Column::DATE, $columns['some_date']->type);
+        $this->assertTrue($columns['some_date']->length >= 7);
     }
 
     public function testColumnsNoInflectionOnHashKey()
@@ -268,7 +268,7 @@ abstract class AdapterTestCase extends DatabaseTestCase
     public function testColumnsx()
     {
         $columns = ConnectionManager::get_connection()->columns('authors');
-        $names = ['author_id', 'parent_author_id', 'name', 'updated_at', 'created_at', 'some_Date', 'some_time', 'some_text', 'encrypted_password', 'mixedCaseField'];
+        $names = ['author_id', 'parent_author_id', 'name', 'updated_at', 'created_at', 'some_date', 'some_time', 'some_text', 'encrypted_password', 'mixedCaseField'];
 
         foreach ($names as $field) {
             $this->assertTrue(array_key_exists($field, $columns));

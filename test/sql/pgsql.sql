@@ -5,7 +5,7 @@ CREATE TABLE authors(
 	"mixedCaseField" varchar(50),
 	updated_at timestamp,
 	created_at timestamp,
-	"some_Date" date,
+	some_date date,
 	some_time time,
 	some_text text,
 	encrypted_password varchar(50)

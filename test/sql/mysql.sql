@@ -5,7 +5,7 @@ CREATE TABLE authors(
 	mixedCaseField varchar(50),
 	updated_at datetime,
 	created_at datetime,
-	some_Date date,
+	some_date date,
 	some_time time,
 	some_text text,
 	some_enum enum('a','b','c'),

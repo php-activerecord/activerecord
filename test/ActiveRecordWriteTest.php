@@ -349,7 +349,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testSetDateFlagsDirty()
     {
-        $author = Author::create(['some_Date' => new DateTime()]);
+        $author = Author::create(['some_date' => new DateTime()]);
         $author = Author::find($author->id);
         $author->some_date->setDate(2010, 1, 1);
         $this->assertArrayHasKey('some_date', $author->dirty_attributes());
