@@ -25,9 +25,8 @@ class MysqlAdapterTest extends AdapterTestCase
         $valuestore = ValuestoreValidations::create(['key' => 'GA_KEY', 'value' => 'UA-1234567-2']);
 
         $this->assertEquals(['Key must be unique'], $valuestore->errors->full_messages());
-        $this->assertEquals(1, ValuestoreValidations::where("`key`= ?", 'GA_KEY')->count());
+        $this->assertEquals(1, ValuestoreValidations::where('`key`= ?', 'GA_KEY')->count());
     }
-
 
     public function testEnum()
     {
