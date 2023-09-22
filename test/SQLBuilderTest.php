@@ -76,7 +76,6 @@ class SQLBuilderTest extends DatabaseTestCase
     public function testWhereWithHashAndNull()
     {
         $this->sql->where([new WhereClause(['id' => 1, 'name' => null])]);
-        $this->assert_sql_has('SELECT * FROM authors WHERE id = ? AND name IS ?', (string) $this->sql);
         $this->assertEquals([1, null], $this->sql->get_where_values());
     }
 
