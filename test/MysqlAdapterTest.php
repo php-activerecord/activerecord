@@ -4,8 +4,9 @@ use ActiveRecord\Column;
 use ActiveRecord\Config;
 use ActiveRecord\ConnectionManager;
 use ActiveRecord\WhereClause;
+use test\models\ValueStoreValidations;
 
-class MysqlAdapterTst extends AdapterTestCase
+class MysqlAdapterTest extends AdapterTestCase
 {
     public function setUp($connection_name=null): void
     {
@@ -17,6 +18,16 @@ class MysqlAdapterTst extends AdapterTestCase
         $a = new WhereClause('name = ? or name in( ? )', ["Tito's Guild", [1, "Tito's Guild"]]);
         $this->assertEquals("name = 'Tito\'s Guild' or name in( 1,'Tito\'s Guild' )", $a->to_s(ConnectionManager::get_connection(), substitute: true));
     }
+
+    public function testValidatesUniquenessOfWorksWithMysqlReservedWordAsColumnName()
+    {
+        ValueStoreValidations::create(['key' => 'GA_KEY', 'value' => 'UA-1234567-1']);
+        $valuestore = ValuestoreValidations::create(['key' => 'GA_KEY', 'value' => 'UA-1234567-2']);
+
+        $this->assertEquals(['Key must be unique'], $valuestore->errors->full_messages());
+        $this->assertEquals(1, ValuestoreValidations::where("`key`= ?", 'GA_KEY')->count());
+    }
+
 
     public function testEnum()
     {

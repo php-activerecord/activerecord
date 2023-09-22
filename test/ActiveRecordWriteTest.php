@@ -415,13 +415,21 @@ class ActiveRecordWriteTest extends DatabaseTestCase
      */
     public function testUpdateAllWithConditionsAsString()
     {
-        $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => 'name = "Tito"']);
+        $num_affected = Author::update_all([
+            'set' => 'parent_author_id = 2',
+            'conditions' => ['name = ?', 'Tito']
+        ]);
         $this->assertEquals(2, $num_affected);
     }
 
     public function testUpdateAllWithConditionsAsHash()
     {
-        $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => ['name' => 'Tito']]);
+        $num_affected = Author::update_all([
+            'set' => 'parent_author_id = 2',
+            'conditions' => [
+                'name' => 'Tito'
+            ]
+        ]);
         $this->assertEquals(2, $num_affected);
     }
 
