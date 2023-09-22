@@ -5,7 +5,7 @@ use ActiveRecord\Config;
 use ActiveRecord\ConnectionManager;
 use ActiveRecord\WhereClause;
 
-class MysqlAdapterTest extends AdapterTestCase
+class MysqlAdapterTst extends AdapterTestCase
 {
     public function setUp($connection_name=null): void
     {
