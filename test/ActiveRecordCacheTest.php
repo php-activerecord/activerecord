@@ -23,6 +23,7 @@ class ActiveRecordCacheTest extends DatabaseTestCase
     {
         Cache::flush();
         Cache::initialize();
+        parent::tearDown();
     }
 
     public function testDefaultExpire()

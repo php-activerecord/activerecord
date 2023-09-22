@@ -685,13 +685,13 @@ class RelationshipTest extends DatabaseTestCase
                 'class_name' => 'Event',
                 'order' => 'id asc',
                 'conditions' => [
-                    'length(title) = ?', 14
+                    'title = ?', 'Love Overboard'
                 ]
             ]
         ];
         $venues = Venue::includes('events')->find([2, 6]);
 
-        $this->assert_sql_has('WHERE (length(title) = ?) AND (venue_id IN(?,?)) ORDER BY id asc', ActiveRecord\Table::load(Event::class)->last_sql);
+        $this->assert_sql_has('WHERE (title = ?) AND (venue_id IN(?,?)) ORDER BY id asc', ActiveRecord\Table::load(Event::class)->last_sql);
         $this->assertEquals(1, count($venues[0]->events));
     }
 

@@ -50,6 +50,12 @@ abstract class DatabaseTestCase extends TestCase
         }
     }
 
+    public function tearDown(): void
+    {
+        ActiveRecord\Config::instance()->set_date_class($this->original_date_class);
+        ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
+    }
+
     public static function setUpBeforeClass(): void
     {
         static::resetTableData();
@@ -59,12 +65,6 @@ abstract class DatabaseTestCase extends TestCase
     {
         $loader = new DatabaseLoader(ConnectionManager::get_connection());
         $loader->reset_table_data();
-    }
-
-    public function tearDown(): void
-    {
-        ActiveRecord\Config::instance()->set_date_class($this->original_date_class);
-        ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
     }
 
     public function assert_exception_message_contains($contains, $closure)

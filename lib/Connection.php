@@ -388,6 +388,10 @@ abstract class Connection
             throw new DatabaseException($msg . ': ' . $e->getMessage());
         }
 
+        ob_start();
+        $sth->debugDumpParams();
+        $info = ob_get_clean();
+
         return $sth;
     }
 
