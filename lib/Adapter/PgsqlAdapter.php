@@ -155,6 +155,11 @@ SQL;
         return $table;
     }
 
+    public function guard_name(string $string): string
+    {
+        return strpos($string, '-') ? $this->quote_name($string) : $string;
+    }
+
     /**
      * @see Connection::escapeColumns()
      *

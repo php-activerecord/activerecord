@@ -949,6 +949,6 @@ class RelationshipTest extends DatabaseTestCase
     public function testDontAttemptEagerLoadWhenRecordDoesNotExist()
     {
         $this->expectException(RecordNotFound::class);
-        Author::find(999999, ['include' => ['books']]);
+        Author::includes('books')->find(999999);
     }
 }

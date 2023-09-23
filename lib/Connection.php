@@ -516,10 +516,15 @@ abstract class Connection
      *
      * @param string $string string to quote
      */
-    public function quote_name($string): string
+    public function quote_name(string $string): string
     {
         return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string) - 1] === static::$QUOTE_CHARACTER ?
             $string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
+    }
+
+    public function guard_name(string $string): string
+    {
+        return $string;
     }
 
     /**
