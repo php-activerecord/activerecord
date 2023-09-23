@@ -112,8 +112,7 @@ abstract class Connection
         $config = Config::instance();
 
         if (!str_contains($connection_string_or_connection_name ?? '', '://')) {
-            $connection_string = $connection_string_or_connection_name ?
-                $config->get_connection($connection_string_or_connection_name) :
+            $connection_string = $config->get_connection($connection_string_or_connection_name ?? '') ??
                 $config->get_default_connection_string();
         } else {
             $connection_string = $connection_string_or_connection_name;

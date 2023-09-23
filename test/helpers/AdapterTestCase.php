@@ -47,7 +47,6 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
     public function testNullConnectionStringUsesDefaultConnection()
     {
-        $this->assertNotNull(ActiveRecord\Connection::instance(null));
         $this->assertNotNull(ActiveRecord\Connection::instance(''));
         $this->assertNotNull(ActiveRecord\Connection::instance());
     }

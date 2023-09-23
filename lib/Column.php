@@ -117,11 +117,6 @@ class Column
             return $value;
         }
 
-        // It's just a decimal number
-        elseif (is_float($value) && floor($value) != $value) {
-            return (int) $value;
-        }
-
         // If adding 0 to a string causes a float conversion,
         // we have a number over PHP_INT_MAX
         elseif (is_string($value) && 1 === bccomp($value, (string) PHP_INT_MAX)) {
@@ -157,8 +152,7 @@ class Column
             case self::STRING:    return (string) $value;
             case self::INTEGER:    return static::castIntegerSafely($value);
             case self::DECIMAL:    return (float) $value;
-            case self::DATETIME:
-            case self::DATE:
+            default: // DATETIME, DATE, TIME
                 if ('' === $value) {
                     return null;
                 }
@@ -179,8 +173,6 @@ class Column
 
                 return $connection->string_to_datetime($value);
         }
-
-        return $value;
     }
 
     /**
