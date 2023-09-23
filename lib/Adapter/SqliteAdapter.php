@@ -36,6 +36,8 @@ class SqliteAdapter extends Connection
 
     public function query_column_info(string $table): \PDOStatement
     {
+        $table = $this->quote_name($table);
+
         return $this->query("pragma table_info($table)");
     }
 
@@ -104,8 +106,8 @@ class SqliteAdapter extends Connection
         throw new ActiveRecordException('SqliteAdapter::set_charset not supported.');
     }
 
-    public function accepts_limit_and_order_for_update_and_delete(): bool
+    public function not(): string
     {
-        return true;
+        return 'NOT ';
     }
 }

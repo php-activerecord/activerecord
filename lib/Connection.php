@@ -329,6 +329,17 @@ abstract class Connection
         return (int) $this->connection->lastInsertId($sequence);
     }
 
+    public function eqToken(mixed $value): string
+    {
+        if (is_array($value)) {
+            return 'IN(?)';
+        } elseif (is_null($value)) {
+            return 'IS ?';
+        }
+
+        return '= ?';
+    }
+
     /**
      * Execute a raw SQL query on the database.
      *
@@ -372,6 +383,11 @@ abstract class Connection
         }
 
         return $sth;
+    }
+
+    public function not(): string
+    {
+        return '!';
     }
 
     /**
@@ -486,10 +502,15 @@ abstract class Connection
      *
      * @param string $string string to quote
      */
-    public function quote_name($string): string
+    public function quote_name(string $string): string
     {
         return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string) - 1] === static::$QUOTE_CHARACTER ?
             $string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
+    }
+
+    public function guard_name(string $string): string
+    {
+        return $string;
     }
 
     /**

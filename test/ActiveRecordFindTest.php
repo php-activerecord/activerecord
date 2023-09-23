@@ -162,6 +162,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
     public function testFindAllWithEmptyArrayBindValueThrowsException()
     {
         $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('No bound parameter for index 0');
         Author::where(['author_id IN(?)', []])->to_a();
     }
 
@@ -176,7 +177,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindHashUsingAliasWithNull()
     {
-        $venues = Venue::where(['marquee' => null])->to_a();
+        $venues = Venue::where(['name' => null])->to_a();
         $this->assertEquals(0, count($venues));
     }
 
@@ -225,6 +226,8 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindLast()
     {
+        static::resetTableData();
+
         $author = Author::last();
         $this->assertEquals(5, $author->author_id);
         $this->assertEquals('Tito', $author->name);
@@ -273,14 +276,14 @@ class ActiveRecordFindTest extends DatabaseTestCase
             'author'=>true
         ];
         JoinBook::joins(['author', 'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)'])->first();
-        $this->assert_sql_has('INNER JOIN authors ON(books.author_id = authors.author_id)', JoinBook::table()->last_sql);
-        $this->assert_sql_has('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
+        $this->assert_sql_includes('INNER JOIN authors ON(books.author_id = authors.author_id)', JoinBook::table()->last_sql);
+        $this->assert_sql_includes('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
     }
 
     public function testJoinsOnModelWithExplicitJoins()
     {
         JoinBook::joins(['LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)'])->first();
-        $this->assert_sql_has('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
+        $this->assert_sql_includes('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
     }
 
     public function testFindNonExistentPrimaryKey()
@@ -304,7 +307,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
     public function testFindByPkShouldNotUseLimit()
     {
         Author::find(1);
-        $this->assert_sql_has('SELECT * FROM authors WHERE author_id = ?', Author::table()->last_sql);
+        $this->assert_sql_includes('SELECT * FROM authors WHERE author_id = ?', Author::table()->last_sql);
     }
 
     public function testFindsDatetime()

@@ -120,8 +120,6 @@ class SQLBuilder
      * @param array<string,string> $mappedNames
      * @param array<string>        $columns     Table column names
      *
-     * @throws Exception\ExpressionsException
-     *
      * @return $this
      */
     public function where(array $clauses=[], array $mappedNames=[], array $columns=[]): static
@@ -133,7 +131,7 @@ class SQLBuilder
             $expression = $clause->to_s($this->connection, !empty($this->joins) ? $this->table : '', $mappedNames);
             $expression = $this->connection->escapeColumns($expression, $columns);
             $values = array_merge($values, array_flatten($clause->values()));
-            $inverse = $clause->negated() ? '!' : '';
+            $inverse = $clause->negated() ? $this->connection->not() : '';
             $wrappedExpression = $inverse || count($clauses) > 1 ? '(' . $expression . ')' : $expression;
             $sql .=  $inverse . $wrappedExpression . ($idx < (count($clauses) - 1) ? $glue : '');
         }
@@ -344,7 +342,7 @@ class SQLBuilder
 
         $e = new WhereClause($sql, [array_values($this->data)]);
 
-        return $e->to_s($this->connection);
+        return $e->to_s(ConnectionManager::get_connection());
     }
 
     private function build_select(): string

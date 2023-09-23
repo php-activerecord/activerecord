@@ -49,7 +49,7 @@ class Column
     public string $name = '';
 
     /**
-     * The inflected name of this columns .. hyphens/spaces will be => _.
+     * The inflected name of this column. hyphens and spaces will become => _.
      */
     public string $inflected_name;
 

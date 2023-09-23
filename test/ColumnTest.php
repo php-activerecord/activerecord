@@ -1,23 +1,17 @@
 <?php
 
 use ActiveRecord\Column;
-use ActiveRecord\DatabaseException;
+use ActiveRecord\ConnectionManager;
 use ActiveRecord\DateTime;
-use PHPUnit\Framework\TestCase;
 
-class ColumnTest extends TestCase
+class ColumnTest extends DatabaseTestCase
 {
     private $column;
-    private $conn;
 
     public function setUp($connection_name = null): void
     {
         $this->column = new Column();
-        try {
-            $this->conn = ActiveRecord\ConnectionManager::get_connection(ActiveRecord\Config::instance()->get_default_connection());
-        } catch (DatabaseException $e) {
-            $this->markTestSkipped('failed to connect using default connection. ' . $e->getMessage());
-        }
+        parent::setUp($connection_name);
     }
 
     public function assert_mapped_type($type, $raw_type)
@@ -29,7 +23,7 @@ class ColumnTest extends TestCase
     public function assert_cast($type, $casted_value, $original_value)
     {
         $this->column->type = $type;
-        $value = $this->column->cast($original_value, $this->conn);
+        $value = $this->column->cast($original_value, ConnectionManager::get_connection());
 
         if (null != $original_value && (Column::DATETIME == $type || Column::DATE == $type)) {
             $this->assertTrue($value instanceof DateTime);
@@ -122,16 +116,16 @@ class ColumnTest extends TestCase
     {
         $column = new Column();
         $column->type = Column::DATE;
-        $this->assertEquals(null, $column->cast(null, $this->conn));
-        $this->assertEquals(null, $column->cast('', $this->conn));
+        $this->assertEquals(null, $column->cast(null, ConnectionManager::get_connection()));
+        $this->assertEquals(null, $column->cast('', ConnectionManager::get_connection()));
     }
 
     public function testEmptyAndNullDatetimeStringsShouldReturnNull()
     {
         $column = new Column();
         $column->type = Column::DATETIME;
-        $this->assertEquals(null, $column->cast(null, $this->conn));
-        $this->assertEquals(null, $column->cast('', $this->conn));
+        $this->assertEquals(null, $column->cast(null, ConnectionManager::get_connection()));
+        $this->assertEquals(null, $column->cast('', ConnectionManager::get_connection()));
     }
 
     public function testNativeDateTimeAttributeCopiesExactTz()
@@ -141,7 +135,7 @@ class ColumnTest extends TestCase
         $column = new Column();
         $column->type = Column::DATETIME;
 
-        $dt2 = $column->cast($dt, $this->conn);
+        $dt2 = $column->cast($dt, ConnectionManager::get_connection());
 
         $this->assertEquals($dt->getTimestamp(), $dt2->getTimestamp());
         $this->assertEquals($dt->getTimeZone(), $dt2->getTimeZone());
@@ -155,7 +149,7 @@ class ColumnTest extends TestCase
         $column = new Column();
         $column->type = Column::DATETIME;
 
-        $dt2 = $column->cast($dt, $this->conn);
+        $dt2 = $column->cast($dt, ConnectionManager::get_connection());
 
         $this->assertEquals($dt->getTimestamp(), $dt2->getTimestamp());
         $this->assertEquals($dt->getTimeZone(), $dt2->getTimeZone());

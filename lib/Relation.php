@@ -813,17 +813,22 @@ class Relation implements \Iterator
     {
         $options = array_merge($this->options, ['limit' => $limit ?? 1]);
 
-        $pk = $this->table()->pk;
+        $pk = array_map(function ($pk) {
+            $col = $this->table()->get_column_by_inflected_name($pk);
+
+            return $this->table()->conn->guard_name($col->name ?? '');
+        }, $this->table()->pk);
+
         if (!empty($pk)) {
             if (array_key_exists('order', $options)) {
                 if (!$isAscending) {
-                    if (str_contains($options['order'], implode(' DESC, ', $this->table()->pk) . ' DESC')) {
+                    if (str_contains($options['order'], implode(' DESC, ', $pk) . ' DESC')) {
                         $options['order'] = SQLBuilder::reverse_order((string) $options['order']);
                     }
                 }
             } elseif (!array_key_exists('having', $options)) {
                 $command = $isAscending ? 'ASC' : 'DESC';
-                $options['order'] = implode(" {$command}, ", $this->table()->pk) . " {$command}";
+                $options['order'] = implode(" {$command}, ", $pk) . " {$command}";
             }
         }
 

@@ -131,9 +131,28 @@ SQL;
         return $c;
     }
 
+    public function eqToken(mixed $value): string
+    {
+        if (is_array($value)) {
+            return 'IN(?)';
+        }
+
+        return '= ?';
+    }
+
+    public function not(): string
+    {
+        return 'NOT ';
+    }
+
     public function set_encoding(string $charset): void
     {
         $this->query("SET NAMES '$charset'");
+    }
+
+    public function guard_name(string $string): string
+    {
+        return strpos($string, '-') ? $this->quote_name($string) : $string;
     }
 
     /**

@@ -5,7 +5,6 @@
 
 namespace ActiveRecord;
 
-use ActiveRecord\Adapter\PgsqlAdapter;
 use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Relationship\AbstractRelationship;
@@ -364,9 +363,9 @@ class Table
         return null;
     }
 
-    public function get_fully_qualified_table_name(bool $quote_name = true): string
+    public function get_fully_qualified_table_name(): string
     {
-        $table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
+        $table = $this->conn->quote_name($this->table);
 
         if (isset($this->db_name)) {
             $table = $this->conn->quote_name($this->db_name) . ".$table";
@@ -464,13 +463,10 @@ class Table
 
     private function get_meta_data(): void
     {
-        // as more adapters are added probably want to do this a better way
-        // than using instanceof but gud enuff for now
-        $quote_name = !($this->conn instanceof PgsqlAdapter);
-
-        $table_name = $this->get_fully_qualified_table_name($quote_name);
+        $table_name = $this->table;
         $conn = $this->conn;
-        $this->columns = Cache::get("get_meta_data-$table_name", function () use ($conn, $table_name) { return $conn->columns($table_name); });
+        $this->columns = Cache::get("get_meta_data-$table_name",
+            static fn () => $conn->columns($table_name));
     }
 
     /**
@@ -547,9 +543,8 @@ class Table
             return;
         }
 
-        if (!($this->sequence = $this->class->getStaticPropertyValue('sequence'))) {
-            $this->sequence = $this->conn->get_sequence_name($this->table, $this->pk[0]);
-        }
+        $this->sequence = $this->class->getStaticPropertyValue('sequence') ??
+            $this->conn->get_sequence_name($this->table, $this->pk[0] ?? '');
     }
 
     private function set_associations(): void

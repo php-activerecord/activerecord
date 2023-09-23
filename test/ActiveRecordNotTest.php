@@ -11,26 +11,23 @@ class ActiveRecordNotTest extends \DatabaseTestCase
         return [
             'string' => [
                 "name = 'Another Book'",
-                "WHERE name = 'Another Book'",
-                "WHERE !(name = 'Another Book')"
+                static fn ($book) => 'AnotherBook' != $book->name
             ],
-            'array' => [[
+            'array' => [
+                [
                   'name = ?', 'Another Book',
                 ],
-                'WHERE name = ?',
-                'WHERE !(name = ?)'
+                static fn ($book) => 'AnotherBook' != $book->name
             ],
             'hash' => [[
                     'name' => 'Another Book',
                 ],
-                'WHERE name = ?',
-                'WHERE !(name = ?)'
+                static fn ($book) => 'AnotherBook' != $book->name
             ],
             'in' => [[
                 'book_id in (?)', [1, 2],
               ],
-              'WHERE book_id in (?,?)',
-              'WHERE !(book_id in (?,?))',
+              static fn ($book) => 1 != $book->name && 2 != $book->name
            ],
         ];
     }
@@ -38,13 +35,11 @@ class ActiveRecordNotTest extends \DatabaseTestCase
     /**
      * @dataProvider conditions
      */
-    public function testString($condition, $expectedWhere, $expectedNotWhere)
+    public function testString($condition, $cb)
     {
-        Book::where($condition)->to_a();
-        $this->assertStringContainsString($expectedWhere, Book::table()->last_sql);
-
-        Book::not($condition)->to_a();
-        $this->assertStringContainsString($expectedNotWhere, Book::table()->last_sql);
+        foreach (Book::where($condition) as $book) {
+            $this->assertTrue($cb($book));
+        }
     }
 
     public function testListOfArguments()

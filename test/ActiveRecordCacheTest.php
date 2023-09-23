@@ -14,14 +14,16 @@ class ActiveRecordCacheTest extends DatabaseTestCase
             return;
         }
 
-        parent::setUp($connection_name);
         Config::instance()->set_cache('memcache://localhost');
+        parent::setUp($connection_name);
+        static::setUpBeforeClass();
     }
 
     public function tearDown(): void
     {
         Cache::flush();
         Cache::initialize();
+        parent::tearDown();
     }
 
     public function testDefaultExpire()
@@ -37,9 +39,10 @@ class ActiveRecordCacheTest extends DatabaseTestCase
 
     public function testCachesColumnMetaData()
     {
+        static::resetTableData();
         Author::first();
 
-        $table_name = Author::table()->get_fully_qualified_table_name(!($this->connection instanceof ActiveRecord\PgsqlAdapter));
+        $table_name = Author::table()->table;
         $value = Cache::$adapter->read("get_meta_data-$table_name");
         $this->assertTrue(is_array($value));
     }

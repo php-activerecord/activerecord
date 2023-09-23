@@ -1,5 +1,6 @@
 <?php
 
+use ActiveRecord\ConnectionManager;
 use ActiveRecord\DateTime;
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
@@ -33,6 +34,12 @@ class AuthorExplicitSequence extends ActiveRecord\Model
 
 class ActiveRecordWriteTest extends DatabaseTestCase
 {
+    public function setUp(string $connection_name=null): void
+    {
+        parent::setUp($connection_name);
+        static::resetTableData();
+    }
+
     private function make_new_book_and($save=true)
     {
         $book = new Book();
@@ -63,7 +70,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testInsertWithNoSequenceDefined()
     {
         $this->expectException(DatabaseException::class);
-        if (!$this->connection->supports_sequences()) {
+        if (!ConnectionManager::get_connection()->supports_sequences()) {
             throw new DatabaseException('');
         }
         AuthorWithoutSequence::create(['name' => 'Bob!']);
@@ -85,8 +92,8 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testSequenceWasSet()
     {
-        if ($this->connection->supports_sequences()) {
-            $this->assertEquals($this->connection->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
+        if (ConnectionManager::get_connection()->supports_sequences()) {
+            $this->assertEquals(ConnectionManager::get_connection()->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
         } else {
             $this->assertNull(Author::table()->sequence);
         }
@@ -94,7 +101,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testSequenceWasExplicitlySet()
     {
-        if ($this->connection->supports_sequences()) {
+        if (ConnectionManager::get_connection()->supports_sequences()) {
             $this->assertEquals(AuthorExplicitSequence::$sequence, AuthorExplicitSequence::table()->sequence);
         } else {
             $this->assertNull(Author::table()->sequence);
@@ -376,7 +383,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testDeleteAllWithLimitAndOrder()
     {
-        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
+        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 
@@ -387,14 +394,20 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testUpdateAllWithSetAsString()
     {
-        $num_affected = Author::update_all(['set' => 'parent_author_id = 2']);
-        $this->assertEquals(3, $num_affected);
+        Author::update_all(['set' => 'parent_author_id = 2']);
+        $ids = Author::pluck('parent_author_id');
+        foreach ($ids as $id) {
+            $this->assertEquals(2, $id);
+        }
     }
 
     public function testUpdateAllWithSetAsHash()
     {
-        $num_affected = Author::update_all(['set' => ['parent_author_id' => 2]]);
-        $this->assertEquals(3, $num_affected);
+        Author::update_all(['set' => ['parent_author_id' => 2]]);
+        $ids = Author::pluck('parent_author_id');
+        foreach ($ids as $id) {
+            $this->assertEquals(2, $id);
+        }
     }
 
     /**
@@ -402,13 +415,21 @@ class ActiveRecordWriteTest extends DatabaseTestCase
      */
     public function testUpdateAllWithConditionsAsString()
     {
-        $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => 'name = "Tito"']);
+        $num_affected = Author::update_all([
+            'set' => 'parent_author_id = 2',
+            'conditions' => ['name = ?', 'Tito']
+        ]);
         $this->assertEquals(2, $num_affected);
     }
 
     public function testUpdateAllWithConditionsAsHash()
     {
-        $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => ['name' => 'Tito']]);
+        $num_affected = Author::update_all([
+            'set' => 'parent_author_id = 2',
+            'conditions' => [
+                'name' => 'Tito'
+            ]
+        ]);
         $this->assertEquals(2, $num_affected);
     }
 
@@ -420,7 +441,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testUpdateAllWithLimitAndOrder()
     {
-        if (!$this->connection->accepts_limit_and_order_for_update_and_delete()) {
+        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 

@@ -25,6 +25,8 @@ class MysqlAdapter extends Connection
 
     public function query_column_info(string $table): \PDOStatement
     {
+        $table = $this->quote_name($table);
+
         return $this->query("SHOW COLUMNS FROM $table");
     }
 

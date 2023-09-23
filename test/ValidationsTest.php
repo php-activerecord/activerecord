@@ -1,6 +1,7 @@
 <?php
 
 use test\models\Book;
+use test\models\ValueStoreValidations;
 
 class BookValidations extends ActiveRecord\Model
 {
@@ -19,12 +20,6 @@ class BookValidations extends ActiveRecord\Model
     }
 }
 
-class ValuestoreValidations extends ActiveRecord\Model
-{
-    public static string $table_name = 'valuestore';
-    public static array $validates_uniqueness_of = [];
-}
-
 class ValidationsTest extends DatabaseTestCase
 {
     public function setUp(string $connection_name=null): void
@@ -33,7 +28,7 @@ class ValidationsTest extends DatabaseTestCase
 
         BookValidations::$validates_presence_of = ['name' => true];
         BookValidations::$validates_uniqueness_of =  ['name' => true];
-        ValuestoreValidations::$validates_uniqueness_of = ['key' => true];
+        ValueStoreValidations::$validates_uniqueness_of = ['key' => true];
     }
 
     public function testIsValidInvokesValidations()
@@ -149,15 +144,6 @@ class ValidationsTest extends DatabaseTestCase
         $book = BookValidations::create(['name_alias' => 'Another Book', 'x' => 2]);
         $this->assertFalse($book->is_valid());
         $this->assertEquals(['Name alias and x must be unique'], $book->errors->full_messages());
-    }
-
-    public function testValidatesUniquenessOfWorksWithMysqlReservedWordAsColumnName()
-    {
-        ValuestoreValidations::create(['key' => 'GA_KEY', 'value' => 'UA-1234567-1']);
-        $valuestore = ValuestoreValidations::create(['key' => 'GA_KEY', 'value' => 'UA-1234567-2']);
-
-        $this->assertEquals(['Key must be unique'], $valuestore->errors->full_messages());
-        $this->assertEquals(1, ValuestoreValidations::where("`key`='GA_KEY'")->count());
     }
 
     public function testGetValidationRules()

@@ -5,7 +5,7 @@
 
 namespace ActiveRecord;
 
-use ActiveRecord\Exception\ExpressionsException;
+use ActiveRecord\Exception\DatabaseException;
 
 /**
  * Templating like class for building SQL statements.
@@ -54,18 +54,6 @@ class WhereClause
     }
 
     /**
-     * Bind a value to the specific one based index. There must be a bind marker
-     * for each value bound or to_s() will throw an exception.
-     */
-    public function bind(int $parameter_number, mixed $value): void
-    {
-        if ($parameter_number <= 0) {
-            throw new ExpressionsException("Invalid parameter index: $parameter_number");
-        }
-        $this->values[$parameter_number - 1] = $value;
-    }
-
-    /**
      * Returns all the values currently bound.
      *
      * @return array<mixed>
@@ -87,7 +75,7 @@ class WhereClause
      * @param array<string,string> $mappedNames
      * @param array<mixed>         $values
      *
-     * @throws ExpressionsException
+     * @throws DatabaseException
      */
     public function to_s(Connection $connection, string $prependTableName = '', array $mappedNames = [],
         bool $substitute=false, string $glue=' AND ', array $values=null): string
@@ -100,7 +88,11 @@ class WhereClause
         }
 
         $ret = '';
-        $num_values = count($values);
+        if (1 == count($values) && is_array($values[0])) {
+            $num_values = count($values[0]);
+        } else {
+            $num_values = count($values);
+        }
         $quotes = 0;
 
         for ($i = 0, $j = 0; $i < strlen($expression); ++$i) {
@@ -109,7 +101,7 @@ class WhereClause
             if (self::ParameterMarker == $ch) {
                 if (0 == $quotes % 2) {
                     if ($j > $num_values - 1) {
-                        throw new ExpressionsException("No bound parameter for index $j");
+                        throw new DatabaseException("No bound parameter for index $j");
                     }
                     $ch = $this->substitute($connection, $expression, $values, $substitute, $i, $j++);
                 }
@@ -165,7 +157,7 @@ class WhereClause
             // map to correct name if $map was supplied
             $name = $map && isset($map[$parts[$i]]) ? $map[$parts[$i]] : $parts[$i];
 
-            $expression .= $connection->quote_name($name) . $bind;
+            $expression .= $name . $bind;
         }
 
         return new WhereClause($expression, $conditionValues);
@@ -222,13 +214,7 @@ class WhereClause
                 $name = $table . '.' . $name;
             }
 
-            if (is_array($value)) {
-                $sql .= "$g$name IN(?)";
-            } elseif (is_null($value)) {
-                $sql .= "$g$name IS ?";
-            } else {
-                $sql .= "$g$name = ?";
-            }
+            $sql .=  "$g$name " . $connection->eqToken($value);
 
             $g = $glue;
         }

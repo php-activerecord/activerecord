@@ -137,6 +137,7 @@ class RelationTest extends DatabaseTestCase
 
     public function testAllPrimaryKeys()
     {
+        static::resetTableData();
         $rel = Author::all();
         $queries = $rel->find([1, 3]);
         $this->assertEquals(2, count($queries));
@@ -176,7 +177,7 @@ class RelationTest extends DatabaseTestCase
 
     public function testToSql(): void
     {
-        $this->assertEquals(
+        $this->assert_sql_includes(
             'SELECT * FROM `books` WHERE name = ? ORDER BY name',
             \test\models\Book::where('name = ?', 'The Art of Main Tanking')
                 ->order('name')->to_sql()

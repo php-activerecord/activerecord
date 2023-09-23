@@ -47,6 +47,10 @@ jobs:
         php-version:
           - 8.1
           - 8.2
+        database:
+          - mysql
+          - pgsql
+          - sqlite
 
     steps:
       - name: Checkout code
@@ -88,6 +92,9 @@ jobs:
           echo "PostgreSQL Connection String: postgres://test:test@localhost:5432/test"
 
       - name: Run PHPUnit
+        env:
+          DATABASE: ${{ matrix.database }}
+          CI: true
         run: |
           vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml
 

@@ -31,6 +31,8 @@ class CacheModelTest extends DatabaseTestCase
     {
         Cache::flush();
         Cache::initialize();
+
+        parent::tearDown();
     }
 
     public function testDefaultExpire()
@@ -112,6 +114,8 @@ class CacheModelTest extends DatabaseTestCase
 
     public function testModelUpdateCache()
     {
+        static::setUpBeforeClass();
+
         $method = $this->set_method_public(Publisher::class, 'cache_key');
 
         $publisher = Publisher::find(1);
