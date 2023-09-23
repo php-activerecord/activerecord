@@ -10,11 +10,6 @@ class BookFormat extends ActiveRecord\Model
 
 class ValidatesFormatOfTest extends DatabaseTestCase
 {
-    public function setUp($connection_name=null): void
-    {
-        parent::setUp($connection_name);
-    }
-
     public function testFormat()
     {
         BookFormat::$validates_format_of = ['name' => ['with' => '/^[a-z\W]*$/']];
