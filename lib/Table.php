@@ -543,9 +543,9 @@ class Table
             return;
         }
 
-        if (!($this->sequence = $this->class->getStaticPropertyValue('sequence'))) {
-            $this->sequence = $this->conn->get_sequence_name($this->table, $this->pk[0]);
-        }
+        $this->sequence = $this->class->getStaticPropertyValue('sequence') ??
+            $this->conn->get_sequence_name($this->table, $this->pk[0] ?? '');
+
     }
 
     private function set_associations(): void
