@@ -17,6 +17,11 @@ abstract class AdapterTestCase extends DatabaseTestCase
             $this->markTestSkipped($connection_name . ' drivers are not present');
         }
 
+        $envDatabase = getenv('DATABASE');
+        if (!empty($envDatabase) && $envDatabase != $connection_name) {
+            $this->markTestSkipped('Skipping adapter test for this env');
+        }
+
         parent::setUp($connection_name);
         static::setUpBeforeClass();
     }
