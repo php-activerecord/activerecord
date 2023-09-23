@@ -868,7 +868,11 @@ class Relation implements \Iterator
     public function delete_all(): int
     {
         $table = static::table();
-        $options = array_intersect_key($this->options, array_flip(['limit', 'order']));
+        $options = array_intersect_key($this->options, array_flip([
+            'conditions',
+            'limit',
+            'order'
+        ]));
         $count = $table->delete($options);
 
         return $count;

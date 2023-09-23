@@ -1144,7 +1144,13 @@ class Model
             return false;
         }
 
-        static::table()->delete($pk);
+        $options = [
+            'conditions' => [
+                new WhereClause([$this->table()->pk[0] => $pk], [])
+            ]
+        ];
+
+        static::table()->delete($options);
         $this->invoke_callback('after_destroy', false);
         $this->remove_from_cache();
 
