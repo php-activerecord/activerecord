@@ -55,7 +55,7 @@ class ActiveRecordSelectTest extends \DatabaseTestCase
     public function testStarRemovesAllOtherColumnNames()
     {
         $relation = Author::select('name')->select('*');
-        $this->assertEquals('SELECT * FROM `authors`', $relation->to_sql());
+        $this->assert_sql_has('SELECT * FROM `authors`', $relation->to_sql());
     }
 
     public function testAlias()
