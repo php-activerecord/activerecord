@@ -77,6 +77,7 @@ class ActiveRecordFirstLastTest extends \DatabaseTestCase
 
     public function testLast()
     {
+        static::resetTableData();
         $author = Author::last();
         $this->assertInstanceOf(Author::class, $author);
 
