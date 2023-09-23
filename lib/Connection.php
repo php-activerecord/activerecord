@@ -6,8 +6,6 @@
 
 namespace ActiveRecord;
 
-require_once 'Column.php';
-
 use ActiveRecord\Adapter\SqliteAdapter;
 use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
@@ -121,24 +119,18 @@ abstract class Connection
             $connection_string = $connection_string_or_connection_name;
         }
 
-        if (!$connection_string) {
-            throw new DatabaseException('Empty connection string');
-        }
+        assert(!empty($connection_string), 'Empty connection string');
         $info = static::parse_connection_url($connection_string);
         $fqclass = static::load_adapter_class($info['protocol']);
 
-        try {
-            $connection = new $fqclass($info);
-            assert($connection instanceof Connection);
-            $connection->protocol = $info['protocol'];
-            $connection->logging = $config->get_logging();
-            $connection->logger = $config->get_logger();
+        $connection = new $fqclass($info);
+        assert($connection instanceof Connection);
+        $connection->protocol = $info['protocol'];
+        $connection->logging = $config->get_logging();
+        $connection->logger = $config->get_logger();
 
-            if (isset($info['charset'])) {
-                $connection->set_encoding($info['charset']);
-            }
-        } catch (\PDOException $e) {
-            throw new DatabaseException($e);
+        if (isset($info['charset'])) {
+            $connection->set_encoding($info['charset']);
         }
 
         return $connection;
@@ -269,22 +261,30 @@ abstract class Connection
     protected function __construct(array $info)
     {
         try {
-            // unix sockets start with a /
-            if ('/' != $info['host'][0]) {
-                $host = 'host=' . $info['host'];
-
-                if (isset($info['port'])) {
-                    $host .= ';port=' . $info['port'];
-                }
-            } else {
-                $host = 'unix_socket=' . $info['host'];
-            }
-
-            $dsn = $info['protocol'] . ":$host;dbname=" . $info['db'];
+            $dsn = static::data_source_name($info);
             $this->connection = new \PDO($dsn, $info['user'], $info['pass'], static::$PDO_OPTIONS);
         } catch (\PDOException $e) {
             throw new Exception\ConnectionException($e);
         }
+    }
+
+    /**
+     * @param ConnectionInfo $info
+     */
+    public static function data_source_name(array $info): string
+    {
+        // unix sockets start with a /
+        if ('/' != $info['host'][0]) {
+            $host = 'host=' . $info['host'];
+
+            if (isset($info['port'])) {
+                $host .= ';port=' . $info['port'];
+            }
+        } else {
+            $host = 'unix_socket=' . $info['host'];
+        }
+
+        return $info['protocol'] . ":$host;dbname=" . $info['db'];
     }
 
     /**
