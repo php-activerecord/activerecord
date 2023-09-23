@@ -207,13 +207,11 @@ class HasMany extends AbstractRelationship
     {
         $relationship_attributes = $this->get_foreign_key_for_new_association($model);
 
-        if ($guard_attributes) {
-            // First build the record with just our relationship attributes (unguarded)
-            $record = parent::build_association($model, $relationship_attributes, false);
+        // First build the record with just our relationship attributes (unguarded)
+        $record = parent::build_association($model, $relationship_attributes, false);
 
-            // Then, set our normal attributes (using guarding)
-            $record->set_attributes($attributes);
-        }
+        // Then, set our normal attributes (using guarding)
+        $record->set_attributes($attributes);
 
         return $record;
     }

@@ -1516,7 +1516,7 @@ class Model
 
                 return match ($method) {
                     'build_association' => $association->build_association($this, $args),
-                    'create_association' => $association->create_association($this, $args)
+                    default => $association->create_association($this, $args),
                 };
             }
         }
