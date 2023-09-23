@@ -222,6 +222,7 @@ class HasMany extends AbstractRelationship
     {
         $record = static::build_association($model, $attributes, $guard_attributes);
         $record->save();
+
         return $record;
     }
 
