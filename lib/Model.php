@@ -1352,11 +1352,6 @@ class Model
                     $exceptions[] = $e->getMessage();
                 }
             } else {
-                // ignore OciAdapter's limit() stuff
-                if ('ar_rnum__' == $name) {
-                    continue;
-                }
-
                 // set arbitrary data
                 $this->assign_attribute($name, $value);
             }
