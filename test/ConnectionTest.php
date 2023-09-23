@@ -60,6 +60,9 @@ class ConnectionTest extends TestCase
     {
         $info = ActiveRecord\Connection::parse_connection_url('mysql://user:password@unix(/tmp/mysql.sock)/database');
         $this->assertEquals('/tmp/mysql.sock', $info['host']);
+
+        $dsn = Connection::data_source_name($info);
+        $this->assertStringContainsString('unix_socket=/tmp/mysql.sock', $dsn);
     }
 
     public function testParseConnectionUrlWithDecodeOption()
