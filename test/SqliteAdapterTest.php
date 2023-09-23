@@ -4,7 +4,7 @@ use ActiveRecord\Connection;
 use ActiveRecord\ConnectionManager;
 use ActiveRecord\Exception\ConnectionException;
 
-class SqliteAdapterTst extends AdapterTestCase
+class SqliteAdapterTest extends AdapterTestCase
 {
     public function setUp(string $connection_name=null): void
     {
