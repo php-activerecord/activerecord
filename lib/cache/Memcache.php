@@ -26,11 +26,8 @@ class Memcache
         $this->memcache = new \Memcache();
         $port = $options['port'] ?? self::DEFAULT_PORT;
         if (!@$this->memcache->connect($options['host'], $port)) {
-            if ($error = error_get_last()) {
-                $message = $error['message'];
-            } else {
-                $message = sprintf('Could not connect to %s:%s', $options['host'], $port);
-            }
+            $error = error_get_last();
+            $message = $error['message'] ?? sprintf('Could not connect to %s:%s', $options['host'], $port);
             throw new CacheException($message);
         }
     }
