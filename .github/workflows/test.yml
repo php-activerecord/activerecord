@@ -94,6 +94,7 @@ jobs:
       - name: Run PHPUnit
         env:
           DATABASE: ${{ matrix.database }}
+          CI: true
         run: |
           vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.xml
 

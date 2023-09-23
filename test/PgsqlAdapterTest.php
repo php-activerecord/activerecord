@@ -2,7 +2,7 @@
 
 use ActiveRecord\ConnectionManager;
 
-class PgsqlAdapterTst extends AdapterTestCase
+class PgsqlAdapterTest extends AdapterTestCase
 {
     public function setUp($connection_name=null): void
     {
