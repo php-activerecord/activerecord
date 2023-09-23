@@ -347,7 +347,8 @@ class SQLBuilder
 
     private function build_select(): string
     {
-        $sql = 'SELECT ' . ($this->distinct ? 'DISTINCT ' : '') . "$this->select FROM $this->table";
+        $table = $this->connection->quote_table_name_for_from($this->table);
+        $sql = 'SELECT ' . ($this->distinct ? 'DISTINCT ' : '') . "$this->select FROM $table";
 
         if (!empty($this->joins)) {
             $sql .= ' ' . $this->joins;

@@ -155,6 +155,11 @@ SQL;
         return $table;
     }
 
+    public function quote_table_name_for_from(string $table): string
+    {
+        return $this->quote_name($table);
+    }
+
     /**
      * @see Connection::escapeColumns()
      *

@@ -312,6 +312,11 @@ abstract class Connection
         return $this->quote_name($table);
     }
 
+    public function quote_table_name_for_from(string $table): string
+    {
+        return $table;
+    }
+
     /**
      * Escapes quotes in a string.
      *
