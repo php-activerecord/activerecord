@@ -365,7 +365,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testDeleteAllWithConditionsAsString()
     {
-        $num_affected = Author::delete_all(['conditions' => 'parent_author_id = 2']);
+        $num_affected = Author::where('parent_author_id = ?', 2)->delete_all();
         $this->assertEquals(2, $num_affected);
     }
 

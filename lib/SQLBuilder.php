@@ -235,9 +235,6 @@ class SQLBuilder
 
     public function delete(): static
     {
-        $args = func_get_args();
-        $arg = $args[0] ?? null;
-
         $this->operation = 'DELETE';
         isset($arg) && $this->where([WhereClause::from_arg($arg)], []);
 

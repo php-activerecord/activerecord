@@ -868,26 +868,10 @@ class Relation implements \Iterator
     public function delete_all(): int
     {
         $table = static::table();
-        $conn = static::connection();
-        $sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
+        $options = array_intersect_key($this->options, array_flip(['limit', 'order']));
+        $count = $table->delete($options);
 
-        $conditions = $this->options;
-
-        $sql->delete($conditions);
-
-        if (isset($options['limit'])) {
-            $sql->limit($options['limit']);
-        }
-
-        if (isset($options['order'])) {
-            $sql->order($options['order']);
-        }
-
-        $values = $sql->bind_values();
-        $ret = $conn->query($table->last_sql = $sql->to_s(), $values);
-
-        return $ret->rowCount();
-
+        return $count;
     }
 
     /**
