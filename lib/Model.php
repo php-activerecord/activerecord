@@ -1069,59 +1069,11 @@ class Model
     }
 
     /**
-     * Deletes records matching conditions in $options
-     *
-     * Does not instantiate models and therefore does not invoke callbacks
-     *
-     * Delete all using a hash:
-     *
-     * ```
-     * YourModel::delete_all(['conditions' => ['name' => 'Tito']]);
-     * ```
-     *
-     * Delete all using an array:
-     *
-     * ```
-     * YourModel::delete_all(['conditions' => ['name = ?', 'Tito']]);
-     * ```
-     *
-     * Delete all using a string:
-     *
-     * ```
-     * YourModel::delete_all(['conditions' => 'name = "Tito"']);
-     * ```
-     *
-     * An options array takes the following parameters:
-     *
-     * @param QueryOptions $options
-     *                              return integer Number of rows affected
+     * @see Relation::delete_all()
      */
-    public static function delete_all(array $options = []): int
+    public static function delete_all(): int
     {
-        $table = static::table();
-        $conn = static::connection();
-        $sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
-
-        $conditions = $options['conditions'] ?? $options;
-
-        if (is_array($conditions) && !is_hash($conditions)) {
-            $sql->delete($conditions);
-        } else {
-            $sql->delete($conditions);
-        }
-
-        if (isset($options['limit'])) {
-            $sql->limit($options['limit']);
-        }
-
-        if (isset($options['order'])) {
-            $sql->order($options['order']);
-        }
-
-        $values = $sql->bind_values();
-        $ret = $conn->query($table->last_sql = $sql->to_s(), $values);
-
-        return $ret->rowCount();
+        return static::Relation()->delete_all();
     }
 
     /**
@@ -1191,7 +1143,13 @@ class Model
             return false;
         }
 
-        static::table()->delete($pk);
+        $options = [
+            'conditions' => [
+                new WhereClause([$this->table()->pk[0] => $pk], [])
+            ]
+        ];
+
+        static::table()->delete($options);
         $this->invoke_callback('after_destroy', false);
         $this->remove_from_cache();
 
@@ -1394,11 +1352,6 @@ class Model
                     $exceptions[] = $e->getMessage();
                 }
             } else {
-                // ignore OciAdapter's limit() stuff
-                if ('ar_rnum__' == $name) {
-                    continue;
-                }
-
                 // set arbitrary data
                 $this->assign_attribute($name, $value);
             }

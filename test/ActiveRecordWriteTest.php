@@ -363,22 +363,22 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertArrayHasKey('some_date', $author->dirty_attributes());
     }
 
-    public function testDeleteAllWithConditionsAsString()
+    public function testWhereDeleteAll()
     {
-        $num_affected = Author::delete_all(['conditions' => 'parent_author_id = 2']);
+        $num_affected = Author::where('parent_author_id = ?', 2)->delete_all();
         $this->assertEquals(2, $num_affected);
     }
 
-    public function testDeleteAllWithConditionsAsHash()
+    public function testDistinctDeleteAllNotSupported()
     {
-        $num_affected = Author::delete_all(['conditions' => ['parent_author_id' => 2]]);
-        $this->assertEquals(2, $num_affected);
+        $this->expectException(ActiveRecordException::class);
+        Author::distinct()->delete_all();
     }
 
-    public function testDeleteAllWithConditionsAsArray()
+    public function testDeleteAll()
     {
-        $num_affected = Author::delete_all(['conditions' => ['parent_author_id = ?', 2]]);
-        $this->assertEquals(2, $num_affected);
+        $num_affected = Author::delete_all();
+        $this->assertEquals(5, $num_affected);
     }
 
     public function testDeleteAllWithLimitAndOrder()
@@ -387,7 +387,10 @@ class ActiveRecordWriteTest extends DatabaseTestCase
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 
-        $num_affected = Author::delete_all(['conditions' => ['parent_author_id = ?', 2], 'limit' => 1, 'order' => 'name asc']);
+        $num_affected = Author::limit(1)
+            ->order('name asc')
+            ->where(['parent_author_id = ?', 2])
+            ->delete_all();
         $this->assertEquals(1, $num_affected);
         $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
     }

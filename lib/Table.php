@@ -440,20 +440,17 @@ class Table
     }
 
     /**
-     * @param array<string,mixed> $data
-     *
-     * @throws Exception\ActiveRecordException
+     * @param RelationOptions $options
      */
-    public function delete(array $data): \PDOStatement
+    public function delete(array $options): int
     {
-        $data = $this->process_data($data);
-
-        $sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
-        $sql->delete($data);
-
+        $sql = $this->options_to_sql($options);
+        $sql->delete();
         $values = $sql->bind_values();
 
-        return $this->conn->query($this->last_sql = $sql->to_s(), $values);
+        $ret = $this->conn->query($this->last_sql = $sql->to_s(), $values);
+
+        return $ret->rowCount();
     }
 
     private function add_relationship(AbstractRelationship $relationship): void
