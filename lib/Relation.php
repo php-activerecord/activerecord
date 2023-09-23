@@ -867,6 +867,10 @@ class Relation implements \Iterator
      */
     public function delete_all(): int
     {
+        if (isset($this->options['distinct'])) {
+            throw new ActiveRecordException("delete_all doesn't support distinct");
+        }
+
         $table = $this->table();
         $options = array_intersect_key($this->options, array_flip([
             'conditions',

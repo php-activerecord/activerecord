@@ -369,6 +369,12 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertEquals(2, $num_affected);
     }
 
+    public function testDistinctDeleteAllNotSupported()
+    {
+        $this->expectException(ActiveRecordException::class);
+        Author::distinct()->delete_all();
+    }
+
     public function testDeleteAll()
     {
         $num_affected = Author::delete_all();
