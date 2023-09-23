@@ -375,7 +375,10 @@ class ActiveRecordWriteTest extends DatabaseTestCase
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 
-        $num_affected = Author::delete_all(['conditions' => ['parent_author_id = ?', 2], 'limit' => 1, 'order' => 'name asc']);
+        $num_affected = Author::limit(1)
+            ->order('name asc')
+            ->where(['parent_author_id = ?', 2])
+            ->delete_all();
         $this->assertEquals(1, $num_affected);
         $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
     }
