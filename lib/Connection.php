@@ -307,16 +307,6 @@ abstract class Connection
         return $columns;
     }
 
-    public function quote_table_name(string $table): string
-    {
-        return $this->quote_name($table);
-    }
-
-    public function quote_table_name_for_from(string $table): string
-    {
-        return $table;
-    }
-
     /**
      * Escapes quotes in a string.
      *
@@ -391,10 +381,6 @@ abstract class Connection
         } catch (\PDOException $e) {
             throw new DatabaseException($msg . ': ' . $e->getMessage());
         }
-
-        ob_start();
-        $sth->debugDumpParams();
-        $info = ob_get_clean();
 
         return $sth;
     }

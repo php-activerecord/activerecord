@@ -150,11 +150,6 @@ SQL;
         $this->query("SET NAMES '$charset'");
     }
 
-    public function quote_table_name(string $table): string
-    {
-        return $table;
-    }
-
     public function guard_name(string $string): string
     {
         return strpos($string, '-') ? $this->quote_name($string) : $string;
