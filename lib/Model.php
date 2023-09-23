@@ -1069,7 +1069,6 @@ class Model
     }
 
     /**
-     *
      * @see Relation::delete_all()
      */
     public static function delete_all(): int

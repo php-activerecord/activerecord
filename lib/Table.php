@@ -441,15 +441,16 @@ class Table
 
     /**
      * @param RelationOptions $options
-     *
      */
     public function delete(array $options): int
     {
         $sql = $this->options_to_sql($options);
-        $sql->delete([]);
+        $sql->delete();
         $values = $sql->bind_values();
 
-        return $this->conn->query($this->last_sql = $sql->to_s(), $values);
+        $ret = $this->conn->query($this->last_sql = $sql->to_s(), $values);
+
+        return $ret->rowCount();
     }
 
     private function add_relationship(AbstractRelationship $relationship): void
