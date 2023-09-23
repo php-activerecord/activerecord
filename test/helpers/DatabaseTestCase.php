@@ -86,7 +86,7 @@ abstract class DatabaseTestCase extends TestCase
      * Takes database specific quotes into account by removing them. So, this won't
      * work if you have actual quotes in your strings.
      */
-    public function assert_sql_has($needle, $haystack)
+    public function assert_sql_includes($needle, $haystack)
     {
         $needle = str_replace(['"', '`'], '', $needle);
         $haystack = str_replace(['"', '`'], '', $haystack);

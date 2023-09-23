@@ -49,13 +49,13 @@ class ActiveRecordSelectTest extends \DatabaseTestCase
     public function testRemoveRepeatedColumnNames()
     {
         $relation = Author::select('name,name')->select('name, author_id');
-        $this->assert_sql_has('SELECT name, author_id FROM authors', $relation->to_sql());
+        $this->assert_sql_includes('SELECT name, author_id FROM authors', $relation->to_sql());
     }
 
     public function testStarRemovesAllOtherColumnNames()
     {
         $relation = Author::select('name')->select('*');
-        $this->assert_sql_has('SELECT * FROM `authors`', $relation->to_sql());
+        $this->assert_sql_includes('SELECT * FROM `authors`', $relation->to_sql());
     }
 
     public function testAlias()

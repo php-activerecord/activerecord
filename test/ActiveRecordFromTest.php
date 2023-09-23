@@ -32,7 +32,7 @@ class ActiveRecordFromTest extends \DatabaseTestCase
     public function testSimpleTableName(): void
     {
         $venues = Venue::from('events');
-        $this->assert_sql_has('FROM events', $venues->to_sql());
+        $this->assert_sql_includes('FROM events', $venues->to_sql());
 
         $venue = $venues->first();
 
@@ -42,7 +42,7 @@ class ActiveRecordFromTest extends \DatabaseTestCase
     public function testAlias(): void
     {
         $venues = Venue::from('events as old_events');
-        $this->assert_sql_has('FROM events as old_events', $venues->to_sql());
+        $this->assert_sql_includes('FROM events as old_events', $venues->to_sql());
 
         $venue = $venues->first();
 

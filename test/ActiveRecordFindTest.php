@@ -276,14 +276,14 @@ class ActiveRecordFindTest extends DatabaseTestCase
             'author'=>true
         ];
         JoinBook::joins(['author', 'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)'])->first();
-        $this->assert_sql_has('INNER JOIN authors ON(books.author_id = authors.author_id)', JoinBook::table()->last_sql);
-        $this->assert_sql_has('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
+        $this->assert_sql_includes('INNER JOIN authors ON(books.author_id = authors.author_id)', JoinBook::table()->last_sql);
+        $this->assert_sql_includes('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
     }
 
     public function testJoinsOnModelWithExplicitJoins()
     {
         JoinBook::joins(['LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)'])->first();
-        $this->assert_sql_has('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
+        $this->assert_sql_includes('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)', JoinBook::table()->last_sql);
     }
 
     public function testFindNonExistentPrimaryKey()
@@ -307,7 +307,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
     public function testFindByPkShouldNotUseLimit()
     {
         Author::find(1);
-        $this->assert_sql_has('SELECT * FROM authors WHERE author_id = ?', Author::table()->last_sql);
+        $this->assert_sql_includes('SELECT * FROM authors WHERE author_id = ?', Author::table()->last_sql);
     }
 
     public function testFindsDatetime()

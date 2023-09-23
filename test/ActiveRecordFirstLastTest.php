@@ -41,13 +41,13 @@ class ActiveRecordFirstLastTest extends \DatabaseTestCase
     public function testFirstSortsByPkByDefault()
     {
         Author::where(['author_id IN(?)', [1, 2, 3]])->first();
-        $this->assert_sql_has('ORDER BY author_id ASC', Author::table()->last_sql);
+        $this->assert_sql_includes('ORDER BY author_id ASC', Author::table()->last_sql);
     }
 
     public function testFirstSortsBySuppliedOrder()
     {
         Author::order('name')->where(['author_id IN(?)', [1, 2, 3]])->first();
-        $this->assert_sql_has('ORDER BY name', Author::table()->last_sql);
+        $this->assert_sql_includes('ORDER BY name', Author::table()->last_sql);
         $this->assert_sql_doesnt_has('ORDER BY author_id ASC', Author::table()->last_sql);
     }
 
