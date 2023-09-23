@@ -846,6 +846,51 @@ class Relation implements \Iterator
     }
 
     /**
+     * Deletes the records without instantiating the records
+     * first, and without invoking callbacks.
+     *
+     * This is a single SQL DELETE statement that goes straight to the
+     * database. Returns the number of rows affected.
+     *
+     * ```
+     *   Post::where('person_id = ?', 5)
+     *     ->where( ['category' => ['Something', 'Else']])
+     *     ->delete_all();
+     * ```
+     *
+     * If an invalid method is supplied, #delete_all raises an ActiveRecordError:
+     *
+     * ```
+     *  Post::distinct()->delete_all()
+     * ```
+     * => ActiveRecord::ActiveRecordError: delete_all doesn't support distinct
+     */
+    public function delete_all(): int
+    {
+        $table = static::table();
+        $conn = static::connection();
+        $sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
+
+        $conditions = $this->options;
+
+        $sql->delete($conditions);
+
+        if (isset($options['limit'])) {
+            $sql->limit($options['limit']);
+        }
+
+        if (isset($options['order'])) {
+            $sql->order($options['order']);
+        }
+
+        $values = $sql->bind_values();
+        $ret = $conn->query($table->last_sql = $sql->to_s(), $values);
+
+        return $ret->rowCount();
+
+    }
+
+    /**
      * @param RelationOptions $options
      *
      * @throws ActiveRecordException
