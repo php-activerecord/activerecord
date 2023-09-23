@@ -1514,7 +1514,10 @@ class Model
                 // so that we do not double-up on records if we append a newly created
                 $this->initRelationships($association_name);
 
-                return $association->$method($this, $args);
+                return match ($method) {
+                    'build_association' => $association->build_association($this, $args),
+                    'create_association' => $association->create_association($this, $args)
+                };
             }
         }
 

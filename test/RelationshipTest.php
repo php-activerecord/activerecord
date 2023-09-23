@@ -259,10 +259,27 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasManyBuildAssociation()
     {
+        $numBooksBeforeBuild = count(Book::all()->to_a());
         $author = Author::first();
         $author->build_book();
+        $numBooksAfterBuild = count(Book::all()->to_a());
         $this->assertEquals($author->id, $author->build_books()->author_id);
         $this->assertEquals($author->id, $author->build_book()->author_id);
+        $this->assertEquals($numBooksBeforeBuild, $numBooksAfterBuild);
+    }
+
+    public function testHasManyCreateAssociation()
+    {
+        $numBooksBeforeBuild = count(Book::all()->to_a());
+        $author = Author::first();
+        $author->build_book();
+        $this->assertEquals($author->id, $author->create_books()->author_id);
+        $this->assertEquals($author->id, $author->create_book()->author_id);
+
+        $numBooksAfterBuild = count(Book::all()->to_a());
+
+        $this->assertEquals($numBooksBeforeBuild, 2);
+        $this->assertEquals($numBooksAfterBuild, 4);
     }
 
     public function testHasAndBelongsToMany()

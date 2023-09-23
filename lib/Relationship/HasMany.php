@@ -145,9 +145,8 @@ class HasMany extends AbstractRelationship
                 if (!($through_relationship = $this->get_table()->get_relationship($this->through))) {
                     throw new HasManyThroughAssociationException("Could not find the association $this->through in model " . get_class($model));
                 }
-                if (!($through_relationship instanceof self) && !($through_relationship instanceof BelongsTo)) {
-                    throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
-                }
+                assert(($through_relationship instanceof self) || ($through_relationship instanceof BelongsTo),
+                    'has_many through can only use a belongs_to or has_many association');
                 // save old keys as we will be reseting them below for inner join convenience
                 $pk = $this->primary_key;
                 $fk = $this->foreign_key;
@@ -214,12 +213,6 @@ class HasMany extends AbstractRelationship
 
             // Then, set our normal attributes (using guarding)
             $record->set_attributes($attributes);
-        } else {
-            // Merge our attributes
-            $attributes = array_merge($relationship_attributes, $attributes);
-
-            // First build the record with just our relationship attributes (unguarded)
-            $record = parent::build_association($model, $attributes, $guard_attributes);
         }
 
         return $record;
@@ -227,25 +220,8 @@ class HasMany extends AbstractRelationship
 
     public function create_association(Model $model, $attributes = [], $guard_attributes = true): Model
     {
-        $relationship_attributes = $this->get_foreign_key_for_new_association($model);
-
-        if ($guard_attributes) {
-            // First build the record with just our relationship attributes (unguarded)
-            $record = parent::build_association($model, $relationship_attributes, false);
-
-            // Then, set our normal attributes (using guarding)
-            $record->set_attributes($attributes);
-
-            // Save our model, as a "create" instantly saves after building
-            $record->save();
-        } else {
-            // Merge our attributes
-            $attributes = array_merge($relationship_attributes, $attributes);
-
-            // First build the record with just our relationship attributes (unguarded)
-            $record = parent::create_association($model, $attributes, $guard_attributes);
-        }
-
+        $record = static::build_association($model, $attributes, $guard_attributes);
+        $record->save();
         return $record;
     }
 
