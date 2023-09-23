@@ -33,6 +33,8 @@ abstract class DatabaseTestCase extends TestCase
 
         if (empty($envDatabase) && 'sqlite' == $connection_name || 'sqlite' == $config->get_default_connection()) {
             // need to create the db (when not running in CI). the adapter specifically does not create it for us.
+            echo "Creating sql file\n";
+
             static::$db = substr(ActiveRecord\Config::instance()->get_connection('sqlite'), 9);
             new SQLite3(static::$db);
         }
