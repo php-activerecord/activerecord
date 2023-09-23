@@ -137,6 +137,7 @@ class RelationTest extends DatabaseTestCase
 
     public function testAllPrimaryKeys()
     {
+        static::resetTableData();
         $rel = Author::all();
         $queries = $rel->find([1, 3]);
         $this->assertEquals(2, count($queries));
