@@ -19,7 +19,8 @@ abstract class AdapterTestCase extends DatabaseTestCase
 
         $envDatabase = getenv('DATABASE');
         if (!empty($envDatabase) && $envDatabase != $connection_name) {
-            $this->markTestSkipped('Skipping adapter test ['.$connection_name .'] for env: ' . $envDatabase);
+            $this->markTestSkipped('Skipping adapter test [' . $connection_name . '] for env: ' . $envDatabase);
+
             return;
         }
 
