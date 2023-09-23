@@ -36,6 +36,7 @@ class SqliteAdapter extends Connection
 
     public function query_column_info(string $table): \PDOStatement
     {
+        $table = $this->quote_table_name($table);
         return $this->query("pragma table_info($table)");
     }
 
