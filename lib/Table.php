@@ -365,7 +365,7 @@ class Table
 
     public function get_fully_qualified_table_name(): string
     {
-        $table = $this->conn->quote_table_name($this->table);
+        $table = $this->conn->quote_name($this->table);
 
         if (isset($this->db_name)) {
             $table = $this->conn->quote_name($this->db_name) . ".$table";
