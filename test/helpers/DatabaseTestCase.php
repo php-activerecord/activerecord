@@ -31,7 +31,7 @@ abstract class DatabaseTestCase extends TestCase
 
         $this->original_date_class = $config->get_date_class();
 
-        if (empty($envDatabase) && 'sqlite' == $connection_name || 'sqlite' == $config->get_default_connection()) {
+        if (empty($envDatabase) && ('sqlite' == $connection_name || 'sqlite' == $config->get_default_connection())) {
             // need to create the db (when not running in CI). the adapter specifically does not create it for us.
             echo "Creating sql file\n";
 
