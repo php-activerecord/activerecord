@@ -99,7 +99,7 @@ class Cache
 
     public static function set(string $key, mixed $var, int $expire = null): void
     {
-        assert(isset(static::$adapter), "Adapter required to set");
+        assert(isset(static::$adapter), 'Adapter required to set');
 
         $key = static::get_namespace() . $key;
 
@@ -108,7 +108,7 @@ class Cache
 
     public static function delete(string $key): void
     {
-        assert(isset(static::$adapter), "Adapter required to delete");
+        assert(isset(static::$adapter), 'Adapter required to delete');
 
         $key = static::get_namespace() . $key;
         static::$adapter->delete($key);
