@@ -2,6 +2,7 @@
 
 use ActiveRecord\Connection;
 use ActiveRecord\ConnectionManager;
+use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ConnectionException;
 
 class SqliteAdapterTest extends AdapterTestCase
@@ -32,6 +33,12 @@ class SqliteAdapterTest extends AdapterTestCase
         } catch (ConnectionException $e) {
             $this->assertFalse(file_exists(__DIR__ . '/' . self::InvalidDb));
         }
+    }
+
+    public function testSetEncoding()
+    {
+        $this->expectException(ActiveRecordException::class);
+        ConnectionManager::get_connection()->set_encoding('utf8');
     }
 
     public function testLimitWith0OffsetDoesNotContainOffset()
