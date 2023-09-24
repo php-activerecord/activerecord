@@ -1,7 +1,5 @@
 # 1.x -> 2.0
-2.0 has a number of breaking changes.
-
-In 2.0, PHP Active Record aligns more closely with modern Ruby on Rails, introducing a new `Relation` class to chain commands together. Any old functions on `Model` that previously took a `conditions` argument must now move to using a `where` clause:
+2.0 has a number of breaking API changes.
 
 #### methods
 
