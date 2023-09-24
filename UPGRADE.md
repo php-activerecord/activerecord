@@ -215,4 +215,37 @@ class Book extends ActiveRecord
 
 # other changes
 
-`Config::set_model_directory` has been removed, meaning that the active record library no longer maintains its own autoloader or knowledge of where your models are kept. In 2.0, it is recommended to use your own autoloader to manage your models as you would any other classes in your project.
+## `Config::set_model_directory`
+
+`Config::set_model_directory` has been removed, meaning that the active record library no longer maintains its own autoloader or knowledge of where your models are kept. In 2.0 it is recommended to use your own autoloader to manage your models as you would any other classes in your project.
+
+When setting up relationships, active record will assume that any associations are in the same namespace as the class they are bound to. Alternatively, you can specify a class_name in the config options.
+
+Any of the following should work fine:
+
+```php
+// 2.0
+namespace test\models;
+
+use ActiveRecord\Model;
+
+class Author extends Model
+{
+    public static array $has_many = [
+        'books' => true // will attempt to load from test\models
+    ];
+    
+    public static array $has_one = [
+        'parent_author' => [
+            'class_name' => Author::class, 
+            'foreign_key' => 'parent_author_id'
+        ]
+    ];
+    
+}
+
+
+```
+
+
+

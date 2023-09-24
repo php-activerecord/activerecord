@@ -201,9 +201,8 @@ class HasMany extends AbstractRelationship
 
     /**
      * @param Attributes $attributes
-     * @param bool       $guard_attributes
      */
-    public function build_association(Model $model, array $attributes = [], $guard_attributes = true): Model
+    public function build_association(Model $model, array $attributes = [], bool $guard_attributes = true): Model
     {
         $relationship_attributes = $this->get_foreign_key_for_new_association($model);
 
