@@ -27,8 +27,6 @@ class Author extends Model
         $this->encrypted_password = md5($plaintext);
     }
 
-    public static string $db = "test";
-
     public function set_name($value)
     {
         $value = strtoupper($value);

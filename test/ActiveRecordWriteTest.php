@@ -6,6 +6,7 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Table;
 use test\models\Author;
 use test\models\Book;
 use test\models\Venue;
@@ -88,6 +89,15 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $venue = new Venue(['name' => 'Bob']);
         $venue->save();
         $this->assertTrue($venue->id > 0);
+    }
+
+    public function testFullyQualifiedNameWithExplicitDbName()
+    {
+        \test\models\namespacetest\Book::$db = 'test';
+        $name = Table::load(\test\models\namespacetest\Book::class)
+            ->get_fully_qualified_table_name();
+        $this->assertEquals('`test`.`books`', $name);
+        \test\models\namespacetest\Book::$db = '';
     }
 
     public function testSequenceWasSet()
