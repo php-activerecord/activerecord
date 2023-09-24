@@ -383,6 +383,12 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertEquals(2, $num_affected);
     }
 
+    public function testDeleteAllWithDistinct()
+    {
+        $this->expectException(ActiveRecordException::class);
+        Author::distinct()->where('parent_author_id = 2')->delete_all();
+    }
+
     public function testUpdateAllWithSetAsString()
     {
         Author::update_all(['set' => 'parent_author_id = 2']);
