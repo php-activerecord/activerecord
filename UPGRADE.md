@@ -18,6 +18,7 @@ In 2.0, PHP Active Record aligns more closely with modern Ruby on Rails, introdu
 - [Model::$validates_inclusion_of](#modelvalidatesinclusionof)
 
 #### other changes
+- [Config::set_model_directory](#configsetmodeldirectory)
 
 # Methods
 
