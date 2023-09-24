@@ -19,6 +19,11 @@ class InflectorTest extends TestCase
         $this->assertEquals('my_sqls', Inflector::tableize('MySQL'));
     }
 
+    public function testUncamelize()
+    {
+        $this->assertEquals('cute_puppy', Inflector::uncamelize('CutePuppy'));
+    }
+
     public function testKeyify()
     {
         $this->assertEquals('building_type_id', Inflector::keyify('BuildingType'));
