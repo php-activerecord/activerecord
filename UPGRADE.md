@@ -140,32 +140,6 @@ class Person extends ActiveRecord
 }
 ```
 
-## `Model::$has_many`
-
-```php
-// 1.x
-class Person extends ActiveRecord 
-{
-  static $has_many = [
-    ['children', 'foreign_key' => 'parent_id', 'class_name' => 'Person'],
-    ['orders']
-  ];
-}
-
-// 2.0
-class Person extends ActiveRecord 
-{
-  static $has_many = array(
-    [
-      'children' => [
-        'foreign_key' => 'parent_id', 
-        'class_name' => 'Person'
-      ],
-      'orders' => true
-   ];
-}
-```
-
 ## `Model::$belongs_to`
 
 ```php
