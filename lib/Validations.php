@@ -177,8 +177,8 @@ class Validations
     {
         foreach ($this->validators as $validate => $values) {
             assert(
-                array_key_exists($validate, self::$VALIDATION_FUNCTIONS),
-                throw new \Exception('Unknown validator'));
+                in_array($validate, self::$VALIDATION_FUNCTIONS),
+                new \Exception('Unknown validator'));
 
             $definition = wrap_values_in_arrays($values);
             switch ($validate) {
