@@ -6,8 +6,6 @@
 
 namespace ActiveRecord;
 
-use ActiveRecord\Adapter\SqliteAdapter;
-use ActiveRecord\Exception\ConnectionException;
 use ActiveRecord\Exception\DatabaseException;
 use Psr\Log\LoggerInterface;
 
@@ -363,10 +361,7 @@ abstract class Connection
                 throw new DatabaseException();
             }
         } catch (\PDOException $e) {
-            if ($this instanceof SqliteAdapter && 'HY000' === $e->getCode()) {
-                throw new DatabaseException($e);
-            }
-            throw new ConnectionException($e);
+            throw new DatabaseException($e);
         }
 
         $sth->setFetchMode(\PDO::FETCH_ASSOC);
@@ -452,9 +447,7 @@ abstract class Connection
      */
     public function commit(): void
     {
-        if (!$this->connection->commit()) {
-            throw new DatabaseException();
-        }
+        assert($this->connection->commit(), new DatabaseException('Failed to commit'));
     }
 
     /**
@@ -462,9 +455,7 @@ abstract class Connection
      */
     public function rollback(): void
     {
-        if (!$this->connection->rollback()) {
-            throw new DatabaseException();
-        }
+        assert($this->connection->rollback(), new DatabaseException('Failed to roll back'));
     }
 
     /**

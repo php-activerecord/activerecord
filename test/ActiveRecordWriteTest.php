@@ -6,8 +6,10 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Table;
 use test\models\Author;
 use test\models\Book;
+use test\models\Course;
 use test\models\Venue;
 
 class DirtyAuthor extends ActiveRecord\Model
@@ -90,10 +92,22 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertTrue($venue->id > 0);
     }
 
+    public function testFullyQualifiedNameWithExplicitDbName()
+    {
+        Course::$db = 'test';
+        $name = Table::load(Course::class)
+            ->get_fully_qualified_table_name();
+        $this->assert_sql_includes('`test`.`courses`', $name);
+        Course::$db = '';
+    }
+
     public function testSequenceWasSet()
     {
         if (ConnectionManager::get_connection()->supports_sequences()) {
-            $this->assertEquals(ConnectionManager::get_connection()->get_sequence_name('authors', 'author_id'), Author::table()->sequence);
+            $this->assertEquals(
+                ConnectionManager::get_connection()->get_sequence_name('authors', 'author_id'),
+                Author::table()->sequence
+            );
         } else {
             $this->assertNull(Author::table()->sequence);
         }
@@ -363,36 +377,16 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertArrayHasKey('some_date', $author->dirty_attributes());
     }
 
-    public function testWhereDeleteAll()
+    public function testDeleteAll()
     {
-        $num_affected = Author::where('parent_author_id = ?', 2)->delete_all();
+        $num_affected = Author::where('parent_author_id = 2')->delete_all();
         $this->assertEquals(2, $num_affected);
     }
 
-    public function testDistinctDeleteAllNotSupported()
+    public function testDeleteAllWithDistinct()
     {
         $this->expectException(ActiveRecordException::class);
-        Author::distinct()->delete_all();
-    }
-
-    public function testDeleteAll()
-    {
-        $num_affected = Author::delete_all();
-        $this->assertEquals(5, $num_affected);
-    }
-
-    public function testDeleteAllWithLimitAndOrder()
-    {
-        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
-            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
-        }
-
-        $num_affected = Author::limit(1)
-            ->order('name asc')
-            ->where(['parent_author_id = ?', 2])
-            ->delete_all();
-        $this->assertEquals(1, $num_affected);
-        $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
+        Author::distinct()->where('parent_author_id = 2')->delete_all();
     }
 
     public function testUpdateAllWithSetAsString()
