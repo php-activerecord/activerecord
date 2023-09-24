@@ -363,10 +363,7 @@ abstract class Connection
                 throw new DatabaseException();
             }
         } catch (\PDOException $e) {
-            if ($this instanceof SqliteAdapter && 'HY000' === $e->getCode()) {
-                throw new DatabaseException($e);
-            }
-            throw new ConnectionException($e);
+            throw new DatabaseException($e);
         }
 
         $sth->setFetchMode(\PDO::FETCH_ASSOC);
