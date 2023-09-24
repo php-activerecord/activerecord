@@ -38,9 +38,10 @@ class UtilsTest extends TestCase
         $this->assertEquals(['0a', '1a'], AR\collect($this->array_hash, function ($item) { return $item['a']; }));
     }
 
-    public function testUncountable(){
-        $this->assertEquals("sheep",AR\Utils::pluralize("sheep"));
-        $this->assertEquals("sheep",AR\Utils::singularize("sheep"));
+    public function testUncountable()
+    {
+        $this->assertEquals('sheep', AR\Utils::pluralize('sheep'));
+        $this->assertEquals('sheep', AR\Utils::singularize('sheep'));
     }
 
     public function testCollectWithArrayHashUsingString()
