@@ -7,18 +7,18 @@ In 2.0, PHP Active Record aligns more closely with modern Ruby on Rails, introdu
 
 - [Model::find()](#modelfind)
 - [Model::count()](#modelcount)
-- [Model::delete_all()](#modeldeleteall)
-- [Model::find_all_by_...()](#modelfindallbyattribute)
+- [Model::delete_all()](#modeldelete_all)
+- [Model::find_all_by_...()](#modelfind_all_by_attribute)
 
 #### static properties 
 
-- [Model::$has_one](#modelhasone)
-- [Model::$has_many](#modelhasmany)
-- [Model::$belongs_to](#modelbelongsto)
-- [Model::$validates_inclusion_of](#modelvalidatesinclusionof)
+- [Model::$has_one](#modelhas_one)
+- [Model::$has_many](#modelhas_many)
+- [Model::$belongs_to](#modelbelongs_to)
+- [Model::$validates_inclusion_of](#modelvalidates_inclusion_of)
 
 #### other changes
-- [Config::set_model_directory](#configsetmodeldirectory)
+- [Config::set_model_directory](#configset_model_directory)
 
 # Methods
 
