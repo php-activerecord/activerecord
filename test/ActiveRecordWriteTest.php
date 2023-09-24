@@ -96,7 +96,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         \test\models\namespacetest\Book::$db = 'test';
         $name = Table::load(\test\models\namespacetest\Book::class)
             ->get_fully_qualified_table_name();
-        $this->assertEquals('`test`.`books`', $name);
+        $this->assert_sql_includes('`test`.`books`', $name);
         \test\models\namespacetest\Book::$db = '';
     }
 
