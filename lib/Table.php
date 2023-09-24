@@ -367,7 +367,7 @@ class Table
     {
         $table = $this->conn->quote_name($this->table);
 
-        if (isset($this->db_name)) {
+        if (!empty($this->db_name)) {
             $table = $this->conn->quote_name($this->db_name) . ".$table";
         }
 
