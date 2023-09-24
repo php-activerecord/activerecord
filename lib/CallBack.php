@@ -182,9 +182,7 @@ class CallBack
         if (('after_' == $first || 'before' == $first) && ('creat' == ($second = substr($name, 7, 5)) || 'updat' == $second || 'reate' == $second || 'pdate' == $second)) {
             $temporal_save = str_replace(['create', 'update'], 'save', $name);
 
-            if (!isset($this->registry[$temporal_save])) {
-                $this->registry[$temporal_save] = [];
-            }
+            $this->registry[$temporal_save] ??= [];
 
             $registry = array_merge($this->registry[$temporal_save], $registry ? $registry : []);
         }
@@ -229,10 +227,10 @@ class CallBack
             }
 
             if (!in_array($closure_or_method_name, $this->publicMethods)) {
-                if ($this->klass->hasMethod($closure_or_method_name)) {
-                    // Method is private or protected
-                    throw new ActiveRecordException('Callback methods need to be public (or anonymous closures). Please change the visibility of ' . $this->klass->getName() . '->' . $closure_or_method_name . '()');
-                }
+                assert(!$this->klass->hasMethod($closure_or_method_name),
+                    new ActiveRecordException(
+                        'Callback methods need to be public (or anonymous closures). Please change the visibility of ' . $this->klass->getName() . '->' . $closure_or_method_name . '()'
+                    ));
 
                 // i'm a dirty ruby programmer
                 throw new ActiveRecordException("Unknown method for callback: $name: #$closure_or_method_name");
