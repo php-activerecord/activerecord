@@ -9,6 +9,7 @@ use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Table;
 use test\models\Author;
 use test\models\Book;
+use test\models\Course;
 use test\models\Venue;
 
 class DirtyAuthor extends ActiveRecord\Model
@@ -93,11 +94,11 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testFullyQualifiedNameWithExplicitDbName()
     {
-        \test\models\namespacetest\Book::$db = 'test';
-        $name = Table::load(\test\models\namespacetest\Book::class)
+        Course::$db = 'test';
+        $name = Table::load(Course::class)
             ->get_fully_qualified_table_name();
-        $this->assert_sql_includes('`test`.`books`', $name);
-        \test\models\namespacetest\Book::$db = '';
+        $this->assert_sql_includes('`test`.`courses`', $name);
+        Course::$db = '';
     }
 
     public function testSequenceWasSet()
@@ -376,33 +377,10 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertArrayHasKey('some_date', $author->dirty_attributes());
     }
 
-    public function testDeleteAllWithConditionsAsString()
+    public function testDeleteAll()
     {
-        $num_affected = Author::delete_all(['conditions' => 'parent_author_id = 2']);
+        $num_affected = Author::where('parent_author_id = 2')->delete_all();
         $this->assertEquals(2, $num_affected);
-    }
-
-    public function testDeleteAllWithConditionsAsHash()
-    {
-        $num_affected = Author::delete_all(['conditions' => ['parent_author_id' => 2]]);
-        $this->assertEquals(2, $num_affected);
-    }
-
-    public function testDeleteAllWithConditionsAsArray()
-    {
-        $num_affected = Author::delete_all(['conditions' => ['parent_author_id = ?', 2]]);
-        $this->assertEquals(2, $num_affected);
-    }
-
-    public function testDeleteAllWithLimitAndOrder()
-    {
-        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
-            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
-        }
-
-        $num_affected = Author::delete_all(['conditions' => ['parent_author_id = ?', 2], 'limit' => 1, 'order' => 'name asc']);
-        $this->assertEquals(1, $num_affected);
-        $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
     }
 
     public function testUpdateAllWithSetAsString()
