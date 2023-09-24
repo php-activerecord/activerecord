@@ -49,6 +49,9 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *
  * Available options:
  * @phpstan-type ValidateNumericOptions array{
+ *  message?: string|null,
+ *  allow_blank: bool,
+ *  allow_null:bool,
  *  only_integer?: bool,
  *  even?: bool,
  *  off?: bool,
@@ -57,8 +60,6 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *  equal_to?: int|float,
  *  less_than?: int|float,
  *  less_than_or_equal_to:int|float,
- *  allow_blank: bool,
- *  allow_null:bool,
  * }
  * @phpstan-type ValidateLengthOptions array{
  *  is?: int,
@@ -82,10 +83,10 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  *  within?: list<string>
  * }
  * @phpstan-type ValidateFormatOptions array{
- *  with: string,
  *  message?: string|null,
  *  allow_blank?:bool,
- *  allow_null?: bool
+ *  allow_null?: bool,
+ *  with: string,
  * }
  */
 class Validations
@@ -97,7 +98,7 @@ class Validations
     private Model $model;
 
     /**
-     * @var array<string>
+     * @var array<string, ValidationOptions>
      */
     private array $validators = [];
     private ValidationErrors $errors;
@@ -138,12 +139,8 @@ class Validations
         $this->model = $model;
         $this->errors = new ValidationErrors($this->model);
         $this->klass = Reflections::instance()->get(get_class($this->model));
-        /** @var array<string,string> $validators */
-        $validators = array_intersect(
-            array_keys($this->klass->getStaticProperties()),
-            self::$VALIDATION_FUNCTIONS
-        );
-        $this->validators = $validators;
+
+        $this->validators = array_intersect_key($this->klass->getStaticProperties(), array_flip(self::$VALIDATION_FUNCTIONS));
     }
 
     public function get_errors(): ValidationErrors
@@ -159,9 +156,7 @@ class Validations
     public function rules(): array
     {
         $data = [];
-        foreach ($this->validators as $validate) {
-            $attrs = $this->klass->getStaticPropertyValue($validate);
-
+        foreach ($this->validators as $validate => $attrs) {
             foreach (wrap_values_in_arrays($attrs) as $field => $attr) {
                 $data[$field] ??= [];
                 $attr['validator'] = $validate;
@@ -180,8 +175,11 @@ class Validations
      */
     public function validate(): ValidationErrors
     {
-        foreach ($this->validators as $validate) {
-            $values = $this->klass->getStaticPropertyValue($validate);
+        foreach ($this->validators as $validate => $values) {
+            assert(
+                in_array($validate, self::$VALIDATION_FUNCTIONS),
+                new \Exception('Unknown validator'));
+
             $definition = wrap_values_in_arrays($values);
             switch ($validate) {
                 case 'validates_presence_of':
@@ -205,8 +203,6 @@ class Validations
                 case 'validates_numericality_of':
                     $this->validates_numericality_of($definition);
                     break;
-                default:
-                    throw new \Exception('Unknown validator');
             }
         }
 
