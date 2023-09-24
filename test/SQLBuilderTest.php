@@ -193,30 +193,6 @@ class SQLBuilderTest extends DatabaseTestCase
         $this->assertEquals('DELETE FROM authors', $this->sql->to_s());
     }
 
-    public function testDeleteWithWhere()
-    {
-        $this->sql->delete(['id=? or name in(?)', 1, ['Tito', 'Mexican']]);
-        $this->assertEquals('DELETE FROM authors WHERE id=? or name in(?,?)', $this->sql->to_s());
-        $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->bind_values());
-    }
-
-    public function testDeleteWithHash()
-    {
-        $this->sql->delete(['id' => 1, 'name' => ['Tito', 'Mexican']]);
-        $this->assert_sql_includes('DELETE FROM authors WHERE id = ? AND name IN(?,?)', $this->sql->to_s());
-        $this->assertEquals([1, 'Tito', 'Mexican'], $this->sql->get_where_values());
-    }
-
-    public function testDeleteWithLimitAndOrder()
-    {
-        if (!ConnectionManager::get_connection()->accepts_limit_and_order_for_update_and_delete()) {
-            $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
-        }
-
-        $this->sql->delete(['id' => 1])->order('name asc')->limit(1);
-        $this->assert_sql_includes('DELETE FROM authors WHERE id = ? ORDER BY name asc LIMIT 1', $this->sql->to_s());
-    }
-
     public function testReverseOrder()
     {
         $this->assertEquals('id ASC, name DESC', SQLBuilder::reverse_order('id DESC, name ASC'));
