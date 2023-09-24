@@ -377,10 +377,16 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         $this->assertArrayHasKey('some_date', $author->dirty_attributes());
     }
 
-    public function testDeleteAll()
+    public function testDeleteAllWhere()
     {
         $num_affected = Author::where('parent_author_id = 2')->delete_all();
         $this->assertEquals(2, $num_affected);
+    }
+
+    public function testDeleteAll()
+    {
+        $num_affected = Author::delete_all();
+        $this->assertEquals(5, $num_affected);
     }
 
     public function testDeleteAllWithDistinct()
