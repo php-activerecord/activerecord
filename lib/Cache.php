@@ -2,6 +2,7 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\cache\iCache;
 use Closure;
 
 /**
@@ -17,7 +18,7 @@ use Closure;
  */
 class Cache
 {
-    public static ?Memcache $adapter = null;
+    public static ?iCache $adapter = null;
 
     /**
      * @var CacheOptions

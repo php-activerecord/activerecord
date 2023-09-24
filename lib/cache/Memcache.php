@@ -2,6 +2,7 @@
 
 namespace ActiveRecord;
 
+use ActiveRecord\cache\iCache;
 use ActiveRecord\Exception\CacheException;
 
 /**
@@ -10,7 +11,7 @@ use ActiveRecord\Exception\CacheException;
  *      port?: int
  *  }
  */
-class Memcache
+class Memcache implements iCache
 {
     public const DEFAULT_PORT = 11211;
 
