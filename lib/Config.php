@@ -38,7 +38,7 @@ class Config extends Singleton
      * });
      * ```
      *
-     * This is a singleton class so you can retrieve the {@link Singleton} instance by doing:
+     * This is a singleton class, so you can retrieve the {@link Singleton} instance by doing:
      *
      * ```
      * $config = ActiveRecord\Config::instance();
@@ -59,7 +59,7 @@ class Config extends Singleton
     private bool $logging = false;
 
     /**
-     * Contains a Logger object that must impelement a log() method.
+     * Contains a Logger object that must implement a log() method.
      */
     private LoggerInterface $logger;
 
@@ -202,9 +202,9 @@ class Config extends Singleton
     /**
      * Returns the logger
      */
-    public function get_logger(): LoggerInterface
+    public function get_logger(): LoggerInterface|null
     {
-        return $this->logger;
+        return $this->logger ?? null;
     }
 
     /**

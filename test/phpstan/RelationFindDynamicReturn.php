@@ -28,14 +28,14 @@ class RelationFindDynamicReturn
         /**
          * @var non-empty-array<int>
          */
-//        $ids = [];
-//
-//        $this->book = Book::All()->find(1);
-//        $this->books = Book::All()->find([1, 2]);
-//        $this->books = Book::All()->find($ids);
-//
-//        $books = Book::find($ids);
-//        $this->books = $books;
+        $ids = [];
+
+        $this->book = Book::All()->find(1);
+        $this->books = Book::All()->find([1, 2]);
+        $this->books = Book::All()->find($ids);
+
+        $books = Book::find($ids);
+        $this->books = $books;
 
         /**
          * @var mixed $mixed;

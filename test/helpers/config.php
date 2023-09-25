@@ -23,10 +23,10 @@ require_once 'AdapterTestCase.php';
 
 require_once __DIR__ . '/../../ActiveRecord.php';
 
-// whether or not to run the slow non-crucial tests
+// whether to run the slow non-crucial tests
 $GLOBALS['slow_tests'] = false;
 
-// whether or not to show warnings when Log or Memcache is missing
+// whether to show warnings when Log or Memcache is missing
 $GLOBALS['show_warnings'] = true;
 
 if ('false' !== getenv('LOG')) {
