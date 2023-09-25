@@ -1,5 +1,5 @@
-# 1.x -> 2.0
-2.0 has a number of breaking API changes.
+# 1.x -> 2.x
+2.x has a number of breaking API changes.
 
 #### methods
 
@@ -7,6 +7,7 @@
 - [Model::all](#modelall)
 - [Model::count()](#modelcount)
 - [Model::delete_all()](#modeldelete_all)
+- [Model::update_all()](#modelupdate_all)
 - [Model::find_all_by_...()](#modelfind_all_by_attribute)
 
 #### static properties 
@@ -90,6 +91,21 @@ $numDeleted = Book::delete_all(['conditions'=>['title = ?', 'Walden']]);
 
 // 2.0
 $numDeleted = Book::where('title = ?', 'Walden')->delete_all();
+```
+
+## `Model::update_all`
+`delete_all` has undergone a similar transformation, and now simply takes a string or hash of attributes as an argument:
+```php
+// 1.x
+$numUpdated = Book::update_all([
+  'conditions'=>['title = ?', 'Walden'],
+  'set' => ['author_id' => 1]
+]);
+
+// 2.0
+$numUpdated = Book::where(['title = ?', 'Walden'])->update_all([
+  'author_id' => 1
+]);
 ```
 
 ## `Model::find_all_by_<attribute>`
