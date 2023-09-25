@@ -875,8 +875,8 @@ class Relation implements \Iterator
      * // Update all invoices and set the number column to its id value.
      * Invoice::update_all('number = id')
      *
-     * @param string|Attributes $attributes A string or hash representing the SET part of
-     * an SQL statement.
+     * @param string|Attributes $attributes a string or hash representing the SET part of
+     *                                      an SQL statement
      *
      * @return int number of affected records
      */
