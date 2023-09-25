@@ -2,8 +2,6 @@
 
 namespace test;
 
-use ActiveRecord\Exception\ActiveRecordException;
-use test\models\Author;
 use test\models\Event;
 use test\models\Venue;
 
