@@ -15,6 +15,7 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * @template TModel of Model
  *
  * @phpstan-import-type RelationOptions from Types
+ * @phpstan-import-type Attributes from Types
  */
 class Relation implements \Iterator
 {
@@ -844,6 +845,44 @@ class Relation implements \Iterator
     public function to_a(): array
     {
         return $this->_to_a($this->options);
+    }
+
+    /**
+     * Updates all records in the current relation with provided attributes.
+     * This method constructs a single SQL UPDATE statement and sends it
+     * straight to the database. It does not instantiate the involved models
+     * and it does not trigger Active Record callbacks or validations.
+     * However, values passed to #update_all will still go through Active
+     * Record's normal type casting and serialization. Returns the number of
+     * rows affected.
+     *
+     * Note: As Active Record callbacks are not triggered, this method will
+     * not automatically update updated_at+/+updated_on columns.
+     *
+     * // Update all customers with the given attributes
+     * Customer::update_all( ['wants_email'] => true)
+     *
+     * // Update all books with 'Rails' in their title
+     * Book::where('title LIKE ?', '%Rails%')
+     *   ->update_all(['author', 'David'])
+     *
+     * // Update all books that match conditions, but limit it to 5 ordered by date
+     * Book::where('title LIKE ?', '%Rails%')
+     *   ->order('created_at')
+     *   ->limit(5)
+     *   ->update_all(['author'=> 'David'])
+     *
+     * // Update all invoices and set the number column to its id value.
+     * Invoice::update_all('number = id')
+     *
+     * @param string|Attributes $attributes a string or hash representing the SET part of
+     *                                      an SQL statement
+     *
+     * @return int number of affected records
+     */
+    public function update_all(array|string $attributes): int
+    {
+        return $this->table()->update($attributes, $this->options);
     }
 
     /**

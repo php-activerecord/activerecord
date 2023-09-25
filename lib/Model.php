@@ -1013,7 +1013,7 @@ class Model
      *
      * @return bool True if the model was saved to the database otherwise false
      */
-    private function update($validate = true)
+    private function update(bool $validate = true)
     {
         $this->verify_not_readonly('update');
 
@@ -1031,8 +1031,15 @@ class Model
                 return false;
             }
 
-            $dirty = $this->dirty_attributes();
-            static::table()->update($dirty, $pk);
+            $attributes = $this->dirty_attributes();
+
+            $options = [
+                'conditions' => [
+                    new WhereClause([$this->table()->pk[0] => $pk], [])
+                ]
+            ];
+
+            static::table()->update($attributes, $options);
             $this->invoke_callback('after_update', false);
             $this->update_cache();
         }
@@ -1076,52 +1083,13 @@ class Model
     }
 
     /**
-     * Updates records using set in $options
+     * @param string|Attributes $attributes
      *
-     * Does not instantiate models and therefore does not invoke callbacks
-     *
-     * Update all using a hash:
-     *
-     * ```
-     * YourModel::update_all(['set' => ['name' => "Bob"]]);
-     * ```
-     *
-     * Update all using a string:
-     *
-     * ```
-     * YourModel::update_all(['set' => 'name = "Bob"']);
-     * ```
-     *
-     * An options array takes the following parameters:
-     *
-     * @param QueryOptions $options
-     *
-     * @return int Number of rows affected
+     * @see Relation::update_all()
      */
-    public static function update_all(array $options = []): int
+    public static function update_all(string|array $attributes): int
     {
-        $table = static::table();
-        $conn = static::connection();
-        $sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
-
-        isset($options['set']) && $sql->update($options['set']);
-
-        if (isset($options['conditions']) && ($conditions = $options['conditions'])) {
-            $sql->where([WhereClause::from_arg($conditions)]);
-        }
-
-        if (isset($options['limit'])) {
-            $sql->limit($options['limit']);
-        }
-
-        if (isset($options['order'])) {
-            $sql->order($options['order']);
-        }
-
-        $values = $sql->bind_values();
-        $ret = $conn->query($table->last_sql = $sql->to_s(), $values);
-
-        return $ret->rowCount();
+        return static::Relation()->update_all($attributes);
     }
 
     /**

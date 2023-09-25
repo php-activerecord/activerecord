@@ -422,21 +422,22 @@ class Table
     }
 
     /**
-     * @param Attributes $data
-     * @param Attributes $where
+     * @param string|Attributes $attributes
+     * @param Attributes        $options
      *
      * @throws Exception\ActiveRecordException
      */
-    public function update(array &$data, array $where): \PDOStatement
+    public function update(string|array $attributes, array $options): int
     {
-        $data = $this->process_data($data);
-
-        $sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
-        $sql->update($data)->where([new WhereClause($where, [])], []);
-
+        $sql = $this->options_to_sql($options);
+        if (is_hash($attributes)) {
+            $attributes = $this->process_data($attributes);
+        }
+        $sql->update($attributes);
         $values = $sql->bind_values();
+        $ret = $this->conn->query($this->last_sql = $sql->to_s(), $values);
 
-        return $this->conn->query($this->last_sql = $sql->to_s(), $values);
+        return $ret->rowCount();
     }
 
     /**
