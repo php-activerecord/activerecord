@@ -94,7 +94,7 @@ $numDeleted = Book::where('title = ?', 'Walden')->delete_all();
 ```
 
 ## `Model::update_all`
-`delete_all` has undergone a similar transformation, and now simply takes a string or hash of attributes as an argument:
+`update_all` has undergone a similar transformation, and now simply takes a string or hash of attributes as an argument:
 ```php
 // 1.x
 $numUpdated = Book::update_all([
