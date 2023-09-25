@@ -848,25 +848,37 @@ class Relation implements \Iterator
     }
 
     /**
-     * Updates records using set in $options
+     * Updates all records in the current relation with provided attributes.
+     * This method constructs a single SQL UPDATE statement and sends it
+     * straight to the database. It does not instantiate the involved models
+     * and it does not trigger Active Record callbacks or validations.
+     * However, values passed to #update_all will still go through Active
+     * Record's normal type casting and serialization. Returns the number of
+     * rows affected.
      *
-     * Does not instantiate models and therefore does not invoke callbacks
+     * Note: As Active Record callbacks are not triggered, this method will
+     * not automatically update updated_at+/+updated_on columns.
      *
-     * Update all using a hash:
+     * // Update all customers with the given attributes
+     * Customer::update_all( ['wants_email'] => true)
      *
-     * ```
-     * YourModel::update_all(['set' => ['name' => "Bob"]]);
-     * ```
+     * // Update all books with 'Rails' in their title
+     * Book::where('title LIKE ?', '%Rails%')
+     *   ->update_all(['author', 'David'])
      *
-     * Update all using a string:
+     * // Update all books that match conditions, but limit it to 5 ordered by date
+     * Book::where('title LIKE ?', '%Rails%')
+     *   ->order('created_at')
+     *   ->limit(5)
+     *   ->update_all(['author'=> 'David'])
      *
-     * ```
-     * YourModel::update_all(['set' => 'name = "Bob"']);
-     * ```
+     * // Update all invoices and set the number column to its id value.
+     * Invoice::update_all('number = id')
      *
-     * An options array takes the following parameters:
+     * @param string|Attributes $attributes A string or hash representing the SET part of
+     * an SQL statement.
      *
-     * @return int Number of rows affected
+     * @return int number of affected records
      */
     public function update_all(array|string $attributes): int
     {

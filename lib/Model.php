@@ -1013,7 +1013,7 @@ class Model
      *
      * @return bool True if the model was saved to the database otherwise false
      */
-    private function update($validate = true)
+    private function update(bool $validate = true)
     {
         $this->verify_not_readonly('update');
 
@@ -1083,6 +1083,8 @@ class Model
     }
 
     /**
+     * @param string|Attributes $attributes
+     *
      * @see Relation::update_all()
      */
     public static function update_all(string|array $attributes): int
