@@ -5,7 +5,6 @@ namespace ActiveRecord\PhpStan\Relation;
 use PhpParser\Node\Arg;
 use PHPStan\Analyser\Scope;
 use PHPStan\Type\ArrayType;
-use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\IntegerType;
 use PHPStan\Type\NullType;
@@ -43,7 +42,7 @@ trait RelationReflectionHelper
                 $nullable = false;
 
                 if (1 == $numArgs) {
-                    if ((!$args[0]->isArray()->yes())) {
+                    if (!$args[0]->isArray()->yes()) {
                         $single = true;
                     }
                 } elseif ($numArgs > 1) {

@@ -9,7 +9,6 @@ namespace ActiveRecord;
 
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
-use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Relationship\AbstractRelationship;

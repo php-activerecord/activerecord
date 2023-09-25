@@ -9,7 +9,6 @@
  */
 
 use test\models\Book;
-use function PHPStan\dumpType;
 
 class RelationFindDynamicReturn
 {
@@ -37,9 +36,6 @@ class RelationFindDynamicReturn
         $books = Book::find($ids);
         $this->books = $books;
 
-        /**
-         * @var mixed $mixed;
-         */
         $mixed = 1;
         $books = Book::find($mixed);
         $this->book = $books;
