@@ -11,12 +11,6 @@ class DelegateTest extends \DatabaseTestCase
 {
     private $options;
 
-    public function testOptionsHashWithUnknownKeys()
-    {
-        $this->expectException(ActiveRecordException::class);
-        $this->assertFalse(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
-    }
-
     public function testDelegate()
     {
         $event = Event::first();

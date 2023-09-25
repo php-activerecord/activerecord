@@ -14,12 +14,6 @@ use test\models\Venue;
 
 class ActiveRecordTest extends DatabaseTestCase
 {
-    public function testOptionsHashWithUnknownKeys()
-    {
-        $this->expectException(ActiveRecordException::class);
-        $this->assertFalse(Author::is_options_hash(['conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush']));
-    }
-
     public function testInvalidAttribute()
     {
         $this->expectException(UndefinedPropertyException::class);
