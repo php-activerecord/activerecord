@@ -6,7 +6,7 @@ use ActiveRecord\Model;
 
 class BookAttrProtected extends Model
 {
-    //    public static $pk = 'book_id';
+    //    public static string $pk = 'book_id';
     public static string $table_name = 'books';
     public static array $belongs_to = [
         'author' => [
