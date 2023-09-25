@@ -4,6 +4,7 @@
 #### methods
 
 - [Model::find()](#modelfind)
+- [Model::all](#modelall)
 - [Model::count()](#modelcount)
 - [Model::delete_all()](#modeldelete_all)
 - [Model::find_all_by_...()](#modelfind_all_by_attribute)
@@ -47,6 +48,27 @@ $book = Book::last('last');
 
 // 2.0
 $book = Book::last();
+```
+
+## `Model::all`
+`Model::all() no longer takes any arguments, and now returns an iterable `Relation` instead of an array of models:
+```php
+// 1.x
+$books = Book::all(['conditions'=>['title = ?', 'Walden']]);
+foreach($books as $book) {}
+
+// 2.0
+$books = Book::where('title = ?', 'Walden')->all();
+foreach($books as $book) {}
+```
+
+The `all` argument has been removed in favor of `Relation::all`:
+```php
+// 1.x
+$books = Book::find('all', ['conditions'=>['title = ?', 'Walden']]);
+
+// 2.0
+$books = Book::where('title = ?', 'Walden')->to_a();
 ```
 
 ## `Model::count`
