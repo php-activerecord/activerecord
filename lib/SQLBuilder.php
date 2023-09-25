@@ -216,18 +216,18 @@ class SQLBuilder
     }
 
     /**
-     * @param Attributes|string $mixed
+     * @param Attributes|string $attributes
      *
      * @throws ActiveRecordException
      */
-    public function update(array|string $mixed): static
+    public function update(array|string $data): static
     {
         $this->operation = 'UPDATE';
 
-        if (is_hash($mixed)) {
-            $this->data = $mixed;
-        } elseif (is_string($mixed)) {
-            $this->update = $mixed;
+        if (is_hash($data)) {
+            $this->data = $data;
+        } elseif (is_string($data)) {
+            $this->update = $data;
         }
 
         return $this;

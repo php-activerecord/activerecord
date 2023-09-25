@@ -395,18 +395,18 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         Author::distinct()->where('parent_author_id = 2')->delete_all();
     }
 
-    public function testUpdateAllWithSetAsString()
+    public function testUpdateAllWithString()
     {
-        Author::update_all(['set' => 'parent_author_id = 2']);
+        Author::update_all('parent_author_id = 2');
         $ids = Author::pluck('parent_author_id');
         foreach ($ids as $id) {
             $this->assertEquals(2, $id);
         }
     }
 
-    public function testUpdateAllWithSetAsHash()
+    public function testUpdateAllWithHash()
     {
-        Author::update_all(['set' => ['parent_author_id' => 2]]);
+        Author::update_all(['parent_author_id' => 2]);
         $ids = Author::pluck('parent_author_id');
         foreach ($ids as $id) {
             $this->assertEquals(2, $id);
@@ -427,18 +427,15 @@ class ActiveRecordWriteTest extends DatabaseTestCase
 
     public function testUpdateAllWithConditionsAsHash()
     {
-        $num_affected = Author::update_all([
-            'set' => 'parent_author_id = 2',
-            'conditions' => [
-                'name' => 'Tito'
-            ]
-        ]);
+        $num_affected = Author::where([
+            'name' => 'Tito'
+        ])->update_all('parent_author_id = 2');
         $this->assertEquals(2, $num_affected);
     }
 
     public function testUpdateAllWithConditionsAsArray()
     {
-        $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'conditions' => ['name = ?', 'Tito']]);
+        $num_affected = Author::where(['name = ?', 'Tito'])->update_all('parent_author_id = 2');
         $this->assertEquals(2, $num_affected);
     }
 
@@ -448,7 +445,10 @@ class ActiveRecordWriteTest extends DatabaseTestCase
             $this->markTestSkipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
         }
 
-        $num_affected = Author::update_all(['set' => 'parent_author_id = 2', 'limit' => 1, 'order' => 'name asc']);
+        $num_affected = Author::limit(1)
+            ->order('name asc')
+            ->update_all('parent_author_id = 2');
+
         $this->assertEquals(1, $num_affected);
         $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
     }

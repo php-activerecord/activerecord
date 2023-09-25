@@ -15,6 +15,7 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * @template TModel of Model
  *
  * @phpstan-import-type RelationOptions from Types
+ * @phpstan-import-type Attributes from Types
  */
 class Relation implements \Iterator
 {
@@ -844,6 +845,34 @@ class Relation implements \Iterator
     public function to_a(): array
     {
         return $this->_to_a($this->options);
+    }
+
+    /**
+     * Updates records using set in $options
+     *
+     * Does not instantiate models and therefore does not invoke callbacks
+     *
+     * Update all using a hash:
+     *
+     * ```
+     * YourModel::update_all(['set' => ['name' => "Bob"]]);
+     * ```
+     *
+     * Update all using a string:
+     *
+     * ```
+     * YourModel::update_all(['set' => 'name = "Bob"']);
+     * ```
+     *
+     * An options array takes the following parameters:
+     *
+     * @param Attributes $options
+     *
+     * @return int Number of rows affected
+     */
+    public function update_all(array|string $attributes): int
+    {
+        return $this->table()->update($attributes, $this->options);
     }
 
     /**
