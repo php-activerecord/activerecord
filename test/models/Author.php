@@ -6,7 +6,7 @@ use ActiveRecord\Model;
 
 class Author extends Model
 {
-    public static $pk = 'author_id';
+    public static string $pk = 'author_id';
     public static array $has_many = [
         'books' => true
     ];
