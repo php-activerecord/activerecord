@@ -24,7 +24,20 @@ class RelationFindDynamicReturn
 
     public function __construct()
     {
+        /**
+         * @var non-empty-array<int>
+         */
+        $ids = [];
+
         $this->book = Book::All()->find(1);
         $this->books = Book::All()->find([1, 2]);
+        $this->books = Book::All()->find($ids);
+
+        $books = Book::find($ids);
+        $this->books = $books;
+
+        $mixed = 1;
+        $books = Book::find($mixed);
+        $this->book = $books;
     }
 }

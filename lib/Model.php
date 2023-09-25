@@ -9,7 +9,6 @@ namespace ActiveRecord;
 
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
-use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Relationship\AbstractRelationship;
@@ -1444,12 +1443,9 @@ class Model
     /**
      * Enables the use of build|create for associations.
      *
-     * @param string $method Name of method
-     * @param mixed  $args   Method args
-     *
      * @return mixed An instance of a given {@link AbstractRelationship}
      */
-    public function __call($method, $args)
+    public function __call(string $method, mixed $args)
     {
         // check for build|create_association methods
         if (preg_match('/(build|create)_/', $method)) {
@@ -1736,56 +1732,11 @@ class Model
     }
 
     /**
-     * Find records in the database.
+     * @see Relation::find()
      *
-     * Finding by the primary key:
-     *
-     * ```
-     * # queries for the model with id=123
-     * YourModel::find(123);
-     *
-     * # queries for model with id in(1,2,3)
-     * YourModel::find(1,2,3);
-     *
-     * # finding by pk accepts an options array
-     * YourModel::find(123, ['order' => 'name desc']);
-     * ```
-     *
-     * Finding by using a conditions array:
-     *
-     * ```
-     * YourModel::find('first', ['conditions' => ['name=?','Tito']],
-     *   'order' => 'name asc'])
-     * YourModel::find('all', ['conditions' => 'amount > 3.14159265']);
-     * YourModel::find('all', ['conditions' => ['id in(?)', [1,2,3]]]);
-     * ```
-     *
-     * Finding by using a hash:
-     *
-     * ```
-     * YourModel::find(['name' => 'Tito', 'id' => 1]);
-     * YourModel::find('first',['name' => 'Tito', 'id' => 1]);
-     * YourModel::find('all',['name' => 'Tito', 'id' => 1]);
-     * ```
-     *
-     * @throws RecordNotFound if no options are passed or finding by pk and no records matched
-     *
-     * @return Model|Model[]|null
-     *
-     * The rules for what gets returned are complex, but predictable:
-     *
-     * /-------------------------------------------------------------------------------------------
-     * 	First Argument								Return Type			Example
-     * --------------------------------------------------------------------------------------------
-     *	int|string									static				User::find(3);
-     * 	array<string, int|string>					static				User::find(["name"=>"Philip"]);
-     * 	"first"										static|null			User::find("first", ["name"=>"Waldo"]);
-     * 	"last"										static|null			User::find("last", ["name"=>"William"]);
-     *  "all"										static[]			User::find("all", ["name"=>"Stephen"]
-     *  ...int|string								static[]			User::find(1, 3, 5, 8);
-     *  list<int|string>						    static[]			User::find([1,3,5,8]);
+     * @return static|array<static>
      */
-    public static function find(/* $pk */): Model|array|null
+    public static function find(/* $pk */): Model|array
     {
         return static::Relation()->find(...func_get_args());
     }

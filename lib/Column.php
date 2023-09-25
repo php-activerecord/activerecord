@@ -117,10 +117,16 @@ class Column
             return $value;
         }
 
+        // string representation of a float
+        elseif ((string) (float) $value === $value && (string) (int) $value !== $value) {
+            return (int) $value;
+        }
+
         // If adding 0 to a string causes a float conversion,
         // we have a number over PHP_INT_MAX
-        elseif (is_string($value) && 1 === bccomp($value, (string) PHP_INT_MAX)) {
-            return $value;
+        // @phpstan-ignore-next-line
+        elseif (is_string($value) && is_float($value + 0)) {
+            return (string) $value;
         }
 
         // If a float was passed and is greater than PHP_INT_MAX

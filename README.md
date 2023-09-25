@@ -15,7 +15,7 @@ Note that the original website, <http://www.phpactiverecord.org/>, has also fall
  
 http://php-activerecord.github.io/activerecord/
 
-and can be found in in `/docs` if you want to make any changes.
+and can be found in `/docs` if you want to make any changes.
 
 ## Installation
 

@@ -50,7 +50,7 @@ abstract class Connection
     /**
      * Contains a Logger object that must implement a log() method.
      */
-    private LoggerInterface $logger;
+    private LoggerInterface|null $logger;
     /**
      * The name of the protocol that is used.
      */
@@ -348,9 +348,9 @@ abstract class Connection
     public function query(string $sql, array &$values = [])
     {
         if ($this->logging) {
-            $this->logger->info($sql);
+            $this->logger?->info($sql);
             if ($values) {
-                $this->logger->info(var_export($values, true));
+                $this->logger?->info(var_export($values, true));
             }
         }
 
