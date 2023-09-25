@@ -18,6 +18,7 @@
 
 #### other changes
 - [Config::set_model_directory](#configset_model_directory)
+- [exceptions location](#exceptions-location)
 
 # Methods
 
@@ -242,5 +243,28 @@ class Author extends Model
 
 ```
 
+# other changes
+
+## exceptions location
+
+All crafted exceptions have moved to a new home in the `Exceptions` namespace.
+
+```php
+// 1.x
+use ActiveRecord\RecordNotFound
+
+try {
+...
+}
+catch(RecordNotFound)
+
+// 2.0
+use ActiveRecord\Exception\RecordNotFound
+
+try {
+...
+}
+catch(RecordNotFound)
+```
 
 
