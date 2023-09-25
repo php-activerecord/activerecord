@@ -177,7 +177,8 @@ class Relation implements \Iterator
                 return $this->className::create(SQLBuilder::create_hash_from_underscored_string(
                     $attributes,
                     $args,
-                    $this->alias_attribute));
+                    $this->alias_attribute
+                ));
             }
 
             return null;
@@ -306,7 +307,7 @@ class Relation implements \Iterator
      *
      * @param string|array<string> $joins
      *
-     * @returns Relation<TModel>
+     * @return Relation<TModel>
      */
     public function joins(string|array $joins): Relation
     {

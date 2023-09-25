@@ -14,18 +14,6 @@ use PHPStan\Type\UnionType;
 
 trait RelationReflectionHelper
 {
-    protected function isNumericArray(ConstantArrayType $args): bool
-    {
-        $keys = $args->getKeyTypes();
-        foreach ($keys as $key) {
-            if (!($key instanceof IntegerType)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     /**
      * @return string[]
      */
@@ -55,8 +43,7 @@ trait RelationReflectionHelper
                 $nullable = false;
 
                 if (1 == $numArgs) {
-                    if (!($args[0] instanceof ConstantArrayType)
-                        || (!$this->isNumericArray($args[0]))) {
+                    if ((!$args[0]->isArray()->yes())) {
                         $single = true;
                     }
                 } elseif ($numArgs > 1) {

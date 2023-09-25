@@ -1444,12 +1444,9 @@ class Model
     /**
      * Enables the use of build|create for associations.
      *
-     * @param string $method Name of method
-     * @param mixed  $args   Method args
-     *
      * @return mixed An instance of a given {@link AbstractRelationship}
      */
-    public function __call($method, $args)
+    public function __call(string $method, mixed $args)
     {
         // check for build|create_association methods
         if (preg_match('/(build|create)_/', $method)) {
@@ -1778,10 +1775,6 @@ class Model
      * 	First Argument								Return Type			Example
      * --------------------------------------------------------------------------------------------
      *	int|string									static				User::find(3);
-     * 	array<string, int|string>					static				User::find(["name"=>"Philip"]);
-     * 	"first"										static|null			User::find("first", ["name"=>"Waldo"]);
-     * 	"last"										static|null			User::find("last", ["name"=>"William"]);
-     *  "all"										static[]			User::find("all", ["name"=>"Stephen"]
      *  ...int|string								static[]			User::find(1, 3, 5, 8);
      *  list<int|string>						    static[]			User::find([1,3,5,8]);
      */
