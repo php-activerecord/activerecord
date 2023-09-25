@@ -1084,7 +1084,6 @@ class Model
 
     /**
      * @see Relation::update_all()
-     *
      */
     public static function update_all(string|array $attributes): int
     {

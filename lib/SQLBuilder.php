@@ -216,8 +216,6 @@ class SQLBuilder
     }
 
     /**
-     * @param Attributes|string $attributes
-     *
      * @throws ActiveRecordException
      */
     public function update(array|string $data): static

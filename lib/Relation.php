@@ -866,8 +866,6 @@ class Relation implements \Iterator
      *
      * An options array takes the following parameters:
      *
-     * @param Attributes $options
-     *
      * @return int Number of rows affected
      */
     public function update_all(array|string $attributes): int

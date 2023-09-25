@@ -423,13 +423,16 @@ class Table
 
     /**
      * @param string|Attributes $attributes
-     * @param Attributes $options
+     * @param Attributes        $options
      *
      * @throws Exception\ActiveRecordException
      */
     public function update(string|array $attributes, array $options): int
     {
         $sql = $this->options_to_sql($options);
+        if (is_hash($attributes)) {
+            $attributes = $this->process_data($attributes);
+        }
         $sql->update($attributes);
         $values = $sql->bind_values();
         $ret = $this->conn->query($this->last_sql = $sql->to_s(), $values);
