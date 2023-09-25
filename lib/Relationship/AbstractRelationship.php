@@ -275,9 +275,10 @@ abstract class AbstractRelationship
     /**
      * @return class-string
      */
-    protected function inferred_class_name(string $name): string
+    protected function inferred_class_name(string $rawName): string
     {
-        if (!has_absolute_namespace($name) && isset($this->options['namespace'])) {
+        $name = $rawName;
+        if (!class_exists($name) && !has_absolute_namespace($name) && isset($this->options['namespace'])) {
             if (!isset($this->options['class_name'])) {
                 $name = classify($name, $this instanceof HasMany);
             }

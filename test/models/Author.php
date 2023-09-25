@@ -16,7 +16,7 @@ class Author extends Model
             'primary_key' => 'author_id'
         ],
         'parent_author' => [
-            'class_name' => 'Author',
+            'class_name' => Author::class,
             'foreign_key' => 'parent_author_id'
         ]
     ];
