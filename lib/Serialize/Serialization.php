@@ -187,33 +187,29 @@ abstract class Serialization
                 }
                 assert(is_string($association));
 
-                try {
-                    $assoc = $this->model->$association;
+                $assoc = $this->model->$association;
 
-                    if (null === $assoc) {
-                        unset($this->attributes[$association]);
-                    } elseif (!is_array($assoc)) {
-                        $serialized = new $serializer_class($assoc, $options);
-                        $this->attributes[$association] = $serialized->to_a();
-                    } else {
-                        $includes = [];
+                if (null === $assoc) {
+                    unset($this->attributes[$association]);
+                } elseif (!is_array($assoc)) {
+                    $serialized = new $serializer_class($assoc, $options);
+                    $this->attributes[$association] = $serialized->to_a();
+                } else {
+                    $includes = [];
 
-                        foreach ($assoc as $a) {
-                            $serialized = new $serializer_class($a, $options);
+                    foreach ($assoc as $a) {
+                        $serialized = new $serializer_class($a, $options);
 
-                            if ($this->includes_with_class_name_element) {
-                                $className = get_class($a);
-                                assert(is_string($className));
-                                $includes[strtolower($className)][] = $serialized->to_a();
-                            } else {
-                                $includes[] = $serialized->to_a();
-                            }
+                        if ($this->includes_with_class_name_element) {
+                            $className = get_class($a);
+                            assert(is_string($className));
+                            $includes[strtolower($className)][] = $serialized->to_a();
+                        } else {
+                            $includes[] = $serialized->to_a();
                         }
-
-                        $this->attributes[$association] = $includes;
                     }
-                } catch (UndefinedPropertyException $e) {
-                    // move along
+
+                    $this->attributes[$association] = $includes;
                 }
             }
         }
