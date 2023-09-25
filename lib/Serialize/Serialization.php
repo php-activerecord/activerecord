@@ -248,16 +248,6 @@ abstract class Serialization
     }
 
     /**
-     * Returns the serialized object as a string.
-     *
-     * @see to_s
-     */
-    final public function __toString(): string
-    {
-        return $this->to_s();
-    }
-
-    /**
      * Performs the serialization.
      */
     abstract public function to_s(): string;
