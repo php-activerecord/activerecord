@@ -300,17 +300,18 @@ class Utils
             }
         }
 
+        $res = '';
         // check for matches using regular expressions
         foreach (self::$plural as $pattern => $result) {
             if (preg_match($pattern, $string)) {
                 $res = preg_replace($pattern, $result, $string);
                 assert(is_string($res));
 
-                return $res;
+                break;
             }
         }
 
-        return $string;
+        return $res;
     }
 
     public static function singularize(string $string): string
