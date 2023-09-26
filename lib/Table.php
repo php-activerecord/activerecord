@@ -541,8 +541,7 @@ class Table
             return;
         }
 
-        $this->sequence = $this->class->getStaticPropertyValue('sequence') ??
-            $this->conn->get_sequence_name($this->table, $this->pk[0] ?? '');
+        $this->conn->init_sequence_name($this);
     }
 
     private function set_associations(): void

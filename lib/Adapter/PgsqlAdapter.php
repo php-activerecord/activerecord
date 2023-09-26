@@ -8,6 +8,7 @@ namespace ActiveRecord\Adapter;
 use ActiveRecord\Column;
 use ActiveRecord\Connection;
 use ActiveRecord\Inflector;
+use ActiveRecord\Table;
 
 /**
  * Adapter for Postgres (not completed yet)
@@ -22,14 +23,22 @@ class PgsqlAdapter extends Connection
         return true;
     }
 
-    public function get_sequence_name(string $table, string $column_name): string
+    public function next_sequence_value(string $sequence_name): ?string
+    {
+        return "nextval('" . str_replace("'", "\\'", $sequence_name) . "')";
+    }
+
+    private function get_sequence_name(string $table, string $column_name): string
     {
         return "{$table}_{$column_name}_seq";
     }
 
-    public function next_sequence_value(string $sequence_name): ?string
+    public function init_sequence_name(Table $table): string
     {
-        return "nextval('" . str_replace("'", "\\'", $sequence_name) . "')";
+        $table->sequence = $table->class->getStaticPropertyValue('sequence') ??
+            $this->get_sequence_name($table->table, $table->pk[0] ?? '');
+
+        return $table->sequence;
     }
 
     public function limit(string $sql, int $offset = 0, int $limit = 0): string

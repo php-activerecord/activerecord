@@ -3,7 +3,6 @@
 namespace ActiveRecord\Serialize;
 
 use ActiveRecord\DateTimeInterface;
-use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Model;
 use ActiveRecord\Types;
 

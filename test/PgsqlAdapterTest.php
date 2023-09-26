@@ -20,7 +20,7 @@ class PgsqlAdapterTest extends AdapterTestCase
     public function testSequenceWasSet()
     {
         $this->assertEquals(
-            ConnectionManager::get_connection()->get_sequence_name('authors', 'author_id'),
+            ConnectionManager::get_connection()->init_sequence_name(Author::table()),
             Author::table()->sequence
         );
     }
