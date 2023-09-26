@@ -304,7 +304,7 @@ class RelationshipTest extends DatabaseTestCase
     {
         $this->expectException(\Exception::class);
         $hasAndBelongsToMany = new HasAndBelongsToMany(Book::class);
-        $hasAndBelongsToMany->load_eagerly([],[],[], Book::table());
+        $hasAndBelongsToMany->load_eagerly([], [], [], Book::table());
     }
 
     public function testBelongsToCreateAssociation()
