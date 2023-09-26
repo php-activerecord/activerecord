@@ -479,9 +479,10 @@ class Validations
             if ('within' == $range_options[0] || 'in' == $range_options[0]) {
                 $range = $options[$range_options[0]];
 
-                if (!$this->is_range($range)) {
-                    throw new ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
-                }
+                assert(
+                    $this->is_range($range),
+                    new ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]")
+                );
                 $range_options = ['minimum', 'maximum'];
                 $options['minimum'] = $range[0];
                 $options['maximum'] = $range[1];

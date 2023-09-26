@@ -435,9 +435,7 @@ abstract class Connection
      */
     public function transaction(): void
     {
-        if (!$this->connection->beginTransaction()) {
-            throw new DatabaseException();
-        }
+        assert($this->connection->beginTransaction(), new DatabaseException());
     }
 
     /**
@@ -469,14 +467,11 @@ abstract class Connection
     /**
      * Return a default sequence name for the specified table.
      *
-     * @param string $table       Name of a table
-     * @param string $column_name Name of column sequence is for
-     *
      * @return string sequence name or null if not supported
      */
-    public function get_sequence_name(string $table, string $column_name): string
+    public function init_sequence_name(Table $table): string
     {
-        return "{$table}_seq";
+        return '';
     }
 
     /**

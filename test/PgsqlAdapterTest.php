@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\ConnectionManager;
+use test\models\Author;
 
 class PgsqlAdapterTest extends AdapterTestCase
 {
@@ -14,6 +15,14 @@ class PgsqlAdapterTest extends AdapterTestCase
         static::resetTableData();
         ConnectionManager::get_connection()->query("INSERT INTO authors(author_id,name) VALUES(nextval('authors_author_id_seq'),'name')");
         $this->assertTrue(ConnectionManager::get_connection()->insert_id('authors_author_id_seq') > 0);
+    }
+
+    public function testSequenceWasSet()
+    {
+        $this->assertEquals(
+            ConnectionManager::get_connection()->init_sequence_name(Author::table()),
+            Author::table()->sequence
+        );
     }
 
     public function testToSql(): void

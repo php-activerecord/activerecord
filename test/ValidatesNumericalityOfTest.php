@@ -117,6 +117,16 @@ class ValidatesNumericalityOfTest extends DatabaseTestCase
         $this->assert_invalid([5, '5'], 'must be greater than 5');
     }
 
+    public function testEqualTo()
+    {
+        BookNumericality::$validates_numericality_of = [
+            'numeric_test' => ['equal_to' => 5]
+        ];
+
+        $this->assert_valid([5, '5']);
+        $this->assert_invalid([6, '6'], 'must be equal to 5');
+    }
+
     public function testGreaterThanOrEqualTo()
     {
         BookNumericality::$validates_numericality_of = [
