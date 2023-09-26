@@ -124,7 +124,7 @@ class Table
         $this->set_table_name();
         $this->get_meta_data();
         $this->set_primary_key();
-        $this->set_sequence_name();
+        $this->conn->init_sequence_name($this);
         $this->set_cache();
 
         $this->callback = new CallBack($class_name);
@@ -533,15 +533,6 @@ class Table
         $this->cache_individual_model = $model_class_name::$cache;
 
         $this->cache_model_expire = $model_class_name::$cache_expire ?? Cache::$options['expire'] ?? 0;
-    }
-
-    private function set_sequence_name(): void
-    {
-        if (!$this->conn->supports_sequences()) {
-            return;
-        }
-
-        $this->conn->init_sequence_name($this);
     }
 
     private function set_associations(): void
