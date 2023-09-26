@@ -6,6 +6,7 @@ use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Relationship\HasAndBelongsToMany;
 use test\models\Author;
 use test\models\AuthorAttrAccessible;
 use test\models\AwesomePerson;
@@ -291,6 +292,19 @@ class RelationshipTest extends DatabaseTestCase
         $course = Course::find(3);
         $students = $course->students;
         $this->assertEquals(1, count($students));
+    }
+
+    public function testHasAndBelongsToManyIsPoly()
+    {
+        $hasAndBelongsToMany = new HasAndBelongsToMany(Book::class);
+        $this->assertTrue($hasAndBelongsToMany->is_poly());
+    }
+
+    public function testHasAndBelongsToManyDoesNotEagerLoad()
+    {
+        $this->expectException(\Exception::class);
+        $hasAndBelongsToMany = new HasAndBelongsToMany(Book::class);
+        $hasAndBelongsToMany->load_eagerly([],[],[], Book::table());
     }
 
     public function testBelongsToCreateAssociation()

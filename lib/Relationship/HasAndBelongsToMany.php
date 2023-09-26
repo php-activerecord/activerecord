@@ -32,6 +32,11 @@ class HasAndBelongsToMany extends AbstractRelationship
         $this->options['association_foreign_key'] ??= Inflector::keyify($this->class_name);
     }
 
+    public function is_poly(): bool
+    {
+        return true;
+    }
+
     /**
      * @return list<TModel>
      */
@@ -69,5 +74,10 @@ class HasAndBelongsToMany extends AbstractRelationship
             . 'INNER JOIN ' . $associated_table_name . ' ON ' . $associated_table_name . '.' . $join_primary_key . ' = ' . $linkingTableName . '.' . $join_primary_key;
 
         return $res;
+    }
+
+    public function load_eagerly($models, $attributes, $includes, Table $table): void
+    {
+        throw new \Exception('load_eagerly undefined for ' . __CLASS__);
     }
 }
