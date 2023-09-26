@@ -16,5 +16,5 @@ class BookAttrProtected extends Model
     ];
 
     // No attributes should be accessible
-    public static array $attr_accessible = [null];
+    public static array $attr_protected = ['book_id'];
 }

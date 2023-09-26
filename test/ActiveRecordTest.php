@@ -8,6 +8,7 @@ use test\models\Author;
 use test\models\AwesomePerson;
 use test\models\Book;
 use test\models\BookAttrAccessible;
+use test\models\BookAttrProtected;
 use test\models\Event;
 use test\models\RmBldg;
 use test\models\Venue;
@@ -221,7 +222,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function testAttrProtected()
     {
-        $book = new BookAttrAccessible(['book_id' => 999]);
+        $book = new BookAttrProtected(['book_id' => 999]);
         $this->assertNull($book->book_id);
         $book->book_id = 999;
         $this->assertEquals(999, $book->book_id);

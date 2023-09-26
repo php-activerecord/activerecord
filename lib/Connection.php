@@ -435,9 +435,7 @@ abstract class Connection
      */
     public function transaction(): void
     {
-        if (!$this->connection->beginTransaction()) {
-            throw new DatabaseException();
-        }
+        assert($this->connection->beginTransaction(), new DatabaseException());
     }
 
     /**

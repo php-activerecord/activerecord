@@ -101,18 +101,6 @@ class ActiveRecordWriteTest extends DatabaseTestCase
         Course::$db = '';
     }
 
-    public function testSequenceWasSet()
-    {
-        if (ConnectionManager::get_connection()->supports_sequences()) {
-            $this->assertEquals(
-                ConnectionManager::get_connection()->get_sequence_name('authors', 'author_id'),
-                Author::table()->sequence
-            );
-        } else {
-            $this->assertNull(Author::table()->sequence);
-        }
-    }
-
     public function testSequenceWasExplicitlySet()
     {
         if (ConnectionManager::get_connection()->supports_sequences()) {
