@@ -164,18 +164,6 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->assertFalse($book->errors->is_invalid('name'));
     }
 
-    public function testFloatAsImpossibleRangeOption()
-    {
-        BookLength::$validates_length_of['name']['within'] = [1, 3.6];
-        $book = new BookLength();
-        $book->name = '123';
-        try {
-            $book->save();
-        } catch (ValidationsArgumentError $e) {
-            $this->assertEquals('Range must be an array of two ints.', $e->getMessage());
-        }
-    }
-
     public function testSignedIntegerAsImpossibleWithinOption()
     {
         BookLength::$validates_length_of['name']['within'] = [-1, 3];

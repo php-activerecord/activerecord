@@ -427,8 +427,6 @@ class Validations
      */
     public static function is_range(array $var): bool
     {
-        assert(is_int($var[0]) && is_int($var[1]), new ValidationsArgumentError('Range must be an array of two ints.'));
-
         return is_array($var) && (int) $var[0] < (int) $var[1];
     }
 
