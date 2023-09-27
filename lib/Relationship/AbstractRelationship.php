@@ -236,8 +236,8 @@ abstract class AbstractRelationship
      */
     public function create_association(Model $model, array $attributes = [], bool $guard_attributes = true): Model
     {
-        $class_name = $this->class_name;
-        $new_record = $class_name::create($attributes, true, $guard_attributes);
+        $new_record = static::build_association($model, $attributes, true);
+        $new_record->save();
 
         return $this->append_record_to_associate($model, $new_record);
     }
