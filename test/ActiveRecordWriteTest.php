@@ -374,10 +374,10 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testDeleteAllWhereWithLimitAndOrder()
     {
         $num_affected = Author::where('parent_author_id = 2')
-            ->limit(1)
+            ->limit(2)
             ->order("author_id asc")
             ->delete_all();
-        $this->assertEquals(1, $num_affected);
+        $this->assertEquals(2, $num_affected);
     }
 
     public function testDeleteAll()
