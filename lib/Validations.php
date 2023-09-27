@@ -535,12 +535,6 @@ class Validations
         $connection = $this->klass->getMethod('connection')->invoke(null);
 
         foreach ($attrs as $attr => $options) {
-            if (is_bool($options)) {
-                if (!$options) {
-                    continue;
-                }
-                $options = [];
-            }
             $pk = $this->model->get_primary_key();
             $pk_value = $this->model->{$pk};
 
