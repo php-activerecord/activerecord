@@ -215,7 +215,6 @@ class HasMany extends AbstractRelationship
         return $record;
     }
 
-
     /**
      * @param list<Model>      $models
      * @param list<Attributes> $attributes
