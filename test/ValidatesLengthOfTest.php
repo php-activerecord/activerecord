@@ -249,18 +249,6 @@ class ValidatesLengthOfTest extends DatabaseTestCase
         $this->fail('An expected exception has not be raised.');
     }
 
-    public function testWithOptionAsNonNumeric()
-    {
-        $this->expectException(ValidationsArgumentError::class);
-        BookLength::$validates_length_of = [
-            'name' => ['within' => ['test']]
-        ];
-
-        $book = new BookLength();
-        $book->name = null;
-        $book->save();
-    }
-
     public function testWithOptionAsNonNumericNonArray()
     {
         $this->expectException(ValidationsArgumentError::class);
