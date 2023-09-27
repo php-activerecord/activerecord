@@ -215,14 +215,6 @@ class HasMany extends AbstractRelationship
         return $record;
     }
 
-    public function create_association(Model $model, $attributes = [], $guard_attributes = true): Model
-    {
-        $record = static::build_association($model, $attributes, $guard_attributes);
-        $record->save();
-
-        return $record;
-    }
-
     /**
      * @param list<Model>      $models
      * @param list<Attributes> $attributes

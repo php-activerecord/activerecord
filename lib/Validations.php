@@ -368,9 +368,7 @@ class Validations
                 if ('odd' != $option && 'even' != $option) {
                     $option_value = (float) $options[$option];
 
-                    if (!is_numeric($option_value)) {
-                        throw new ValidationsArgumentError("$option must be a number");
-                    }
+                    assert(is_numeric($option_value), new ValidationsArgumentError("$option must be a number"));
                     $message = str_replace('%d', $options[$option], $message);
 
                     if ('greater_than' == $option && !($var > $option_value)) {
