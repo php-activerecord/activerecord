@@ -375,7 +375,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     {
         $num_affected = Author::where('parent_author_id = 2')
             ->limit(2)
-            ->order("author_id asc")
+            ->order('author_id asc')
             ->delete_all();
         $this->assertEquals(2, $num_affected);
     }
