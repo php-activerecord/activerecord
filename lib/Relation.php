@@ -161,9 +161,7 @@ class Relation implements \Iterator
         }
 
         $attributes = $this->extract_dynamic_vars($method, 'find_by');
-        if ('' === $attributes) {
-            throw new ActiveRecordException("Call to undefined method: $method");
-        }
+        assert('' !== $attributes, new ActiveRecordException("Call to undefined method: $method"));
 
         $options = $this->options;
 
