@@ -233,15 +233,6 @@ class WhereClause
 
         if (is_array($value)) {
             $value_count = count($value);
-
-            if (0 === $value_count) {
-                if ($substitute) {
-                    return 'NULL';
-                }
-
-                return self::ParameterMarker;
-            }
-
             if ($substitute) {
                 $ret = '';
 
