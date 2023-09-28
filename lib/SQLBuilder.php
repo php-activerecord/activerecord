@@ -327,14 +327,7 @@ class SQLBuilder
     private function build_insert(): string
     {
         $keys = join(',', $this->quoted_key_names());
-
-        if ($this->sequence) {
-            $sql =
-                "INSERT INTO $this->table($keys," . $this->connection->quote_name($this->sequence[0]) .
-                ') VALUES(?,' . $this->connection->next_sequence_value($this->sequence[1]) . ')';
-        } else {
-            $sql = "INSERT INTO $this->table($keys) VALUES(?)";
-        }
+        $sql = $this->connection->buildInsert($this->table, $keys, $this->sequence);
 
         $e = new WhereClause($sql, [array_values($this->data)]);
 

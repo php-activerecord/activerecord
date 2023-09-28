@@ -33,6 +33,19 @@ class PgsqlAdapter extends Connection
         return "{$table}_{$column_name}_seq";
     }
 
+    public function buildInsert(string $table, string $keys, array $sequence): string
+    {
+        if ($sequence) {
+            $sql =
+                "INSERT INTO $table($keys," . $this->quote_name($sequence[0]) .
+                ') VALUES(?,' . $this->next_sequence_value($sequence[1]) . ')';
+        } else {
+            $sql = parent::buildInsert($table, $keys, $sequence);
+        }
+
+        return $sql;
+    }
+
     public function init_sequence_name(Table $table): string
     {
         $table->sequence = $table->class->getStaticPropertyValue('sequence') ??
