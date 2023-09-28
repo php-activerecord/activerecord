@@ -482,6 +482,9 @@ abstract class Connection
         return null;
     }
 
+    /**
+     * @param array<string> $sequence
+     */
     public function buildInsert(string $table, string $keys, array $sequence): string
     {
         return "INSERT INTO $table($keys) VALUES(?)";
