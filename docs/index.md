@@ -1,1 +1,7 @@
-Welcome to Active Record
+# Welcome to Active Record
+
+
+```php
+$book = Book::find(1);
+
+```

@@ -39,13 +39,7 @@
     "test": [
       "Composer\\Config::disableProcessTimeout",
       "ActiveRecord\\Scripts\\TestCommand::runTest"
-    ]
-  },
-  "scripts-descriptions": {
-    "style-check": "Dry run of composer style-fix",
-    "style-fix": "Fixes style errors to conform to project standards",
-    "stan": "Runs phpstan static analysis",
-    "test": "Runs PHPUnit. Usage: composer test [fileName [filter]]",
-    "docs": "tools/phpDocumentor run -d lib -t .docs"
+    ],
+    "docs": "php ./tools/phpDocumentor.phar run -d lib -t .docs"
   }
 }
