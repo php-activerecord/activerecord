@@ -483,6 +483,14 @@ abstract class Connection
     }
 
     /**
+     * @param array<string> $sequence
+     */
+    public function buildInsert(string $table, string $keys, array $sequence): string
+    {
+        return "INSERT INTO $table($keys) VALUES(?)";
+    }
+
+    /**
      * Quote a name like table names and field names.
      *
      * @param string $string string to quote
