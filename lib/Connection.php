@@ -475,14 +475,6 @@ abstract class Connection
     }
 
     /**
-     * Return SQL for getting the next value in a sequence.
-     */
-    public function next_sequence_value(string $sequence_name): ?string
-    {
-        return null;
-    }
-
-    /**
      * @param array<string> $sequence
      */
     public function buildInsert(string $table, string $keys, array $sequence): string
