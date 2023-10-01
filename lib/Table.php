@@ -518,7 +518,10 @@ class Table
             $this->table = $parts[count($parts) - 1];
         }
 
-        $this->db_name = $this->class->getStaticPropertyValue('db', null) ?? $this->class->getStaticPropertyValue('db_name', null);
+        $this->db_name =
+            $this->class->getStaticPropertyValue('db', null)
+            ?? $this->class->getStaticPropertyValue('db_name', null)
+            ?? $this->db_name;
     }
 
     private function set_cache(): void
