@@ -33,6 +33,17 @@ $books = Book::find([1,2,3], ['conditions'=>['title = ?', 'Walden']]);
 $books = Book::where('title = ?', 'Walden')->to_a();
 ```
 
+Also, in 2.x we have fixed a bug around calling `find` with an empty array. It will now throw a `RecordNotFound` exception. If you were relying on the old behavior, you should switch to `where`:
+```php
+// 1.x
+$ids = [];
+$books = Book::find($ids);
+
+// 2.0
+$books = Book::where(['book_id' => $ids])->to_a();
+```
+
+
 The `all` argument has been removed in favor of `Relation::all`:
 ```php
 // 1.x
