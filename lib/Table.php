@@ -492,7 +492,7 @@ class Table
 
     private function set_primary_key(): void
     {
-        $pk = $this->class->getStaticPropertyValue('pk', null) ?? $this->class->getStaticPropertyValue('primary_key', null);
+        $pk = $this->class->getStaticPropertyValue('pk', null) ?? $this->class->getStaticPropertyValue('primary_key', null) ?? null;
         if (isset($pk)) {
             $this->pk = is_array($pk) ? $pk : [$pk];
         } else {
@@ -508,7 +508,7 @@ class Table
 
     private function set_table_name(): void
     {
-        $table = $this->class->getStaticPropertyValue('table', null) ?? $this->class->getStaticPropertyValue('table_name', null);
+        $table = $this->class->getStaticPropertyValue('table', null) ?? $this->class->getStaticPropertyValue('table_name', null) ?? null;
         if (isset($table)) {
             $this->table = $table;
         } else {
@@ -520,7 +520,7 @@ class Table
             $this->table = $parts[count($parts) - 1];
         }
 
-        $db = $this->class->getStaticPropertyValue('db', null) ?? $this->class->getStaticPropertyValue('db_name', null);
+        $db = $this->class->getStaticPropertyValue('db', null) ?? $this->class->getStaticPropertyValue('db_name', null) ?? null;
         if (isset($db)) {
             $this->db_name = $db;
         }
