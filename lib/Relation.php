@@ -719,6 +719,10 @@ class Relation implements \Iterator
         $options['conditions'] ??= [];
         $options['conditions'][] = $this->pk_conditions($args);
 
+        if (is_array($args) && count($args) === 0) {
+            throw new RecordNotFound("Couldn't find " . $this->className . " without an ID");
+        }
+
         $list = $this->_to_a($options);
         if (is_array($args) && count($list) != count($args)) {
             throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));

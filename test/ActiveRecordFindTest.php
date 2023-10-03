@@ -17,6 +17,13 @@ class ActiveRecordFindTest extends DatabaseTestCase
         Author::find();
     }
 
+    public function testFindWithEmptyArray()
+    {
+        $this->expectException(RecordNotFound::class);
+        $this->expectExceptionMessage("Couldn't find test\models\Author without an ID");
+        Author::find([]);
+    }
+
     public function testFindReturnsSingleModel()
     {
         $author = Author::select('author_id')->find(3);
