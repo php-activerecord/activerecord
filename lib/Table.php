@@ -493,7 +493,7 @@ class Table
     private function set_primary_key(): void
     {
         $pk = $this->class->getStaticPropertyValue('pk', null) ?? $this->class->getStaticPropertyValue('primary_key', null);
-        if ($pk) {
+        if (isset($pk)) {
             $this->pk = is_array($pk) ? $pk : [$pk];
         } else {
             $this->pk = [];
@@ -509,7 +509,7 @@ class Table
     private function set_table_name(): void
     {
         $table = $this->class->getStaticPropertyValue('table', null) ?? $this->class->getStaticPropertyValue('table_name', null);
-        if ($table) {
+        if (isset($table)) {
             $this->table = $table;
         } else {
             // infer table name from the class name
@@ -521,7 +521,7 @@ class Table
         }
 
         $db = $this->class->getStaticPropertyValue('db', null) ?? $this->class->getStaticPropertyValue('db_name', null);
-        if ($db) {
+        if (isset($db)) {
             $this->db_name = $db;
         }
     }
