@@ -91,6 +91,10 @@ class WhereClause
         $num_values = count($values);
         $quotes = 0;
 
+        if (1 == $num_values && is_array($values[0]) && 0 == count($values[0])) {
+            return '1=0';
+        }
+
         for ($i = 0, $j = 0; $i < strlen($expression); ++$i) {
             $ch = $expression[$i];
 
