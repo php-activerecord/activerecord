@@ -3,7 +3,6 @@
 use ActiveRecord\ConnectionManager;
 use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\WhereClause;
-use test\models\Author;
 
 class WhereClauseTest extends DatabaseTestCase
 {
@@ -133,12 +132,6 @@ class WhereClauseTest extends DatabaseTestCase
         $a = new WhereClause('name=?', ["Tito's Guild"]);
         $escaped = ConnectionManager::get_connection()->escape("Tito's Guild");
         $this->assertEquals("name=$escaped", $a->to_s(ConnectionManager::get_connection(), substitute: true));
-    }
-
-    public function testBindInvalidParameterNumberArrayWithIn()
-    {
-        $this->expectException(DatabaseException::class);
-        Author::where(['author_id IN(?)', []])->to_a();
     }
 
     public function testSubstituteUsingAlternateValues(): void

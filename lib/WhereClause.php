@@ -88,12 +88,12 @@ class WhereClause
         }
 
         $ret = '';
-        if (1 == count($values) && is_array($values[0])) {
-            $num_values = count($values[0]);
-        } else {
-            $num_values = count($values);
-        }
+        $num_values = count($values);
         $quotes = 0;
+
+        if (1 == $num_values && is_array($values[0]) && 0 == count($values[0])) {
+            return '1=0';
+        }
 
         for ($i = 0, $j = 0; $i < strlen($expression); ++$i) {
             $ch = $expression[$i];

@@ -1,6 +1,5 @@
 <?php
 
-use ActiveRecord\Exception\DatabaseException;
 use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\ValidationsArgumentError;
 use ActiveRecord\Model;
@@ -15,6 +14,12 @@ class ActiveRecordFindTest extends DatabaseTestCase
     {
         $this->expectException(ValidationsArgumentError::class);
         Author::find();
+    }
+
+    public function testWhereWithEmptyArray()
+    {
+        $authors = Author::where(['author_id' => []])->to_a();
+        $this->assertEquals(0, count($authors));
     }
 
     public function testFindWithEmptyArray()
@@ -164,13 +169,6 @@ class ActiveRecordFindTest extends DatabaseTestCase
     {
         $authors = Author::where('author_id IN(1,2,3)')->to_a();
         $this->assertEquals(1, $authors[0]->author_id);
-    }
-
-    public function testFindAllWithEmptyArrayBindValueThrowsException()
-    {
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('No bound parameter for index 0');
-        Author::where(['author_id IN(?)', []])->to_a();
     }
 
     public function testFindHashUsingAlias()
