@@ -1,10 +1,10 @@
 site_name: activerecord
+site_dir: .docs
 site_description: PHP implementation of Active Record
 repo_name: php-activerecord/activerecord
 repo_url: https://github.com/php-activerecord/activerecord
 theme:
-  name: mkdocs
-docs_dir: docs/
+  name: 'material'
 markdown_extensions:
   - toc:
       permalink: true

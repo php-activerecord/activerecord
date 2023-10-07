@@ -40,6 +40,8 @@
       "Composer\\Config::disableProcessTimeout",
       "ActiveRecord\\Scripts\\TestCommand::runTest"
     ],
-    "docs": "php ./tools/phpDocumentor.phar run -d lib -t .docs"
+    "install-mkdocs": "pip install mkdocs",
+    "docs": "python -m mkdocs build",
+    "docs-serve": "python -m mkdocs serve"
   }
 }
