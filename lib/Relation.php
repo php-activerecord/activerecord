@@ -669,6 +669,11 @@ class Relation implements \Iterator
         return $this;
     }
 
+    protected function rnf(): RecordNotFound
+    {
+        return new RecordNotFound("Couldn't find " . $this->className . ' without an ID');
+    }
+
     /**
      * Find by id - This can either be a specific id (1),
      * a list of ids (1, 5, 6), or an array of ids ([5, 6, 10]).
@@ -698,7 +703,7 @@ class Relation implements \Iterator
     public function find(): Model|array
     {
         if ($this->isNone) {
-            throw new RecordNotFound('tbd');
+            throw $this->rnf();
         }
 
         $args = func_get_args();
@@ -723,7 +728,7 @@ class Relation implements \Iterator
             $options['conditions'][] = $this->pk_conditions($args);
 
             if (is_array($args) && 0 === count($args)) {
-                throw new RecordNotFound("Couldn't find " . $this->className . ' without an ID');
+                throw $this->rnf();
             }
 
             $list = $this->_to_a($options);
@@ -733,7 +738,7 @@ class Relation implements \Iterator
             throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));
         }
 
-        return $single ? ($list[0] ?? throw new RecordNotFound('tbd')) : $list;
+        return $single ? ($list[0] ?? throw $this->rnf()) : $list;
     }
 
     /**
