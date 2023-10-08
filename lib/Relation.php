@@ -753,8 +753,8 @@ class Relation implements \Iterator
         $models = [];
         $table = $this->table();
 
-        $options = $this->options;
         foreach ($pks as $pk) {
+            $options = $this->options;
             $options['conditions'] ??= [];
             $options['conditions'][] = $this->pk_conditions((array) $pk);
             $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
