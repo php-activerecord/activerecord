@@ -670,7 +670,7 @@ class Relation implements \Iterator
     }
 
     protected function rnf(): RecordNotFound {
-        return new RecordNotFound("Couldn't find " . $this->className . ' without an ID')
+        return new RecordNotFound("Couldn't find " . $this->className . ' without an ID');
     }
 
     /**
