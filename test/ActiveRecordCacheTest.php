@@ -2,6 +2,7 @@
 
 use activerecord\Cache;
 use activerecord\Config;
+use ActiveRecord\Table;
 use test\models\Author;
 
 class ActiveRecordCacheTest extends DatabaseTestCase
@@ -42,7 +43,7 @@ class ActiveRecordCacheTest extends DatabaseTestCase
         static::resetTableData();
         Author::first();
 
-        $table_name = Author::table()->table;
+        $table_name = Table::load(Author::class)->table;
         $value = Cache::$adapter->read("get_meta_data-$table_name");
         $this->assertTrue(is_array($value));
     }

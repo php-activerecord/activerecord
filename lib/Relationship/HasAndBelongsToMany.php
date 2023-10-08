@@ -47,7 +47,7 @@ class HasAndBelongsToMany extends AbstractRelationship
          */
         $rel = new Relation($this->class_name, [], []);
         $rel->from($this->attribute_name);
-        $other_table = $model->table()->table;
+        $other_table = Table::load(get_class($model))->table;
         $rel->where($other_table . '. ' . $this->options['foreign_key'] . ' = ?', $model->{$model->get_primary_key()});
         $rel->joins([$other_table]);
 

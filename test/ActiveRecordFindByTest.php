@@ -4,6 +4,7 @@ namespace test;
 
 use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\DatabaseException;
+use ActiveRecord\Table;
 use test\models\Author;
 use test\models\Venue;
 
@@ -11,8 +12,8 @@ class ActiveRecordFindByTest extends \DatabaseTestCase
 {
     public function testEscapeQuotes()
     {
-        $author = Author::find_by_name("Tito's");
-        $this->assertNotEquals("Tito's", Author::table()->last_sql);
+        Author::find_by_name("Tito's");
+        $this->assertNotEquals("Tito's", Table::load(Author::class)->last_sql);
     }
 
     public function testFindByWithInvalidFieldName()

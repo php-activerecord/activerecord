@@ -9,6 +9,7 @@
 - [Model::delete_all()](#modeldelete_all)
 - [Model::update_all()](#modelupdate_all)
 - [Model::find_all_by_...()](#modelfind_all_by_attribute)
+- [Model::table()](#modeltable)
 
 #### static properties 
 
@@ -18,6 +19,8 @@
 - [Model::$validates_inclusion_of](#modelvalidates_inclusion_of)
 
 #### other changes
+- [Table::delete](#tabledelete)
+- [Table::update](#tableupdate)
 - [Config::set_model_directory](#configset_model_directory)
 - [exceptions location](#exceptions-location)
 
@@ -129,6 +132,22 @@ $books = Book::find_all_by_title('Ubik');
 $books = Book::where('title = ?', 'Ubik')->to_a();
 ```
 
+## `Model::table`
+The static `table` accessor on `Model` is now protected. If you were making calls directly on `Table`, you will need to refactor your code.
+```php
+// 1.x
+Book::table()->update($attributes, $where);
+
+// 2.0
+Book::where($where)->update_all($attributes);
+```
+
+If you do need access to the table instance for some reason, you can still get to it:
+```php
+  $table = Table::load(Book::class);
+```
+
+
 # static properties
 
 The static relationship properties have changed shape, moving from a flat array to a key-config format:
@@ -237,6 +256,36 @@ class Book extends ActiveRecord
 ```
 
 # other changes
+
+## `Table::update`
+You generally shouldn't be working directly with a `Table` instance, but if you are you should be aware that the `update` method has changed shape:
+```php
+// 1.x 
+$table = Book::table();
+$table->update([ 'title' => 'Walden` ], ['author_id` => 1]);
+
+// 2.0
+$table = Table::load(Book::class);
+$options = [
+    'conditions' => [new WhereClause(['author_id` => 1])]
+];
+$table->update([ 'title' => 'Walden' ], $options); // where $options is a RelationOptions.
+```
+
+## `Table::delete`
+You generally shouldn't be working directly with a `Table` instance, but if you are you should be aware that the `delete` method has changed shape:
+```php
+// 1.x 
+$table = Book::table();
+$table->delete(['author_id' => 1]);
+
+// 2.0
+$table = Table::load(Book::class);
+$options = [
+    'conditions' => [new WhereClause(['author_id` => 1])]
+];
+$table->delete($options); // where $options is a RelationOptions.
+```
 
 ## `Config::set_model_directory`
 

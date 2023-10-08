@@ -423,7 +423,7 @@ class Table
 
     /**
      * @param string|Attributes $attributes
-     * @param Attributes        $options
+     * @param RelationOptions   $options
      *
      * @throws Exception\ActiveRecordException
      */

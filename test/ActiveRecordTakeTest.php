@@ -3,6 +3,7 @@
 namespace test;
 
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Table;
 use test\models\Author;
 
 class ActiveRecordTakeTest extends \DatabaseTestCase
@@ -32,14 +33,14 @@ class ActiveRecordTakeTest extends \DatabaseTestCase
     public function testNoImplicitOrder()
     {
         Author::where(['author_id IN(?)', [1, 2, 3]])->take();
-        $this->assert_sql_doesnt_has('ORDER BY', Author::table()->last_sql);
+        $this->assert_sql_doesnt_has('ORDER BY', Table::load(Author::class)->last_sql);
     }
 
     public function testSortsBySuppliedOrder()
     {
         Author::order('name')->where(['author_id IN(?)', [1, 2, 3]])->take();
-        $this->assert_sql_includes('ORDER BY name', Author::table()->last_sql);
-        $this->assert_sql_doesnt_has('ORDER BY author_id ASC', Author::table()->last_sql);
+        $this->assert_sql_includes('ORDER BY name', Table::load(Author::class)->last_sql);
+        $this->assert_sql_doesnt_has('ORDER BY author_id ASC', Table::load(Author::class)->last_sql);
     }
 
     public function testNoResults()

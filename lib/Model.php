@@ -908,7 +908,7 @@ class Model
      *
      * @return Table
      */
-    public static function table()
+    protected static function table()
     {
         $table = Table::load(get_called_class());
 

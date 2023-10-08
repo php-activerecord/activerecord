@@ -104,9 +104,9 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testSequenceWasExplicitlySet()
     {
         if (ConnectionManager::get_connection()->supports_sequences()) {
-            $this->assertEquals(AuthorExplicitSequence::$sequence, AuthorExplicitSequence::table()->sequence);
+            $this->assertEquals(AuthorExplicitSequence::$sequence, Table::load(AuthorExplicitSequence::class)->sequence);
         } else {
-            $this->assertNull(Author::table()->sequence);
+            $this->assertNull(Table::load(Author::class)->sequence);
         }
     }
 
@@ -220,8 +220,8 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testDirtyAttributesClearedAfterSaving()
     {
         $book = $this->make_new_book_and();
-        $this->assertTrue(false !== strpos($book->table()->last_sql, 'name'));
-        $this->assertTrue(false !== strpos($book->table()->last_sql, 'special'));
+        $this->assertTrue(false !== strpos(Table::load(Book::class)->last_sql, 'name'));
+        $this->assertTrue(false !== strpos(Table::load(Book::class)->last_sql, 'special'));
         $this->assertEquals([], $book->dirty_attributes());
     }
 
@@ -304,7 +304,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testUpdateWithNoPrimaryKeyDefined()
     {
         $this->expectException(ActiveRecordException::class);
-        Author::table()->pk = [];
+        Table::load(Author::class)->pk = [];
         $author = Author::first();
         $author->name = 'blahhhhhhhhhh';
         $author->save();
@@ -313,7 +313,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     public function testDeleteWithNoPrimaryKeyDefined()
     {
         $this->expectException(ActiveRecordException::class);
-        Author::table()->pk = [];
+        Table::load(Author::class)->pk = [];
         $author = author::first();
         $author->delete();
     }
@@ -444,7 +444,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
             ->update_all('parent_author_id = 2');
 
         $this->assertEquals(1, $num_affected);
-        $this->assertTrue(false !== strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1'));
+        $this->assertTrue(false !== strpos(Table::load(Author::class)->last_sql, 'ORDER BY name asc LIMIT 1'));
     }
 
     public function testUpdateNativeDatetime()
