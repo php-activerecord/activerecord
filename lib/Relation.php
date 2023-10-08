@@ -669,7 +669,8 @@ class Relation implements \Iterator
         return $this;
     }
 
-    protected function rnf(): RecordNotFound {
+    protected function rnf(): RecordNotFound
+    {
         return new RecordNotFound("Couldn't find " . $this->className . ' without an ID');
     }
 
@@ -704,7 +705,6 @@ class Relation implements \Iterator
         if ($this->isNone) {
             throw $this->rnf();
         }
-
 
         $args = func_get_args();
         $num_args = count($args);
