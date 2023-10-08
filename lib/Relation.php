@@ -714,21 +714,52 @@ class Relation implements \Iterator
         }
 
         $single = !is_array($args) || !array_is_list($args);
+        $table = $this->table();
+        if ($table->cache_individual_model) {
+            $list = static::get_models_from_cache((array) $args);
+        } else {
+            $options = $this->options;
+            $options['conditions'] ??= [];
+            $options['conditions'][] = $this->pk_conditions($args);
 
-        $options = $this->options;
-        $options['conditions'] ??= [];
-        $options['conditions'][] = $this->pk_conditions($args);
+            if (is_array($args) && 0 === count($args)) {
+                throw new RecordNotFound("Couldn't find " . $this->className . ' without an ID');
+            }
 
-        if (is_array($args) && 0 === count($args)) {
-            throw new RecordNotFound("Couldn't find " . $this->className . ' without an ID');
+            $list = $this->_to_a($options);
         }
 
-        $list = $this->_to_a($options);
         if (is_array($args) && count($list) != count($args)) {
             throw new RecordNotFound('found ' . count($list) . ', but was looking for ' . count($args));
         }
 
         return $single ? ($list[0] ?? throw new RecordNotFound('tbd')) : $list;
+    }
+
+    /**
+     * Check cache for each primary key before querying the database.
+     *
+     * @param list<int|string> $pks An array of primary keys
+     *
+     * @return array<TModel>
+     */
+    protected function get_models_from_cache(array $pks)
+    {
+        $models = [];
+        $table = $this->table();
+
+        $options = $this->options;
+        foreach ($pks as $pk) {
+            $options['conditions'] ??= [];
+            $options['conditions'][] = $this->pk_conditions((array) $pk);
+            $models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
+                $res = iterator_to_array($table->find($options));
+
+                return $res[0] ?? null;
+            }, $table->cache_model_expire);
+        }
+
+        return array_filter($models);
     }
 
     /**
