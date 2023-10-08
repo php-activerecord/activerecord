@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\ConnectionManager;
+use ActiveRecord\Table;
 use test\models\Author;
 
 class PgsqlAdapterTest extends AdapterTestCase
@@ -19,9 +20,10 @@ class PgsqlAdapterTest extends AdapterTestCase
 
     public function testSequenceWasSet()
     {
+        $table = Table::load(Author::class);
         $this->assertEquals(
-            ConnectionManager::get_connection()->init_sequence_name(Author::table()),
-            Author::table()->sequence
+            ConnectionManager::get_connection()->init_sequence_name($table),
+            $table->sequence
         );
     }
 

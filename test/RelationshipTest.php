@@ -7,6 +7,7 @@ use ActiveRecord\Exception\RecordNotFound;
 use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
 use ActiveRecord\Relationship\HasAndBelongsToMany;
+use ActiveRecord\Table;
 use test\models\Author;
 use test\models\AuthorAttrAccessible;
 use test\models\AwesomePerson;
@@ -126,7 +127,7 @@ class RelationshipTest extends DatabaseTestCase
     public function testJoinsOnlyLoadsGivenModelAttributes()
     {
         $x = Event::joins(['venue'])->first();
-        $this->assert_sql_includes('SELECT events.*', Event::table()->last_sql);
+        $this->assert_sql_includes('SELECT events.*', Table::load(Event::class)->last_sql);
         $this->assertFalse(array_key_exists('city', $x->attributes()));
     }
 
@@ -135,7 +136,7 @@ class RelationshipTest extends DatabaseTestCase
         $x = Event::select('events.*, venues.city as venue_city')
             ->joins(['venue'])
             ->first();
-        $this->assert_sql_includes('SELECT events.*, venues.city as venue_city', Event::table()->last_sql);
+        $this->assert_sql_includes('SELECT events.*, venues.city as venue_city', Table::load(Event::class)->last_sql);
         $this->assertTrue(array_key_exists('venue_city', $x->attributes()));
     }
 
@@ -304,7 +305,7 @@ class RelationshipTest extends DatabaseTestCase
     {
         $this->expectException(\Exception::class);
         $hasAndBelongsToMany = new HasAndBelongsToMany(Book::class);
-        $hasAndBelongsToMany->load_eagerly([], [], [], Book::table());
+        $hasAndBelongsToMany->load_eagerly([], [], [], Table::load(Book::class));
     }
 
     public function testBelongsToCreateAssociation()
@@ -345,7 +346,7 @@ class RelationshipTest extends DatabaseTestCase
                 'joins' => 'venue'
             ]
         ];
-        $this->assert_sql_doesnt_has('INNER JOIN venues ON(events.venue_id = venues.id)', Event::table()->last_sql);
+        $this->assert_sql_doesnt_has('INNER JOIN venues ON(events.venue_id = venues.id)', Table::load(Event::class)->last_sql);
     }
 
     public function testHasManyWithExplicitClassName()
@@ -362,8 +363,9 @@ class RelationshipTest extends DatabaseTestCase
     public function testInvalidRelationship()
     {
         $this->expectException(RelationshipException::class);
-        Venue::table()->get_relationship('non_existent_table', true);
-        $this->assert_sql_includes(ConnectionManager::get_connection()->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
+        Table::load(Venue::class)->get_relationship('non_existent_table', true);
+        $this->assert_sql_includes(ConnectionManager::get_connection()->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2),
+            Table::load(Event::class)->last_sql);
     }
 
     public function testHasManyWithSelect()
@@ -441,7 +443,7 @@ class RelationshipTest extends DatabaseTestCase
 
         Venue::first()->events;
         $this->assert_sql_includes(ConnectionManager::get_connection()
-            ->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Event::table()->last_sql);
+            ->limit('SELECT type FROM events WHERE venue_id=? GROUP BY type', 1, 2), Table::load(Event::class)->last_sql);
     }
 
     public function testHasManyThrough()
@@ -562,7 +564,10 @@ class RelationshipTest extends DatabaseTestCase
     public function testHasManyWithJoins()
     {
         $x = Venue::joins(['events'])->first();
-        $this->assert_sql_includes('INNER JOIN events ON(venues.id = events.venue_id)', Venue::table()->last_sql);
+        $this->assert_sql_includes(
+            'INNER JOIN events ON(venues.id = events.venue_id)',
+            Table::load(Venue::class
+            )->last_sql);
     }
 
     public function testHasManyWithExplicitKeys()
@@ -617,7 +622,7 @@ class RelationshipTest extends DatabaseTestCase
         Employee::$has_one['position']['order'] = 'title';
         $employee = Employee::find(1);
         $this->assert_default_has_one($employee);
-        $this->assert_sql_includes('ORDER BY title', Position::table()->last_sql);
+        $this->assert_sql_includes('ORDER BY title', Table::load(Position::class)->last_sql);
     }
 
     public function testHasOneWithConditionsAndNonQualifyingRecord()
@@ -660,8 +665,8 @@ class RelationshipTest extends DatabaseTestCase
 
     public function testHasOneWithJoins()
     {
-        $x = Employee::joins(['position'])->first();
-        $this->assert_sql_includes('INNER JOIN positions ON(employees.id = positions.employee_id)', Employee::table()->last_sql);
+        Employee::joins(['position'])->first();
+        $this->assert_sql_includes('INNER JOIN positions ON(employees.id = positions.employee_id)', Table::load(Employee::class)->last_sql);
     }
 
     public function testHasOneWithExplicitKeys()

@@ -157,13 +157,15 @@ abstract class AbstractRelationship
                     $class = $this->options['namespace'] . '\\' . $class;
                 }
 
-                $through_table = $class::table();
+                assert(class_exists($class));
+                $through_table =  Table::load($class);
             } else {
                 $class = $options['class_name'];
                 if (isset($this->options['namespace']) && !class_exists($class)) {
                     $class = $this->options['namespace'] . '\\' . $class;
                 }
-                $relation = $class::table()->get_relationship($options['through']);
+                $relation = Table::load($class)->get_relationship($options['through']);
+                assert(!is_null($relation));
                 $through_table = $relation->get_table();
             }
             $options['joins'] = $this->construct_inner_join_sql($through_table, true);

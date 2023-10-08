@@ -4,6 +4,7 @@ use ActiveRecord\Exception\ActiveRecordException;
 use ActiveRecord\Exception\ReadOnlyException;
 use ActiveRecord\Exception\RelationshipException;
 use ActiveRecord\Exception\UndefinedPropertyException;
+use ActiveRecord\Table;
 use test\models\Author;
 use test\models\AwesomePerson;
 use test\models\Book;
@@ -120,8 +121,8 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function testNamespaceGetsStrippedFromTableName()
     {
-        $model = new \test\models\namespacetest\Book();
-        $this->assertEquals('books', $model->table()->table);
+        new \test\models\namespacetest\Book();
+        $this->assertEquals('books', Table::load(\test\models\namespacetest\Book::class)->table);
     }
 
     public function testNamespaceGetsStrippedFromInferredForeignKey()
