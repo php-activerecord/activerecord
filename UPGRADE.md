@@ -142,7 +142,7 @@ Book::table()->update($attributes, $where);
 Book::where($where)->update_all($attributes);
 ```
 
-If you do need access to the table for some reason, you can still get to it:
+If you do need access to the table instance for some reason, you can still get to it:
 ```php
   $table = Table::load(Book::class);
 ```
@@ -262,11 +262,29 @@ You generally shouldn't be working directly with a `Table` instance, but if you 
 ```php
 // 1.x 
 $table = Book::table();
-$table->update()
+$table->update([ 'title' => 'Walden` ], ['author_id` => 1]);
 
 // 2.0
 $table = Table::load(Book::class);
-$table
+$options = [
+    'conditions' => [new WhereClause(['author_id` => 1])]
+];
+$table->update([ 'title' => 'Walden' ], $options); // where $options is a RelationOptions.
+```
+
+## `Table::delete`
+You generally shouldn't be working directly with a `Table` instance, but if you are you should be aware that the `delete` method has changed shape:
+```php
+// 1.x 
+$table = Book::table();
+$table->delete(['author_id' => 1]);
+
+// 2.0
+$table = Table::load(Book::class);
+$options = [
+    'conditions' => [new WhereClause(['author_id` => 1])]
+];
+$table->delete($options); // where $options is a RelationOptions.
 ```
 
 ## `Config::set_model_directory`
