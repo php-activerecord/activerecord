@@ -1,0 +1,13 @@
+{
+	"title": "php-activerecord",
+	"tagline": "php-activerecord documentation",
+	"themes_directory":"docs/themes",
+	"html": {
+		"repo": "php-activerecord/activerecord",
+		"theme":"phpar-blue",
+		"links": {
+			"GitHub": "https://github.com/php-activerecord/activerecord",
+			"API documentation": "api/index.html"
+		}
+	}
+}

@@ -1,6 +1,7 @@
 <?php
 
 use ActiveRecord\Cache;
+use ActiveRecord\Table;
 use test\models\Author;
 use test\models\Publisher;
 
@@ -37,12 +38,12 @@ class CacheModelTest extends DatabaseTestCase
 
     public function testDefaultExpire()
     {
-        $this->assertEquals(30, Author::table()->cache_model_expire);
+        $this->assertEquals(30, Table::load(Author::class)->cache_model_expire);
     }
 
     public function testExplicitExpire()
     {
-        $this->assertEquals(2592000, Publisher::table()->cache_model_expire);
+        $this->assertEquals(2592000, Table::load(Publisher::class)->cache_model_expire);
     }
 
     public function testCacheKey()

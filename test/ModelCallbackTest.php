@@ -1,5 +1,6 @@
 <?php
 
+use ActiveRecord\Table;
 use test\models\Venue;
 
 class ModelCallbackTest extends DatabaseTestCase
@@ -12,7 +13,7 @@ class ModelCallbackTest extends DatabaseTestCase
         parent::setUp($connection_name);
 
         $this->venue = new Venue();
-        $this->callback = Venue::table()->callback;
+        $this->callback = Table::load(Venue::class)->callback;
     }
 
     public function register_and_invoke_callbacks($callbacks, $return, $closure)
