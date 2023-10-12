@@ -3,20 +3,17 @@ site_dir: .docs
 site_description: PHP implementation of Active Record
 repo_name: php-activerecord/activerecord
 repo_url: https://github.com/php-activerecord/activerecord
-theme:
-  features:
-    - content.code.copy
-  name: 'material'
-  palette:
-    primary: 'indigo'
-    accent: 'indigo'
-markdown_extensions:
-  - pymdownx.highlight:
-      use_pygments: true
-      extend_pygments_lang:
-        php: php
-  - toc:
-      permalink: true
 
 nav:
-- Quick Start: quickstart.md
+  - Quick Start: quickstart.md
+
+
+# Theme
+theme:
+  name: 'material'
+
+# Extensions
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.superfences
