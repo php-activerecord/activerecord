@@ -11,6 +11,7 @@ nav:
   - Basic CRUD operations: crud.md
   - Finders: finders.md
   - Validations: validations.md
+  - Callbacks: callbacks.md
 
 # Theme
 theme:
