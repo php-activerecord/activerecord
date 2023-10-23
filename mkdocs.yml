@@ -8,7 +8,9 @@ nav:
   - Quick Start: quickstart.md
   - Upgrading from 1.x: upgrade.md
   - Conventions: conventions.md
-
+  - Basic CRUD operations: crud.md
+  - Finders: finders.md
+  - Validations: validations.md
 
 # Theme
 theme:

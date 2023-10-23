@@ -1,5 +1,16 @@
 # Basic CRUD
 
+### Create ###
+Here we create a new post by instantiating a new object and then invoking the `save()` method.
+
+```php
+$post = new Post();
+$post->title = 'My first blog post!!';
+$post->author_id = 5;
+$post->save();
+// INSERT INTO `posts` (title,author_id) VALUES('My first blog post!!', 5)
+```
+
 ### Retrieve ###
 These are your basic methods to find and retrieve records from your database.
 See the *Finders* section for more details.
@@ -19,17 +30,6 @@ $post = Post::find_by_name_or_id('The Bridge Builder',100);
 
 # finding using a conditions array
 $posts = Post::find('all',['conditions' => ['name=? or id > ?','The Bridge Builder',100]]);
-```
-
-### Create ###
-Here we create a new post by instantiating a new object and then invoking the `save()` method.
-
-```php
-$post = new Post();
-$post->title = 'My first blog post!!';
-$post->author_id = 5;
-$post->save();
-// INSERT INTO `posts` (title,author_id) VALUES('My first blog post!!', 5)
 ```
 
 ### Update ###
