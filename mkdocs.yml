@@ -17,6 +17,8 @@ nav:
 theme:
   name: 'material'
   timeout: 0
+  logo: img/logo_small.png
+  favicon: img/logo_small.png
 
 # Extensions
 markdown_extensions:
