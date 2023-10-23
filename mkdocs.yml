@@ -6,6 +6,8 @@ repo_url: https://github.com/php-activerecord/activerecord
 
 nav:
   - Quick Start: quickstart.md
+  - Upgrading from 1.x: upgrade.md
+  - Conventions: conventions.md
 
 
 # Theme
