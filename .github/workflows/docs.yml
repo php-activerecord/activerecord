@@ -30,4 +30,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: site  # Change this if your build output folder is different
+          publish_dir: .docs  # Change this if your build output folder is different
