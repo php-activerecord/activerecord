@@ -16,6 +16,7 @@ nav:
 # Theme
 theme:
   name: 'material'
+  timeout: 0
 
 # Extensions
 markdown_extensions:
