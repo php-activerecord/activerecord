@@ -10,6 +10,11 @@ nav:
   - Conventions: conventions.md
   - Basic CRUD operations: crud.md
   - Finders: finders.md
+  - Relationships:
+      - Overview: relationships.md
+      - has_one: hasone.md
+      - has_many: hasmany.md
+      - has_and_belongs_to_many: hasandbelongstomany.md
   - Validations: validations.md
   - Callbacks: callbacks.md
 

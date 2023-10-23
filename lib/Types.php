@@ -23,7 +23,6 @@ namespace ActiveRecord;
  *  join_table?: string,
  *  foreign_key?: string,
  *  association_foreign_key?: string,
- *  uniq?: bool,
  *  validate?: bool
  * }
  * @phpstan-type BelongsToOptions array{
