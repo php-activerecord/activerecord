@@ -3,7 +3,7 @@ name: Documentation
 on:
   push:
     branches:
-      - docs  # Change this to your main branch
+      - master  # Change this to your main branch
 
 jobs:
   build:
