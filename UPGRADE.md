@@ -27,7 +27,7 @@
 # Methods
 
 ## `Model::find`
-Much of the old `find` functionality has been moved to `Relation`. Most notably, `conditions` is no longer supported: 
+Much of the old `find` functionality has been moved to `Relation`. Most notably, the `conditions` argument is no longer supported, and has been replaced by `where()`: 
 ```php
 // 1.x
 $books = Book::find([1,2,3], ['conditions'=>['title = ?', 'Walden']]);
@@ -36,38 +36,40 @@ $books = Book::find([1,2,3], ['conditions'=>['title = ?', 'Walden']]);
 $books = Book::where('title = ?', 'Walden')->to_a();
 ```
 
-Also, in 2.x we have fixed a bug around calling `find` with an empty array. It will now throw a `RecordNotFound` exception. If you were relying on the old behavior, you should switch to `where`:
+Also, in 2.x we have fixed a bug around calling `find` with an empty array. It will now throw a `RecordNotFound` exception, as it should. If you were relying on the old behavior, you should switch to `where`:
 ```php
 // 1.x
 $ids = [];
 $books = Book::find($ids);
 
 // 2.0
-$books = Book::where(['book_id' => $ids])->to_a();
+$books::find($ids); // danger! now throws RecordNotFound
+$books = Book::where(['book_id' => $ids])->to_a(); // this is okay
 ```
 
 
-The `all` argument has been removed in favor of `Relation::all`:
+The `all` argument has been removed in favor of `Relation::all` (which does nothing but return a relation object), or `Relation::where():
 ```php
 // 1.x
 $books = Book::find('all', ['conditions'=>['title = ?', 'Walden']]);
 
 // 2.0
-$books = Book::where('title = ?', 'Walden')->to_a();
+$books = Book::all()->where('title = ?', 'Walden')->to_a();
 ```
 
 The same goes for `first` and `last`:
 ```php
 // 1.x
 $book = Book::find('first');
-$book = Book::last('last');
+$book = Book::find('last');
 
 // 2.0
+$book = Book::first();
 $book = Book::last();
 ```
 
 ## `Model::all`
-`Model::all() no longer takes any arguments, and now returns an iterable `Relation` instead of an array of models:
+`Model::all()` no longer takes any arguments, and now returns an iterable `Relation` instead of an array of models:
 ```php
 // 1.x
 $books = Book::all(['conditions'=>['title = ?', 'Walden']]);
@@ -84,7 +86,7 @@ The `all` argument has been removed in favor of `Relation::all`:
 $books = Book::find('all', ['conditions'=>['title = ?', 'Walden']]);
 
 // 2.0
-$books = Book::where('title = ?', 'Walden')->to_a();
+$books = Book::all()->where('title = ?', 'Walden')->to_a();
 ```
 
 ## `Model::count`
