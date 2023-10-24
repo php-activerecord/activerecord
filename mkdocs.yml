@@ -15,7 +15,15 @@ nav:
       - has_one: hasone.md
       - has_many: hasmany.md
       - has_and_belongs_to_many: hasandbelongstomany.md
-  - Validations: validations.md
+  - Validations:
+      - Overview: validations.md
+      - validates_length_of: validateslengthof.md
+      - validates_presence_of: validatespresenceof.md
+      - validates_format_of: validatesformatof.md
+      - validates_inclusion_of: validatesinclusionof.md
+      - validates_exclusion_of: validatesexclusionof.md
+      - validates_uniqueness_of: validatesuniquenessof.md
+      - validates_numericality_of: validatesnumericalityof.md
   - Callbacks: callbacks.md
 
 # Theme

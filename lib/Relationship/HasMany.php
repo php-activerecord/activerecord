@@ -50,7 +50,6 @@ use ActiveRecord\Types;
  * @phpstan-import-type HasManyOptions from Types
  *
  * @see http://www.phpactiverecord.org/guides/associations
- * @see valid_association_options
  */
 class HasMany extends AbstractRelationship
 {

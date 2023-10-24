@@ -90,6 +90,7 @@ use ActiveRecord\Exception\ValidationsArgumentError;
  * }
  */
 class Validations
+class Validations
 {
     /**
      * @var \ReflectionClass<Model>

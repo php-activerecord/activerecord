@@ -191,7 +191,7 @@ class Model
     public static array $validates_presence_of;
 
     /**
-     * @var ValidateFormatOptions
+     * @var array<string, ValidateFormatOptions>
      */
     public static array $validates_format_of;
 
@@ -206,12 +206,12 @@ class Model
     public static array $validates_exclusion_of;
 
     /**
-     * @var ValidateUniquenessOptions
+     * @var array<string, ValidateUniquenessOptions>
      */
     public static array $validates_uniqueness_of;
 
     /**
-     * @var ValidateNumericOptions
+     * @var array<string, ValidateNumericOptions>
      */
     public static array $validates_numericality_of;
 
