@@ -249,7 +249,7 @@ $table = Table::load(Book::class);
 $options = [
     'conditions' => [new WhereClause(['author_id` => 1])]
 ];
-$table->update([ 'title' => 'Walden' ], $options); // where $options is a RelationOptions.
+$table->update([ 'title' => 'Walden' ], $options); // where $options is a RelationOptions
 ```
 
 ### `Table::delete`
