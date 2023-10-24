@@ -8,7 +8,6 @@
     "version": "2.0.0",
     "require": {
         "php": ">=8.1.0",
-        "ext-bcmath": "*"
     },
     "require-dev": {
       "phpstan/phpstan": "^1.10",
