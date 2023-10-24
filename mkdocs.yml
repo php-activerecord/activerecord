@@ -28,6 +28,7 @@ nav:
       - validates_uniqueness_of: validatesuniquenessof.md
       - validates_numericality_of: validatesnumericalityof.md
   - Callbacks: callbacks.md
+  - Static Checking: staticchecking.md
 
 # Theme
 theme:
