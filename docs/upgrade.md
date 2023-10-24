@@ -1,32 +1,10 @@
 # 1.x -> 2.x
-2.x has a number of breaking API changes.
+2.x has a number of breaking API changes to be aware of. First, be aware that the minimum required PHP version is now 8.1. Other than that, there are some key API changes to be aware of.
 
-#### methods
+## Methods
 
-- [Model::find()](#modelfind)
-- [Model::all](#modelall)
-- [Model::count()](#modelcount)
-- [Model::delete_all()](#modeldelete_all)
-- [Model::update_all()](#modelupdate_all)
-- [Model::find_all_by_...()](#modelfind_all_by_attribute)
-- [Model::table()](#modeltable)
+### `Model::find`
 
-#### static properties 
-
-- [Model::$has_one](#modelhas_one)
-- [Model::$has_many](#modelhas_many)
-- [Model::$belongs_to](#modelbelongs_to)
-- [Model::$validates_inclusion_of](#modelvalidates_inclusion_of)
-
-#### other changes
-- [Table::delete](#tabledelete)
-- [Table::update](#tableupdate)
-- [Config::set_model_directory](#configset_model_directory)
-- [exceptions location](#exceptions-location)
-
-# Methods
-
-## `Model::find`
 Much of the old `find` functionality has been moved to `Relation`. Most notably, the `conditions` argument is no longer supported, and has been replaced by `where()`: 
 ```php
 // 1.x
@@ -68,7 +46,7 @@ $book = Book::first();
 $book = Book::last();
 ```
 
-## `Model::all`
+### `Model::all`
 `Model::all()` no longer takes any arguments, and now returns an iterable `Relation` instead of an array of models:
 ```php
 // 1.x
@@ -89,7 +67,7 @@ $books = Book::find('all', ['conditions'=>['title = ?', 'Walden']]);
 $books = Book::all()->where('title = ?', 'Walden')->to_a();
 ```
 
-## `Model::count`
+### `Model::count`
 The changes to `count` mirror the changes to `find`:
 ```php
 // 1.x
@@ -99,7 +77,7 @@ $numBooks = Book::count(['conditions'=>['title = ?', 'Walden']]);
 $books = Book::where('title = ?', 'Walden')->count();
 ```
 
-## `Model::delete_all`
+### `Model::delete_all`
 Likewise for `delete_all`:
 ```php
 // 1.x
@@ -109,7 +87,7 @@ $numDeleted = Book::delete_all(['conditions'=>['title = ?', 'Walden']]);
 $numDeleted = Book::where('title = ?', 'Walden')->delete_all();
 ```
 
-## `Model::update_all`
+### `Model::update_all`
 `update_all` has undergone a similar transformation, and now simply takes a string or hash of attributes as an argument:
 ```php
 // 1.x
@@ -124,7 +102,7 @@ $numUpdated = Book::where(['title = ?', 'Walden'])->update_all([
 ]);
 ```
 
-## `Model::find_all_by_<attribute>`
+### `Model::find_all_by_<attribute>`
 The `find_all_by...` style of magic method has been removed entirely.
 ```php
 // 1.x
@@ -134,7 +112,7 @@ $books = Book::find_all_by_title('Ubik');
 $books = Book::where('title = ?', 'Ubik')->to_a();
 ```
 
-## `Model::table`
+### `Model::table`
 The static `table` accessor on `Model` is now protected. If you were making calls directly on `Table`, you will need to refactor your code.
 ```php
 // 1.x
@@ -150,11 +128,11 @@ If you do need access to the table instance for some reason, you can still get t
 ```
 
 
-# static properties
+## Static Properties
 
 The static relationship properties have changed shape, moving from a flat array to a key-config format:
 
-## `Model::$has_one`
+### `Model::$has_one`
 
 ```php
 // 1.x
@@ -183,7 +161,7 @@ class Author extends ActiveRecord
 }
 ```
 
-## `Model::$has_many`
+### `Model::$has_many`
 
 ```php
 // 1.x
@@ -209,7 +187,7 @@ class Person extends ActiveRecord
 }
 ```
 
-## `Model::$belongs_to`
+### `Model::$belongs_to`
 
 ```php
 // 1.x
@@ -234,7 +212,7 @@ class Person extends ActiveRecord
 }
 ```
 
-## `Model::$validates_inclusion_of`
+### `Model::$validates_inclusion_of`
 
 (note: the same changes apply for `Model::$validates_exclusion_of`)
 
@@ -257,9 +235,9 @@ class Book extends ActiveRecord
 }
 ```
 
-# other changes
+## Other Changes
 
-## `Table::update`
+### `Table::update`
 You generally shouldn't be working directly with a `Table` instance, but if you are you should be aware that the `update` method has changed shape:
 ```php
 // 1.x 
@@ -274,7 +252,7 @@ $options = [
 $table->update([ 'title' => 'Walden' ], $options); // where $options is a RelationOptions.
 ```
 
-## `Table::delete`
+### `Table::delete`
 You generally shouldn't be working directly with a `Table` instance, but if you are you should be aware that the `delete` method has changed shape:
 ```php
 // 1.x 
@@ -289,7 +267,7 @@ $options = [
 $table->delete($options); // where $options is a RelationOptions.
 ```
 
-## `Config::set_model_directory`
+### `Config::set_model_directory`
 
 `Config::set_model_directory` has been removed, meaning that the active record library no longer maintains its own autoloader or knowledge of where your models are kept. In 2.0 it is recommended to use your own autoloader to manage your models as you would any other classes in your project.
 
@@ -321,9 +299,7 @@ class Author extends Model
 
 ```
 
-# other changes
-
-## exceptions location
+### exceptions location
 
 All crafted exceptions have moved to a new home in the `Exceptions` namespace.
 
