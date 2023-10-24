@@ -10,7 +10,7 @@ includes:
   - vendor/php-patterns/activerecord/extension.neon
 ```
 
-There are several methods (namely `Model::find` and `Relation::find`) on `ActiveRecord\Model` that have dynamic return types, and by tying into  Active Record's bespoke extension.neon file you can eliminate much of the uncertainty around using them and avoid bugs before they happen. For example:
+There are several methods (namely `Model::find`, `Model::first`, `Model::last` and their counterparts on `Relation`) in this library that have dynamic return types, and by tying into  Active Record's bespoke extension.neon file you can eliminate much of the uncertainty around using them and avoid bugs before they happen. For example:
 
 ```php
 class Sample {
