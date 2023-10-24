@@ -10,6 +10,7 @@ nav:
   - Conventions: conventions.md
   - Basic CRUD operations: crud.md
   - Finders: finders.md
+  - Finders (dynamic): findersdynamic.md
   - Relationships:
       - Overview: relationships.md
       - has_one: hasone.md
