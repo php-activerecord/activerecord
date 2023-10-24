@@ -3,6 +3,8 @@ site_dir: .docs
 site_description: PHP implementation of Active Record
 repo_name: php-activerecord/activerecord
 repo_url: https://github.com/php-activerecord/activerecord
+extra_css:
+  - custom.css
 
 nav:
   - Quick Start: quickstart.md
