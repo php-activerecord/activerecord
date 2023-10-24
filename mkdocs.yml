@@ -31,8 +31,8 @@ nav:
 theme:
   name: 'material'
   timeout: 0
-  logo: 'https://github.com/php-activerecord/activerecord/blob/master/docs/img/logo_small.png'
-  favicon: 'https://github.com/php-activerecord/activerecord/blob/master/docs/img/logo_small.png'
+  logo: 'https://github.com/php-activerecord/activerecord/assets/773172/a105c4aa-054d-4468-a892-c51e7601766a'
+  favicon: 'https://github.com/php-activerecord/activerecord/assets/773172/a105c4aa-054d-4468-a892-c51e7601766a'
 
 # Extensions
 markdown_extensions:
