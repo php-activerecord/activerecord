@@ -1,0 +1,1238 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="PHP implementation of Active Record">
+      
+      
+      
+      
+        <link rel="prev" href="../quickstart/">
+      
+      
+        <link rel="next" href="../conventions/">
+      
+      <link rel="icon" href="https://github.com/php-activerecord/activerecord/assets/773172/a105c4aa-054d-4468-a892-c51e7601766a">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
+    
+    
+      
+        <title>Upgrading from 1.x - activerecord</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../custom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1x-2x" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="activerecord" class="md-header__button md-logo" aria-label="activerecord" data-md-component="logo">
+      
+  <img src="https://github.com/php-activerecord/activerecord/assets/773172/a105c4aa-054d-4468-a892-c51e7601766a" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            activerecord
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Upgrading from 1.x
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/php-activerecord/activerecord" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    php-activerecord/activerecord
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="activerecord" class="md-nav__button md-logo" aria-label="activerecord" data-md-component="logo">
+      
+  <img src="https://github.com/php-activerecord/activerecord/assets/773172/a105c4aa-054d-4468-a892-c51e7601766a" alt="logo">
+
+    </a>
+    activerecord
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/php-activerecord/activerecord" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    php-activerecord/activerecord
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Upgrading from 1.x
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Upgrading from 1.x
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modelfind" class="md-nav__link">
+    Model::find
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelall" class="md-nav__link">
+    Model::all
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelcount" class="md-nav__link">
+    Model::count
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modeldelete_all" class="md-nav__link">
+    Model::delete_all
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelupdate_all" class="md-nav__link">
+    Model::update_all
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelfind_all_by_attribute" class="md-nav__link">
+    Model::find_all_by_&lt;attribute&gt;
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modeltable" class="md-nav__link">
+    Model::table
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#static-properties" class="md-nav__link">
+    Static Properties
+  </a>
+  
+    <nav class="md-nav" aria-label="Static Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modelhas_one" class="md-nav__link">
+    Model::$has_one
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelhas_many" class="md-nav__link">
+    Model::$has_many
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelbelongs_to" class="md-nav__link">
+    Model::$belongs_to
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelvalidates_inclusion_of" class="md-nav__link">
+    Model::$validates_inclusion_of
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-changes" class="md-nav__link">
+    Other Changes
+  </a>
+  
+    <nav class="md-nav" aria-label="Other Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tableupdate" class="md-nav__link">
+    Table::update
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tabledelete" class="md-nav__link">
+    Table::delete
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configset_model_directory" class="md-nav__link">
+    Config::set_model_directory
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exceptions-location" class="md-nav__link">
+    exceptions location
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conventions/" class="md-nav__link">
+        Conventions
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../crud/" class="md-nav__link">
+        Basic CRUD operations
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../finders/" class="md-nav__link">
+        Finders
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../findersdynamic/" class="md-nav__link">
+        Finders (dynamic)
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7" tabindex="0" aria-expanded="false">
+          Relationships
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Relationships" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Relationships
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../relationships/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hasone/" class="md-nav__link">
+        has_one
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hasmany/" class="md-nav__link">
+        has_many
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hasandbelongstomany/" class="md-nav__link">
+        has_and_belongs_to_many
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8" tabindex="0" aria-expanded="false">
+          Validations
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Validations" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Validations
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validations/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validateslengthof/" class="md-nav__link">
+        validates_length_of
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validatespresenceof/" class="md-nav__link">
+        validates_presence_of
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validatesformatof/" class="md-nav__link">
+        validates_format_of
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validatesinclusionof/" class="md-nav__link">
+        validates_inclusion_of
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validatesexclusionof/" class="md-nav__link">
+        validates_exclusion_of
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validatesuniquenessof/" class="md-nav__link">
+        validates_uniqueness_of
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validatesnumericalityof/" class="md-nav__link">
+        validates_numericality_of
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../callbacks/" class="md-nav__link">
+        Callbacks
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../staticchecking/" class="md-nav__link">
+        Static Checking
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modelfind" class="md-nav__link">
+    Model::find
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelall" class="md-nav__link">
+    Model::all
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelcount" class="md-nav__link">
+    Model::count
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modeldelete_all" class="md-nav__link">
+    Model::delete_all
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelupdate_all" class="md-nav__link">
+    Model::update_all
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelfind_all_by_attribute" class="md-nav__link">
+    Model::find_all_by_&lt;attribute&gt;
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modeltable" class="md-nav__link">
+    Model::table
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#static-properties" class="md-nav__link">
+    Static Properties
+  </a>
+  
+    <nav class="md-nav" aria-label="Static Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modelhas_one" class="md-nav__link">
+    Model::$has_one
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelhas_many" class="md-nav__link">
+    Model::$has_many
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelbelongs_to" class="md-nav__link">
+    Model::$belongs_to
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelvalidates_inclusion_of" class="md-nav__link">
+    Model::$validates_inclusion_of
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-changes" class="md-nav__link">
+    Other Changes
+  </a>
+  
+    <nav class="md-nav" aria-label="Other Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tableupdate" class="md-nav__link">
+    Table::update
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tabledelete" class="md-nav__link">
+    Table::delete
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configset_model_directory" class="md-nav__link">
+    Config::set_model_directory
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exceptions-location" class="md-nav__link">
+    exceptions location
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+
+<h1 id="1x-2x">1.x -&gt; 2.x<a class="headerlink" href="#1x-2x" title="Permanent link">&para;</a></h1>
+<p>2.x has a number of breaking API changes to be aware of. First, be aware that the minimum required PHP version is now 8.1. Other than that, there are some key API changes to be aware of.</p>
+<h2 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h2>
+<h3 id="modelfind"><code>Model::find</code><a class="headerlink" href="#modelfind" title="Permanent link">&para;</a></h3>
+<p>Much of the old <code>find</code> functionality has been moved to <code>Relation</code>. Most notably, the <code>conditions</code> argument is no longer supported, and has been replaced by <code>where()</code>: 
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">find</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">]]);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">to_a</span><span class="p">();</span>
+</code></pre></div></p>
+<p>Also, in 2.x we have fixed a bug around calling <code>find</code> with an empty array. It will now throw a <code>RecordNotFound</code> exception, as it should. If you were relying on the old behavior, you should switch to <code>where</code>:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$ids</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="nv">$ids</span><span class="p">);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$books</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="nv">$ids</span><span class="p">);</span> <span class="c1">// danger! now throws RecordNotFound</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">where</span><span class="p">([</span><span class="s1">&#39;book_id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$ids</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">to_a</span><span class="p">();</span> <span class="c1">// this is okay</span>
+</code></pre></div></p>
+<p>The <code>all</code> argument has been removed in favor of <code>Relation::all</code> (which does nothing but return a relation object), or `Relation::where():
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">]]);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">to_a</span><span class="p">();</span>
+</code></pre></div></p>
+<p>The same goes for <code>first</code> and <code>last</code>:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$book</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;first&#39;</span><span class="p">);</span>
+<span class="nv">$book</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;last&#39;</span><span class="p">);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$book</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">first</span><span class="p">();</span>
+<span class="nv">$book</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">last</span><span class="p">();</span>
+</code></pre></div></p>
+<h3 id="modelall"><code>Model::all</code><a class="headerlink" href="#modelall" title="Permanent link">&para;</a></h3>
+<p><code>Model::all()</code> no longer takes any arguments, and now returns an iterable <code>Relation</code> instead of an array of models:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">all</span><span class="p">([</span><span class="s1">&#39;conditions&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">]]);</span>
+<span class="k">foreach</span><span class="p">(</span><span class="nv">$books</span> <span class="k">as</span> <span class="nv">$book</span><span class="p">)</span> <span class="p">{}</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">();</span>
+<span class="k">foreach</span><span class="p">(</span><span class="nv">$books</span> <span class="k">as</span> <span class="nv">$book</span><span class="p">)</span> <span class="p">{}</span>
+</code></pre></div></p>
+<p>The <code>all</code> argument has been removed in favor of <code>Relation::all</code>:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">]]);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">all</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">to_a</span><span class="p">();</span>
+</code></pre></div></p>
+<h3 id="modelcount"><code>Model::count</code><a class="headerlink" href="#modelcount" title="Permanent link">&para;</a></h3>
+<p>The changes to <code>count</code> mirror the changes to <code>find</code>:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$numBooks</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">count</span><span class="p">([</span><span class="s1">&#39;conditions&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">]]);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">count</span><span class="p">();</span>
+</code></pre></div></p>
+<h3 id="modeldelete_all"><code>Model::delete_all</code><a class="headerlink" href="#modeldelete_all" title="Permanent link">&para;</a></h3>
+<p>Likewise for <code>delete_all</code>:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$numDeleted</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">delete_all</span><span class="p">([</span><span class="s1">&#39;conditions&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">]]);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$numDeleted</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">delete_all</span><span class="p">();</span>
+</code></pre></div></p>
+<h3 id="modelupdate_all"><code>Model::update_all</code><a class="headerlink" href="#modelupdate_all" title="Permanent link">&para;</a></h3>
+<p><code>update_all</code> has undergone a similar transformation, and now simply takes a string or hash of attributes as an argument:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$numUpdated</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">update_all</span><span class="p">([</span>
+  <span class="s1">&#39;conditions&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">],</span>
+  <span class="s1">&#39;set&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;author_id&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]</span>
+<span class="p">]);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$numUpdated</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">where</span><span class="p">([</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Walden&#39;</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">update_all</span><span class="p">([</span>
+  <span class="s1">&#39;author_id&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="p">]);</span>
+</code></pre></div></p>
+<h3 id="modelfind_all_by_attribute"><code>Model::find_all_by_&lt;attribute&gt;</code><a class="headerlink" href="#modelfind_all_by_attribute" title="Permanent link">&para;</a></h3>
+<p>The <code>find_all_by...</code> style of magic method has been removed entirely.
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">find_all_by_title</span><span class="p">(</span><span class="s1">&#39;Ubik&#39;</span><span class="p">);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$books</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;title = ?&#39;</span><span class="p">,</span> <span class="s1">&#39;Ubik&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">to_a</span><span class="p">();</span>
+</code></pre></div></p>
+<h3 id="modeltable"><code>Model::table</code><a class="headerlink" href="#modeltable" title="Permanent link">&para;</a></h3>
+<p>The static <code>table</code> accessor on <code>Model</code> is now protected. If you were making calls directly on <code>Table</code>, you will need to refactor your code.
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="nx">Book</span><span class="o">::</span><span class="na">table</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">(</span><span class="nv">$attributes</span><span class="p">,</span> <span class="nv">$where</span><span class="p">);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nx">Book</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="nv">$where</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">update_all</span><span class="p">(</span><span class="nv">$attributes</span><span class="p">);</span>
+</code></pre></div></p>
+<p>If you do need access to the table instance for some reason, you can still get to it:
+<div class="highlight"><pre><span></span><code>  <span class="nv">$table</span> <span class="o">=</span> <span class="nx">Table</span><span class="o">::</span><span class="na">load</span><span class="p">(</span><span class="nx">Book</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+</code></pre></div></p>
+<h2 id="static-properties">Static Properties<a class="headerlink" href="#static-properties" title="Permanent link">&para;</a></h2>
+<p>The static relationship properties have changed shape, moving from a flat array to a key-config format:</p>
+<h3 id="modelhas_one"><code>Model::$has_one</code><a class="headerlink" href="#modelhas_one" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="k">class</span> <span class="nc">Author</span> <span class="k">extends</span> <span class="nx">ActiveRecord</span> 
+<span class="p">{</span>
+  <span class="k">static</span> <span class="nv">$has_one</span> <span class="o">=</span>  <span class="p">[</span>
+    <span class="p">[</span><span class="s1">&#39;awesome_person&#39;</span><span class="p">,</span> <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;author_id&#39;</span><span class="p">,</span> <span class="s1">&#39;primary_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;author_id&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;parent_author&#39;</span><span class="p">,</span> <span class="s1">&#39;class_name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Author&#39;</span><span class="p">,</span> <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;parent_author_id&#39;</span><span class="p">]];</span>
+<span class="p">}</span>
+
+<span class="c1">// 2.0</span>
+<span class="k">class</span> <span class="nc">Author</span> <span class="k">extends</span> <span class="nx">ActiveRecord</span> 
+<span class="p">{</span>
+  <span class="k">static</span> <span class="nv">$has_one</span> <span class="o">=</span>  <span class="p">[</span>
+    <span class="s1">&#39;awesome_person&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+      <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;author_id&#39;</span><span class="p">,</span> 
+      <span class="s1">&#39;primary_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;author_id&#39;</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+      <span class="s1">&#39;parent_author&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+        <span class="s1">&#39;class_name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Author&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;parent_author_id&#39;</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+  <span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="modelhas_many"><code>Model::$has_many</code><a class="headerlink" href="#modelhas_many" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ActiveRecord</span> 
+<span class="p">{</span>
+  <span class="k">static</span> <span class="nv">$has_many</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s1">&#39;children&#39;</span><span class="p">,</span> <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;parent_id&#39;</span><span class="p">,</span> <span class="s1">&#39;class_name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Person&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;orders&#39;</span><span class="p">]</span>
+  <span class="p">];</span>
+<span class="p">}</span>
+
+<span class="c1">// 2.0</span>
+<span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ActiveRecord</span> 
+<span class="p">{</span>
+  <span class="k">static</span> <span class="nv">$has_many</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="p">[</span>
+      <span class="s1">&#39;children&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+        <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;parent_id&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;class_name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Person&#39;</span>
+      <span class="p">],</span>
+      <span class="s1">&#39;orders&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+   <span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="modelbelongs_to"><code>Model::$belongs_to</code><a class="headerlink" href="#modelbelongs_to" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ActiveRecord</span> 
+<span class="p">{</span>
+  <span class="k">static</span> <span class="nv">$belongs_to</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">,</span> <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;parent_id&#39;</span><span class="p">,</span> <span class="s1">&#39;class_name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Person&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;orders&#39;</span><span class="p">]</span>
+  <span class="p">];</span>
+<span class="p">}</span>
+
+<span class="c1">// 2.0</span>
+<span class="k">class</span> <span class="nc">Person</span> <span class="k">extends</span> <span class="nx">ActiveRecord</span> 
+<span class="p">{</span>
+  <span class="k">static</span> <span class="nv">$belongs_to</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="p">[</span>
+      <span class="s1">&#39;parent&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+        <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;parent_id&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;class_name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Person&#39;</span>
+      <span class="p">],</span>
+   <span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="modelvalidates_inclusion_of"><code>Model::$validates_inclusion_of</code><a class="headerlink" href="#modelvalidates_inclusion_of" title="Permanent link">&para;</a></h3>
+<p>(note: the same changes apply for <code>Model::$validates_exclusion_of</code>)</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="k">class</span> <span class="nc">Book</span> <span class="k">extends</span> <span class="nx">ActiveRecord</span> 
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="nv">$validates_exclusion_of</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;blah&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;bravo&#39;</span><span class="p">]]</span>
+    <span class="p">];</span>
+<span class="p">}</span>
+
+<span class="c1">// 2.0</span>
+<span class="k">class</span> <span class="nc">Book</span> <span class="k">extends</span> <span class="nx">ActiveRecord</span> 
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="nv">$validates_exclusion_of</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+      <span class="s1">&#39;in&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;blah&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;bravo&#39;</span><span class="p">]]</span>
+    <span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="other-changes">Other Changes<a class="headerlink" href="#other-changes" title="Permanent link">&para;</a></h2>
+<h3 id="tableupdate"><code>Table::update</code><a class="headerlink" href="#tableupdate" title="Permanent link">&para;</a></h3>
+<p>You generally shouldn't be working directly with a <code>Table</code> instance, but if you are you should be aware that the <code>update</code> method has changed shape:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x </span>
+<span class="nv">$table</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">table</span><span class="p">();</span>
+<span class="nv">$table</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span> <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Walden` ], [&#39;</span><span class="nx">author_id</span><span class="sb">` =&gt; 1]);</span>
+
+<span class="sb">// 2.0</span>
+<span class="sb">$table = Table::load(Book::class);</span>
+<span class="sb">$options = [</span>
+<span class="sb">    &#39;conditions&#39; =&gt; [new WhereClause([&#39;author_id`</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">])]</span>
+<span class="p">];</span>
+<span class="nv">$table</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span> <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Walden&#39;</span> <span class="p">],</span> <span class="nv">$options</span><span class="p">);</span> <span class="c1">// where $options is a RelationOptions</span>
+</code></pre></div></p>
+<h3 id="tabledelete"><code>Table::delete</code><a class="headerlink" href="#tabledelete" title="Permanent link">&para;</a></h3>
+<p>You generally shouldn't be working directly with a <code>Table</code> instance, but if you are you should be aware that the <code>delete</code> method has changed shape:
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x </span>
+<span class="nv">$table</span> <span class="o">=</span> <span class="nx">Book</span><span class="o">::</span><span class="na">table</span><span class="p">();</span>
+<span class="nv">$table</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">([</span><span class="s1">&#39;author_id&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]);</span>
+
+<span class="c1">// 2.0</span>
+<span class="nv">$table</span> <span class="o">=</span> <span class="nx">Table</span><span class="o">::</span><span class="na">load</span><span class="p">(</span><span class="nx">Book</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$options</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;conditions&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="k">new</span> <span class="nx">WhereClause</span><span class="p">([</span><span class="err">&#39;</span><span class="nx">author_id</span><span class="err">`</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">])]</span>
+<span class="p">];</span>
+<span class="nv">$table</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="nv">$options</span><span class="p">);</span> <span class="c1">// where $options is a RelationOptions.</span>
+</code></pre></div></p>
+<h3 id="configset_model_directory"><code>Config::set_model_directory</code><a class="headerlink" href="#configset_model_directory" title="Permanent link">&para;</a></h3>
+<p><code>Config::set_model_directory</code> has been removed, meaning that the active record library no longer maintains its own autoloader or knowledge of where your models are kept. In 2.0 it is recommended to use your own autoloader to manage your models as you would any other classes in your project.</p>
+<p>When setting up relationships, active record will assume that any associations are in the same namespace as the class they are bound to. Alternatively, you can specify a class_name in the config options.</p>
+<p>Any of the following should work fine:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 2.0</span>
+<span class="k">namespace</span> <span class="nx">test\models</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">ActiveRecord\Model</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Author</span> <span class="k">extends</span> <span class="nx">Model</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">array</span> <span class="nv">$has_many</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;books&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span> <span class="c1">// will attempt to load from test\models</span>
+    <span class="p">];</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">array</span> <span class="nv">$has_one</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;parent_author&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+            <span class="s1">&#39;class_name&#39;</span> <span class="o">=&gt;</span> <span class="nx">Author</span><span class="o">::</span><span class="na">class</span><span class="p">,</span> 
+            <span class="s1">&#39;foreign_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;parent_author_id&#39;</span>
+        <span class="p">]</span>
+    <span class="p">];</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="exceptions-location">exceptions location<a class="headerlink" href="#exceptions-location" title="Permanent link">&para;</a></h3>
+<p>All crafted exceptions have moved to a new home in the <code>Exceptions</code> namespace.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 1.x</span>
+<span class="k">use</span> <span class="nx">ActiveRecord\RecordNotFound</span>
+
+<span class="k">try</span> <span class="p">{</span>
+<span class="o">...</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="nx">RecordNotFound</span><span class="p">)</span>
+
+<span class="c1">// 2.0</span>
+<span class="k">use</span> <span class="nx">ActiveRecord\Exception\RecordNotFound</span>
+
+<span class="k">try</span> <span class="p">{</span>
+<span class="o">...</span>
+<span class="p">}</span>
+<span class="k">catch</span><span class="p">(</span><span class="nx">RecordNotFound</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
+      
+    
+  </body>
+</html>
