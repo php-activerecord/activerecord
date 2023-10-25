@@ -9,7 +9,7 @@ Callbacks in PHP ActiveRecord are methods that allow you to execute custom code 
 
 **Business Logic**: Callbacks let you encapsulate complex business logic within your models, improving maintainability.
 
-## Callbacks Overview
+## Callbacks Overview 
 1. `after_construct`
    The `after_construct` callback is triggered immediately after a new model instance is created, but before it's populated with data. It's useful for performing tasks like setting default attribute values or initializing resources.
 
