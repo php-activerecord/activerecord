@@ -316,9 +316,8 @@ class Table
 
             if ($collect_attrs_for_includes) {
                 $attrs[] = $model->attributes();
+                $list[] = $model;
             }
-
-            $list[] = $model;
 
             yield $model;
         }
