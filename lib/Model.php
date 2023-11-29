@@ -1112,7 +1112,7 @@ class Model
 
         $options = [
             'conditions' => [
-                new WhereClause([$this->table()->pk[0] => $pk], [])
+                new WhereClause($pk, [])
             ]
         ];
 
