@@ -12,3 +12,8 @@ phpstan.neon.dist export-ignore
 phpstan-baseline.neon export-ignore
 phpunit.xml.dist export-ignore
 mkdocs.yml export-ignore
+
+*.ai binary
+*.psd binary
+*.jpg binary
+*.png binary
