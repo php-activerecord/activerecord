@@ -58,7 +58,9 @@ class HasAndBelongsToMany extends AbstractRelationship
             ' ON ' . $associated_table . '.' . $associated_pk . ' = ' . $join_table . '.' . $this->options['association_foreign_key']
         ]);
 
-        return $rel->to_a();
+        $results = $rel->to_a();
+        /** @var list<TModel> $results */
+        return $results;
     }
 
     public static function inferJoiningTableName(string $class_name, string $association_name): string
