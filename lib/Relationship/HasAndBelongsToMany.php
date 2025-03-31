@@ -42,14 +42,21 @@ class HasAndBelongsToMany extends AbstractRelationship
      */
     public function load(Model $model): mixed
     {
-        /**
-         * @var Relation<TModel>
-         */
         $rel = new Relation($this->class_name, [], []);
-        $rel->from($this->attribute_name);
-        $other_table = Table::load(get_class($model))->table;
-        $rel->where($other_table . '. ' . $this->options['foreign_key'] . ' = ?', $model->{$model->get_primary_key()});
-        $rel->joins([$other_table]);
+        // Use the join table rather than the attribute name.
+        $join_table = $this->options['join_table'];
+        $rel->from($join_table);
+
+        // Filter on the join table's column that references the parent model.
+        $rel->where($join_table . '.' . $this->options['foreign_key'] . ' = ?', $model->{$model->get_primary_key()});
+
+        // Now join the associated table using its actual primary key.
+        $associated_table = Table::load($this->class_name)->table;
+        $associated_pk  = Table::load($this->class_name)->pk[0];
+        $rel->joins([
+            'INNER JOIN ' . $associated_table .
+            ' ON ' . $associated_table . '.' . $associated_pk . ' = ' . $join_table . '.' . $this->options['association_foreign_key']
+        ]);
 
         return $rel->to_a();
     }
