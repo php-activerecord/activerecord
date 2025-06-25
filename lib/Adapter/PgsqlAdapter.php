@@ -132,7 +132,7 @@ SQL;
             preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/', $column['type'], $matches);
 
             $c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
-            $c->length = count($matches) >= 4 ? intval($matches[3]) : intval($column['attlen']);
+            $c->length = isset($matches[3]) ? intval($matches[3]) : intval($column['attlen']);
 
             if ($c->length < 0) {
                 $c->length = null;

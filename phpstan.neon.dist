@@ -6,8 +6,8 @@ parameters:
         - %currentWorkingDirectory%/test/phpstan
 
     reportUnmatchedIgnoredErrors: false
-    checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
+      - identifier: missingType.generics
 
 includes:
   - extension.neon

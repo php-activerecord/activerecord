@@ -70,7 +70,7 @@ class MysqlAdapter extends Connection
 
             $c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
 
-            if (count($matches) >= 4) {
+            if (isset($matches[3])) {
                 $c->length = intval($matches[3]);
             }
         }
