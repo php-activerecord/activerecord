@@ -23,7 +23,7 @@ jobs:
         with:
           coverage: pcov
           ini-values: zend.assertions=1, assert.exception=1
-          php-version: 8.4
+          php-version: 8.3
           extensions: memcached
           tools: cs2pr
 
