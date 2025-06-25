@@ -10,7 +10,7 @@ on:
 jobs:
   phpunit:
     name: PHPUnit
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     services:
       memcached:
         image: memcached:1.6
@@ -47,6 +47,8 @@ jobs:
         php-version:
           - 8.1
           - 8.2
+          - 8.3
+          - 8.4
         database:
           - mysql
           - pgsql

@@ -10,7 +10,7 @@ on:
 jobs:
   phpstan:
     name: PHPStan
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
 
@@ -23,7 +23,7 @@ jobs:
         with:
           coverage: pcov
           ini-values: zend.assertions=1, assert.exception=1
-          php-version: 8.1
+          php-version: 8.4
           extensions: memcached
           tools: cs2pr
 
