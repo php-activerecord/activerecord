@@ -850,7 +850,7 @@ class Relation implements \Iterator
     /**
      * @return array<TModel>
      */
-    private function firstOrLast(?int $limit = null, bool $isAscending): array
+    private function firstOrLast(?int $limit = null, bool $isAscending = true): array
     {
         $options = array_merge($this->options, ['limit' => $limit ?? 1]);
 
