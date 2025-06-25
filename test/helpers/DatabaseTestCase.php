@@ -17,7 +17,7 @@ abstract class DatabaseTestCase extends TestCase
     public static $log = false;
     public static $db;
 
-    public function setUp(string $connection_name=null): void
+    public function setUp(?string $connection_name=null): void
     {
         ActiveRecord\Table::clear_cache();
         Cache::flush();
@@ -38,7 +38,7 @@ abstract class DatabaseTestCase extends TestCase
         }
 
         try {
-            ActiveRecord\ConnectionManager::get_connection($connection_name);
+            ConnectionManager::get_connection($connection_name);
         } catch (Exception $e) {
             $this->markTestSkipped($connection_name . ' failed to connect. ' . $e->getMessage());
         }

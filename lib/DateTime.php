@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -67,8 +68,8 @@ final class DateTime extends \DateTime implements DateTimeInterface
         'rss'     => \DateTime::RSS,
         'w3c'     => \DateTime::W3C];
 
-    private Model|null $model = null;
-    private string|null $attribute_name = null;
+    private ?Model $model = null;
+    private ?string $attribute_name = null;
 
     public function attribute_of(Model $model, string $attribute_name): void
     {
@@ -109,7 +110,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
      *
      * @return string a format string
      */
-    public static function get_format(string $format = null): string
+    public static function get_format(?string $format = null): string
     {
         // use default format if no format specified
         if (!$format) {
@@ -129,7 +130,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
      * This needs to be overridden so it returns an instance of this class instead of PHP's \DateTime.
      * See http://php.net/manual/en/datetime.createfromformat.php
      */
-    public static function createFromFormat(string $format, string $time, \DateTimeZone $timezone = null): static
+    public static function createFromFormat(string $format, string $time, ?\DateTimeZone $timezone = null): static
     {
         $phpDate = parent::createFromFormat($format, $time, $timezone);
         assert($phpDate);

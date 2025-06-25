@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -202,7 +203,7 @@ class Config extends Singleton
     /**
      * Returns the logger
      */
-    public function get_logger(): LoggerInterface|null
+    public function get_logger(): ?LoggerInterface
     {
         return $this->logger ?? null;
     }

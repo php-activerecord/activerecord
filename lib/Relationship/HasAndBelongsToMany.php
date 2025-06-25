@@ -62,7 +62,7 @@ class HasAndBelongsToMany extends AbstractRelationship
         return implode('_', $parts);
     }
 
-    public function construct_inner_join_sql(Table $from_table, bool $using_through = false, string $alias = null): string
+    public function construct_inner_join_sql(Table $from_table, bool $using_through = false, ?string $alias = null): string
     {
         $other_table = Table::load($this->class_name);
         $associated_table_name = $other_table->table;

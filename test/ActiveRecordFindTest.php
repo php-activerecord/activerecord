@@ -189,13 +189,13 @@ class ActiveRecordFindTest extends DatabaseTestCase
 
     public function testFindAllHash()
     {
-        $books = \test\models\Book::all()->where(['author_id' => 1])->to_a();
+        $books = test\models\Book::all()->where(['author_id' => 1])->to_a();
         $this->assertTrue(count($books) > 0);
     }
 
     public function testFindAllHashWithOrder()
     {
-        $books = \test\models\Book::order('name DESC')->where(['author_id' => 1])->to_a();
+        $books = test\models\Book::order('name DESC')->where(['author_id' => 1])->to_a();
         $this->assertTrue(count($books) > 0);
     }
 
@@ -259,7 +259,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $res = Author::all()->to_a();
 
         foreach ($res as $author) {
-            $this->assertTrue($author instanceof ActiveRecord\Model);
+            $this->assertTrue($author instanceof Model);
             ++$i;
         }
         $this->assertTrue($i > 0);
@@ -270,7 +270,7 @@ class ActiveRecordFindTest extends DatabaseTestCase
         $i = 0;
 
         foreach (Author::all()->to_a() as $author) {
-            $this->assertTrue($author instanceof ActiveRecord\Model);
+            $this->assertTrue($author instanceof Model);
             ++$i;
         }
         $this->assertTrue($i > 0);

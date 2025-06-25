@@ -100,7 +100,7 @@ class SerializationTest extends DatabaseTestCase
     {
         $now = new DateTime();
         $a = $this->_a(['only' => 'created_at'], new Author(['created_at' => $now]));
-        $this->assertEquals($now->format(\ActiveRecord\Serialize\Serialization::$DATETIME_FORMAT), $a['created_at']);
+        $this->assertEquals($now->format(ActiveRecord\Serialize\Serialization::$DATETIME_FORMAT), $a['created_at']);
     }
 
     public function testToJson()
@@ -200,7 +200,7 @@ class SerializationTest extends DatabaseTestCase
         $book = Book::find(1);
         $this->assertEquals('secondary_author_id,name',
             $book->to_csv(['only'=>['secondary_author_id', 'name'],
-                                'only_header'=>true])
+                'only_header'=>true])
         );
     }
 

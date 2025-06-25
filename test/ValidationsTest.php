@@ -22,7 +22,7 @@ class BookValidations extends ActiveRecord\Model
 
 class ValidationsTest extends DatabaseTestCase
 {
-    public function setUp(string $connection_name=null): void
+    public function setUp(?string $connection_name=null): void
     {
         parent::setUp($connection_name);
 

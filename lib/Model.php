@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The base class for your models.
  *
@@ -836,7 +837,7 @@ class Model
      * @param string          $name     Name of an attribute
      * @param DelegateOptions $delegate An array containing delegate data
      */
-    private function is_delegated(string $name, array $delegate): string|null
+    private function is_delegated(string $name, array $delegate): ?string
     {
         if (is_array($delegate)) {
             if (!empty($delegate['prefix'])) {
@@ -1403,7 +1404,7 @@ class Model
      *
      * @see Relation::__call()
      */
-    public static function __callStatic(string $method, mixed $args): static|null
+    public static function __callStatic(string $method, mixed $args): ?static
     {
         return static::Relation()->$method(...$args);
     }
@@ -1674,7 +1675,7 @@ class Model
      *
      * @return static|array<static>|null
      */
-    public static function take(int $limit = null): static|array|null
+    public static function take(?int $limit = null): static|array|null
     {
         return static::Relation()->take($limit);
     }
@@ -1684,7 +1685,7 @@ class Model
      *
      * @return static|array<static>|null
      */
-    public static function first(int $limit = null): static|array|null
+    public static function first(?int $limit = null): static|array|null
     {
         return static::Relation()->first($limit);
     }
@@ -1694,7 +1695,7 @@ class Model
      *
      * @return static|array<static>|null
      */
-    public static function last(int $limit = null): static|array|null
+    public static function last(?int $limit = null): static|array|null
     {
         return static::Relation()->last($limit);
     }

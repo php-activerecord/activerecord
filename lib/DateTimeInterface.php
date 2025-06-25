@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -29,5 +30,5 @@ interface DateTimeInterface
     /**
      * See http://php.net/manual/en/datetime.createfromformat.php
      */
-    public static function createFromFormat(string $format, string $time, \DateTimeZone $timezone = null): static;
+    public static function createFromFormat(string $format, string $time, ?\DateTimeZone $timezone = null): static;
 }

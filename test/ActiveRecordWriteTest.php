@@ -36,7 +36,7 @@ class AuthorExplicitSequence extends ActiveRecord\Model
 
 class ActiveRecordWriteTest extends DatabaseTestCase
 {
-    public function setUp(string $connection_name=null): void
+    public function setUp(?string $connection_name=null): void
     {
         parent::setUp($connection_name);
         static::resetTableData();
@@ -314,7 +314,7 @@ class ActiveRecordWriteTest extends DatabaseTestCase
     {
         $this->expectException(ActiveRecordException::class);
         Table::load(Author::class)->pk = [];
-        $author = author::first();
+        $author = Author::first();
         $author->delete();
     }
 

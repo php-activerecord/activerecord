@@ -15,20 +15,20 @@ class ActiveRecordNotTest extends \DatabaseTestCase
             ],
             'array' => [
                 [
-                  'name = ?', 'Another Book',
+                    'name = ?', 'Another Book',
                 ],
                 static fn ($book) => 'AnotherBook' != $book->name
             ],
             'hash' => [[
-                    'name' => 'Another Book',
-                ],
+                'name' => 'Another Book',
+            ],
                 static fn ($book) => 'AnotherBook' != $book->name
             ],
             'in' => [[
                 'book_id in (?)', [1, 2],
-              ],
-              static fn ($book) => 1 != $book->name && 2 != $book->name
-           ],
+            ],
+                static fn ($book) => 1 != $book->name && 2 != $book->name
+            ],
         ];
     }
 

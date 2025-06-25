@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is not something we need to execute in tests. It's included
  * only as a means to confirm that Relation methods are set up with generics
@@ -11,12 +12,12 @@ class RelationToModel
 {
     protected Book $book;
 
-    public function bookFromFirst(): Book|null
+    public function bookFromFirst(): ?Book
     {
         return Book::all()->first();
     }
 
-    public function bookFromLast(): Book|null
+    public function bookFromLast(): ?Book
     {
         return Book::all()->last();
     }
@@ -45,7 +46,7 @@ class RelationToModel
         return Book::all()->to_a();
     }
 
-    public function bookFromTake(): Book|null
+    public function bookFromTake(): ?Book
     {
         return Book::all()->take();
     }

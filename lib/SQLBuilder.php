@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -200,7 +201,7 @@ class SQLBuilder
      *
      * @return $this
      */
-    public function insert(array $hash, mixed $pk = null, string $sequence_name = null): static
+    public function insert(array $hash, mixed $pk = null, ?string $sequence_name = null): static
     {
         if (!is_hash($hash)) {
             throw new ActiveRecordException('Inserting requires a hash.');

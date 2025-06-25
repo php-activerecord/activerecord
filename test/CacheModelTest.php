@@ -67,7 +67,7 @@ class CacheModelTest extends DatabaseTestCase
     public function testModelCacheNew()
     {
         $publisher = new Publisher([
-           'name'=>'HarperCollins'
+            'name'=>'HarperCollins'
         ]);
         $publisher->save();
 

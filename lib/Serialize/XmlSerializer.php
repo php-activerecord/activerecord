@@ -57,7 +57,7 @@ class XmlSerializer extends Serialization
     /**
      * @param array<string,mixed> $data
      */
-    private function write(array $data, string $tag = null): void
+    private function write(array $data, ?string $tag = null): void
     {
         foreach ($data as $attr => $value) {
             $attr = $tag ?? $attr;

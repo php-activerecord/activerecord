@@ -51,9 +51,9 @@ ActiveRecord\Config::initialize(function ($cfg) {
 
     if (class_exists('Monolog\Logger')) { // Monolog installed
         $log = new Monolog\Logger('arlog');
-        $log->pushHandler(new \Monolog\Handler\StreamHandler(
+        $log->pushHandler(new Monolog\Handler\StreamHandler(
             dirname(__FILE__) . '/../log/query.log',
-            \Monolog\Level::Warning)
+            Monolog\Level::Warning)
         );
 
         $cfg->set_logging(true);

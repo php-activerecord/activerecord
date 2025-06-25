@@ -50,7 +50,7 @@ abstract class Connection
     /**
      * Contains a Logger object that must implement a log() method.
      */
-    private LoggerInterface|null $logger;
+    private ?LoggerInterface $logger;
     /**
      * The name of the protocol that is used.
      */
@@ -105,7 +105,7 @@ abstract class Connection
      *
      * @see parse_connection_url
      */
-    public static function instance(string $connection_string_or_connection_name = null)
+    public static function instance(?string $connection_string_or_connection_name = null)
     {
         $config = Config::instance();
 

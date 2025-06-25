@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface
  *
@@ -147,7 +148,7 @@ class Relation implements \Iterator
      *
      * @return Model|null The first model that meets the find by criteria, or null if no row meets that criteria
      */
-    public function __call(string $method, mixed $args): Model|null
+    public function __call(string $method, mixed $args): ?Model
     {
         $create = false;
 
@@ -778,7 +779,7 @@ class Relation implements \Iterator
      *
      * @return TModel|array<TModel>|null
      */
-    public function take(int $limit = null): Model|array|null
+    public function take(?int $limit = null): Model|array|null
     {
         $options = array_merge($this->options, ['limit' => $limit ?? 1]);
         $models = $this->_to_a($options);
@@ -798,7 +799,7 @@ class Relation implements \Iterator
      *
      * @return TModel|array<TModel>|null
      */
-    public function first(int $limit = null): Model|array|null
+    public function first(?int $limit = null): Model|array|null
     {
         $models = $this->firstOrLast($limit, true);
 
@@ -819,7 +820,7 @@ class Relation implements \Iterator
      *
      * @return TModel|array<TModel>|null
      */
-    public function last(int $limit = null): Model|array|null
+    public function last(?int $limit = null): Model|array|null
     {
         $models = $this->firstOrLast($limit, false);
 
@@ -849,7 +850,7 @@ class Relation implements \Iterator
     /**
      * @return array<TModel>
      */
-    private function firstOrLast(int $limit = null, bool $isAscending): array
+    private function firstOrLast(?int $limit = null, bool $isAscending): array
     {
         $options = array_merge($this->options, ['limit' => $limit ?? 1]);
 
@@ -1083,7 +1084,7 @@ class Relation implements \Iterator
      *   'name' => 'Oscar'      // WHERE "users"."name" = 'Oscar'
      * ])->to_sql()
      *
-     * @throws Exception\ActiveRecordException
+     * @throws ActiveRecordException
      * @throws Exception\RelationshipException
      */
     public function to_sql(): string

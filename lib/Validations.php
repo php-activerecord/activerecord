@@ -1,4 +1,5 @@
 <?php
+
 /**
  * These two classes have been <i>heavily borrowed</i> from Ruby on Rails' ActiveRecord so much that
  * this piece can be considered a straight port. The reason for this is that the vaildation process is

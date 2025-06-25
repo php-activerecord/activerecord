@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -28,7 +29,7 @@ class ConnectionManager extends Singleton
      *
      * @return Connection
      */
-    public static function get_connection(string $name=null)
+    public static function get_connection(?string $name=null)
     {
         $config = Config::instance();
         $name = $name ?? $config->get_default_connection();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -66,7 +67,7 @@ class Column
     /**
      * The maximum length of this column.
      */
-    public int|null $length = null;
+    public ?int $length = null;
 
     /**
      * True if this column allows null.

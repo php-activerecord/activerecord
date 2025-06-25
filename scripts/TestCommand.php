@@ -47,7 +47,7 @@ class TestCommand
         }
     }
 
-    private static function buildArgs(string|null $fileName, string|null $filter): array
+    private static function buildArgs(?string $fileName, ?string $filter): array
     {
         $args = ['vendor/bin/phpunit'];
 

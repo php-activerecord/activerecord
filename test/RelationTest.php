@@ -179,7 +179,7 @@ class RelationTest extends DatabaseTestCase
     {
         $this->assert_sql_includes(
             'SELECT * FROM `books` WHERE name = ? ORDER BY name',
-            \test\models\Book::where('name = ?', 'The Art of Main Tanking')
+            test\models\Book::where('name = ?', 'The Art of Main Tanking')
                 ->order('name')->to_sql()
         );
     }

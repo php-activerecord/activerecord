@@ -158,7 +158,7 @@ class DateTimeTest extends TestCase
 
     public function testCreateFromFormatWithTz()
     {
-        $d = DateTime::createFromFormat('Y-m-d H:i:s', '2000-02-01 03:04:05', new \DateTimeZone('Etc/GMT-10'));
+        $d = DateTime::createFromFormat('Y-m-d H:i:s', '2000-02-01 03:04:05', new DateTimeZone('Etc/GMT-10'));
         $d2 = new DateTime('2000-01-31 17:04:05');
 
         $this->assertEquals($d2->getTimestamp(), $d->getTimestamp());
@@ -166,7 +166,7 @@ class DateTimeTest extends TestCase
 
     public function testNativeDateTimeAttributeCopiesExactTz()
     {
-        $dt = new \DateTime('', new \DateTimeZone('America/New_York'));
+        $dt = new \DateTime('', new DateTimeZone('America/New_York'));
         $model = $this->get_model();
 
         // Test that the data transforms without modification
@@ -180,7 +180,7 @@ class DateTimeTest extends TestCase
 
     public function testArDateTimeAttributeCopiesExactTz()
     {
-        $dt = new DateTime('', new \DateTimeZone('America/New_York'));
+        $dt = new DateTime('', new DateTimeZone('America/New_York'));
         $model = $this->get_model();
 
         // Test that the data transforms without modification

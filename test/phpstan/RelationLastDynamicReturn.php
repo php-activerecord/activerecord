@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is not something we need to execute in tests. It's included
  * only as a means to test and aid in the development of dynamic PHPStan

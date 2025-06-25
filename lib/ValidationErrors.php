@@ -11,7 +11,7 @@ namespace ActiveRecord;
  */
 class ValidationErrors implements \IteratorAggregate
 {
-    private Model|null $model;
+    private ?Model $model;
 
     /**
      * @var array<string, array<string>>
@@ -170,7 +170,7 @@ class ValidationErrors implements \IteratorAggregate
      *
      * @return array<string, array<string>>
      */
-    public function to_array(callable $closure = null): array
+    public function to_array(?callable $closure = null): array
     {
         $errors = [];
 

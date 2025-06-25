@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -78,7 +79,7 @@ class WhereClause
      * @throws DatabaseException
      */
     public function to_s(Connection $connection, string $prependTableName = '', array $mappedNames = [],
-        bool $substitute=false, string $glue=' AND ', array $values=null): string
+        bool $substitute=false, string $glue=' AND ', ?array $values=null): string
     {
         $values = $values ?? $this->values;
         $expression = $this->expression;

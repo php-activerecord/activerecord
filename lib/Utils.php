@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -187,7 +188,7 @@ class Utils
         return (bool) ((int) $number & 1);
     }
 
-    public static function is_blank(string|null $var): bool
+    public static function is_blank(?string $var): bool
     {
         return 0 === strlen($var ?? '');
     }

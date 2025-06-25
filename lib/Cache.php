@@ -83,7 +83,7 @@ class Cache
      *
      * @param int $expire in seconds
      */
-    public static function get(string $key, \Closure $closure, int $expire = null): mixed
+    public static function get(string $key, \Closure $closure, ?int $expire = null): mixed
     {
         if (!static::$adapter) {
             return $closure();
@@ -98,7 +98,7 @@ class Cache
         return $value;
     }
 
-    public static function set(string $key, mixed $var, int $expire = null): void
+    public static function set(string $key, mixed $var, ?int $expire = null): void
     {
         assert(isset(static::$adapter), 'Adapter required to set');
 

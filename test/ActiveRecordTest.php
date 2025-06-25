@@ -121,14 +121,14 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function testNamespaceGetsStrippedFromTableName()
     {
-        new \test\models\namespacetest\Book();
-        $this->assertEquals('books', Table::load(\test\models\namespacetest\Book::class)->table);
+        new test\models\namespacetest\Book();
+        $this->assertEquals('books', Table::load(test\models\namespacetest\Book::class)->table);
     }
 
     public function testNamespaceGetsStrippedFromInferredForeignKey()
     {
-        $model = new \test\models\namespacetest\Book();
-        $table = ActiveRecord\Table::load(get_class($model));
+        $model = new test\models\namespacetest\Book();
+        $table = Table::load(get_class($model));
 
         $this->assertEquals($table->get_relationship('parent_book')->foreign_key[0], 'book_id');
         $this->assertEquals($table->get_relationship('parent_book_2')->foreign_key[0], 'book_id');
@@ -137,8 +137,8 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function testNamespacedRelationshipAssociatesCorrectly()
     {
-        $model = new \test\models\namespacetest\Book();
-        $table = ActiveRecord\Table::load(get_class($model));
+        $model = new test\models\namespacetest\Book();
+        $table = Table::load(get_class($model));
 
         $this->assertNotNull($table->get_relationship('parent_book'));
         $this->assertNotNull($table->get_relationship('parent_book_2'));
@@ -266,7 +266,7 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function testCastWhenLoading()
     {
-        $book = \test\models\Book::find(1);
+        $book = Book::find(1);
         $this->assertSame(1, $book->book_id);
         $this->assertSame('Ancient Art of Main Tanking', $book->name);
     }
@@ -400,10 +400,10 @@ class ActiveRecordTest extends DatabaseTestCase
 
     public function testClearCacheForSpecificClass()
     {
-        $book_table1 = ActiveRecord\Table::load(Book::class);
-        $book_table2 = ActiveRecord\Table::load(Book::class);
-        ActiveRecord\Table::clear_cache('Book');
-        $book_table3 = ActiveRecord\Table::load(Book::class);
+        $book_table1 = Table::load(Book::class);
+        $book_table2 = Table::load(Book::class);
+        Table::clear_cache('Book');
+        $book_table3 = Table::load(Book::class);
 
         $this->assertTrue($book_table1 === $book_table2);
         $this->assertTrue($book_table1 !== $book_table3);
@@ -437,7 +437,7 @@ class ActiveRecordTest extends DatabaseTestCase
     public function testAssigningPhpDatetimeGetsConvertedToDateClassWithDefaults()
     {
         $author = new Author();
-        $author->created_at = $now = new \DateTime();
+        $author->created_at = $now = new DateTime();
         $this->assertInstanceOf('ActiveRecord\\DateTime', $author->created_at);
         $this->assertEquals($now->format(DateTime::ATOM), $author->created_at->format(DateTime::ATOM));
     }
@@ -446,14 +446,14 @@ class ActiveRecordTest extends DatabaseTestCase
     {
         ActiveRecord\Config::instance()->set_date_class('\\DateTime'); // use PHP built-in DateTime
         $author = new Author();
-        $author->created_at = $now = new \DateTime();
+        $author->created_at = $now = new DateTime();
         $this->assertInstanceOf('DateTime', $author->created_at);
         $this->assertEquals($now->format(DateTime::ATOM), $author->created_at->format(DateTime::ATOM));
     }
 
     public function testAssigningFromMassAssignmentPhpDatetimeGetsConvertedToArDatetime()
     {
-        $author = new Author(['created_at' => new \DateTime()]);
+        $author = new Author(['created_at' => new DateTime()]);
         $this->assertInstanceOf('ActiveRecord\\DateTime', $author->created_at);
     }
 

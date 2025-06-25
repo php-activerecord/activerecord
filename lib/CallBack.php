@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -163,7 +164,7 @@ class CallBack
      *               that was for a before_* callback and that method returned false. If this happens, execution
      *               of any other callbacks after the offending callback will not occur.
      */
-    public function invoke(Model|null $model, string $name, bool $must_exist = true)
+    public function invoke(?Model $model, string $name, bool $must_exist = true)
     {
         if ($must_exist && !array_key_exists($name, $this->registry)) {
             throw new ActiveRecordException("No callbacks were defined for: $name on " . ($model ? get_class($model) : 'null'));
@@ -214,7 +215,7 @@ class CallBack
      *
      * @throws ActiveRecordException if invalid callback type or callback method was not found
      */
-    public function register(string $name, \Closure|string $closure_or_method_name = null, array $options = []): void
+    public function register(string $name, \Closure|string|null $closure_or_method_name = null, array $options = []): void
     {
         $closure_or_method_name ??= $name;
 

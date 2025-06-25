@@ -31,7 +31,7 @@ class PgsqlAdapterTest extends AdapterTestCase
     {
         $this->assert_sql_includes(
             'SELECT * FROM authors WHERE "mixedCaseField" = ? ORDER BY name',
-            \test\models\Author::where('mixedCaseField = ?', 'The Art of Main Tanking')
+            Author::where('mixedCaseField = ?', 'The Art of Main Tanking')
                 ->order('name')->to_sql()
         );
     }

@@ -2,7 +2,6 @@
 
 namespace test;
 
-use ActiveRecord;
 use ActiveRecord\Table;
 use test\models\Author;
 use test\models\Venue;
@@ -13,7 +12,7 @@ class ActiveRecordGroupTest extends \DatabaseTestCase
     {
         $venues = Venue::select('state')->group('state')->to_a();
         $this->assertTrue(count($venues) > 0);
-        $this->assert_sql_includes('GROUP BY state', ActiveRecord\Table::load(Venue::class)->last_sql);
+        $this->assert_sql_includes('GROUP BY state', Table::load(Venue::class)->last_sql);
     }
 
     public function testWithArray(): void
@@ -21,7 +20,7 @@ class ActiveRecordGroupTest extends \DatabaseTestCase
         $venues = Venue::select(['city', 'state'])->group(['city', 'state'])->to_a();
         $this->assertTrue(count($venues) > 0);
 
-        $this->assert_sql_includes('GROUP BY city, state', ActiveRecord\Table::load(Venue::class)->last_sql);
+        $this->assert_sql_includes('GROUP BY city, state', Table::load(Venue::class)->last_sql);
     }
 
     public function testWithList(): void
@@ -29,7 +28,7 @@ class ActiveRecordGroupTest extends \DatabaseTestCase
         $venues = Venue::select('city', 'state')->group('city', 'state')->to_a();
         $this->assertTrue(count($venues) > 0);
 
-        $this->assert_sql_includes('GROUP BY city, state', ActiveRecord\Table::load(Venue::class)->last_sql);
+        $this->assert_sql_includes('GROUP BY city, state', Table::load(Venue::class)->last_sql);
     }
 
     public function testGroupWithOrderAndLimitAndHaving(): void
@@ -42,7 +41,7 @@ class ActiveRecordGroupTest extends \DatabaseTestCase
 
         $venues = $relation->to_a();
         $this->assertTrue(count($venues) > 0);
-        $this->assert_sql_includes('SELECT state FROM venues GROUP BY state HAVING length(state) = 2 ORDER BY state', ActiveRecord\Table::load(Venue::class)->last_sql);
+        $this->assert_sql_includes('SELECT state FROM venues GROUP BY state HAVING length(state) = 2 ORDER BY state', Table::load(Venue::class)->last_sql);
     }
 
     public function testHaving(): void

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
@@ -102,7 +103,7 @@ class Table
         return self::$cache[$model_class_name];
     }
 
-    public static function clear_cache(string $model_class_name = null): void
+    public static function clear_cache(?string $model_class_name = null): void
     {
         if ($model_class_name && array_key_exists($model_class_name, self::$cache)) {
             unset(self::$cache[$model_class_name]);
@@ -351,7 +352,7 @@ class Table
         }
     }
 
-    public function get_column_by_inflected_name(string $inflected_name): Column|null
+    public function get_column_by_inflected_name(string $inflected_name): ?Column
     {
         foreach ($this->columns as $raw_name => $column) {
             if ($column->inflected_name == $inflected_name) {
@@ -408,7 +409,7 @@ class Table
      *
      * @throws Exception\ActiveRecordException
      */
-    public function insert(array &$data, string|int $pk = null, string $sequence_name = null): \PDOStatement
+    public function insert(array &$data, string|int|null $pk = null, ?string $sequence_name = null): \PDOStatement
     {
         $data = $this->process_data($data);
 

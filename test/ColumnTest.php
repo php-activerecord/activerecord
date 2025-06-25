@@ -130,7 +130,7 @@ class ColumnTest extends DatabaseTestCase
 
     public function testNativeDateTimeAttributeCopiesExactTz()
     {
-        $dt = new \DateTime('', new \DateTimeZone('America/New_York'));
+        $dt = new \DateTime('', new DateTimeZone('America/New_York'));
 
         $column = new Column();
         $column->type = Column::DATETIME;
@@ -144,7 +144,7 @@ class ColumnTest extends DatabaseTestCase
 
     public function testArDateTimeAttributeCopiesExactTz()
     {
-        $dt = new DateTime('', new \DateTimeZone('America/New_York'));
+        $dt = new DateTime('', new DateTimeZone('America/New_York'));
 
         $column = new Column();
         $column->type = Column::DATETIME;
