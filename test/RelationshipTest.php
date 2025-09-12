@@ -20,7 +20,9 @@ use test\models\JoinBook;
 use test\models\Position;
 use test\models\Property;
 use test\models\Student;
+use test\models\Task;
 use test\models\Venue;
+use test\models\Worker;
 
 class NotModel
 {
@@ -306,6 +308,42 @@ class RelationshipTest extends DatabaseTestCase
         $this->expectException(Exception::class);
         $hasAndBelongsToMany = new HasAndBelongsToMany(Book::class);
         $hasAndBelongsToMany->load_eagerly([], [], [], Table::load(Book::class));
+    }
+
+    public function testHasAndBelongsToManyPrimaryKeyIsSameAsForeignKey()
+    {
+        $student = Student::find(1);
+        $courses = $student->courses;
+
+        $this->assertEquals(2, count($courses));
+        $this->assert_sql_includes('INNER JOIN courses_students ON (courses.course_id = courses_students.course_id) INNER JOIN students ON students.student_id = courses_students.student_id', Table::load(Course::class)->last_sql);
+    }
+
+    public function testHasAndBelongsToManyPrimaryKeyIsSameAsForeignKeyReverse()
+    {
+        $course = Course::find(1);
+        $students = $course->students;
+
+        $this->assertEquals(2, count($students));
+        $this->assert_sql_includes('INNER JOIN courses_students ON (students.student_id = courses_students.student_id) INNER JOIN courses ON courses.course_id = courses_students.course_id', Table::load(Student::class)->last_sql);
+    }
+
+    public function testHasAndBelongsToManyPrimaryKeyIsDifferentThanForeignKey()
+    {
+        $worker = Worker::find(1);
+        $tasks = $worker->tasks;
+
+        $this->assertEquals(1, count($tasks));
+        $this->assert_sql_includes('INNER JOIN tasks_workers ON (tasks.id = tasks_workers.task_id) INNER JOIN workers ON workers.id = tasks_workers.worker_id', Table::load(Task::class)->last_sql);
+    }
+
+    public function testHasAndBelongsToManyPrimaryKeyIsDifferentThanForeignKeyReverse()
+    {
+        $task = Task::find(1);
+        $workers = $task->workers;
+
+        $this->assertEquals(1, count($workers));
+        $this->assert_sql_includes('INNER JOIN tasks_workers ON (workers.id = tasks_workers.worker_id) INNER JOIN tasks ON tasks.id = tasks_workers.task_id', Table::load(Worker::class)->last_sql);
     }
 
     public function testBelongsToCreateAssociation()

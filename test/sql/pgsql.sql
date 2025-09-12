@@ -132,5 +132,19 @@ CREATE TABLE courses_students(
   PRIMARY KEY(course_id, student_id)
 );
 
+CREATE TABLE tasks (
+	id serial primary key
+);
+
+CREATE TABLE workers (
+	id serial primary key
+);
+
+CREATE TABLE tasks_workers (
+	id serial primary key,
+	worker_id int not null,
+	task_id int not null
+);
+
 -- reproduces issue GH-96 for testing
 CREATE INDEX user_newsletters_id_and_user_id_idx ON user_newsletters USING btree(id, user_id);

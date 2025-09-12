@@ -131,3 +131,17 @@ CREATE TABLE courses_students(
      student_id int not null,
      PRIMARY KEY(course_id, student_id)
 );
+
+CREATE TABLE tasks (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+);
+
+CREATE TABLE workers (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+);
+
+CREATE TABLE tasks_workers (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  worker_id INTEGER NOT NULL,
+  task_id INTEGER NOT NULL
+);

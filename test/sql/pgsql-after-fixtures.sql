@@ -15,3 +15,6 @@ SELECT setval('users_id_seq', max(id)) FROM users;
 SELECT setval('newsletters_id_seq', max(id)) FROM newsletters;
 SELECT setval('user_newsletters_id_seq', max(id)) FROM user_newsletters;
 SELECT setval('valuestore_id_seq', max(id)) FROM valuestore;
+SELECT setval('tasks_id_seq', max(id)) FROM tasks;
+SELECT setval('workers_id_seq', max(id)) FROM workers;
+SELECT setval('tasks_workers_id_seq', max(id)) FROM tasks_workers;

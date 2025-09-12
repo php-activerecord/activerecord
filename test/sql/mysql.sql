@@ -132,3 +132,17 @@ CREATE TABLE courses_students(
   `student_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY(course_id, student_id)
 );
+
+CREATE TABLE tasks (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE workers (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE tasks_workers (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  worker_id INT NOT NULL,
+  task_id INT NOT NULL
+);
