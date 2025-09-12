@@ -569,7 +569,7 @@ class Table
 
                     case 'has_and_belongs_to_many':
                         $definition['join_table'] ??= HasAndBelongsToMany::inferJoiningTableName($this->table, $attribute);
-                        $definition['foreign_key'] ??= $this->pk[0];
+                        $definition['foreign_key'] ??= Inflector::keyify(Utils::singularize($this->table));
                         $relationship = new HasAndBelongsToMany($attribute, $definition);
                         break;
                 }

@@ -47,9 +47,11 @@ class HasAndBelongsToMany extends AbstractRelationship
          */
         $rel = new Relation($this->class_name, [], []);
         $rel->from($this->attribute_name);
-        $other_table = Table::load(get_class($model))->table;
-        $rel->where($other_table . '. ' . $this->options['foreign_key'] . ' = ?', $model->{$model->get_primary_key()});
-        $rel->joins([$other_table]);
+        $other_table = Table::load(get_class($model));
+        $other_table_name = $other_table->table;
+        $other_table_primary_key = $other_table->pk[0];
+        $rel->where($other_table_name . '.' . $other_table_primary_key . ' = ?', $model->{$model->get_primary_key()});
+        $rel->joins([$other_table_name]);
 
         return $rel->to_a();
     }
@@ -70,8 +72,12 @@ class HasAndBelongsToMany extends AbstractRelationship
         $foreign_key = $this->options['foreign_key'];
         $join_primary_key = $this->options['association_foreign_key'];
         $linkingTableName = $this->options['join_table'];
-        $res = 'INNER JOIN ' . $linkingTableName . " ON ($from_table_name.$foreign_key = " . $linkingTableName . ".$foreign_key) "
-            . 'INNER JOIN ' . $associated_table_name . ' ON ' . $associated_table_name . '.' . $join_primary_key . ' = ' . $linkingTableName . '.' . $join_primary_key;
+
+        $from_table_primary_key = $from_table->pk[0];
+        $associated_table_primary_key = $other_table->pk[0];
+
+        $res = 'INNER JOIN ' . $linkingTableName . " ON ($from_table_name.$from_table_primary_key = " . $linkingTableName . ".$foreign_key) "
+            . 'INNER JOIN ' . $associated_table_name . ' ON ' . $associated_table_name . '.' . $associated_table_primary_key . ' = ' . $linkingTableName . '.' . $join_primary_key;
 
         return $res;
     }
