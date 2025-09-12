@@ -342,7 +342,7 @@ class Model
      * Constructs a model.
      *
      * When a user instantiates a new object (e.g.: it was not ActiveRecord that instantiated via a find)
-     * then @var $attributes will be mapped according to the schema's defaults. Otherwise, the given
+     * then @var will $attributes be mapped according to the schema's defaults. Otherwise, the given
      * $attributes will be mapped via set_attributes_via_mass_assignment.
      *
      * ```
