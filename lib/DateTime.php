@@ -201,7 +201,7 @@ final class DateTime extends \DateTime implements DateTimeInterface
         return parent::setTimezone($timezone);
     }
 
-    public function modify(string $modify = ''): DateTime|false
+    public function modify(string $modify = ''): self
     {
         $this->flag_dirty();
 
